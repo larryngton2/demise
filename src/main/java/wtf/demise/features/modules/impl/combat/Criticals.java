@@ -6,13 +6,15 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.ModuleCategory;
+import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MovementUtils;
-
 import java.util.Objects;
 
+@ModuleInfo(name = "Criticals", category = ModuleCategory.Combat)
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Jump", "NoGround", "Visual", "NCP", "Timer"}, "Jump", this);
     private boolean attacked;

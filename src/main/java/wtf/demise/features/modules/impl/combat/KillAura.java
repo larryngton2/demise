@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.combat;
 
 import wtf.demise.events.impl.render.Render3DEvent;
+import wtf.demise.events.impl.render.RenderGuiEvent;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.features.modules.ModuleCategory;
@@ -40,10 +41,12 @@ public class KillAura extends Module {
     // attack
     private final SliderValue attackDelayMin = new SliderValue("Attack delay (min)", 25, 25, 1000, 25, this);
     private final SliderValue attackDelayMax = new SliderValue("Attack delay (max)", 25, 25, 1000, 25, this);
-    private final BoolValue failSwing = new BoolValue("Fail swing", false, this);
+    private final BoolValue rayCast = new BoolValue("RayCast", false, this);
+    private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
 
     // autoBlock
-    private final ModeValue autoBlock = new ModeValue("AutoBlock", new String[]{"None", "Fake", "Vanilla", "Release", "AAC", "VanillaForce", "Smart", "Blink", "Fast Blink"}, "Vanilla", this);
+    private final ModeValue autoBlock = new ModeValue("AutoBlock", new String[]{"None", "Fake", "Vanilla", "Release", "AAC", "VanillaForce", "Smart", "Blink"}, "Vanilla", this);
+    private final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> !Objects.equals(autoBlock.get(), "None") && rayCast.get());
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Normal", "None"}, "Silent", this);
@@ -64,6 +67,7 @@ public class KillAura extends Module {
     private final SliderValue pauseRange = new SliderValue("Pause range", 0.5f, 0, 6, 0.1f, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
     private final BoolValue delayed = new BoolValue("Delayed", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue delayedTicks = new SliderValue("Ticks", 2, 0, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
+
     // offset
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "SinCos"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue chance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
@@ -146,7 +150,7 @@ public class KillAura extends Module {
             }
         }
 
-        targets.removeIf(target -> mc.thePlayer.getDistanceToEntity(target) > searchRange.get() + 0.4);
+        targets.removeIf(target -> mc.thePlayer.getDistanceToEntity(target) > searchRange.get() + 0.4 || target.isDead);
 
         if (currentTarget != null) {
             if (Objects.equals(rotationMode.get(), "Silent") && mc.thePlayer.getDistanceToEntity(currentTarget) <= searchRange.get() + 0.4) {
@@ -165,59 +169,8 @@ public class KillAura extends Module {
                 }
             }
 
-            if (mc.thePlayer.getDistanceToEntity(currentTarget) <= attackRange.get() + 0.4) {
-                if (System.currentTimeMillis() - lastTargetTime >= MathUtils.randomizeInt((int) attackDelayMin.get(), (int) attackDelayMax.get())) {
-                    lastTargetTime = System.currentTimeMillis();
+            attack();
 
-                    MovingObjectPosition movingObjectPosition = RayCastUtil.rayCast(new Vector2f(RotationUtils.currentRotation[0], RotationUtils.currentRotation[1]), attackRange.get() + 0.85 /* tested on grim, works fine */, -0.1f);
-                    if (movingObjectPosition == null || movingObjectPosition.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
-                        if (failSwing.get()) {
-                            AttackOrder.sendConditionalSwing(movingObjectPosition);
-                        }
-
-                        if (isBlocking) {
-                            blocking(false);
-                        }
-                    } else {
-                        switch (autoBlock.get()) {
-                            case "None":
-                                if (isBlocking) {
-                                    blocking(false);
-                                }
-                                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
-                                break;
-                            case "Fake":
-                                isBlocking = true;
-                                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
-                                break;
-                            case "Vanilla":
-                                blocking(true);
-                                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
-                                break;
-                            case "Release":
-                                releaseAb((EntityLivingBase) currentTarget);
-                                break;
-                            case "AAC":
-                                AACAb(currentTarget);
-                                break;
-                            case "VanillaForce":
-                                vanillaReblockAb(currentTarget);
-                                break;
-                            case "Smart":
-                                smartAb((EntityLivingBase) currentTarget);
-                                break;
-                            case "Blink":
-                                blinkAb(currentTarget);
-                                break;
-                            case "Fast Blink":
-                                //handled on render tick
-                                break;
-                        }
-                    }
-                }
-            } else if (isBlocking) {
-                blocking(false);
-            }
         } else if (isBlocking) {
             blocking(false);
         }
@@ -290,10 +243,6 @@ public class KillAura extends Module {
         }
 
         if (currentTarget != null) {
-            if (mc.thePlayer.getDistanceToEntity(currentTarget) <= attackRange.get() + 0.4 && Objects.equals(autoBlock.get(), "Fast Blink")) {
-                blinkAb(currentTarget);
-            }
-
             if (positionOnPlayer != null && lastPositionOnPlayer != null && targetOnPlayer.get()) {
                 Vec3 interpolatedPosition = new Vec3(
                         (positionOnPlayer.xCoord - lastPositionOnPlayer.xCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.xCoord,
@@ -301,6 +250,61 @@ public class KillAura extends Module {
                         (positionOnPlayer.zCoord - lastPositionOnPlayer.zCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.zCoord);
                 RenderUtils.renderBreadCrumb(interpolatedPosition, dotScale.get());
             }
+        }
+    }
+
+    private void attack() {
+        if (mc.thePlayer.getDistanceToEntity(currentTarget) <= attackRange.get() + 0.4) {
+            if (System.currentTimeMillis() - lastTargetTime >= MathUtils.randomizeInt((int) attackDelayMin.get(), (int) attackDelayMax.get())) {
+                lastTargetTime = System.currentTimeMillis();
+
+                MovingObjectPosition movingObjectPosition = RayCastUtil.rayCast(new Vector2f(RotationUtils.currentRotation[0], RotationUtils.currentRotation[1]), attackRange.get() + 0.85 /* tested on grim, works fine */, -0.1f);
+                if (rayCast.get() && movingObjectPosition == null || movingObjectPosition.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
+                    if (failSwing.get() && failSwing.canDisplay()) {
+                        AttackOrder.sendConditionalSwing(movingObjectPosition);
+                    }
+
+                    if (isBlocking && unBlockOnRayCastFail.get()) {
+                        blocking(false);
+                    }
+                }
+
+                if ((rayCast.get() && movingObjectPosition != null && movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) || !rayCast.get()) {
+                    switch (autoBlock.get()) {
+                        case "None":
+                            if (isBlocking) {
+                                blocking(false);
+                            }
+                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                            break;
+                        case "Fake":
+                            isBlocking = true;
+                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                            break;
+                        case "Vanilla":
+                            blocking(true);
+                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                            break;
+                        case "Release":
+                            releaseAb((EntityLivingBase) currentTarget);
+                            break;
+                        case "AAC":
+                            AACAb(currentTarget);
+                            break;
+                        case "VanillaForce":
+                            vanillaReblockAb(currentTarget);
+                            break;
+                        case "Smart":
+                            smartAb((EntityLivingBase) currentTarget);
+                            break;
+                        case "Blink":
+                            blinkAb(currentTarget);
+                            break;
+                    }
+                }
+            }
+        } else if (isBlocking) {
+            blocking(false);
         }
     }
 
