@@ -1,11 +1,11 @@
 package wtf.demise.features.modules.impl.combat;
 
-import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.features.modules.ModuleCategory;
 import de.florianmichael.viamcp.fixes.AttackOrder;
+import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -25,11 +25,10 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.entity.Entity;
 import wtf.demise.utils.player.*;
 import net.minecraft.util.*;
-import java.util.ArrayList;
+
+import java.util.*;
+
 import wtf.demise.Demise;
-import java.util.Objects;
-import java.util.Random;
-import java.util.List;
 
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
@@ -48,21 +47,23 @@ public class KillAura extends Module {
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Normal", "None"}, "Silent", this);
-    private final ModeValue aimMode = new ModeValue("Aim Position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight"}, "Nearest", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue aimMode = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight"}, "Nearest", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "LerpLimit"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue smoothReset = new BoolValue("Smooth reset", false, this);
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue rangeToLimit = new SliderValue("Range to limit (<)", 1.5f, 0, 8, 0.1f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
     private final SliderValue limitYawSpeedMin = new SliderValue("Yaw limit speed (min)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
     private final SliderValue limitYawSpeedMax = new SliderValue("Yaw limit speed (max)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
     private final SliderValue limitPitchSpeedMin = new SliderValue("Pitch limit speed (min)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
     private final SliderValue limitPitchSpeedMax = new SliderValue("Pitch limit speed (max)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
-    private final BoolValue movementFix = new BoolValue("MovementFix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final BoolValue pauseRotation = new BoolValue("Pause Rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue pauseRange = new SliderValue("Pause Range", 0.5f, 0, 6, 0.1f, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
-
+    private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue pauseRange = new SliderValue("Pause range", 0.5f, 0, 6, 0.1f, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
+    private final BoolValue delayed = new BoolValue("Delayed", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue delayedTicks = new SliderValue("Ticks", 2, 0, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
     // offset
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "SinCos"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue chance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
@@ -70,11 +71,11 @@ public class KillAura extends Module {
     private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
-    public final SliderValue frequency = new SliderValue("SpeedSinCos", 1.5f, 0f, 5.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    public final SliderValue yStrengthAimPattern = new SliderValue("YStrengthAmplitudeSinCos", 3.5f, 0f, 15.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    public final SliderValue xStrengthAimPattern = new SliderValue("XStrengthAmplitudeSinCos", 3.5f, 0f, 15.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    public final SliderValue yawStrengthAddon = new SliderValue("Yaw Strength Randomize", 5f, 1, 35f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    public final SliderValue pitchStrengthAddon = new SliderValue("Pitch Strength Randomize", 5f, 1, 35f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
+    private final SliderValue frequency = new SliderValue("SpeedSinCos", 1.5f, 0f, 5.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
+    private final SliderValue yStrengthAimPattern = new SliderValue("YStrengthAmplitudeSinCos", 3.5f, 0f, 15.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
+    private final SliderValue xStrengthAimPattern = new SliderValue("XStrengthAmplitudeSinCos", 3.5f, 0f, 15.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
+    private final SliderValue yawStrengthAddon = new SliderValue("Yaw Strength Randomize", 5f, 1, 35f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
+    private final SliderValue pitchStrengthAddon = new SliderValue("Pitch Strength Randomize", 5f, 1, 35f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
 
     //target
     private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health"}, "Distance", this);
@@ -83,9 +84,11 @@ public class KillAura extends Module {
     private final SliderValue targetSwitchDelay = new SliderValue("Target Switch Delay (ms)", 500, 50, 1000, 50, this, targetSwitch::get);
 
     // misc
-    private final BoolValue botCheck = new BoolValue("Bot Check", false, this);
     private final BoolValue targetOnPlayer = new BoolValue("Target on player", false, this);
+    private final SliderValue dotScale = new SliderValue("Target scale", 0.04f, 0.01f, 1, 0.01f, this, targetOnPlayer::get);
+    private final BoolValue botCheck = new BoolValue("Bot Check", false, this);
 
+    private final Queue<Vec3> positionHistory = new LinkedList<>();
     public List<EntityLivingBase> targets = new ArrayList<>();
     private Vec3 positionOnPlayer, lastPositionOnPlayer;
     public static Entity currentTarget = null;
@@ -114,7 +117,7 @@ public class KillAura extends Module {
     }
 
     @EventTarget
-    public void udpate(UpdateEvent e) {
+    public void onUpdate(UpdateEvent e) {
         if (mc.thePlayer == null || mc.theWorld == null) {
             return;
         }
@@ -137,13 +140,13 @@ public class KillAura extends Module {
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity instanceof EntityLivingBase) {
-                if (mc.thePlayer.getDistanceToEntity(entity) <= attackRange.get() + 0.4) {
+                if (mc.thePlayer.getDistanceToEntity(entity) <= searchRange.get() + 0.4) {
                     targets.add((EntityLivingBase) entity);
                 }
             }
         }
 
-        targets.removeIf(target -> mc.thePlayer.getDistanceToEntity(target) > attackRange.get() + 0.4);
+        targets.removeIf(target -> mc.thePlayer.getDistanceToEntity(target) > searchRange.get() + 0.4);
 
         if (currentTarget != null) {
             if (Objects.equals(rotationMode.get(), "Silent") && mc.thePlayer.getDistanceToEntity(currentTarget) <= searchRange.get() + 0.4) {
@@ -156,7 +159,7 @@ public class KillAura extends Module {
                             RotationUtils.setRotation(calcToEntity((EntityLivingBase) currentTarget), movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()), MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()), smoothReset.get(), SmoothMode.Lerp);
                             break;
                         case "LerpLimit":
-                            RotationUtils.setRotation(calcToEntity((EntityLivingBase) currentTarget), movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()), MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()), smoothReset.get(), SmoothMode.LerpLimit, MathUtils.randomizeInt(limitYawSpeedMin.get(), limitYawSpeedMax.get()), MathUtils.randomizeInt(limitPitchSpeedMin.get(), limitPitchSpeedMax.get()));
+                            RotationUtils.setRotation(calcToEntity((EntityLivingBase) currentTarget), movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()), MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()), smoothReset.get(), SmoothMode.LerpLimit, MathUtils.randomizeInt(limitYawSpeedMin.get(), limitYawSpeedMax.get()), MathUtils.randomizeInt(limitPitchSpeedMin.get(), limitPitchSpeedMax.get()), rangeToLimit.get() + 0.4f, currentTarget);
                             break;
                     }
                 }
@@ -296,7 +299,7 @@ public class KillAura extends Module {
                         (positionOnPlayer.xCoord - lastPositionOnPlayer.xCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.xCoord,
                         (positionOnPlayer.yCoord - lastPositionOnPlayer.yCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.yCoord,
                         (positionOnPlayer.zCoord - lastPositionOnPlayer.zCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.zCoord);
-                RenderUtils.renderBreadCrumb(interpolatedPosition);
+                RenderUtils.renderBreadCrumb(interpolatedPosition, dotScale.get());
             }
         }
     }
@@ -418,8 +421,24 @@ public class KillAura extends Module {
                 break;
         }
 
-        currentVec = targetVec;
+        if (delayed.get()) {
+            positionHistory.add(targetVec);
 
+            while (positionHistory.size() > delayedTicks.get()) {
+                positionHistory.poll();
+            }
+
+            if (positionHistory.size() >= delayedTicks.get()) {
+                currentVec = positionHistory.poll();
+            } else {
+                currentVec = targetVec;
+            }
+        } else {
+            positionHistory.clear();
+            currentVec = targetVec;
+        }
+
+        // positionHistory can't be 0 at this point, therefore currentVec can't be null. fuck you intellij.
         double deltaX = currentVec.xCoord - playerPos.xCoord;
         double deltaY = currentVec.yCoord - playerPos.yCoord;
         double deltaZ = currentVec.zCoord - playerPos.zCoord;

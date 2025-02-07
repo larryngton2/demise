@@ -79,8 +79,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode, float yawLimiter, float pitchLimiter) {
-
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget) {
         switch (smoothMode) {
             case Linear:
                 RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
@@ -89,7 +88,7 @@ public class RotationUtils implements InstanceAccess {
                 RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
                 break;
             case LerpLimit:
-                RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter);
+                RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget);
                 break;
         }
 
@@ -233,16 +232,18 @@ public class RotationUtils implements InstanceAccess {
         return applyGCDFix(currentRotation, finalTargetRotation);
     }
 
-    public static float[] smoothLerp(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float maxYawChange, float maxPitchChange) {
+    public static float[] smoothLerp(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float maxYawChange, float maxPitchChange, float rangeToLimit, Entity currentTarget) {
         float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
         float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
+        if (mc.thePlayer.getDistanceToEntity(currentTarget) <= rangeToLimit) {
         if (Math.abs(yawDifference) > maxYawChange) {
             yawDifference = Math.signum(yawDifference) * maxYawChange;
         }
 
         if (Math.abs(pitchDifference) > maxPitchChange) {
             pitchDifference = Math.signum(pitchDifference) * maxPitchChange;
+        }
         }
 
         float newYaw = currentRotation[0] + (yawDifference * hSpeed / 180);
@@ -502,59 +503,7 @@ public class RotationUtils implements InstanceAccess {
         return objectMouseOver;
     }
 
-    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize, float gravity, float velocity) {
-        EntityPlayerSP player = mc.thePlayer;
-
-        double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (player.posX + (predict ? player.posX - player.prevPosX : 0.0));
-        double posY = target.getEntityBoundingBox().minY + (predict ? (target.getEntityBoundingBox().minY - target.prevPosY) * predictSize : 0.0) + target.getEyeHeight() - 0.15 - (player.getEntityBoundingBox().minY + (predict ? player.posY - player.prevPosY : 0.0)) - player.getEyeHeight();
-        double posZ = target.posZ + (predict ? (target.posZ - target.prevPosZ) * predictSize : 0.0) - (player.posZ + (predict ? player.posZ - player.prevPosZ : 0.0));
-        double posSqrt = Math.sqrt(posX * posX + posZ * posZ);
-
-        /*velocity = player.getItemInUseDuration() / 20f;*/
-        velocity = Math.min((velocity * velocity + velocity * 2) / 3, 1f);
-
-        float gravityModifier = 0.12f * gravity;
-
-        return new float[]{
-                (float) Math.toDegrees(Math.atan2(posZ, posX)) - 90f,
-                (float) -Math.toDegrees(Math.atan((velocity * velocity - Math.sqrt(
-                        velocity * velocity * velocity * velocity - gravityModifier * (gravityModifier * posSqrt * posSqrt + 2 * posY * velocity * velocity)
-                )) / (gravityModifier * posSqrt)))
-        };
-    }
-
-    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize) {
-
-        float gravity = 0.03f;
-        float velocity = 0;
-
-        return faceTrajectory(target, predict, predictSize, gravity, velocity);
-    }
-
-    public static Vec3 heuristics(Entity entity, Vec3 xyz) {
-        double boxSize = 0.2;
-        float f11 = entity.getCollisionBorderSize();
-        double minX = MathHelper.clamp_double(
-                xyz.xCoord - boxSize, entity.getEntityBoundingBox().minX - (double) f11, entity.getEntityBoundingBox().maxX + (double) f11
-        );
-        double minY = MathHelper.clamp_double(
-                xyz.yCoord - boxSize, entity.getEntityBoundingBox().minY - (double) f11, entity.getEntityBoundingBox().maxY + (double) f11
-        );
-        double minZ = MathHelper.clamp_double(
-                xyz.zCoord - boxSize, entity.getEntityBoundingBox().minZ - (double) f11, entity.getEntityBoundingBox().maxZ + (double) f11
-        );
-        double maxX = MathHelper.clamp_double(
-                xyz.xCoord + boxSize, entity.getEntityBoundingBox().minX - (double) f11, entity.getEntityBoundingBox().maxX + (double) f11
-        );
-        double maxY = MathHelper.clamp_double(
-                xyz.yCoord + boxSize, entity.getEntityBoundingBox().minY - (double) f11, entity.getEntityBoundingBox().maxY + (double) f11
-        );
-        double maxZ = MathHelper.clamp_double(
-                xyz.zCoord + boxSize, entity.getEntityBoundingBox().minZ - (double) f11, entity.getEntityBoundingBox().maxZ + (double) f11
-        );
-        xyz.xCoord = MathHelper.clamp_double(xyz.xCoord + MathUtils.randomSin(), minX, maxX);
-        xyz.yCoord = MathHelper.clamp_double(xyz.yCoord + MathUtils.randomSin(), minY, maxY);
-        xyz.zCoord = MathHelper.clamp_double(xyz.zCoord + MathUtils.randomSin(), minZ, maxZ);
-        return xyz;
+    public static float angleDifference(float a, float b) {
+        return MathHelper.wrapAngleTo180_float(a - b);
     }
 }

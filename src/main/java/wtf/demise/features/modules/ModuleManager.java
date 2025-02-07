@@ -52,6 +52,7 @@ public class ModuleManager {
                 Velocity.class,
                 AutoHead.class,
                 Criticals.class,
+                FakeLag.class,
 
                 // Legit
                 AutoClicker.class,
@@ -111,7 +112,8 @@ public class ModuleManager {
                 Trajectories.class,
                 Breadcrumbs.class,
                 ChinaHat.class,
-                Particles.class
+                Particles.class,
+                MoveStatus.class
         );
 
         // Sort modules by name for better organization

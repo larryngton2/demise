@@ -1052,7 +1052,7 @@ public class RenderUtils implements InstanceAccess {
         });
     }
 
-    public static void renderBreadCrumb(final Vec3 vec3) {
+    public static void renderBreadCrumb(final Vec3 vec3, float scale) {
         GlStateManager.disableDepth();
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -1067,13 +1067,11 @@ public class RenderUtils implements InstanceAccess {
             final double distanceFromPlayer = mc.thePlayer.getDistance(vec3.xCoord, vec3.yCoord - 1, vec3.zCoord);
             int quality = (int) (distanceFromPlayer * 4 + 10);
 
-            if (quality > 350)
-                quality = 350;
+            if (quality > 350) quality = 350;
 
             GL11.glPushMatrix();
             GL11.glTranslated(x, y, z);
 
-            final float scale = 0.04f;
             GL11.glScalef(-scale, -scale, -scale);
 
             GL11.glRotated(-(mc.getRenderManager()).playerViewY, 0.0D, 1.0D, 0.0D);
@@ -1093,8 +1091,7 @@ public class RenderUtils implements InstanceAccess {
 
             GL11.glPopMatrix();
 
-        } catch (final ConcurrentModificationException ignored) {
-        }
+        } catch (final ConcurrentModificationException ignored) {}
 
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glEnable(GL11.GL_TEXTURE_2D);

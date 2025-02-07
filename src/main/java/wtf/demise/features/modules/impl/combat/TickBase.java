@@ -3,6 +3,7 @@ package wtf.demise.features.modules.impl.combat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TimerManipulationEvent;
 import wtf.demise.events.impl.player.MotionEvent;
@@ -12,6 +13,7 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -29,14 +31,14 @@ import java.util.List;
 
 @ModuleInfo(name = "TickBase", category = ModuleCategory.Combat)
 public class TickBase extends Module {
-    public final ModeValue mode = new ModeValue("Mode",new String[]{"Future","Past"},"Future",this);
-    public final SliderValue delay = new SliderValue("Delay", 50, 0, 1000,50, this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
+    public final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     public final SliderValue minActiveRange = new SliderValue("Min Active Range", 3f, 0.1f, 7f, 0.1f, this);
     public final SliderValue maxActiveRange = new SliderValue("Max Active Range", 7f, 0.1f, 7f, 0.1f, this);
     public final SliderValue maxTick = new SliderValue("Max Ticks", 4, 1, 20, this);
-    public final BoolValue displayPredictPos = new BoolValue("Dislay Predict Pos",false,this);
-    public final BoolValue check = new BoolValue("Check",false,this);
-    public final BoolValue workWithBackTrack = new BoolValue("Work With Back Track",false,this);
+    public final BoolValue displayPredictPos = new BoolValue("Dislay Predict Pos", false, this);
+    public final BoolValue check = new BoolValue("Check", false, this);
+    public final BoolValue workWithBackTrack = new BoolValue("Work With Back Track", false, this);
     public TimerUtils timer = new TimerUtils();
     public int skippedTick = 0;
     private long shifted, previousTime;
@@ -71,7 +73,7 @@ public class TickBase extends Module {
                 return;
             }
 
-            if(timer.hasTimeElapsed(delay.get())) {
+            if (timer.hasTimeElapsed(delay.get())) {
                 if (shouldStart()) {
                     firstAnimation = false;
                     while (skippedTick <= maxTick.get() && !shouldStop()) {
@@ -88,7 +90,6 @@ public class TickBase extends Module {
             working = false;
         }
     }
-
 
     @EventTarget
     public void onTimerManipulation(TimerManipulationEvent event) {
@@ -133,20 +134,20 @@ public class TickBase extends Module {
     }
 
     @EventTarget
-    public void onRender3D(Render3DEvent event) {
-        if(displayPredictPos.get()) {
+    public void onRender3D(Render3DEvent e) {
+        if (displayPredictPos.get() && mc.gameSettings.thirdPersonView != 0) {
             double x = predictProcesses.get(predictProcesses.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
             double y = predictProcesses.get(predictProcesses.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
             double z = predictProcesses.get(predictProcesses.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
             AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
             AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
-            RenderUtils.drawAxisAlignedBB(axis,false, true, new Color(50, 255, 255, 150).getRGB());
+            RenderUtils.drawAxisAlignedBB(axis, false, true, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
         }
     }
 
-    public boolean shouldStart(){
+    public boolean shouldStart() {
         Vec3 targetPos = target.getPositionVector();
-        if(workWithBackTrack.get())
+        if (workWithBackTrack.get())
             targetPos = getModule(BackTrack.class).realPosition;
         return predictProcesses.get((int) (maxTick.get() - 1)).position.distanceTo(target.getPositionVector()) <
                 mc.thePlayer.getPositionVector().distanceTo(target.getPositionVector()) &&
@@ -157,8 +158,8 @@ public class TickBase extends Module {
                 !predictProcesses.get((int) (maxTick.get() - 1)).isCollidedHorizontally;
     }
 
-    public boolean shouldStop(){
-        return mc.thePlayer.hurtTime != 0;
+    public boolean shouldStop() {
+        return mc.thePlayer.hurtTime > 5;
     }
 
     public boolean handleTick() {
@@ -172,7 +173,7 @@ public class TickBase extends Module {
         return false;
     }
 
-    public boolean freezeAnim(){
+    public boolean freezeAnim() {
         if (skippedTick != 0) {
             if (!firstAnimation) {
                 firstAnimation = true;
