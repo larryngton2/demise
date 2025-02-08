@@ -75,7 +75,7 @@ public class ModuleManager {
                 InvMove.class,
                 LongJump.class,
                 NoJumpDelay.class,
-                NoSlowdown.class,
+                NoSlow.class,
                 SafeWalk.class,
                 Speed.class,
                 Sprint.class,

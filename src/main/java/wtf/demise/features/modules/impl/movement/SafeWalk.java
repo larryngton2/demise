@@ -5,6 +5,7 @@ import net.minecraft.item.ItemBlock;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.SafeWalkEvent;
+import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
@@ -33,6 +34,11 @@ public class SafeWalk extends Module {
     public void onMoveInput(MoveInputEvent event) {
         if (canSafeWalk() && mode.is("Sneak") && PlayerUtils.blockRelativeToPlayer(0, -1, 0) instanceof BlockAir)
             event.setSneaking(true);
+    }
+
+    @EventTarget
+    public void onUpdate(UpdateEvent e) {
+        this.setTag(String.valueOf(mode.get()));
     }
 
     public boolean canSafeWalk() {

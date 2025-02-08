@@ -2,13 +2,8 @@ package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
@@ -22,7 +17,6 @@ import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
@@ -31,12 +25,10 @@ import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.misc.WorldEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.events.impl.render.RenderGuiEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.player.Stealer;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.font.FontRenderer;
@@ -72,18 +64,15 @@ public class Interface extends Module {
             new BoolValue("Health", false),
             new BoolValue("Potion HUD", true),
             new BoolValue("Target HUD", true),
-            new BoolValue("Inventory", false),
             new BoolValue("Notification", false),
-            new BoolValue("Pointer", false),
-            new BoolValue("Session Info", false),
-            new BoolValue("Key Bind", false)
+            new BoolValue("Session Info", false)
     ), this);
 
     public final BoolValue cFont = new BoolValue("C Fonts", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue fontMode = new ModeValue("C Fonts Mode", new String[]{"Bold", "Semi Bold", "Regular", "Tahoma"}, "Regular", this, () -> cFont.canDisplay() && cFont.get());
     public final SliderValue fontSize = new SliderValue("Font Size", 17, 10, 25, this, cFont::get);
     public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Styles", "Nursultan", "Exhi", "Type 1", "NeverLose"}, "Text", this, () -> elements.isEnabled("Watermark"));
-    public final ModeValue animation = new ModeValue("Animation", new String[]{"ScaleIn", "MoveIn", "Slide In"}, "ScaleIn", this, () -> elements.isEnabled("Module List"));
+    public final ModeValue animation = new ModeValue("Animation", new String[]{"ScaleIn", "MoveIn", "SlideIn"}, "MoveIn", this, () -> elements.isEnabled("Module List"));
     public final ModeValue arrayPosition = new ModeValue("Position", new String[]{"Right", "Left"}, "Right", this, () -> elements.isEnabled("Module List"));
     public final SliderValue x = new SliderValue("Module List X", -5, -50, 50, this, () -> elements.isEnabled("Module List"));
     public final SliderValue y = new SliderValue("Module List Y", 5, -50, 50, this, () -> elements.isEnabled("Module List"));
@@ -93,10 +82,9 @@ public class Interface extends Module {
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
     public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Default", "Nursultan", "Exhi", "Sexy", "Type 1", "NeverLose", "Mod"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
-    public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Astolfo", "Type 1", "Type 2", "Exhi", "Adjust", "Moon", "Novo 1", "Novo 2", "Novo 3", "Novo 4"}, "Moon", this, () -> elements.isEnabled("Target HUD"));
+    public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Astolfo", "MoonLight", "Moon"}, "Moon", this, () -> elements.isEnabled("Target HUD"));
     public final BoolValue targetHudParticle = new BoolValue("TargetHUD Particle", true, this, () -> elements.isEnabled("Target HUD"));
     public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Test", "Type 2", "Type 3", "Test2", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
-    public final ModeValue keyBindMode = new ModeValue("Key Bind Mode", new String[]{"Type 1"}, "Type 1", this, () -> elements.isEnabled("Key Bind"));
     public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
     public final BoolValue centerNotif = new BoolValue("Center Notification", true, this, () -> notificationMode.is("Exhi"));
     public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo", "NeverLose"}, "Fade", this);
@@ -491,10 +479,6 @@ public class Interface extends Module {
             GL11.glPopMatrix();
         }
 
-        if (elements.isEnabled("Health")) {
-            renderHealth();
-        }
-
         if (elements.isEnabled("Session Info") && sessionInfoMode.is("Exhi")) {
             mc.fontRendererObj.drawStringWithShadow(RenderUtils.sessionTime(), event.getScaledResolution().getScaledWidth() / 2.0f - mc.fontRendererObj.getStringWidth(RenderUtils.sessionTime()) / 2.0f, BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? 47 : 30.0f, -1);
         }
@@ -680,15 +664,6 @@ public class Interface extends Module {
     }
 
     @EventTarget
-    public void onRenderGui(RenderGuiEvent event) {
-        if (elements.isEnabled("Health")) {
-            if (mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiChest && !getModule(Stealer.class).isStealing || mc.currentScreen instanceof GuiContainerCreative) {
-                renderHealth();
-            }
-        }
-    }
-
-    @EventTarget
     public void onTick(TickEvent event) {
         mainColor.setRainbow(color.is("Rainbow"));
         KillAura aura = getModule(KillAura.class);
@@ -772,81 +747,6 @@ public class Interface extends Module {
         }
     }
 
-    public void renderHealth() {
-        ScaledResolution sr = new ScaledResolution(mc);
-        int xWidth = 0;
-        GuiScreen screen = mc.currentScreen;
-        float absorptionHealth = mc.thePlayer.getAbsorptionAmount();
-        String string = this.healthFormat.format(mc.thePlayer.getHealth() / 2.0f) + "§c\u2764 " + (absorptionHealth <= 0.0f ? "" : "§e" + this.healthFormat.format(absorptionHealth / 2.0f) + "§6\u2764");
-        int offsetY = 0;
-        if (mc.thePlayer.getHealth() >= 0.0f && mc.thePlayer.getHealth() < 10.0f || mc.thePlayer.getHealth() >= 10.0f && mc.thePlayer.getHealth() < 100.0f) {
-            xWidth = 3;
-        }
-        if (screen instanceof GuiInventory) {
-            offsetY = 70;
-        } else if (screen instanceof GuiContainerCreative) {
-            offsetY = 80;
-        } else if (screen instanceof GuiChest) {
-            offsetY = ((GuiChest) screen).ySize / 2 - 15;
-        }
-        int x = new ScaledResolution(mc).getScaledWidth() / 2 - xWidth;
-        int y = new ScaledResolution(mc).getScaledHeight() / 2 + 25 + offsetY;
-        Color color = new Color(ColorUtils.getHealthColor(mc.thePlayer));
-        mc.fontRendererObj.drawString(string, absorptionHealth > 0.0f ? x - 15.5f : x - 3.5f, y, color.getRGB(), true);
-        GL11.glPushMatrix();
-        mc.getTextureManager().bindTexture(Gui.icons);
-        random.setSeed(mc.ingameGUI.getUpdateCounter() * 312871L);
-        float width = sr.getScaledWidth() / 2.0f - mc.thePlayer.getMaxHealth() / 2.5f * 10.0f / 2.0f;
-        float maxHealth = mc.thePlayer.getMaxHealth();
-        int lastPlayerHealth = mc.ingameGUI.lastPlayerHealth;
-        int healthInt = MathHelper.ceiling_float_int(mc.thePlayer.getHealth());
-        int l2 = -1;
-        boolean flag = mc.ingameGUI.healthUpdateCounter > (long) mc.ingameGUI.getUpdateCounter() && (mc.ingameGUI.healthUpdateCounter - (long) mc.ingameGUI.getUpdateCounter()) / 3L % 2L == 1L;
-        if (mc.thePlayer.isPotionActive(Potion.regeneration)) {
-            l2 = mc.ingameGUI.getUpdateCounter() % MathHelper.ceiling_float_int(maxHealth + 5.0f);
-        }
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        for (int i6 = MathHelper.ceiling_float_int(maxHealth / 2.0f) - 1; i6 >= 0; --i6) {
-            int xOffset = 16;
-            if (mc.thePlayer.isPotionActive(Potion.poison)) {
-                xOffset += 36;
-            } else if (mc.thePlayer.isPotionActive(Potion.wither)) {
-                xOffset += 72;
-            }
-            int k3 = 0;
-            if (flag) {
-                k3 = 1;
-            }
-            float renX = width + (float) (i6 % 10 * 8);
-            float renY = (float) sr.getScaledHeight() / 2.0f + 15.0f + (float) offsetY;
-            if (healthInt <= 4) {
-                renY += (float) random.nextInt(2);
-            }
-            if (i6 == l2) {
-                renY -= 2.0f;
-            }
-            int yOffset = 0;
-            if (mc.theWorld.getWorldInfo().isHardcoreModeEnabled()) {
-                yOffset = 5;
-            }
-            Gui.drawTexturedModalRect(renX, renY, 16 + k3 * 9, 9 * yOffset, 9, 9);
-            if (flag) {
-                if (i6 * 2 + 1 < lastPlayerHealth) {
-                    Gui.drawTexturedModalRect(renX, renY, xOffset + 54, 9 * yOffset, 9, 9);
-                }
-                if (i6 * 2 + 1 == lastPlayerHealth) {
-                    Gui.drawTexturedModalRect(renX, renY, xOffset + 63, 9 * yOffset, 9, 9);
-                }
-            }
-            if (i6 * 2 + 1 < healthInt) {
-                Gui.drawTexturedModalRect(renX, renY, xOffset + 36, 9 * yOffset, 9, 9);
-            }
-            if (i6 * 2 + 1 != healthInt) continue;
-            Gui.drawTexturedModalRect(renX, renY, xOffset + 45, 9 * yOffset, 9, 9);
-        }
-        GL11.glPopMatrix();
-    }
-
     private String intToRomanByGreedy(int num) {
         int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
         String[] symbols = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
@@ -864,26 +764,13 @@ public class Interface extends Module {
 
     public FontRenderer getFr() {
 
-        FontRenderer fr = null;
-        switch (fontMode.get()) {
-            case "Bold":
-                fr = Fonts.interBold.get(fontSize.get());
-                break;
-
-            case "Semi Bold":
-                fr = Fonts.interSemiBold.get(fontSize.get());
-                break;
-
-            case "Regular":
-                fr = Fonts.interRegular.get(fontSize.get());
-                break;
-            case "Tahoma":
-                fr = Fonts.Tahoma.get(fontSize.get());
-                break;
-
-        }
-
-        return fr;
+        return switch (fontMode.get()) {
+            case "Bold" -> Fonts.interBold.get(fontSize.get());
+            case "Semi Bold" -> Fonts.interSemiBold.get(fontSize.get());
+            case "Regular" -> Fonts.interRegular.get(fontSize.get());
+            case "Tahoma" -> Fonts.Tahoma.get(fontSize.get());
+            default -> null;
+        };
     }
 
     public Color getMainColor() {
@@ -920,26 +807,19 @@ public class Interface extends Module {
         return color(0);
     }
 
-
     public int color(int counter, int alpha) {
         int colors = getMainColor().getRGB();
-        switch (color.get()) {
-            case "Rainbow":
-                colors = ColorUtils.swapAlpha(getRainbow(counter), alpha);
-                break;
-            case "Dynamic":
-                colors = ColorUtils.swapAlpha(ColorUtils.colorSwitch(getMainColor(), new Color(ColorUtils.darker(getMainColor().getRGB(), 0.25F)), 2000.0F, counter, 75L, fadeSpeed.get()).getRGB(), alpha);
-                break;
-            case "Fade":
-                colors = ColorUtils.swapAlpha((ColorUtils.colorSwitch(getMainColor(), getSecondColor(), 2000.0F, counter, 75L, fadeSpeed.get()).getRGB()), alpha);
-                break;
-            case "Astolfo":
-                colors = ColorUtils.swapAlpha(astolfoRainbow(counter, mainColor.getSaturation(), mainColor.getBrightness()), alpha);
-                break;
-            case "NeverLose":
-                colors = ColorUtils.swapAlpha(iconRGB, alpha);
-                break;
-        }
+        colors = switch (color.get()) {
+            case "Rainbow" -> ColorUtils.swapAlpha(getRainbow(counter), alpha);
+            case "Dynamic" ->
+                    ColorUtils.swapAlpha(ColorUtils.colorSwitch(getMainColor(), new Color(ColorUtils.darker(getMainColor().getRGB(), 0.25F)), 2000.0F, counter, 75L, fadeSpeed.get()).getRGB(), alpha);
+            case "Fade" ->
+                    ColorUtils.swapAlpha((ColorUtils.colorSwitch(getMainColor(), getSecondColor(), 2000.0F, counter, 75L, fadeSpeed.get()).getRGB()), alpha);
+            case "Astolfo" ->
+                    ColorUtils.swapAlpha(astolfoRainbow(counter, mainColor.getSaturation(), mainColor.getBrightness()), alpha);
+            case "NeverLose" -> ColorUtils.swapAlpha(iconRGB, alpha);
+            default -> colors;
+        };
         return colors;
     }
 
@@ -949,23 +829,15 @@ public class Interface extends Module {
 
     public int bgColor(int counter, int alpha) {
         int colors = getMainColor().getRGB();
-        switch (bgColor.get()) {
-            case "Dark":
-                colors = (new Color(21, 21, 21, alpha)).getRGB();
-                break;
-            case "Synced":
-                colors = new Color(ColorUtils.applyOpacity(color(counter, alpha), alpha / 255f), true).darker().darker().getRGB();
-                break;
-            case "None":
-                colors = new Color(0, 0, 0, 0).getRGB();
-                break;
-            case "Custom":
-                colors = ColorUtils.swapAlpha(bgCustomColor.get().getRGB(), alpha);
-                break;
-            case "NeverLose":
-                colors = ColorUtils.swapAlpha(NeverLose.bgColor.getRGB(), alpha);
-                break;
-        }
+        colors = switch (bgColor.get()) {
+            case "Dark" -> (new Color(21, 21, 21, alpha)).getRGB();
+            case "Synced" ->
+                    new Color(ColorUtils.applyOpacity(color(counter, alpha), alpha / 255f), true).darker().darker().getRGB();
+            case "None" -> new Color(0, 0, 0, 0).getRGB();
+            case "Custom" -> ColorUtils.swapAlpha(bgCustomColor.get().getRGB(), alpha);
+            case "NeverLose" -> ColorUtils.swapAlpha(NeverLose.bgColor.getRGB(), alpha);
+            default -> colors;
+        };
         return colors;
     }
 

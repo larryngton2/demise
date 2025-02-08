@@ -17,11 +17,8 @@ public class WidgetManager implements InstanceAccess {
     public WidgetManager() {
         INSTANCE.getEventManager().register(this);
         register(new TargetHUDWidget());
-        register(new InventoryWidget());
         register(new PotionHUDWidget());
         register(new SessionInfoWidget());
-        register(new PointerWidget());
-        register(new KeyBindWidget());
     }
 
     public boolean loaded;

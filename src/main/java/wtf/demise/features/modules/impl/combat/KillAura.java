@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.combat;
 
 import wtf.demise.events.impl.render.Render3DEvent;
-import wtf.demise.events.impl.render.RenderGuiEvent;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.features.modules.ModuleCategory;
@@ -41,6 +40,9 @@ public class KillAura extends Module {
     // attack
     private final SliderValue attackDelayMin = new SliderValue("Attack delay (min)", 25, 25, 1000, 25, this);
     private final SliderValue attackDelayMax = new SliderValue("Attack delay (max)", 25, 25, 1000, 25, this);
+    private final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
+    private final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
+    private final SliderValue clicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
     private final BoolValue rayCast = new BoolValue("RayCast", false, this);
     private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
 
@@ -70,7 +72,7 @@ public class KillAura extends Module {
 
     // offset
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "SinCos"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue chance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
@@ -104,6 +106,7 @@ public class KillAura extends Module {
     public Vec3 currentVec;
     public Vec3 targetVec;
     public Vec3 prevVec;
+    private Random rand = new Random();
 
     @Override
     public void onEnable() {
@@ -169,8 +172,7 @@ public class KillAura extends Module {
                 }
             }
 
-            attack();
-
+            sendAttack();
         } else if (isBlocking) {
             blocking(false);
         }
@@ -253,11 +255,9 @@ public class KillAura extends Module {
         }
     }
 
-    private void attack() {
+    private void sendAttack() {
         if (mc.thePlayer.getDistanceToEntity(currentTarget) <= attackRange.get() + 0.4) {
-            if (System.currentTimeMillis() - lastTargetTime >= MathUtils.randomizeInt((int) attackDelayMin.get(), (int) attackDelayMax.get())) {
-                lastTargetTime = System.currentTimeMillis();
-
+            if (System.currentTimeMillis() - lastTargetTime >= MathUtils.nextInt((int) attackDelayMin.get(), (int) attackDelayMax.get())) {
                 MovingObjectPosition movingObjectPosition = RayCastUtil.rayCast(new Vector2f(RotationUtils.currentRotation[0], RotationUtils.currentRotation[1]), attackRange.get() + 0.85 /* tested on grim, works fine */, -0.1f);
                 if (rayCast.get() && movingObjectPosition == null || movingObjectPosition.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
                     if (failSwing.get() && failSwing.canDisplay()) {
@@ -275,15 +275,15 @@ public class KillAura extends Module {
                             if (isBlocking) {
                                 blocking(false);
                             }
-                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                            attack();
                             break;
                         case "Fake":
                             isBlocking = true;
-                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                            attack();
                             break;
                         case "Vanilla":
                             blocking(true);
-                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                            attack();
                             break;
                         case "Release":
                             releaseAb((EntityLivingBase) currentTarget);
@@ -302,9 +302,23 @@ public class KillAura extends Module {
                             break;
                     }
                 }
+
+                lastTargetTime = System.currentTimeMillis();
             }
         } else if (isBlocking) {
             blocking(false);
+        }
+    }
+
+    private void attack() {
+        int attackCount = 1;
+
+        if (extraClicks.get() && rand.nextInt(100) <= eChance.get()) {
+            attackCount = (int) clicks.get() + 1;
+        }
+
+        for (int i = 0; i < attackCount; i++) {
+            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
         }
     }
 
@@ -338,14 +352,14 @@ public class KillAura extends Module {
     }
 
     private void releaseAb(EntityLivingBase e) {
-        AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+        attack();
         blocking(e.hurtTime >= 5 || mc.thePlayer.getDistanceToEntity(e) > attackRange.get() + 0.4);
     }
 
     private void AACAb(Entity e) {
         if (System.currentTimeMillis() - lastTargetTime >= MathUtils.nextInt((int) attackDelayMin.get(), (int) attackDelayMax.get())) {
             blocking(false);
-            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+            attack();
             lastTargetTime = System.currentTimeMillis();
         }
         mc.addScheduledTask(() -> blocking(true));
@@ -361,11 +375,11 @@ public class KillAura extends Module {
         if (!mc.gameSettings.keyBindUseItem.isKeyDown() || !mc.thePlayer.isBlocking()) {
             blocking(true);
         }
-        AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+        attack();
     }
 
     private void smartAb(EntityLivingBase e) {
-        AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+        attack();
         blocking(((mc.thePlayer.hurtTime <= 5 && mc.thePlayer.hurtTime != 0) && mc.thePlayer.motionY >= 0) || e.hurtTime >= 5);
     }
 
@@ -383,7 +397,7 @@ public class KillAura extends Module {
                 break;
             case 2:
                 blocking(true);
-                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                attack();
                 blink = false;
                 break;
         }
@@ -452,9 +466,7 @@ public class KillAura extends Module {
 
         switch (offsetMode.get()) {
             case "Gaussian":
-                Random rand = new Random();
-
-                if (rand.nextInt(100) <= chance.get()) {
+                if (rand.nextInt(100) <= oChance.get()) {
                     double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
                     double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
 

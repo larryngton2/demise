@@ -30,8 +30,8 @@ import java.util.Objects;
 
 import static net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RELEASE_USE_ITEM;
 
-@ModuleInfo(name = "NoSlowdown", category = ModuleCategory.Movement)
-public class NoSlowdown extends Module {
+@ModuleInfo(name = "NoSlow", category = ModuleCategory.Movement)
+public class NoSlow extends Module {
 
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "GrimAC", "Intave", "Old Intave", "Watchdog", "NCP"}, "Vanilla", this);
     private final BoolValue sprint = new BoolValue("Sprint", true, this);

@@ -2,11 +2,9 @@ package wtf.demise.gui.widget.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -15,7 +13,6 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.ParticleRenderer;
 import wtf.demise.utils.render.RenderUtils;
@@ -23,8 +20,6 @@ import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import static net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen;
 
@@ -68,35 +63,21 @@ public class TargetHUDWidget extends Widget {
     }
 
     public float getTHUDWidth(Entity entity) {
-        float width = switch (setting.targetHudMode.get()) {
-            case "Type 1" -> Math.max(120, Fonts.interBold.get(18).getStringWidth(entity.getName()) + 50);
+        return switch (setting.targetHudMode.get()) {
             case "Astolfo" -> Math.max(130, mc.fontRendererObj.getStringWidth(entity.getName()) + 60);
-            case "Type 2" -> Math.max(100, mc.fontRendererObj.getStringWidth(entity.getDisplayName().getFormattedText())) + 11;
-            case "Exhi" -> Math.max(124.0f, Fonts.interBold.get(17).getStringWidth(entity.getName()) + 54.0f);
-            case "Adjust" -> 130;
+            case "MoonLight" -> Math.max(120, Fonts.interBold.get(18).getStringWidth(entity.getName()) + 50);
             case "Moon" -> 35 + Fonts.interSemiBold.get(18).getStringWidth(entity.getName()) + 33;
-            case "Novo 1", "Novo 2" -> 35 + mc.fontRendererObj.getStringWidth(entity.getName()) + 33;
-            case "Novo 3" -> 35 + mc.fontRendererObj.getStringWidth(entity.getName()) + 34;
-            case "Novo 4" -> 135.0f;
             default -> 0;
         };
-        return width;
     }
 
     public float getTHUDHeight() {
-        float height = switch (setting.targetHudMode.get()) {
-            case "Type 1" -> 44;
+        return switch (setting.targetHudMode.get()) {
             case "Astolfo" -> 56;
-            case "Type 2" -> 38.0F;
-            case "Exhi" -> 38;
-            case "Adjust" -> 35;
+            case "MoonLight" -> 44;
             case "Moon" -> 40.5f;
-            case "Novo 1" -> 37.5f;
-            case "Novo 2", "Novo 3" -> 36f;
-            case "Novo 4" -> 45.0f;
             default -> 0;
         };
-        return height;
     }
 
     @Override
@@ -154,7 +135,7 @@ class TargetHUD implements InstanceAccess {
             }
 
             break;
-            case "Type 1": {
+            case "MoonLight": {
                 target.healthAnimation.animate((width - 52) * MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1), 30);
                 float hurtTime = (target.hurtTime == 0 ? 0 :
                         target.hurtTime - mc.timer.renderPartialTicks) * 0.5f;
@@ -172,147 +153,12 @@ class TargetHUD implements InstanceAccess {
                 }
             }
 
-            if(setting.targetHudParticle.get()){
-                ParticleRenderer.renderParticle(target,x + 4,  y + 4,34 / 2f);
-            }
-            break;
-
-            case "Type 2": {
-                if (!shader) {
-                    target.healthAnimation.animate((width - (5 * 4 + 26.5f)) * MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1), 30);
-                    RoundedUtils.drawRound(x, y, width, height, 4, new Color(setting.bgColor(), true));
-                    RenderUtils.renderPlayer2D(target, x + 5, y + 6.8f, 26.5f, 2, -1);
-
-                    RoundedUtils.drawRound(x + 5 * 2 + 26.5f, y + 6.8f, 0.5f, 26.5f, 2, new Color(30, 30, 30));
-
-                    Fonts.interSemiBold.get(14).drawString(target.getDisplayName().getFormattedText(), x + 5 * 3 + 26.5f, y + 6.8f + (float) Fonts.interSemiBold.get(14).getHeight() / 2, -1);
-                    Fonts.interRegular.get(12).drawString((int) (MathUtils.roundToHalf(target.getHealth())) + "HP", x + 5 * 3 + 26.5f, y + 6.8f * 2.25 + (float) Fonts.interSemiBold.get(14).getHeight() / 2, -1);
-
-                    RoundedUtils.drawGradientHorizontal(x + 5 * 3 + 26.5f, y + 26.5f, target.healthAnimation.getOutput(), 3.8f, 2, new Color(setting.color(0)), new Color(setting.color(90)));
-
-                    RenderUtils.drawRect(x + 5 * 3 + 26.5f + Fonts.interRegular.get(12).getStringWidth((int) (MathUtils.roundToHalf(target.getHealth())) + "HP") + 2, y + 6.8f * 2.25f + 1.5f, 0.5f, Fonts.psRegular.get(12).getHeight(), new Color(128, 128, 128).getRGB());
-
-                    List<ItemStack> items = new ArrayList<>();
-                    if (target.getHeldItem() != null) {
-                        items.add(target.getHeldItem());
-                    }
-                    for (int index = 3; index >= 0; index--) {
-                        ItemStack stack = target.inventory.armorInventory[index];
-                        if (stack != null) {
-                            items.add(stack);
-                        }
-                    }
-                    float i = 0;
-
-                    for (ItemStack stack : items) {
-                        RenderUtils.renderItemStack(stack, i + x + 5 * 3 + 26.5f + Fonts.interRegular.get(12).getStringWidth((int) (MathUtils.roundToHalf(target.getHealth())) + "HP") + 2 + 1, y + 6.8f * 2.25f + 1.5f, 0.5f);
-                        i += 7.5f;
-                    }
-
-                } else {
-                    RoundedUtils.drawGradientHorizontal(x, y, width, height, 4, new Color(setting.color(0)), new Color(setting.color(90)));
-                }
-
-                if(setting.targetHudParticle.get()){
-                    ParticleRenderer.renderParticle(target,x + 5, y + 6.8f,26.5f / 2f);
-                }
-            }
-            break;
-
-            case "Exhi": {
-                float health = target.getHealth();
-                float totalHealth = health + target.getAbsorptionAmount();
-                float progress = health / target.getMaxHealth();
-                if ((double) health < 19.5 || health < 10.0f || health < 15.0f || health < 5.0f || health < 2.0f) {
-                    progress = (float) ((double) progress - 0.175);
-                }
-                float healthLocation = 50.0f * progress;
-                Color color = new Color(ColorUtils.getHealthColor(target));
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(x, y, 0.0);
-
-                RenderUtils.drawExhiRect(0, -2, width, height, 1);
-
-                RenderUtils.drawRect(42.5f, 9.5f, 61.5f, 3.5f, ColorUtils.darker(color.getRGB(), 0.2f));
-                RenderUtils.drawRect(42.5f, 9.5f, 11 + healthLocation, 3.5f, color.getRGB());
-
-                RenderUtils.drawBorderedRect(42.0f, 9.0f, 61.5f, 4.5f, 0.5f, new Color(0, 0, 0, 0).getRGB(), new Color(0, 0, 0).getRGB());
-                for (int i = 1; i < 10; ++i) {
-                    float separator = 5.882353f * i;
-                    RenderUtils.drawRect(43.5f + separator, 9.0f, 0.5f, 4.5f, new Color(0, 0, 0).getRGB());
-                }
-                Fonts.interBold.get(17).drawString(target.getName(), 42.0f, 1f, -1);
-                Fonts.interRegular.get(10, false).drawString("HP: " + (int) totalHealth + " | Dist: " + (int) mc.thePlayer.getDistanceToEntity(target), 42.5f, 15.5f, -1);
-                List<ItemStack> items = new ArrayList<>();
-                if (target.getHeldItem() != null) {
-                    items.add(target.getHeldItem());
-                }
-                for (int index = 3; index >= 0; index--) {
-                    ItemStack stack = target.inventory.armorInventory[index];
-                    if (stack != null) {
-                        items.add(stack);
-                    }
-                }
-                float i = 0;
-
-                for (ItemStack stack : items) {
-                    RenderUtils.renderItemStack(stack, i + 28 + 16, 19, 1, true, 0.5f);
-                    i += 16;
-                }
-
-                GlStateManager.scale(0.31, 0.31, 0.31);
-                GlStateManager.translate(73.0f, 102.0f, 40.0f);
-                RenderUtils.drawEntityOnScreen(target.rotationYaw, target.rotationPitch, target);
-                GlStateManager.popMatrix();
-            }
-            break;
-
-            case "Adjust": {
-
-                float padding = 2;
-                float healthX = x + padding;
-                float healthPercentage = target.getHealth() / target.getMaxHealth();
-                float healthWidth = (width - padding * 2) * healthPercentage;
-                target.healthAnimation.animate(healthWidth, 25);
-
-                String sheesh = decimalFormat.format(Math.abs(mc.thePlayer.getHealth() - target.getHealth()));
-                String healthDiff = mc.thePlayer.getHealth() < target.getHealth() ? "-" + sheesh : "+" + sheesh;
-
-                if (!shader) {
-                    RenderUtils.drawRect(x, y, width, height, new Color(0, 0, 0, 100).getRGB());
-                    RenderUtils.drawRect(healthX, y + height - 5, width - padding * 2, 4, ColorUtils.darker(setting.color(0), 0.3f));
-                    RenderUtils.drawRect(healthX, y + height - 5, target.healthAnimation.getOutput(), 4, setting.color(0));
-                    RenderUtils.renderPlayer2D(target, x + padding, y + padding, 28 - padding, 0, -1);
-
-                    Fonts.interRegular.get(15).drawString(target.getName(), x + padding + 30, y + 3 + padding, -1);
-                    Fonts.interRegular.get(15).drawString(healthDiff, x + width - padding - Fonts.interRegular.get(15).getStringWidth(healthDiff), y + height - 5 * 2 - padding, -1);
-
-                    List<ItemStack> items = new ArrayList<>();
-                    if (target.getHeldItem() != null) {
-                        items.add(target.getHeldItem());
-                    }
-                    for (int index = 3; index >= 0; index--) {
-                        ItemStack stack = target.inventory.armorInventory[index];
-                        if (stack != null) {
-                            items.add(stack);
-                        }
-                    }
-                    float i = x + 30 + padding;
-
-                    for (ItemStack stack : items) {
-                        RenderUtils.renderItemStack(stack, i, y + 10 + padding, 1, true, 0.5f);
-                        i += 16;
-                    }
-                }
-
-                if(setting.targetHudParticle.get()){
-                    ParticleRenderer.renderParticle(target,x + padding, y + padding,(28 - padding) / 2);
-                }
+            if (setting.targetHudParticle.get()) {
+                ParticleRenderer.renderParticle(target, x + 4, y + 4, 34 / 2f);
             }
             break;
 
             case "Moon": {
-
                 float healthPercentage = target.getHealth() / target.getMaxHealth();
                 float space = (width - 48) / 100;
 
@@ -332,98 +178,11 @@ class TargetHUD implements InstanceAccess {
                     RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.color()));
                 }
 
-                if(setting.targetHudParticle.get()){
-                    ParticleRenderer.renderParticle(target,x + 2.5f, y + 2.5f,35 / 2f);
+                if (setting.targetHudParticle.get()) {
+                    ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f, 35 / 2f);
                 }
             }
             break;
-
-            case "Novo 1": {
-
-                float healthPercentage = target.getHealth() / target.getMaxHealth();
-                float space = (width - 50) / 100;
-
-                target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
-
-                if (!shader) {
-                    RenderUtils.drawEntityOnScreen(x + 18, y + 32, 15, target);
-                    RenderUtils.drawBorderedRect(x, y, width, height, (float) 1, new Color(0, 0, 0, 50).getRGB(), new Color(40, 40, 40, 178).getRGB());
-                    RenderUtils.drawRect(x, y, width, height, new Color(40, 40, 40, 178).getRGB());
-                    RenderUtils.drawRect(x + 40, y + 14, 100 * space, 10, new Color(30, 30, 30, 203).getRGB());
-                    RenderUtils.drawRect(x + 40, y + 15.5f, target.healthAnimation.getOutput(), 8.5f, new Color(0, 255, 0, 255).getRGB());
-                    String text = String.format("%.1f", target.getHealth() / 2);
-                    mc.fontRendererObj.drawStringWithShadow(text, x + 40, y + 27, -1);
-                    mc.fontRendererObj.drawStringWithShadow(target.getName(), x + 40, y + 4, -1);
-                    mc.fontRendererObj.drawStringWithShadow("❤", x + 40 + 23, y + 27, new Color(255, 100, 100).getRGB());
-                }
-            }
-            break;
-
-            case "Novo 2": {
-
-                float healthPercentage = target.getHealth() / target.getMaxHealth();
-                float space = (width - 50) / 100;
-
-                target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
-
-                if (!shader) {
-                    RenderUtils.drawBorderedRect(x, y, width, height, 1f, new Color(0, 0, 0, 50).getRGB(), new Color(40, 40, 40, 180).getRGB());
-                    RenderUtils.drawRect(x, y, width, height, new Color(40, 40, 40, 180).getRGB());
-                    RenderUtils.renderPlayer2D(target, (x + 1.5f + 1), (float) (y + 0.4), 35, 0, -1);
-                    String text = String.format("%.1f", target.getHealth());
-                    mc.fontRendererObj.drawStringWithShadow("❤", x + 62 + 1, y + 26.6f, setting.color(0));
-                    RenderUtils.drawRect(x + 40 + 1, y + 16.5f, target.healthAnimation.getOutput(), 8.8f, setting.color(0));
-                    mc.fontRendererObj.drawStringWithShadow(text, x + 40 + 1, y + 28f, -1);
-                    mc.fontRendererObj.drawStringWithShadow(target.getName(), x + 40f, y + 4, -1);
-                }
-
-                if(setting.targetHudParticle.get()){
-                    ParticleRenderer.renderParticle(target,(x + 1.5f + 1), (float) (y + 0.4), 35 /2f);
-                }
-            }
-            break;
-
-            case "Novo 3": {
-
-                float healthPercentage = target.getHealth() / target.getMaxHealth();
-                float space = (width - 50) / 100;
-
-                target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
-
-                if (!shader) {
-
-                    RenderUtils.drawBorderedRect(x, y, width, height, 1f, new Color(0, 0, 0, 50).getRGB(), new Color(29, 29, 29, 130).getRGB());
-                    RenderUtils.drawRect(x, y, width, height, new Color(40, 40, 40, 130).getRGB());
-                    RenderUtils.drawRect(x + 40 + 1, y + 16.5f, 100 * space + 1, 10.8f, new Color(0, 0, 0, 50).getRGB());
-                    RenderUtils.drawRect(x + 40 + 1, y + 16.5f, target.healthAnimation.getOutput(), 10.8f, setting.color());
-                    RenderUtils.renderPlayer2D(target, (x + 1.5f + 1f), (float) (y + 0.4), 35, 0, -1);
-                    String text = String.format("%.1f", healthPercentage * 100) + "%";
-                    mc.fontRendererObj.drawStringWithShadow(text, x + 1 + 40 + 50 * space - mc.fontRendererObj.getStringWidth(text) / 2f, y + 18f, -1);
-                    mc.fontRendererObj.drawStringWithShadow(target.getName(), x + 1 + 40, y + 4, -1);
-                }
-            }
-
-            if(setting.targetHudParticle.get()){
-                ParticleRenderer.renderParticle(target,(x + 1.5f + 1f), (float) (y + 0.4),35 / 2f);
-            }
-
-            break;
-
-            case "Novo 4": {
-
-                float healthPercentage = target.getHealth() / target.getMaxHealth();
-                float space = width;
-
-                target.healthAnimation.animate(space * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
-
-                if(!shader) {
-                    RenderUtils.drawRect(x - 1.0f, y + 4.0f, width, height, setting.bgColor());
-                    mc.fontRendererObj.drawStringWithShadow(target.getName(), x + 30.0f, y + 13.0f, -1);
-                    RenderUtils.renderItemStack(target, x + 13, y + 25, 1, true, 0.5f);
-                    GuiInventory.drawEntityOnScreen(x + 15, y + 40, 15, target.rotationYaw, -target.rotationPitch, target);
-                    RenderUtils.drawRect(x - 1, y + 47, target.healthAnimation.getOutput(), 2f, ColorUtils.getHealthColor(target));
-                }
-            }
         }
         GlStateManager.popMatrix();
     }
