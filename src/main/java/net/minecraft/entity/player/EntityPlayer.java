@@ -78,10 +78,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KeepSprint;
+import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.waveycapes.config.Config;
 import wtf.demise.utils.waveycapes.sim.StickSimulation;
+
+import javax.swing.text.html.Option;
 
 @SuppressWarnings("incomplete-switch")
 public abstract class EntityPlayer extends EntityLivingBase {
@@ -201,7 +204,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
 
     public void onUpdate()
     {
-        Interface cape = Demise.INSTANCE.getModuleManager().getModule(Interface.class);
+        Options cape = Demise.INSTANCE.getModuleManager().getModule(Options.class);
         if(cape.wavey.get()){
             simulate(this);
         }

@@ -69,6 +69,7 @@ public class ModuleManager {
                 // Other
                 Twerk.class,
                 AntiCheat.class,
+                Options.class,
 
                 // Movement
                 Freeze.class,

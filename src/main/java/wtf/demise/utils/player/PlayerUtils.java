@@ -22,11 +22,15 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.scoreboard.Score;
+import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.*;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.utils.InstanceAccess;
 import com.google.common.base.Predicate;
 
@@ -418,5 +422,77 @@ public class PlayerUtils implements InstanceAccess {
         }
 
         return null;
+    }
+
+    private static final String[] healthSubstrings = {"hp", "health", "lives", "❤"};
+
+    public static Float getActualHealth(EntityLivingBase entity) {
+        if (Demise.INSTANCE.getModuleManager().getModule(Options.class).fixHealth.get()) {
+            Scoreboard scoreboard = entity.getEntityWorld().getScoreboard();
+            ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(2);
+
+            if (objective == null) {
+                return entity.getHealth();
+            }
+
+            Score score = scoreboard.getValueFromObjective(entity.getName(), objective);
+
+            if (score == null || objective.getDisplayName() == null) {
+                return entity.getHealth();
+            }
+
+            String displayName = objective.getDisplayName();
+
+            boolean containsHealthSubstring = false;
+            for (String substring : healthSubstrings) {
+                if (displayName.contains(substring)) {
+                    containsHealthSubstring = true;
+                    break;
+                }
+            }
+
+            if (!containsHealthSubstring) {
+                return entity.getHealth();
+            }
+
+            int scoreboardHealth = score.getScorePoints();
+
+            if (scoreboardHealth > 0) {
+                return (float) scoreboardHealth;
+            }
+        }
+
+        return entity.getHealth();
+    }
+
+    public static class PredictProcess {
+        public final Vec3 position;
+        private final float fallDistance;
+        private final boolean onGround;
+        public final boolean isCollidedHorizontally;
+        public final float eyeHeight;
+        public final double x, y, z;
+
+        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally) {
+            this.position = position;
+            this.fallDistance = fallDistance;
+            this.onGround = onGround;
+            this.isCollidedHorizontally = isCollidedHorizontally;
+            this.eyeHeight = 0f;
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+        }
+
+        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally, float eyeHeight, double x, double y, double z) {
+            this.position = position;
+            this.fallDistance = fallDistance;
+            this.onGround = onGround;
+            this.isCollidedHorizontally = isCollidedHorizontally;
+            this.eyeHeight = eyeHeight;
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+        }
     }
 }

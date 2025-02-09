@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
+import org.jetbrains.annotations.NotNull;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
@@ -21,6 +22,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.GLUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -90,7 +92,7 @@ public class ESP extends Module {
             final float x2 = positions[2];
             final float y2 = positions[3];
 
-            final float health = player.getHealth();
+            final float health = PlayerUtils.getActualHealth(player);
             final float maxHealth = player.getMaxHealth();
             final float healthPercentage = health / maxHealth;
 
@@ -98,7 +100,7 @@ public class ESP extends Module {
                 final FontRenderer fontRenderer = mc.fontRendererObj;
 
                 final String hacker = getModule(AntiCheat.class).isHacker(player) ? EnumChatFormatting.RED + "[Hacker] " + EnumChatFormatting.RESET : "";
-                final String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(player.getHealth())) + EnumChatFormatting.RED + "❤" :"";
+                final String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(PlayerUtils.getActualHealth(player))) + EnumChatFormatting.RED + "❤" :"";
                 final String name = hacker + player.getDisplayName().getFormattedText() + healthString;
                 float halfWidth = (float) fontRenderer.getStringWidth(name) / 2 * tagsSize.get();
                 final float xDif = x2 - x;

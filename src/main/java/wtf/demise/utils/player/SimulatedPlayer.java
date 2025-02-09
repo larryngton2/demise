@@ -44,9 +44,9 @@ public class SimulatedPlayer implements InstanceAccess {
     public boolean onGround;
     private boolean isAirBorne;
     public float rotationYaw;
-    private double posX;
-    private double posY;
-    private double posZ;
+    public double posX;
+    public double posY;
+    public double posZ;
     private final PlayerCapabilities capabilities;
     private final Entity ridingEntity;
     private float jumpMovementFactor;

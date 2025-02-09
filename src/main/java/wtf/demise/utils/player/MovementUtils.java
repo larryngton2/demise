@@ -8,7 +8,9 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
+import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.misc.DebugUtils;
 
 import java.util.Arrays;
 
@@ -385,6 +387,7 @@ public class MovementUtils implements InstanceAccess {
         event.setForward(closestForward);
         event.setStrafe(closestStrafe);
     }
+
     public static void moveFlying(double increase) {
         if (!MovementUtils.isMoving()) return;
         final double yaw = MovementUtils.getDirection();

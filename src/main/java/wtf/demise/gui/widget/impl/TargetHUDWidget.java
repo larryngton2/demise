@@ -13,6 +13,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.ParticleRenderer;
 import wtf.demise.utils.render.RenderUtils;
@@ -123,10 +124,10 @@ class TargetHUD implements InstanceAccess {
                     drawEntityOnScreen((int) (x + 22), (int) (y + 51), 24, mc.thePlayer.rotationYaw, -mc.thePlayer.rotationPitch, target);
                     mc.fontRendererObj.drawStringWithShadow(target.getName(), x + 50, y + 6, -1);
                     GlStateManager.scale(1.5, 1.5, 1.5);
-                    mc.fontRendererObj.drawStringWithShadow(String.format("%.1f", target.getHealth()) + " ❤", (x + 50) / 1.5f, (y + 22) / 1.5f, setting.color(1));
+                    mc.fontRendererObj.drawStringWithShadow(String.format("%.1f", PlayerUtils.getActualHealth(target)) + " ❤", (x + 50) / 1.5f, (y + 22) / 1.5f, setting.color(1));
                     GlStateManager.popMatrix();
                     float healthWidth = (width - 54);
-                    target.healthAnimation.animate(healthWidth * MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1), 30);
+                    target.healthAnimation.animate(healthWidth * MathHelper.clamp_float(PlayerUtils.getActualHealth(target) / target.getMaxHealth(), 0, 1), 30);
                     RoundedUtils.drawRound(x + 48, y + 42, width - 54, 7, 0, ColorUtils.applyOpacity(new Color(setting.color(1)).darker().darker().darker(), (float) (1 * animation.getOutput())));
                     RoundedUtils.drawRound(x + 48, y + 42, target.healthAnimation.getOutput(), 7, 0, ColorUtils.applyOpacity(new Color(setting.color(1)), (float) (1 * animation.getOutput())));
                 } else {
@@ -136,7 +137,7 @@ class TargetHUD implements InstanceAccess {
 
             break;
             case "MoonLight": {
-                target.healthAnimation.animate((width - 52) * MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1), 30);
+                target.healthAnimation.animate((width - 52) * MathHelper.clamp_float(PlayerUtils.getActualHealth(target) / target.getMaxHealth(), 0, 1), 30);
                 float hurtTime = (target.hurtTime == 0 ? 0 :
                         target.hurtTime - mc.timer.renderPartialTicks) * 0.5f;
                 if (!shader) {
@@ -159,7 +160,7 @@ class TargetHUD implements InstanceAccess {
             break;
 
             case "Moon": {
-                float healthPercentage = target.getHealth() / target.getMaxHealth();
+                float healthPercentage = PlayerUtils.getActualHealth(target)/ target.getMaxHealth();
                 float space = (width - 48) / 100;
 
                 target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
@@ -168,7 +169,7 @@ class TargetHUD implements InstanceAccess {
                     RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.bgColor(), true));
 
                     RoundedUtils.drawRound(x + 42, y + 26.5f, (100 * space), 8, 4, new Color(0, 0, 0, 150));
-                    String text = String.format("%.1f", target.getHealth());
+                    String text = String.format("%.1f", PlayerUtils.getActualHealth(target));
 
                     RoundedUtils.drawRound(x + 42, y + 26.5f, target.healthAnimation.getOutput(), 8.5f, 4, new Color(setting.color(0)));
                     RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 35, 10, -1);

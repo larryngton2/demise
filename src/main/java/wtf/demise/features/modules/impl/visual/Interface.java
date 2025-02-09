@@ -99,9 +99,6 @@ public class Interface extends Module {
     public final BoolValue hideScoreRed = new BoolValue("Hide Scoreboard Red Points", true, this, () -> !hideScoreboard.get());
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
 
-    public final BoolValue cape = new BoolValue("Cape", true, this);
-    public final BoolValue wavey = new BoolValue("Wavey Cape", true, this);
-    public final BoolValue enchanted = new BoolValue("Enchanted", true, this, () -> cape.get() && !wavey.get());
     private final DecimalFormat bpsFormat = new DecimalFormat("0.00");
     private final DecimalFormat xyzFormat = new DecimalFormat("0");
     private final DecimalFormat healthFormat = new DecimalFormat("0.#", new DecimalFormatSymbols(Locale.ENGLISH));
@@ -109,7 +106,6 @@ public class Interface extends Module {
     public final Map<EntityPlayer, DecelerateAnimation> animationEntityPlayerMap = new HashMap<>();
     public int lost = 0, killed = 0, won = 0;
     public int prevMatchKilled = 0, matchKilled = 0, match;
-    private final Random random = new Random();
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {

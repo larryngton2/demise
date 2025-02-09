@@ -90,6 +90,7 @@ public class Scaffold extends Module {
     private double onGroundY;
     private int oloSlot = -1;
     private int blocksPlaced;
+    private float strafeYaw;
     private boolean placing;
     private int tellyTicks;
     private boolean placed;
@@ -139,8 +140,6 @@ public class Scaffold extends Module {
             }
         }
     }
-
-
 
     @Override
     public void onDisable() {
@@ -315,21 +314,18 @@ public class Scaffold extends Module {
 
                 switch (godBridgePitch.get()) {
                     case "Custom": {
-
                         yaw = MovementUtils.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
-
                         finalYaw = Math.round(yaw / 45f) * 45f;
 
                         pitch = getYawBasedPitch(data.blockPos, data.facing, finalYaw, previousRotation[1], minPitch.get(), maxPitch.get());
-
                         rotation = new float[]{finalYaw, pitch};
                     }
                     break;
 
                     case "Normal": {
-
                         yaw = MovementUtils.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
                         finalYaw = Math.round(yaw / 45f) * 45f;
+
                         pitch = getYawBasedPitch(data.blockPos, data.facing, finalYaw, previousRotation[1], 74, RotationUtils.getRotations(getVec3(data))[1]);
                         rotation = new float[]{finalYaw, pitch};
                     }
@@ -484,7 +480,6 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onStrafe(StrafeEvent event) {
-
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 

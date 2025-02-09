@@ -44,7 +44,7 @@ public class TickBase extends Module {
     private long shifted, previousTime;
     public boolean working;
     private boolean firstAnimation = true;
-    public final List<PredictProcess> predictProcesses = new ArrayList<>();
+    public final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
     public EntityPlayer target;
 
     @Override
@@ -124,7 +124,7 @@ public class TickBase extends Module {
 
         for (int i = 0; i < (skippedTick != 0 ? skippedTick : maxTick.get()); i++) {
             simulatedPlayer.tick();
-            predictProcesses.add(new PredictProcess(
+            predictProcesses.add(new PlayerUtils.PredictProcess(
                     simulatedPlayer.getPos(),
                     simulatedPlayer.fallDistance,
                     simulatedPlayer.onGround,
@@ -182,19 +182,5 @@ public class TickBase extends Module {
             return true;
         }
         return false;
-    }
-
-    public static class PredictProcess {
-        private final Vec3 position;
-        private final float fallDistance;
-        private final boolean onGround;
-        private final boolean isCollidedHorizontally;
-
-        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally) {
-            this.position = position;
-            this.fallDistance = fallDistance;
-            this.onGround = onGround;
-            this.isCollidedHorizontally = isCollidedHorizontally;
-        }
     }
 }

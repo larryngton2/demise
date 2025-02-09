@@ -1,6 +1,10 @@
 package wtf.demise.features.modules.impl.combat;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.features.modules.ModuleCategory;
@@ -25,14 +29,13 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.entity.Entity;
 import wtf.demise.utils.player.*;
 import net.minecraft.util.*;
-
 import java.util.*;
-
 import wtf.demise.Demise;
 
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
 
+    private static final Log log = LogFactory.getLog(KillAura.class);
     //reach
     private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
@@ -67,8 +70,10 @@ public class KillAura extends Module {
     private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseRange = new SliderValue("Pause range", 0.5f, 0, 6, 0.1f, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
-    private final BoolValue delayed = new BoolValue("Delayed", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue delayedTicks = new SliderValue("Ticks", 2, 0, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
+    private final BoolValue delayed = new BoolValue("Delayed target pos", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue delayedTicks = new SliderValue("Delay ticks", 2, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
+    private final BoolValue predict = new BoolValue("Rotation prediction", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
 
     // offset
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "SinCos"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -94,10 +99,12 @@ public class KillAura extends Module {
     private final SliderValue dotScale = new SliderValue("Target scale", 0.04f, 0.01f, 1, 0.01f, this, targetOnPlayer::get);
     private final BoolValue botCheck = new BoolValue("Bot Check", false, this);
 
+    public final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
     private final Queue<Vec3> positionHistory = new LinkedList<>();
     public List<EntityLivingBase> targets = new ArrayList<>();
     private Vec3 positionOnPlayer, lastPositionOnPlayer;
     public static Entity currentTarget = null;
+    private final Random rand = new Random();
     public static boolean isBlocking = false;
     private static long lastTargetTime = 0;
     private long lastSwitchTime = 0;
@@ -106,7 +113,8 @@ public class KillAura extends Module {
     public Vec3 currentVec;
     public Vec3 targetVec;
     public Vec3 prevVec;
-    private Random rand = new Random();
+    double lastYawOffset;
+    double lastPitchOffset;
 
     @Override
     public void onEnable() {
@@ -226,7 +234,7 @@ public class KillAura extends Module {
                         break;
                     case "Health":
                         EntityLivingBase potentialTarget = (EntityLivingBase) entity;
-                        float potentialHealth = potentialTarget.getHealth();
+                        float potentialHealth = PlayerUtils.getActualHealth(potentialTarget);
                         if (potentialHealth < leastHealth) {
                             target = potentialTarget;
                             leastHealth = potentialHealth;
@@ -258,7 +266,7 @@ public class KillAura extends Module {
     private void sendAttack() {
         if (mc.thePlayer.getDistanceToEntity(currentTarget) <= attackRange.get() + 0.4) {
             if (System.currentTimeMillis() - lastTargetTime >= MathUtils.nextInt((int) attackDelayMin.get(), (int) attackDelayMax.get())) {
-                MovingObjectPosition movingObjectPosition = RayCastUtil.rayCast(new Vector2f(RotationUtils.currentRotation[0], RotationUtils.currentRotation[1]), attackRange.get() + 0.85 /* tested on grim, works fine */, -0.1f);
+                MovingObjectPosition movingObjectPosition = RayCastUtil.rayCast(new Vector2f(RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw, RotationUtils.currentRotation != null ? RotationUtils.currentRotation[1] : mc.thePlayer.rotationPitch), attackRange.get() + 0.85 /* tested on grim, works fine */, -0.1f);
                 if (rayCast.get() && movingObjectPosition == null || movingObjectPosition.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
                     if (failSwing.get() && failSwing.canDisplay()) {
                         AttackOrder.sendConditionalSwing(movingObjectPosition);
@@ -408,14 +416,32 @@ public class KillAura extends Module {
         isBlocking = state;
     }
 
+    /*
+     *         double simulatedEyeHeight = predictProcesses.get(predictProcesses.size() - 1).eyeHeight;
+     *         double simulatedX = predictProcesses.get(predictProcesses.size() - 1).x;
+     *         double simulatedY = predictProcesses.get(predictProcesses.size() - 1).y;
+     *         double simulatedZ = predictProcesses.get(predictProcesses.size() - 1).z;
+     *
+     *         Vec3 getSimulatedPosEyes = new Vec3(simulatedX, simulatedY + simulatedEyeHeight, simulatedZ);
+     *
+     *         Vec3 playerPos = predict.get() ? getSimulatedPosEyes : mc.thePlayer.getPositionEyes(1);
+     */
+
     public float[] calcToEntity(EntityLivingBase entity) {
         prevVec = currentVec;
         float yaw;
         float pitch;
 
-        Vec3 playerPos = mc.thePlayer.getPositionEyes(1);
+        Vec3 playerPos;
+        if (predict.get() && !predictProcesses.isEmpty()) {
+            PlayerUtils.PredictProcess predictedProcess = predictProcesses.get(predictProcesses.size() - 1);
+            playerPos = new Vec3(predictedProcess.position.xCoord, predictedProcess.position.yCoord + mc.thePlayer.getEyeHeight(), predictedProcess.position.zCoord);
+        } else {
+            playerPos = mc.thePlayer.getPositionEyes(1);
+        }
+
         Vec3 entityPos = entity.getPositionVector();
-        final AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox();
+        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox();
 
         switch (aimMode.get()) {
             case "Head":
@@ -466,12 +492,21 @@ public class KillAura extends Module {
 
         switch (offsetMode.get()) {
             case "Gaussian":
-                if (rand.nextInt(100) <= oChance.get()) {
-                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
-                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
+                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
+                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
 
-                    yaw += (float) (rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor);
-                    pitch += (float) (rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor);
+                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
+                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
+
+                if (rand.nextInt(100) <= oChance.get()) {
+                    yaw += (float) yawOffset;
+                    pitch += (float) pitchOffset;
+
+                    lastYawOffset = yawOffset;
+                    lastPitchOffset = pitchOffset;
+                } else {
+                    yaw += (float) lastYawOffset;
+                    pitch += (float) lastPitchOffset;
                 }
                 break;
             case "SinCos":
@@ -491,5 +526,40 @@ public class KillAura extends Module {
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 
         return new float[]{yaw, pitch};
+    }
+
+    @EventTarget
+    public void onMove(MoveEvent event) {
+        predictProcesses.clear();
+
+        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput);
+
+        simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
+
+        for (int i = 0; i < predictTicks.get(); i++) {
+            simulatedPlayer.tick();
+            predictProcesses.add(new PlayerUtils.PredictProcess(
+                    simulatedPlayer.getPos(),
+                    simulatedPlayer.fallDistance,
+                    simulatedPlayer.onGround,
+                    simulatedPlayer.isCollidedHorizontally,
+                    simulatedPlayer.getEyeHeight(),
+                    simulatedPlayer.posX,
+                    simulatedPlayer.posY,
+                    simulatedPlayer.posZ
+            ));
+        }
+    }
+
+    @EventTarget
+    public void onRender3D(Render3DEvent e) {
+        if (predict.get() && mc.gameSettings.thirdPersonView != 0) {
+            double x = predictProcesses.get(predictProcesses.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
+            double y = predictProcesses.get(predictProcesses.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
+            double z = predictProcesses.get(predictProcesses.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
+            AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
+            AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
+            RenderUtils.drawAxisAlignedBB(axis, false, true, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
+        }
     }
 }

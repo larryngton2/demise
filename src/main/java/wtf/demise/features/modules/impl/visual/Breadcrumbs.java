@@ -20,7 +20,7 @@ public final class Breadcrumbs extends Module {
     List<Vec3> path = new ArrayList<>();
 
     private final BoolValue timeoutBool = new BoolValue("Timeout", true, this);
-    private final SliderValue timeout = new SliderValue("Time", 15, 1, 150, 0.1f, this);
+    private final SliderValue timeout = new SliderValue("Time", 15, 1, 150, 1, this);
 
     @Override
     public void onEnable() {

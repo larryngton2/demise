@@ -9,6 +9,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
 import net.optifine.reflect.Reflector;
 import org.jetbrains.annotations.NotNull;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldEvent;
@@ -16,10 +17,8 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.hypot;
@@ -31,8 +30,8 @@ public class RotationUtils implements InstanceAccess {
     private static boolean smoothlyReset;
     public static float cachedHSpeed;
     public static float cachedVSpeed;
-    static final Random rand = new Random();
     public static SmoothMode smoothMode = SmoothMode.Linear;
+    private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
 
     public static boolean shouldRotate() {
         return currentRotation != null;
@@ -43,14 +42,25 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction) {
-        RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
+        if (moduleRotation.silent.get()) {
+            RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
+        } else {
+            mc.thePlayer.rotationYaw = applyGCDFix(serverRotation, rotation)[0];
+            mc.thePlayer.rotationPitch = applyGCDFix(serverRotation, rotation)[1];
+        }
         currentCorrection = correction;
         smoothlyReset = false;
         enabled = true;
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset) {
-        RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+        if (moduleRotation.silent.get()) {
+            RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+        } else {
+            mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
+            mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
+        }
+
         currentCorrection = correction;
         RotationUtils.smoothlyReset = smoothlyReset;
         cachedHSpeed = hSpeed;
@@ -61,13 +71,26 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode) {
-        switch (smoothMode) {
-            case Linear:
-                RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
-                break;
-            case Lerp:
-                RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
-                break;
+        if (moduleRotation.silent.get()) {
+            switch (smoothMode) {
+                case Linear:
+                    RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+                case Lerp:
+                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+            }
+        } else {
+            switch (smoothMode) {
+                case Linear:
+                    mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+                case Lerp:
+                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+            }
         }
 
         currentCorrection = correction;
@@ -80,16 +103,33 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget) {
-        switch (smoothMode) {
-            case Linear:
-                RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
-                break;
-            case Lerp:
-                RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
-                break;
-            case LerpLimit:
-                RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget);
-                break;
+        if (moduleRotation.silent.get()) {
+            switch (smoothMode) {
+                case Linear:
+                    RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+                case Lerp:
+                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+                case LerpLimit:
+                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget);
+                    break;
+            }
+        } else {
+            switch (smoothMode) {
+                case Linear:
+                    mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+                case Lerp:
+                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+                case LerpLimit:
+                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[0];
+                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[1];
+                    break;
+            }
         }
 
         currentCorrection = correction;

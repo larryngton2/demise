@@ -11,4 +11,5 @@ public class Rotation extends Module {
     public final BoolValue body = new BoolValue("Render Body", true, this);
     public final BoolValue realistic = new BoolValue("Realistic", true, this, body::get);
     public final BoolValue fixAim = new BoolValue("Fix Aim", true, this);
+    public final BoolValue silent = new BoolValue("Silent (only disable for debugging purposes)", true, this);
 }
