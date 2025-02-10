@@ -104,7 +104,7 @@ public final class Stealer extends Module {
 
     @EventTarget
     public void onMotion(MotionEvent event) {
-        setTag(minDelay.get() + " " + maxDelay.get());
+        setTag(minDelay.get() + " - " + maxDelay.get());
         rotation = null;
         if (aura.get() && !(isEnabled(Scaffold.class) || KillAura.isBlocking)) {
             if (event.isPre()) {
