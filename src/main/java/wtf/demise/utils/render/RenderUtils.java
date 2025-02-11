@@ -392,8 +392,6 @@ public class RenderUtils implements InstanceAccess {
     }
 
     public static void drawFilledBoundingBox(final AxisAlignedBB bb, Color color) {
-
-
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 
@@ -1091,7 +1089,8 @@ public class RenderUtils implements InstanceAccess {
 
             GL11.glPopMatrix();
 
-        } catch (final ConcurrentModificationException ignored) {}
+        } catch (final ConcurrentModificationException ignored) {
+        }
 
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glEnable(GL11.GL_TEXTURE_2D);

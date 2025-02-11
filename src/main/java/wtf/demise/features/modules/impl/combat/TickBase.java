@@ -159,7 +159,7 @@ public class TickBase extends Module {
     }
 
     public boolean shouldStop() {
-        return mc.thePlayer.hurtTime > 5;
+        return mc.thePlayer.hurtTime != 0;
     }
 
     public boolean handleTick() {

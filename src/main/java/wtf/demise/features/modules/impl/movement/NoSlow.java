@@ -25,6 +25,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
+import wtf.demise.features.values.impl.SliderValue;
 
 import java.util.Objects;
 
@@ -33,8 +34,10 @@ import static net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RE
 @ModuleInfo(name = "NoSlow", category = ModuleCategory.Movement)
 public class NoSlow extends Module {
 
+    public final SliderValue speed = new SliderValue("Speed", 1, 0, 1, 0.1f, this);
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "GrimAC", "Intave", "Old Intave", "Watchdog", "NCP"}, "Vanilla", this);
     private final BoolValue sprint = new BoolValue("Sprint", true, this);
+    private final BoolValue onlyConsumable = new BoolValue("Only consumable", false, this);
     private boolean eat = true;
     private int lastFoodAmount;
     private float foodSpeed;
@@ -112,8 +115,9 @@ public class NoSlow extends Module {
                 break;
 
             case "Intave":
-                if (isUsingConsumable() && event.isPre())
+                if (isUsingConsumable() && event.isPre()) {
                     sendPacketNoEvent(new C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
+                }
                 break;
 
             case "Watchdog":
@@ -243,9 +247,14 @@ public class NoSlow extends Module {
             event.setStrafe(foodSpeed);
             return;
         }
+
+        if (onlyConsumable.get() && !isUsingConsumable()) {
+            return;
+        }
+
         event.setSprinting(sprint.get());
 
-        event.setForward(1);
-        event.setStrafe(1);
+        event.setForward(speed.get());
+        event.setStrafe(speed.get());
     }
 }

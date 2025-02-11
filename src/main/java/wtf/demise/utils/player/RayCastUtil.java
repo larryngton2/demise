@@ -8,7 +8,7 @@ import org.lwjglx.util.vector.Vector2f;
 
 import java.util.List;
 public final class RayCastUtil {
-    private static Minecraft mc = Minecraft.getMinecraft();
+    private static final Minecraft mc = Minecraft.getMinecraft();
 
     public static MovingObjectPosition rayCast(final Vector2f rotation, final double range) {
         return rayCast(rotation, range, 0);

@@ -233,8 +233,9 @@ public class RotationUtils implements InstanceAccess {
 
     @EventTarget
     public void onLook(LookEvent event) {
-        if (shouldRotate() && INSTANCE.getModuleManager().getModule(Rotation.class).fixAim.get())
+        if (shouldRotate()) {
             event.rotation = currentRotation;
+        }
     }
 
     private static void resetRotation() {

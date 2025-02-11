@@ -1,7 +1,9 @@
 package net.minecraft.util;
 
 import com.google.common.base.Objects;
+import lombok.Getter;
 
+@Getter
 public class Vec3i implements Comparable<Vec3i>
 {
     public static final Vec3i NULL_VECTOR = new Vec3i(0, 0, 0);
@@ -45,21 +47,6 @@ public class Vec3i implements Comparable<Vec3i>
     public int compareTo(Vec3i p_compareTo_1_)
     {
         return this.getY() == p_compareTo_1_.getY() ? (this.getZ() == p_compareTo_1_.getZ() ? this.getX() - p_compareTo_1_.getX() : this.getZ() - p_compareTo_1_.getZ()) : this.getY() - p_compareTo_1_.getY();
-    }
-
-    public int getX()
-    {
-        return this.x;
-    }
-
-    public int getY()
-    {
-        return this.y;
-    }
-
-    public int getZ()
-    {
-        return this.z;
     }
 
     public Vec3i crossProduct(Vec3i vec)

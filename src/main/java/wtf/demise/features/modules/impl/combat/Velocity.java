@@ -1,31 +1,44 @@
 package wtf.demise.features.modules.impl.combat;
 
+import de.florianmichael.viamcp.fixes.AttackOrder;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import net.minecraft.util.Vec3;
+import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.AttackEvent;
-import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.gui.font.Fonts;
+import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.*;
 
 @ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
 public class Velocity extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "IntaveReduce", "JumpReset", "Legit"}, "Normal", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "JumpReset", "Legit packet", "Intave test"}, "Normal", this);
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
-    private final SliderValue intaveHurtTime = new SliderValue("Intave HurtTime", 9, 1, 10, 1, this, () -> mode.is("IntaveReduce"));
-    private final SliderValue intaveFactor = new SliderValue("Intave Factor", 0.6f, 0, 1, 0.05f, this, () -> mode.is("IntaveReduce"));
+    private final SliderValue rHurtTime = new SliderValue("HurtTime", 9, 1, 10, 1, this, () -> mode.is("Reduce"));
+    private final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce"));
+    private final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce"));
+    private final BoolValue debug = new BoolValue("Debug", false, this, () -> Objects.equals(mode.get(), "Intave test"));
+    private final SliderValue packets = new SliderValue("Packets", 5, 1, 20, 1, this, () -> Objects.equals(mode.get(), "Legit packet"));
+
+    private double iFactor = 0.0;
+    private boolean attacked;
+    private boolean shouldReduce;
+    private Entity currentTarget;
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
@@ -54,10 +67,46 @@ public class Velocity extends Module {
                         mc.thePlayer.jump();
                     }
                     break;
+                case "Intave test":
+                    if (mc.thePlayer.hurtTime < 5) {
+                        iFactor -= 0.005;
+                    }
+
+                    if (iFactor > 1 || iFactor < 0) {
+                        iFactor = 0.0;
+                    }
+
+                    if (!Range.between(5, 7).contains(mc.thePlayer.hurtTime)) {
+                        attacked = false;
+                    }
+                    break;
+                case "Legit packet":
+                    if (Range.between(7, 9).contains(mc.thePlayer.hurtTime)) {
+                        if (shouldReduce) {
+                            for (int i = 0; i < packets.get(); i++) {
+                                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+
+                                DebugUtils.sendMessage(String.valueOf(i));
+                            }
+
+                            currentTarget = null;
+                            shouldReduce = false;
+                        }
+                    } else {
+                        attacked = false;
+                    }
+                    break;
             }
         }
 
         this.setTag(mode.get());
+    }
+
+    @EventTarget
+    public void onRender2D(Render2DEvent event) {
+        if (Objects.equals(mode.get(), "Intave test") && debug.get()) {
+            Fonts.interSemiBold.get(15).drawCenteredString(String.valueOf(iFactor), (float) event.getScaledResolution().getScaledWidth() / 2, (float) event.getScaledResolution().getScaledHeight() / 2 - 30, -1);
+        }
     }
 
     @EventTarget
@@ -86,36 +135,33 @@ public class Velocity extends Module {
     }
 
     @EventTarget
-    public void onMoveInput(MoveInputEvent event) {
-        if (mode.is("Legit") && KillAura.currentTarget != null && mc.thePlayer.hurtTime > 0) {
-            ArrayList<Vec3> vec3s = new ArrayList<>();
-            HashMap<Vec3, Integer> map = new HashMap<>();
-            Vec3 playerPos = new Vec3(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
-            Vec3 onlyForward = PlayerUtils.getPredictedPos(1.0F, 0.0F).add(playerPos);
-            Vec3 strafeLeft = PlayerUtils.getPredictedPos(1.0F, 1.0F).add(playerPos);
-            Vec3 strafeRight = PlayerUtils.getPredictedPos(1.0F, -1.0F).add(playerPos);
-            map.put(onlyForward, 0);
-            map.put(strafeLeft, 1);
-            map.put(strafeRight, -1);
-            vec3s.add(onlyForward);
-            vec3s.add(strafeLeft);
-            vec3s.add(strafeRight);
-            Vec3 targetVec = new Vec3(KillAura.currentTarget.posX, KillAura.currentTarget.posY, KillAura.currentTarget.posZ);
-            vec3s.sort(Comparator.comparingDouble(targetVec::distanceXZTo));
-            if (!mc.thePlayer.movementInput.sneak) {
-                System.out.println(map.get(vec3s.get(0)));
-                mc.thePlayer.movementInput.moveStrafe = map.get(vec3s.get(0));
-            }
-        }
-    }
-
-    @EventTarget
     public void onAttack(AttackEvent e) {
-        if (mode.is("IntaveReduce")) {
-            if (mc.thePlayer.hurtTime == intaveHurtTime.get()) {
-                mc.thePlayer.motionX *= intaveFactor.get();
-                mc.thePlayer.motionZ *= intaveFactor.get();
-            }
+        switch (mode.get()) {
+            case "Reduce":
+                if (mc.thePlayer.hurtTime == rHurtTime.get()) {
+                    double factor = MathUtils.randomizeDouble(rFactorMin.get(), rFactorMax.get());
+
+                    mc.thePlayer.motionX *= factor;
+                    mc.thePlayer.motionZ *= factor;
+                }
+                break;
+            case "Intave test":
+                if (Range.between(5, 7).contains(mc.thePlayer.hurtTime) && !attacked) {
+                    mc.thePlayer.motionX *= iFactor;
+                    mc.thePlayer.motionZ *= iFactor;
+
+                    iFactor += MathUtils.nextDouble(0.2, 0.5);
+
+                    attacked = true;
+                }
+                break;
+            case "Legit packet":
+                if (Range.between(7, 9).contains(mc.thePlayer.hurtTime) && !attacked) {
+                    currentTarget = e.getTargetEntity();
+                    shouldReduce = true;
+                    attacked = true;
+                }
+                break;
         }
     }
 }

@@ -7,7 +7,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
@@ -34,17 +33,11 @@ import java.util.*;
 
 @ModuleInfo(name = "Scaffold", category = ModuleCategory.Movement)
 public class Scaffold extends Module {
-    private final ModeValue switchBlock = new ModeValue("Switch Block", new String[]{"Silent", "Switch", "Spoof"}, "Spoof", this);
-    private final BoolValue biggestStack = new BoolValue("Biggest Stack", false, this);
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly", "Watchdog"}, "Normal", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly"}, "Normal", this);
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));
     private final SliderValue maxTellyTicks = new SliderValue("Max Telly Ticks", 4, 1, 5, this, () -> mode.is("Telly"));
-    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "God Bridge", "Reverse", "Custom", "Unfair Pitch","Hypixel","Hypixel 2"}, "Normal", this);
-    private final ModeValue rotationsHitVec = new ModeValue("Rotation Hit Vec", new String[]{"Centre","Closest"}, "Centre", this,() -> rotations.is("Normal"));
-    private final ModeValue godBridgePitch = new ModeValue("God Bridge Pitch Mode", new String[]{"Normal", "Custom"}, "Custom", this, () -> rotations.is("God Bridge") && !mode.is("Grim 1.17"));
+    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Reverse", "Custom", "Hypixel", "Hypixel 2"}, "Normal", this);
     private final SliderValue customYaw = new SliderValue("Custom Yaw", 180, 0, 180, 1, this, () -> rotations.is("Custom"));
-    private final SliderValue minPitch = new SliderValue("Min Pitch Range", 55, 50, 90, .1f, this, () -> godBridgePitch.canDisplay() && godBridgePitch.is("Custom"));
-    public final SliderValue maxPitch = new SliderValue("Max Pitch Range", 75, 50, 90, .1f, this, () -> godBridgePitch.canDisplay() && godBridgePitch.is("Custom"));
     private final BoolValue customRotationSetting = new BoolValue("Custom Rotation Setting", false, this);
     private final SliderValue minYawRotSpeed = new SliderValue("Min Yaw Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.canDisplay() && customRotationSetting.get());
     private final SliderValue minPitchRotSpeed = new SliderValue("Min Pitch Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.canDisplay() && customRotationSetting.get());
@@ -58,47 +51,33 @@ public class Scaffold extends Module {
             new BoolValue("Ray Trace", true),
             new BoolValue("Keep Y", false),
             new BoolValue("Speed Keep Y", false),
+            new BoolValue("Auto Jump", false),
             new BoolValue("Safe Walk", false),
             new BoolValue("Safe Walk When No Data", false),
             new BoolValue("Snap", false),
             new BoolValue("AD Strafe", false),
             new BoolValue("Hover", false),
             new BoolValue("Sneak", false),
-            new BoolValue("Jump", false),
             new BoolValue("Target Block ESP", false)
     ), this);
-    private final SliderValue blocksToJump = new SliderValue("Blocks To Jump", 7, 1, 8, this, () -> addons.isEnabled("Jump"));
     private final SliderValue blocksToSneak = new SliderValue("Blocks To Sneak", 7, 1, 8, this, () -> addons.isEnabled("Sneak"));
     private final SliderValue sneakDistance = new SliderValue("Sneak Distance", 0, 0, 0.5f, 0.01f, this, () -> addons.isEnabled("Sneak"));
-    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla","Watchdog"}, "Jump", this,() -> !mode.is("Telly"));
-    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla","Watchdog","Low"}, "Jump", this,() -> !mode.is("Telly"));
-    private final ModeValue wdSprint = new ModeValue("WD Sprint Mode", new String[]{"Beside", "Bottom","Offset"}, "Bottom", this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && !addons.isEnabled("Keep Y"));
-    private final BoolValue sprintBoost = new BoolValue("Sprint Boost Test", true, this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && !addons.isEnabled("Keep Y"));
-    private final BoolValue extra = new BoolValue("Extra", true, this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && !addons.isEnabled("Keep Y") && sprintBoost.get());
-    private final ModeValue wdKeepY = new ModeValue("WD Keep Y Mode", new String[]{"Normal", "Opal", "None"}, "Opal", this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && addons.isEnabled("Keep Y"));
-    private final ModeValue wdLowhop = new ModeValue("WD Fast Fall Mode", new String[]{"8 Tick","7 Tick","Disabled"}, "Opal", this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && addons.isEnabled("Keep Y"));
-    private final BoolValue unPatch = new BoolValue("Un Patch Test", true, this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && (addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y")));
-    private final SliderValue straightSpeed = new SliderValue("Keep Y Straight Speed", 1, 0.5f, 1f, 0.01f, this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && addons.isEnabled("Keep Y"));
-    private final SliderValue diagonalSpeed = new SliderValue("Keep Y Diagonal Speed", 0.95f, 0.5f, 1f, 0.01f, this, () -> mode.is("Watchdog") && addons.isEnabled("Sprint") && addons.isEnabled("Keep Y"));
+    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "Low"}, "Jump", this, () -> !mode.is("Telly"));
     public final ModeValue counter = new ModeValue("Counter", new String[]{"None", "Simple", "Normal", "Exhibition"}, "Normal", this);
 
     private float[] previousRotation;
     private BlockPos previousBlock;
-    private boolean isOnRightSide;
     private BlockPos targetBlock;
-    private int towerMoveTick;
     private double onGroundY;
     private int oloSlot = -1;
     private int blocksPlaced;
-    private float strafeYaw;
     private boolean placing;
     private int tellyTicks;
     private boolean placed;
     public PlaceData data;
-    private int towerTick;
-    private boolean start;
 
-    float yaw,pitch;
+    float yaw, pitch;
     private HoverState hoverState = HoverState.DONE;
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
             Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
@@ -127,65 +106,30 @@ public class Scaffold extends Module {
 
         oloSlot = mc.thePlayer.inventory.currentItem;
         onGroundY = mc.thePlayer.getEntityBoundingBox().minY;
-        previousRotation = new float[]{mc.thePlayer.rotationYaw + 180,82};
-
-        if (wdSprint.canDisplay() && wdSprint.is("Offset") && !(PlayerUtils.getBlock(mc.thePlayer.getPosition()) instanceof BlockLiquid) && !addons.isEnabled("Hover")) {
-            if (!mc.gameSettings.keyBindJump.isKeyDown()) {
-                MovementUtils.stop();
-            }
-            if (mc.thePlayer.onGround) {
-                hoverState = HoverState.JUMP;
-            } else {
-                hoverState = HoverState.DONE;
-            }
-        }
+        previousRotation = new float[]{mc.thePlayer.rotationYaw + 180, 82};
     }
 
     @Override
     public void onDisable() {
-        switch (switchBlock.get()) {
-            case "Silent":
-                sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                break;
-            case "Switch":
-                mc.thePlayer.inventory.currentItem = oloSlot;
-                break;
-            case "Spoof":
-                mc.thePlayer.inventory.currentItem = oloSlot;
-                SpoofSlotUtils.stopSpoofing();
-                break;
-        }
+        mc.thePlayer.inventory.currentItem = oloSlot;
+        SpoofSlotUtils.stopSpoofing();
+
         previousRotation = null;
         blocksPlaced = 0;
         placing = false;
         tellyTicks = 0;
-        start = false;
-
-        if (wdSprint.canDisplay() && sprintBoost.get()) {
-            mc.thePlayer.motionX *= .8;
-            mc.thePlayer.motionZ *= .8;
-        }
     }
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
         setTag(mode.get());
 
-        if (getBlockSlot() == -1)
+        if (getBlockSlot() == -1) {
             return;
-
-        switch (switchBlock.get()) {
-            case "Silent":
-                sendPacketNoEvent(new C09PacketHeldItemChange(getBlockSlot()));
-                break;
-            case "Switch":
-                mc.thePlayer.inventory.currentItem = getBlockSlot();
-                break;
-            case "Spoof":
-                mc.thePlayer.inventory.currentItem = getBlockSlot();
-                SpoofSlotUtils.startSpoofing(oloSlot);
-                break;
         }
+
+        mc.thePlayer.inventory.currentItem = getBlockSlot();
+        SpoofSlotUtils.startSpoofing(oloSlot);
 
         data = null;
 
@@ -199,32 +143,11 @@ public class Scaffold extends Module {
             posY = onGroundY;
         }
 
-        if (wdKeepY.canDisplay() && wdKeepY.is("Normal") && !towering() && !towering()) {
-            posY = mc.thePlayer.ticksExisted % 6 != 0 ? onGroundY : mc.thePlayer.getEntityBoundingBox().minY;
-        }
-
         if (towerMoving() || towering()) {
             onGroundY = posY = mc.thePlayer.getEntityBoundingBox().minY;
         }
 
-        if (wdKeepY.canDisplay() && wdKeepY.is("Opal") && !towering() && !towering()) {
-            if (FallDistanceComponent.distance > 0 && !start) {
-                posY = mc.thePlayer.getEntityBoundingBox().minY;
-                start = true;
-            }
-        }
-
         targetBlock = new BlockPos(mc.thePlayer.posX, posY - 1, mc.thePlayer.posZ);
-
-
-        if (wdKeepY.canDisplay() && wdKeepY.is("Opal")) {
-            if (start && !towering() && !towerMoving()) {
-                targetBlock = targetBlock.add(0, -1, 0);
-                if (mc.thePlayer.fallDistance > 0 && groundDistance() > 0 && MovementUtils.isMoving()) {
-                    targetBlock = targetBlock.add(0, 1, 0);
-                }
-            }
-        }
 
         if (mode.is("Telly") && mc.thePlayer.onGround) {
             tellyTicks = MathUtils.randomizeInt((int) minTellyTicks.get(), (int) maxTellyTicks.get());
@@ -260,10 +183,6 @@ public class Scaffold extends Module {
             blocksPlaced = 0;
         }
 
-        if (!MovementUtils.isMoving()) {
-            start = false;
-        }
-
         switch (hoverState) {
             case JUMP:
                 if (mc.thePlayer.onGround && !isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown()) {
@@ -281,56 +200,9 @@ public class Scaffold extends Module {
 
         switch (rotations.get()) {
             case "Normal": {
-                Vec3 hitVec = switch (rotationsHitVec.get()) {
-                    case "Centre" -> getVec3(data);
-                    case "Closest" -> getHitVecOptimized(data.blockPos, data.facing);
-                    default -> null;
-                };
+                Vec3 hitVec = getVec3(data);
 
-                assert hitVec != null;
                 rotation = RotationUtils.getRotations(hitVec);
-            }
-            break;
-
-            case "God Bridge": {
-                float yaw;
-                float pitch;
-                float finalYaw;
-                float movingYaw = MovementUtils.getRawDirection() + 180;
-
-                if (mc.thePlayer.onGround) {
-                    isOnRightSide = Math.floor(mc.thePlayer.posX + Math.cos(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posX) ||
-                            Math.floor(mc.thePlayer.posZ + Math.sin(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posZ);
-
-                    BlockPos posInDirection = mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(movingYaw), 1);
-
-                    boolean isLeaningOffBlock = mc.theWorld.getBlockState(mc.thePlayer.getPosition().down()) instanceof BlockAir;
-                    boolean nextBlockIsAir = mc.theWorld.getBlockState(posInDirection.down()).getBlock() instanceof BlockAir;
-
-                    if (isLeaningOffBlock && nextBlockIsAir) {
-                        isOnRightSide = !isOnRightSide;
-                    }
-                }
-
-                switch (godBridgePitch.get()) {
-                    case "Custom": {
-                        yaw = MovementUtils.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
-                        finalYaw = Math.round(yaw / 45f) * 45f;
-
-                        pitch = getYawBasedPitch(data.blockPos, data.facing, finalYaw, previousRotation[1], minPitch.get(), maxPitch.get());
-                        rotation = new float[]{finalYaw, pitch};
-                    }
-                    break;
-
-                    case "Normal": {
-                        yaw = MovementUtils.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
-                        finalYaw = Math.round(yaw / 45f) * 45f;
-
-                        pitch = getYawBasedPitch(data.blockPos, data.facing, finalYaw, previousRotation[1], 74, RotationUtils.getRotations(getVec3(data))[1]);
-                        rotation = new float[]{finalYaw, pitch};
-                    }
-                    break;
-                }
             }
             break;
             case "Custom": {
@@ -368,15 +240,6 @@ public class Scaffold extends Module {
                 }
             }
             break;
-            case "Unfair Pitch": {
-                rotation = new float[]{mc.thePlayer.rotationYaw, getYawBasedPitch(data.blockPos, data.facing, mc.thePlayer.rotationYaw, previousRotation[1], 91, 100)};
-            }
-
-            break;
-        }
-
-        if (unPatch.canDisplay() && (addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) || !addons.isEnabled("Speed Keep Y")) && unPatch.get() && mc.thePlayer.onGround && !towering() && !towerMoving()) {
-            rotation = new float[]{mc.thePlayer.rotationYaw, 0f};
         }
 
         if (tower.canDisplay() && tower.is("Watchdog") && towering()) {
@@ -398,9 +261,10 @@ public class Scaffold extends Module {
         yaw = rotation[0];
         pitch = rotation[1];
     }
+
     @EventTarget
     public void onLookEvent(LookEvent event) {
-        event.rotation = new float[] {yaw,pitch};
+        event.rotation = new float[]{yaw, pitch};
     }
 
     @EventTarget
@@ -415,10 +279,6 @@ public class Scaffold extends Module {
 
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
-
-        if (mode.is("Watchdog") && towerMoving() && towerMove.is("Jump")) {
-            event.setJumping(placing);
-        }
 
         if (addons.isEnabled("AD Strafe") && MovementUtils.isMoving() && MovementUtils.isMovingStraight() && mc.currentScreen == null && !Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCodeDefault()) && mc.thePlayer.onGround) {
             final BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ);
@@ -483,25 +343,10 @@ public class Scaffold extends Module {
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 
-        if(wdLowhop.canDisplay() && wdLowhop.is("7 Tick") && placed) {
-            if (mc.thePlayer.offGroundTicks == 1) {
-                mc.thePlayer.motionY += 0.057f;
-            }
-
-            if (mc.thePlayer.offGroundTicks == 3) {
-                mc.thePlayer.motionY -= 0.1309f;
-            }
-
-            if (mc.thePlayer.offGroundTicks == 4) {
-                mc.thePlayer.motionY -= 0.2;
-            }
-        }
-
-        if(towerMove.is("Low")){
-            if(towerMoving()) {
+        if (towerMove.is("Low")) {
+            if (towerMoving()) {
                 if (mc.thePlayer.offGroundTicks == 1) {
                     mc.thePlayer.motionY += 0.057f;
-
 
                     if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && !(getModule(Scaffold.class).isEnabled() && mc.gameSettings.keyBindJump.isKeyDown()) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 >= 2) {
                         MovementUtils.strafe(0.48);
@@ -525,20 +370,10 @@ public class Scaffold extends Module {
         }
 
         if (mc.thePlayer.onGround) {
-            if (((addons.isEnabled("Keep Y") || mode.is("Telly")|| wdKeepY.canDisplay())) && MovementUtils.isMoving() && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
-                mc.thePlayer.jump();
-            }
-        }
-
-        if (addons.isEnabled("Jump")) {
-            if (mc.thePlayer.onGround && !mc.gameSettings.keyBindJump.isKeyDown() && MovementUtils.isMoving() && MovementUtils.isMovingStraight()
-                    && !mc.thePlayer.isSneaking()) {
-                if (blocksPlaced >= blocksToJump.get()) {
+            if ((addons.isEnabled("Auto Jump") || mode.is("Telly")) && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
+                if (MovementUtils.isMoving()) {
                     mc.thePlayer.jump();
-                    blocksPlaced = 0;
                 }
-            } else {
-                blocksPlaced = 0;
             }
         }
     }
@@ -571,21 +406,6 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onAfterJump(AfterJumpEvent event) {
-
-        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
-            return;
-
-        if (wdKeepY.canDisplay() && !towering() && !towerMoving() && addons.isEnabled("Sprint") && mc.thePlayer.onGround && MovementUtils.isMoving()) {
-            MovementUtils.strafe(MovementUtils.getSpeed() * (MovementUtils.isMovingStraight() ? straightSpeed.get() : diagonalSpeed.get()));
-        }
-
-        if (mode.is("Watchdog") && mc.gameSettings.keyBindJump.isKeyDown() && towerMove.is("Jump") && placing) {
-            MovementUtils.strafe(0.4);
-        }
-    }
-
-    @EventTarget
     public void onMotion(MotionEvent event) {
 
         if (event.isPost())
@@ -593,39 +413,6 @@ public class Scaffold extends Module {
 
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
-
-        if (wdSprint.canDisplay() && !(PlayerUtils.getBlock(mc.thePlayer.getPosition()) instanceof BlockLiquid) && !towering() && !towerMoving()) {
-            if (wdSprint.is("Offset")) {
-                if (mc.thePlayer.onGround) {
-                    event.setY(event.getY() + 1E-13);
-                }
-            }
-            if (mc.thePlayer.onGround && sprintBoost.get()) {
-                if (extra.get()) {
-                    mc.thePlayer.motionX *= 1.13 - MovementUtils.getSpeedEffect() * .01 - Math.random() * 1E-4;
-                    mc.thePlayer.motionZ *= 1.13 - MovementUtils.getSpeedEffect() * .01 - Math.random() * 1E-4;
-                } else {
-                    mc.thePlayer.motionX *= 1.114 - MovementUtils.getSpeedEffect() * .01 - Math.random() * 1E-4;
-                    mc.thePlayer.motionZ *= 1.114 - MovementUtils.getSpeedEffect() * .01 - Math.random() * 1E-4;
-                }
-            }
-        }
-
-        if(wdLowhop.canDisplay() && wdLowhop.is("8 Tick") && placed) {
-            boolean down = false;
-            int simpleY = (int) Math.round((event.y % 1) * 10000);
-
-            if (simpleY == 13) {
-                mc.thePlayer.motionY = mc.thePlayer.motionY - 0.02483;
-            }
-
-            if (simpleY == 2000) {
-                mc.thePlayer.motionY = mc.thePlayer.motionY - 0.1913;
-            }
-
-            if (simpleY == 13) down = true;
-            if (down) event.y -= 1E-5;
-        }
 
         if (tower.canDisplay()) {
             if (tower.get().equals("Watchdog")) {
@@ -667,9 +454,9 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onRender3D(Render3DEvent event){
-        if(addons.isEnabled("Target Block ESP")){
-            RenderUtils.renderBlock(data.blockPos,getModule(Interface.class).color(0,100),false,true);
+    public void onRender3D(Render3DEvent event) {
+        if (addons.isEnabled("Target Block ESP")) {
+            RenderUtils.renderBlock(data.blockPos, getModule(Interface.class).color(0, 100), false, true);
         }
     }
 
@@ -687,7 +474,7 @@ public class Scaffold extends Module {
     }
 
     public int getBlockSlot() {
-        int slot = -1, size = 0;
+        int slot = -1;
 
         if (getBlockCount() == 0) {
             return -1;
@@ -700,8 +487,7 @@ public class Scaffold extends Module {
                 final Item item = s.getStack().getItem();
                 final ItemStack is = s.getStack();
 
-                if (item instanceof ItemBlock && !blacklistedBlocks.contains(((ItemBlock) item).getBlock()) && (biggestStack.get() && is.stackSize > size || !biggestStack.get())) {
-                    size = is.stackSize;
+                if (item instanceof ItemBlock && !blacklistedBlocks.contains(((ItemBlock) item).getBlock())) {
                     slot = i;
                 }
             }
@@ -728,20 +514,11 @@ public class Scaffold extends Module {
         return blockCount;
     }
 
-    public double groundDistance() {
-        for (int i = 1; i <= 20; i++) {
-            if (!mc.thePlayer.onGround && !(PlayerUtils.getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - ((double) i / 10), mc.thePlayer.posZ)) instanceof BlockAir)) {
-                return ((double) i / 10);
-            }
-        }
-        return -1;
-    }
-
     private static boolean isInteractable(Block block) {
         return block instanceof BlockFurnace || block instanceof BlockFenceGate || block instanceof BlockChest || block instanceof BlockEnderChest || block instanceof BlockEnchantmentTable || block instanceof BlockBrewingStand || block instanceof BlockBed || block instanceof BlockDropper || block instanceof BlockDispenser || block instanceof BlockHopper || block instanceof BlockAnvil || block == Blocks.crafting_table;
     }
 
-    private void place(BlockPos pos,EnumFacing facing,Vec3 hitVec) {
+    private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
 
         placing = false;
         if (!addons.isEnabled("Ray Trace")) {
@@ -754,10 +531,6 @@ public class Scaffold extends Module {
                 placing = true;
                 blocksPlaced += 1;
                 placed = true;
-
-                if (facing == EnumFacing.UP && wdKeepY.canDisplay()) {
-                    start = true;
-                }
             }
             previousBlock = data.blockPos.offset(data.facing);
         } else {
@@ -772,17 +545,13 @@ public class Scaffold extends Module {
                     placing = true;
                     blocksPlaced += 1;
                     placed = true;
-
-                    if (facing == EnumFacing.UP && wdKeepY.canDisplay()) {
-                        start = true;
-                    }
                 }
             }
             previousBlock = ray.getBlockPos().offset(ray.sideHit);
         }
     }
 
-    public float getYawBasedPitch(BlockPos blockPos, EnumFacing facing, float currentYaw, float lastPitch,float minPitch, float maxPitch) {
+    public float getYawBasedPitch(BlockPos blockPos, EnumFacing facing, float currentYaw, float lastPitch, float minPitch, float maxPitch) {
         float increment = (float) (Math.random() / 20.0) + 0.05F;
 
         for (float i = maxPitch; i > minPitch; i -= increment) {

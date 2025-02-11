@@ -1,5 +1,6 @@
 package net.minecraft.client.multiplayer;
 
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -41,6 +42,7 @@ public class PlayerControllerMP
     private float stepSoundTickCounter;
     private int blockHitDelay;
     private boolean isHittingBlock;
+    @Getter
     private WorldSettings.GameType currentGameType = WorldSettings.GameType.SURVIVAL;
     private int currentPlayerItem;
 
@@ -554,11 +556,6 @@ public class PlayerControllerMP
     public boolean isSpectatorMode()
     {
         return this.currentGameType == WorldSettings.GameType.SPECTATOR;
-    }
-
-    public WorldSettings.GameType getCurrentGameType()
-    {
-        return this.currentGameType;
     }
 
     public boolean getIsHittingBlock()

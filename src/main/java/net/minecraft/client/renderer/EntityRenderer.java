@@ -370,7 +370,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             boolean flag = false;
             double i = 3;
 
-
             MouseOverEvent mouseOverEvent = new MouseOverEvent(i);
             Demise.INSTANCE.getEventManager().call(mouseOverEvent);
 

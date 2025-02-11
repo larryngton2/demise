@@ -31,6 +31,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.SendMessageEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.exploit.Disabler;
+import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.utils.player.MovementUtils;
 import wtf.demise.utils.player.RotationUtils;
 
@@ -140,7 +141,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
         boolean flag = this.isSprinting();
 
-        if (flag != this.serverSprintState) {
+        if (flag != this.serverSprintState && !Demise.INSTANCE.getModuleManager().getModule(Sprint.class).silent.get()) {
             if (flag) {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
             } else {

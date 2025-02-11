@@ -470,29 +470,12 @@ public class PlayerUtils implements InstanceAccess {
         private final float fallDistance;
         private final boolean onGround;
         public final boolean isCollidedHorizontally;
-        public final float eyeHeight;
-        public final double x, y, z;
 
         public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally) {
             this.position = position;
             this.fallDistance = fallDistance;
             this.onGround = onGround;
             this.isCollidedHorizontally = isCollidedHorizontally;
-            this.eyeHeight = 0f;
-            this.x = 0;
-            this.y = 0;
-            this.z = 0;
-        }
-
-        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally, float eyeHeight, double x, double y, double z) {
-            this.position = position;
-            this.fallDistance = fallDistance;
-            this.onGround = onGround;
-            this.isCollidedHorizontally = isCollidedHorizontally;
-            this.eyeHeight = eyeHeight;
-            this.x = 0;
-            this.y = 0;
-            this.z = 0;
         }
     }
 }

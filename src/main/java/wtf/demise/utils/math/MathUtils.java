@@ -17,9 +17,7 @@ public class MathUtils {
         return Math.round(val * one) / one;
     }
 
-    public static double interpolate(double old,
-                                     double now,
-                                     float partialTicks) {
+    public static double interpolate(double old, double now, float partialTicks) {
         return old + (now - old) * partialTicks;
     }
 
