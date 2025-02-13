@@ -1,8 +1,6 @@
 package net.minecraft.client.shader;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
-import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,6 +8,9 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResourceManager;
 import org.lwjglx.util.vector.Matrix4f;
+
+import java.io.IOException;
+import java.util.List;
 
 public class Shader
 {

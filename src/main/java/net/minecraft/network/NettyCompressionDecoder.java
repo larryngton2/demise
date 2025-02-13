@@ -5,8 +5,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.DecoderException;
+
 import java.util.List;
-import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 public class NettyCompressionDecoder extends ByteToMessageDecoder

@@ -1,6 +1,5 @@
 package wtf.demise.features.modules.impl.combat;
 
-import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import wtf.demise.events.annotations.EventTarget;
@@ -16,6 +15,7 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
+
 import java.awt.*;
 
 @ModuleInfo(name = "FakeLag", category = ModuleCategory.Combat)

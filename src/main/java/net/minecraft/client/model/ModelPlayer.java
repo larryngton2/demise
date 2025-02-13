@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.features.modules.impl.visual.ESP;
-import wtf.demise.features.modules.impl.visual.Interface;
 
 public class ModelPlayer extends ModelBiped {
     public ModelRenderer bipedLeftArmwear;

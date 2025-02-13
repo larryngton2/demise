@@ -1,18 +1,14 @@
 package wtf.demise.utils.waveycapes.renderlayers;
 
-import wtf.demise.utils.waveycapes.CapeMovement;
-import wtf.demise.utils.waveycapes.config.Config;
-import wtf.demise.utils.waveycapes.sim.StickSimulation;
-import wtf.demise.utils.waveycapes.util.Matrix4f;
-import wtf.demise.utils.waveycapes.util.Mth;
-import wtf.demise.utils.waveycapes.util.PoseStack;
-import wtf.demise.utils.waveycapes.util.Vector3f;
-import wtf.demise.utils.waveycapes.util.Vector4f;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
+import wtf.demise.utils.waveycapes.CapeMovement;
+import wtf.demise.utils.waveycapes.config.Config;
+import wtf.demise.utils.waveycapes.sim.StickSimulation;
+import wtf.demise.utils.waveycapes.util.*;
 
 public class SmoothCapeRenderer {
 

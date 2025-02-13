@@ -8,9 +8,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
-import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.misc.DebugUtils;
 
 import java.util.Arrays;
 

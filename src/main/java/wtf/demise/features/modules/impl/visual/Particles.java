@@ -23,6 +23,7 @@ public final class Particles extends Module {
 
     private final SliderValue amount = new SliderValue("Amount", 10, 1, 20, 1, this);
     private final BoolValue physics = new BoolValue("Physics", true, this);
+    private final SliderValue simulationSpeed = new SliderValue("Simulation speed", 0.25f, 0.01f, 1, 0.01f, this);
 
     private final List<Particle> particles = new EvictingList<>(100);
     private final TimerUtils timer = new TimerUtils();
@@ -38,8 +39,9 @@ public final class Particles extends Module {
     public void onPreMotion(final MotionEvent event) {
         if (event.isPre()) {
             if (target != null && target.hurtTime >= 9 && mc.thePlayer.getDistance(target.posX, target.posY, target.posZ) < 10) {
-                for (int i = 0; i < amount.get(); i++)
+                for (int i = 0; i < amount.get(); i++) {
                     particles.add(new Particle(new Vec3(target.posX + (Math.random() - 0.5) * 0.5, target.posY + Math.random() * 1 + 0.5, target.posZ + (Math.random() - 0.5) * 0.5)));
+                }
 
                 target = null;
             }
@@ -51,11 +53,12 @@ public final class Particles extends Module {
         if (particles.isEmpty())
             return;
 
-        for (int i = 0; i <= timer.getTime() / 1E+11; i++) {
-            if (physics.get())
+        for (int i = 0; i <= timer.getTime() / simulationSpeed.get(); i++) {
+            if (physics.get()) {
                 particles.forEach(Particle::update);
-            else
+            } else {
                 particles.forEach(Particle::updateWithoutPhysics);
+            }
         }
 
         particles.removeIf(particle -> mc.thePlayer.getDistanceSq(particle.getPosition().xCoord, particle.getPosition().yCoord, particle.getPosition().zCoord) > 50 * 10);

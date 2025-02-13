@@ -8,7 +8,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
-import org.jetbrains.annotations.NotNull;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldEvent;
 import wtf.demise.events.impl.render.Render2DEvent;

@@ -1,10 +1,10 @@
 package wtf.demise.utils.waveycapes.sim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import wtf.demise.utils.waveycapes.config.Config;
 import wtf.demise.utils.waveycapes.util.Mth;
+
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Java port of <a href="https://www.youtube.com/watch?v=PGk0rnyTa1U">this</a> by Sebastian Lague
  * Has some changes like maximizing bends, only designed to simulate a single

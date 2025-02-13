@@ -21,7 +21,8 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Random;
 
 @ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
 public class Velocity extends Module {

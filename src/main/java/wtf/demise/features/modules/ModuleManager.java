@@ -16,7 +16,11 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
 import wtf.demise.features.modules.impl.exploit.*;
-import wtf.demise.features.modules.impl.misc.*;
+import wtf.demise.features.modules.impl.legit.AutoClicker;
+import wtf.demise.features.modules.impl.legit.NoHitDelay;
+import wtf.demise.features.modules.impl.misc.AntiCheat;
+import wtf.demise.features.modules.impl.misc.Options;
+import wtf.demise.features.modules.impl.misc.Twerk;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
@@ -53,10 +57,11 @@ public class ModuleManager {
                 AutoHead.class,
                 Criticals.class,
                 FakeLag.class,
+                MoreKB.class,
 
                 // Legit
                 AutoClicker.class,
-                MoreKB.class,
+                NoHitDelay.class,
 
                 // Exploit
                 Blink.class,
@@ -65,6 +70,7 @@ public class ModuleManager {
                 PingSpoof.class,
                 Timer.class,
                 NoGuiClose.class,
+                Regen.class,
 
                 // Other
                 Twerk.class,

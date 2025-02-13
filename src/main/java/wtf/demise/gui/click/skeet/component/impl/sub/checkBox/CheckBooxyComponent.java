@@ -1,9 +1,9 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.checkBox;
 
+import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.component.ButtonComponent;
 import wtf.demise.gui.click.skeet.component.Component;
 import wtf.demise.gui.click.skeet.component.PredicateComponent;
-import wtf.demise.gui.click.skeet.LockedResolution;
 
 public abstract class CheckBooxyComponent extends ButtonComponent implements PredicateComponent
 {

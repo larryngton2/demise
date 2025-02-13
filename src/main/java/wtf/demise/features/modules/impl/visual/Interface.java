@@ -26,6 +26,7 @@ import wtf.demise.events.impl.misc.WorldEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.KillAura;
@@ -41,7 +42,6 @@ import wtf.demise.utils.player.MovementUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
-import wtf.demise.features.modules.Module;
 
 import java.awt.*;
 import java.text.DateFormat;

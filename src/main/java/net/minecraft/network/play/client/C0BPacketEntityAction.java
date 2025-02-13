@@ -1,12 +1,12 @@
 package net.minecraft.network.play.client;
 
-import java.io.IOException;
-
 import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
+
+import java.io.IOException;
 
 public class C0BPacketEntityAction implements Packet<INetHandlerPlayServer>
 {

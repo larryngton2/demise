@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.combat;
+package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovingObjectPosition;

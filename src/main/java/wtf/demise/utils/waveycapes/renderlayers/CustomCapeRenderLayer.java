@@ -1,8 +1,15 @@
 package wtf.demise.utils.waveycapes.renderlayers;
 
-import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.entity.player.EnumPlayerModelParts;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -13,17 +20,6 @@ import wtf.demise.utils.waveycapes.WindMode;
 import wtf.demise.utils.waveycapes.config.Config;
 import wtf.demise.utils.waveycapes.sim.StickSimulation;
 import wtf.demise.utils.waveycapes.util.Mth;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.entity.player.EnumPlayerModelParts;
-import net.minecraft.util.MathHelper;
-
-import java.util.Iterator;
 
 public class CustomCapeRenderLayer implements LayerRenderer<AbstractClientPlayer> {
     static final int partCount = 16;

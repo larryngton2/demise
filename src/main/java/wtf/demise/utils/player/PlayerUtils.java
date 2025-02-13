@@ -1,5 +1,6 @@
 package wtf.demise.utils.player;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -32,7 +33,6 @@ import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.utils.InstanceAccess;
-import com.google.common.base.Predicate;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,10 +1,10 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.key;
 
+import org.lwjglx.input.Keyboard;
+import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.ButtonComponent;
 import wtf.demise.gui.click.skeet.component.Component;
-import wtf.demise.gui.click.skeet.LockedResolution;
-import org.lwjglx.input.Keyboard;
 import wtf.demise.gui.font.FontRenderer;
 
 import java.awt.*;

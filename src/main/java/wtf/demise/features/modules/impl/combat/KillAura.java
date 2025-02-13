@@ -1,37 +1,41 @@
 package wtf.demise.features.modules.impl.combat;
 
-import wtf.demise.events.impl.misc.MouseOverEvent;
-import wtf.demise.events.impl.player.AttackEvent;
-import wtf.demise.events.impl.player.MoveEvent;
-import wtf.demise.events.impl.render.Render3DEvent;
-import wtf.demise.features.modules.impl.visual.Interface;
-import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.packet.PingSpoofComponent;
-import wtf.demise.features.modules.ModuleCategory;
 import de.florianmichael.viamcp.fixes.AttackOrder;
-import wtf.demise.events.impl.player.MotionEvent;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import org.lwjglx.util.vector.Vector2f;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
+import wtf.demise.events.impl.player.AttackEvent;
+import wtf.demise.events.impl.player.MotionEvent;
+import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.render.Render3DEvent;
+import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.ModuleCategory;
+import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.client.settings.KeyBinding;
-import wtf.demise.features.modules.ModuleInfo;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.network.play.client.*;
-import wtf.demise.utils.render.RenderUtils;
-import wtf.demise.utils.packet.PacketUtils;
-import wtf.demise.features.modules.Module;
-import org.lwjglx.util.vector.Vector2f;
+import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
-import net.minecraft.item.ItemSword;
-import net.minecraft.entity.Entity;
+import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.packet.PacketUtils;
+import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.*;
-import net.minecraft.util.*;
+import wtf.demise.utils.render.RenderUtils;
+
 import java.util.*;
-import wtf.demise.Demise;
 
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
@@ -58,13 +62,15 @@ public class KillAura extends Module {
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Normal", "None"}, "Silent", this);
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this, () -> Objects.equals(aimPos.get(), "Straight"));
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "LerpLimit"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue xzTrim = new SliderValue("XZ trim", 0, 0, 0.5f, 0.01f, this);
+    private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "LerpLimit", "Correlation"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue smoothReset = new BoolValue("Smooth reset", false, this);
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue threshold = new SliderValue("Threshold", 0.5f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Correlation"));
     private final SliderValue rangeToLimit = new SliderValue("Range to limit (<)", 1.5f, 0, 8, 0.1f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
     private final SliderValue limitYawSpeedMin = new SliderValue("Yaw limit speed (min)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
     private final SliderValue limitYawSpeedMax = new SliderValue("Yaw limit speed (max)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
@@ -221,6 +227,14 @@ public class KillAura extends Module {
                         MathUtils.randomizeInt(limitPitchSpeedMin.get(), limitPitchSpeedMax.get()),
                         rangeToLimit.get() + 0.4f, target);
                 break;
+            case Correlation:
+                RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
+                        MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()),
+                        MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()),
+                        smoothReset.get(), SmoothMode.Correlation,
+                        MathUtils.randomizeInt(limitYawSpeedMin.get(), limitYawSpeedMax.get()),
+                        MathUtils.randomizeInt(limitPitchSpeedMin.get(), limitPitchSpeedMax.get()),
+                        rangeToLimit.get() + 0.4f, target, threshold.get());
         }
     }
 
@@ -302,6 +316,15 @@ public class KillAura extends Module {
                 RenderUtils.renderBreadCrumb(interpolatedPosition, dotScale.get());
             }
         }
+
+        if (predict.get() && mc.gameSettings.thirdPersonView != 0 && renderPredictPos.get()) {
+            double x = predictProcesses.get(predictProcesses.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
+            double y = predictProcesses.get(predictProcesses.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
+            double z = predictProcesses.get(predictProcesses.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
+            AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
+            AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
+            RenderUtils.drawAxisAlignedBB(axis, false, true, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
+        }
     }
 
     private void sendAttack() {
@@ -318,14 +341,22 @@ public class KillAura extends Module {
 
         MovingObjectPosition mov = performRayCast();
 
+        handleAttack(mov);
+        lastTargetTime.reset();
+    }
+
+    private void handleAttack(MovingObjectPosition mov) {
+
         if (shouldFailSwing(mov)) {
             handleFailSwing(mov);
-            lastTargetTime.reset();
             return;
         }
 
-        handleAttack(mov);
-        lastTargetTime.reset();
+        if ((rayCast.get() && mov != null && mov.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) || !rayCast.get()) {
+            attack();
+        }
+
+        handleAutoBlock();
     }
 
     private boolean isWithinAttackRange() {
@@ -368,38 +399,35 @@ public class KillAura extends Module {
         if (isBlocking && unBlockOnRayCastFail.get()) {
             blocking(false);
         }
+
+        lastTargetTime.reset();
     }
 
-    private void handleAttack(MovingObjectPosition movingObjectPosition) {
-        if ((rayCast.get() && movingObjectPosition != null && movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) || !rayCast.get()) {
-            switch (autoBlock.get()) {
-                case "None":
-                    if (isBlocking) {
-                        blocking(false);
-                    }
-                    attack();
-                    break;
-                case "Fake":
-                    isBlocking = true;
-                    attack();
-                    break;
-                case "Vanilla":
-                    blocking(true);
-                    attack();
-                    break;
-                case "Release":
-                    releaseAb((EntityLivingBase) currentTarget);
-                    break;
-                case "VanillaForce":
-                    vanillaReblockAb(currentTarget);
-                    break;
-                case "Smart":
-                    smartAb((EntityLivingBase) currentTarget);
-                    break;
-                case "Blink":
-                    blinkAb(currentTarget);
-                    break;
-            }
+    private void handleAutoBlock() {
+        switch (autoBlock.get()) {
+            case "None":
+                if (isBlocking) {
+                    blocking(false);
+                }
+                break;
+            case "Fake":
+                isBlocking = true;
+                break;
+            case "Vanilla":
+                blocking(true);
+                break;
+            case "Release":
+                releaseAb((EntityLivingBase) currentTarget);
+                break;
+            case "VanillaForce":
+                vanillaReblockAb(currentTarget);
+                break;
+            case "Smart":
+                smartAb((EntityLivingBase) currentTarget);
+                break;
+            case "Blink":
+                blinkAb(currentTarget);
+                break;
         }
     }
 
@@ -465,7 +493,6 @@ public class KillAura extends Module {
     }
 
     private void releaseAb(EntityLivingBase e) {
-        attack();
         blocking(e.hurtTime >= 5 || isWithinAttackRange());
     }
 
@@ -474,14 +501,9 @@ public class KillAura extends Module {
         if (!mc.gameSettings.keyBindUseItem.isKeyDown() || !mc.thePlayer.isBlocking()) {
             blocking(true);
         }
-        attack();
     }
 
     private void smartAb(EntityLivingBase e) {
-        if (!isBlocking) {
-            attack();
-        }
-
         blocking(((mc.thePlayer.hurtTime <= 5 && mc.thePlayer.hurtTime != 0) && mc.thePlayer.motionY >= 0) || e.hurtTime > 5);
     }
 
@@ -499,7 +521,6 @@ public class KillAura extends Module {
                 break;
             case 2:
                 blocking(true);
-                attack();
                 blink = false;
                 break;
         }
@@ -524,7 +545,7 @@ public class KillAura extends Module {
         }
 
         Vec3 entityPos = entity.getPositionVector();
-        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox();
+        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().contract(xzTrim.get(), yTrim.get(), xzTrim.get());
 
         switch (aimPos.get()) {
             case "Head":
@@ -541,7 +562,7 @@ public class KillAura extends Module {
                 break;
             case "Straight":
                 final double ex = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
-                final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY + yTrim.get(), entityBoundingBox.maxY - yTrim.get());
+                final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
                 final double ez = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
 
                 targetVec = new Vec3(ex, ey, ez);
@@ -551,7 +572,7 @@ public class KillAura extends Module {
 
                 if (mc.thePlayer.posY < entity.posY) {
                     final double exx = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
-                    final double eyy = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY + 0.25, entityBoundingBox.maxY - 0.25);
+                    final double eyy = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
                     final double ezz = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
 
                     targetVec = new Vec3(exx, eyy, ezz);
@@ -675,18 +696,6 @@ public class KillAura extends Module {
                     simulatedPlayer.onGround,
                     simulatedPlayer.isCollidedHorizontally
             ));
-        }
-    }
-
-    @EventTarget
-    public void onRender3D(Render3DEvent e) {
-        if (predict.get() && mc.gameSettings.thirdPersonView != 0 && renderPredictPos.get()) {
-            double x = predictProcesses.get(predictProcesses.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
-            double y = predictProcesses.get(predictProcesses.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
-            double z = predictProcesses.get(predictProcesses.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
-            AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
-            AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
-            RenderUtils.drawAxisAlignedBB(axis, false, true, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
         }
     }
 }

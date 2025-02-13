@@ -41,6 +41,7 @@ import wtf.demise.utils.misc.FilteredArrayList;
 import wtf.demise.utils.misc.HttpResponse;
 import wtf.demise.utils.misc.HttpUtils;
 import wtf.demise.utils.render.shader.impl.MainMenu;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;

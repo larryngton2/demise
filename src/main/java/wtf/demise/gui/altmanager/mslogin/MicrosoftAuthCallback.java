@@ -1,10 +1,9 @@
 package wtf.demise.gui.altmanager.mslogin;
 
-import wtf.demise.gui.altmanager.repository.credential.MicrosoftAltCredential;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import wtf.demise.gui.altmanager.repository.credential.MicrosoftAltCredential;
 
 import java.io.Closeable;
 import java.io.OutputStream;

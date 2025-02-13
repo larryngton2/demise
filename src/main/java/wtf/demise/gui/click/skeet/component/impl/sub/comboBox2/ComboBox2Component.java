@@ -1,14 +1,14 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.comboBox2;
 
+import net.minecraft.client.gui.Gui;
+import org.lwjgl.opengl.GL11;
 import wtf.demise.features.values.impl.BoolValue;
+import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.ButtonComponent;
 import wtf.demise.gui.click.skeet.component.Component;
 import wtf.demise.gui.click.skeet.component.ExpandableComponent;
 import wtf.demise.gui.click.skeet.component.PredicateComponent;
-import wtf.demise.gui.click.skeet.LockedResolution;
-import net.minecraft.client.gui.Gui;
-import org.lwjgl.opengl.GL11;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.utils.misc.StringUtils;
 import wtf.demise.utils.render.ColorUtils;

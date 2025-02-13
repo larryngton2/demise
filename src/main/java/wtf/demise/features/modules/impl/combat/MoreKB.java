@@ -12,7 +12,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.utils.player.MovementUtils;
 
-@ModuleInfo(name = "MoreKB", category = ModuleCategory.Legit)
+@ModuleInfo(name = "MoreKB", category = ModuleCategory.Combat)
 public class MoreKB extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit Fast", "Packet"}, "Legit Test", this);
     private final BoolValue onlyGround = new BoolValue("Only Ground", true, this);

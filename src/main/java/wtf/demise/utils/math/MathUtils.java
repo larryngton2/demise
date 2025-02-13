@@ -1,7 +1,8 @@
 package wtf.demise.utils.math;
 
-import net.minecraft.util.*;
-import org.joml.SimplexNoise;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 import java.security.SecureRandom;
 
@@ -158,9 +159,5 @@ public class MathUtils {
 
     public static Vec3 closestPointOnFace(AxisAlignedBB aabb, EnumFacing face, Vec3 vec) {
         return closestPointOnFace(aabb, face, vec.xCoord, vec.yCoord, vec.zCoord);
-    }
-
-    public static double randomSin() {
-        return Math.sin(nextDouble(0.0, Math.PI * 2));
     }
 }

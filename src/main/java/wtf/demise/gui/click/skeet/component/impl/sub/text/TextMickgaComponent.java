@@ -1,8 +1,8 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.text;
 
+import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.Component;
-import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.font.FontRenderer;
 
 public class TextMickgaComponent extends Component

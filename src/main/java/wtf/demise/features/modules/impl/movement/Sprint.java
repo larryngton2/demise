@@ -1,9 +1,7 @@
 package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.network.play.client.C0BPacketEntityAction;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;

@@ -15,6 +15,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import net.minecraft.client.network.NetHandlerHandshakeMemory;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.network.play.server.S40PacketDisconnect;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.NetHandlerHandshakeTCP;
+import net.minecraft.util.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
@@ -23,22 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
-
-import net.minecraft.client.network.NetHandlerHandshakeMemory;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.network.play.server.S40PacketDisconnect;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.NetHandlerHandshakeTCP;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.LazyLoadBase;
-import net.minecraft.util.MessageDeserializer;
-import net.minecraft.util.MessageDeserializer2;
-import net.minecraft.util.MessageSerializer;
-import net.minecraft.util.MessageSerializer2;
-import net.minecraft.util.ReportedException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class NetworkSystem
 {

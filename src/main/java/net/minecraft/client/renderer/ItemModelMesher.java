@@ -1,8 +1,6 @@
 package net.minecraft.client.renderer;
 
 import com.google.common.collect.Maps;
-import java.util.Map;
-import java.util.Map.Entry;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -10,10 +8,12 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.src.Config;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ISmartItemModel;
 import net.optifine.CustomItems;
 import net.optifine.reflect.Reflector;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ItemModelMesher
 {

@@ -1,7 +1,5 @@
 package net.minecraft.realms;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerLoginClient;
 import net.minecraft.network.EnumConnectionState;
@@ -11,6 +9,9 @@ import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class RealmsConnect
 {

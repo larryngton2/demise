@@ -17,6 +17,7 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -128,6 +129,52 @@ public class RotationUtils implements InstanceAccess {
                 case LerpLimit:
                     mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[0];
                     mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[1];
+                    break;
+            }
+        }
+
+        currentCorrection = correction;
+        RotationUtils.smoothlyReset = smoothlyReset;
+        cachedHSpeed = hSpeed;
+        cachedVSpeed = vSpeed;
+        RotationUtils.smoothMode = smoothMode;
+
+        enabled = true;
+    }
+
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget, float threshold) {
+        if (moduleRotation.silent.get()) {
+            switch (smoothMode) {
+                case Linear:
+                    RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+                case Lerp:
+                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+                case LerpLimit:
+                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget);
+                    break;
+                case Correlation:
+                    RotationUtils.currentRotation = smoothCorrelation(serverRotation, rotation, hSpeed, vSpeed, threshold);
+                    break;
+            }
+        } else {
+            switch (smoothMode) {
+                case Linear:
+                    mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+                case Lerp:
+                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+                case LerpLimit:
+                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[0];
+                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[1];
+                    break;
+                case Correlation:
+                    mc.thePlayer.rotationYaw = smoothCorrelation(serverRotation, rotation, hSpeed, vSpeed, threshold)[0];
+                    mc.thePlayer.rotationPitch = smoothCorrelation(serverRotation, rotation, hSpeed, vSpeed, threshold)[1];
                     break;
             }
         }
@@ -259,6 +306,34 @@ public class RotationUtils implements InstanceAccess {
         };
 
         return applyGCDFix(currentRotation, finalTargetRotation);
+    }
+
+    public static float[] smoothCorrelation(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float correlationThreshold) {
+        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
+        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
+
+        double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
+
+        float correlation = calculateCorrelation(currentRotation, targetRotation);
+
+        float smoothingFactor = (correlation > correlationThreshold) ? correlation : 0.1f;
+
+        float straightLineYaw = (float) (Math.abs(yawDifference / rotationDifference) * hSpeed * smoothingFactor);
+        float straightLinePitch = (float) (Math.abs(pitchDifference / rotationDifference) * vSpeed * smoothingFactor);
+
+        float[] finalTargetRotation = new float[]{
+                currentRotation[0] + Math.max(-straightLineYaw, Math.min(straightLineYaw, yawDifference)),
+                currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
+        };
+
+        return applyGCDFix(currentRotation, finalTargetRotation);
+    }
+
+    private static float calculateCorrelation(float[] currentRotation, float[] targetRotation) {
+        float yawCorrelation = 1 - abs(getAngleDifference(targetRotation[0], currentRotation[0])) / 180.0f;
+        float pitchCorrelation = 1 - abs(getAngleDifference(targetRotation[1], currentRotation[1])) / 180.0f;
+
+        return (yawCorrelation + pitchCorrelation) / 2.0f;
     }
 
     public static float[] smoothLerp(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {

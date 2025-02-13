@@ -1,15 +1,15 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.text.box;
 
-import wtf.demise.gui.click.skeet.SkeetUI;
-import wtf.demise.gui.click.skeet.component.ButtonComponent;
-import wtf.demise.gui.click.skeet.component.Component;
-import wtf.demise.gui.click.skeet.component.PredicateComponent;
-import wtf.demise.gui.click.skeet.LockedResolution;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ChatAllowedCharacters;
 import org.lwjglx.input.Keyboard;
+import wtf.demise.gui.click.skeet.LockedResolution;
+import wtf.demise.gui.click.skeet.SkeetUI;
+import wtf.demise.gui.click.skeet.component.ButtonComponent;
+import wtf.demise.gui.click.skeet.component.Component;
+import wtf.demise.gui.click.skeet.component.PredicateComponent;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.render.RenderUtils;
 

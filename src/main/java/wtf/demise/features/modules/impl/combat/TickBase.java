@@ -24,7 +24,6 @@ import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
 import wtf.demise.utils.render.RenderUtils;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

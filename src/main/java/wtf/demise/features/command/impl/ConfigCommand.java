@@ -5,7 +5,7 @@ import wtf.demise.features.command.Command;
 import wtf.demise.features.config.impl.ModuleConfig;
 import wtf.demise.utils.misc.DebugUtils;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;

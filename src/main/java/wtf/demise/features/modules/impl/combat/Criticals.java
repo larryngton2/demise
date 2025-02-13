@@ -12,6 +12,7 @@ import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MovementUtils;
+
 import java.util.Objects;
 
 @ModuleInfo(name = "Criticals", category = ModuleCategory.Combat)

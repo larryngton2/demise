@@ -11,7 +11,6 @@ import wtf.demise.utils.player.PlayerUtils;
 
 @Getter
 public class Particle {
-
     private final TimerUtils removeTimer = new TimerUtils();
 
     public final Vec3 position;

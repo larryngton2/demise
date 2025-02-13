@@ -1,15 +1,15 @@
 package wtf.demise.gui.click.neverlose.panel;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import lombok.Getter;
+import lombok.Setter;
+import org.lwjgl.opengl.GL11;
 import org.lwjglx.input.Mouse;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.click.IComponent;
 import wtf.demise.gui.click.neverlose.components.ModuleComponent;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import lombok.Getter;
-import lombok.Setter;
-import org.lwjgl.opengl.GL11;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;

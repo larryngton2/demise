@@ -13,7 +13,6 @@ import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
-
 import java.awt.*;
 
 import static wtf.demise.gui.click.neverlose.NeverLose.*;

@@ -1,5 +1,6 @@
 package wtf.demise.gui.click.skeet.component.impl;
 
+import net.minecraft.client.gui.Gui;
 import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.Component;
@@ -8,7 +9,6 @@ import wtf.demise.gui.click.skeet.component.PredicateComponent;
 import wtf.demise.gui.click.skeet.component.impl.sub.comboBox.ComboBoxComponent;
 import wtf.demise.gui.click.skeet.component.impl.sub.comboBox.ComboBoxTextComponent;
 import wtf.demise.gui.click.skeet.component.impl.sub.key.KeyBindComponent;
-import net.minecraft.client.gui.Gui;
 
 import java.awt.*;
 

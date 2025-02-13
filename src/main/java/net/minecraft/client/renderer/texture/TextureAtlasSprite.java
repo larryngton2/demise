@@ -1,12 +1,6 @@
 package net.minecraft.client.renderer.texture;
 
 import com.google.common.collect.Lists;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Callable;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.AnimationFrame;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
@@ -19,6 +13,13 @@ import net.optifine.SmartAnimations;
 import net.optifine.shaders.Shaders;
 import net.optifine.util.CounterInt;
 import net.optifine.util.TextureUtils;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 public class TextureAtlasSprite
 {

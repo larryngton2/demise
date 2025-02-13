@@ -1,10 +1,10 @@
 package wtf.demise.gui.click.skeet.component;
 
-import org.lwjglx.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import org.lwjglx.input.Mouse;
+import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.impl.GroupBoxComponent;
-import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.utils.animations.Translate;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RenderUtils;

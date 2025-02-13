@@ -1,17 +1,17 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.color;
 
-import wtf.demise.gui.click.skeet.SkeetUI;
-import wtf.demise.gui.click.skeet.component.ButtonComponent;
-import wtf.demise.gui.click.skeet.component.Component;
-import wtf.demise.gui.click.skeet.component.ExpandableComponent;
-import wtf.demise.gui.click.skeet.component.PredicateComponent;
-import wtf.demise.gui.click.skeet.LockedResolution;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
+import wtf.demise.gui.click.skeet.LockedResolution;
+import wtf.demise.gui.click.skeet.SkeetUI;
+import wtf.demise.gui.click.skeet.component.ButtonComponent;
+import wtf.demise.gui.click.skeet.component.Component;
+import wtf.demise.gui.click.skeet.component.ExpandableComponent;
+import wtf.demise.gui.click.skeet.component.PredicateComponent;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 

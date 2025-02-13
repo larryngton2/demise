@@ -1,11 +1,8 @@
 package net.optifine;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockOldLeaf;
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.IBakedModel;
@@ -15,6 +12,9 @@ import net.minecraft.src.Config;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.optifine.model.ModelUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SmartLeaves
 {

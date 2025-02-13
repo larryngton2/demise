@@ -1,10 +1,10 @@
 package wtf.demise.gui.click.skeet.component.impl.sub.button;
 
+import net.minecraft.client.gui.Gui;
 import wtf.demise.gui.click.skeet.LockedResolution;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.ButtonComponent;
 import wtf.demise.gui.click.skeet.component.Component;
-import net.minecraft.client.gui.Gui;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
