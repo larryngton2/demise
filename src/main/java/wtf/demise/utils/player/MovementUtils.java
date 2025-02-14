@@ -459,4 +459,8 @@ public class MovementUtils implements InstanceAccess {
         }
         return null;
     }
+
+    public static double predictedMotion(final double motion) {
+        return (motion - 0.08) * 0.98F;
+    }
 }

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.button.MenuButton;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.render.RoundedUtils;
@@ -33,23 +34,17 @@ public class GuiMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
 
-        float buttonWidth = 140;
-        float buttonHeight = 25;
+        float buttonWidth = 100;
+        float buttonHeight = 20;
 
         int count = 20;
 
-        RoundedUtils.drawRound(width / 2f - buttonWidth / 2f - 20,(height / 2f) - 60,buttonWidth + 20 * 2,200,10,new Color(0,0,0,64));
-
-        Blur.startBlur();
-        RoundedUtils.drawRound(width / 2f - buttonWidth / 2f - 20,(height / 2f) - 60,buttonWidth + 20 * 2,200,10,new Color(0,0,0,64));
-        Blur.endBlur(10,3);
-
-        Fonts.interBold.get(35).drawCenteredString(Demise.INSTANCE.getClientName(), (width / 2f - buttonWidth / 2f) + buttonWidth / 2, (height / 2f) + count - (buttons.size() * buttonHeight) / 2f, -1);
+        Fonts.interBold.get(35).drawCenteredStringWithShadow(Demise.INSTANCE.getClientName(), (width / 2f - buttonWidth / 2f) + buttonWidth / 2, (height / 2f) + count - (buttons.size() * buttonHeight) / 2f, -1);
         Fonts.interMedium.get(14).drawStringWithShadow("Welcome back, " + EnumChatFormatting.AQUA + Demise.INSTANCE.getDiscordRP().getName(), width - (2 + Fonts.interMedium.get(14).getStringWidth("Welcome back," + Demise.INSTANCE.getDiscordRP().getName())), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
 
         for (MenuButton button : buttons) {
             button.x = width / 2f - buttonWidth / 2f;
-            button.y = ((height / 2f) + count - (buttons.size() * buttonHeight) / 2f) + Fonts.interBold.get(35).getHeight() + 2;
+            button.y = ((height / 2f) + count - (buttons.size() * buttonHeight) / 2f) + Fonts.interBold.get(36).getHeight() + 2;
             button.width = buttonWidth;
             button.height = buttonHeight;
             button.clickAction = () -> {

@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.combat;
 
 import de.florianmichael.viamcp.fixes.AttackOrder;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,6 +31,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.*;
@@ -46,6 +48,7 @@ public class KillAura extends Module {
 
     // attack
     private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "PlayerController", "Packet"}, "PlayerController", this);
+    private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
     private final BoolValue noSwing = new BoolValue("No swing", false, this, () -> Objects.equals(clickMode.get(), "Packet"));
     private final SliderValue attackDelayMin = new SliderValue("Attack delay (min)", 25, 25, 1000, 25, this);
     private final SliderValue attackDelayMax = new SliderValue("Attack delay (max)", 25, 25, 1000, 25, this);
@@ -252,6 +255,10 @@ public class KillAura extends Module {
                     continue;
                 }
 
+                if (PlayerUtils.isInTeam(entity)) {
+                    continue;
+                }
+
                 double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
                 if (distanceToEntity <= searchRange.get()) {
                     targets.add(entity);
@@ -277,6 +284,10 @@ public class KillAura extends Module {
 
             if (entity instanceof EntityPlayer && entity != mc.thePlayer && !Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity) && distanceToEntity <= searchRange.get() + 0.4) {
                 if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
+                    continue;
+                }
+
+                if (PlayerUtils.isInTeam(entity)) {
                     continue;
                 }
 
@@ -429,6 +440,18 @@ public class KillAura extends Module {
                 blinkAb(currentTarget);
                 break;
         }
+    }
+
+    private boolean shouldClick() {
+        if (mc.thePlayer.hurtTime != 0 || mc.thePlayer.motionY < 0) {
+            return true;
+        }
+
+        if (currentTarget instanceof EntityLivingBase) {
+            return ((EntityLivingBase) currentTarget).hurtTime <= 3;
+        }
+
+        return true;
     }
 
     private void attack() {

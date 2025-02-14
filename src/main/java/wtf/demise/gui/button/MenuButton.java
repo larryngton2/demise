@@ -27,7 +27,6 @@ public class MenuButton implements Button {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
-
         boolean hovered = MouseUtils.isHovered2(x, y, width, height, mouseX, mouseY);
         hoverAnimation.setDirection(hovered ? Direction.FORWARDS : Direction.BACKWARDS);
         Color rectColor = new Color(0, 0, 0, 128);

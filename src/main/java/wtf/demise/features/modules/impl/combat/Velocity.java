@@ -3,7 +3,11 @@ package wtf.demise.features.modules.impl.combat;
 import de.florianmichael.viamcp.fixes.AttackOrder;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
 import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
@@ -19,6 +23,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.Objects;
@@ -26,7 +31,7 @@ import java.util.Random;
 
 @ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
 public class Velocity extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "JumpReset", "Legit packet", "Intave test"}, "Normal", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "JumpReset", "Legit packet", "Intave test", "GrimC07"}, "Normal", this);
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
@@ -40,6 +45,7 @@ public class Velocity extends Module {
     private boolean attacked;
     private boolean shouldReduce;
     private Entity currentTarget;
+    private boolean velocity;
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
@@ -97,6 +103,15 @@ public class Velocity extends Module {
                         attacked = false;
                     }
                     break;
+                case "GrimC07":
+                    if (velocity) {
+                        PacketUtils.sendPacket(
+                                new C07PacketPlayerDigging((mc.objectMouseOver != null && mc.thePlayer.isSwingInProgress && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK ? C07PacketPlayerDigging.Action.START_DESTROY_BLOCK : C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK), new BlockPos(mc.thePlayer), EnumFacing.UP)
+                        );
+
+                        velocity = false;
+                    }
+                    break;
             }
         }
 
@@ -116,22 +131,36 @@ public class Velocity extends Module {
             return;
         }
 
-        if (Objects.equals(mode.get(), "Cancel") && e.getPacket() instanceof S12PacketEntityVelocity) {
-            Packet<?> packet = e.getPacket();
-            S12PacketEntityVelocity s12 = (S12PacketEntityVelocity) packet;
-            if (s12.getEntityID() == mc.thePlayer.getEntityId()) {
-                S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) e.getPacket();
-                if (horizontal.get() != 100.0D) {
-                    mc.thePlayer.motionX = ((double) s12PacketEntityVelocity.getMotionX() / 8000) * horizontal.get() / 100.0;
-                    mc.thePlayer.motionZ = ((double) s12PacketEntityVelocity.getMotionZ() / 8000) * horizontal.get() / 100.0;
-                }
+        switch (mode.get()) {
+            case "Cancel":
+                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
+                    if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
 
-                if (vertical.get() != 100.0D) {
-                    mc.thePlayer.motionY = ((double) s12PacketEntityVelocity.getMotionY() / 8000) * vertical.get() / 100.0;
-                }
+                        if (horizontal.get() != 100.0D) {
+                            mc.thePlayer.motionX = ((double) packet.getMotionX() / 8000) * horizontal.get() / 100.0;
+                            mc.thePlayer.motionZ = ((double) packet.getMotionZ() / 8000) * horizontal.get() / 100.0;
+                        }
 
-                e.setCancelled(true);
-            }
+                        if (vertical.get() != 100.0D) {
+                            mc.thePlayer.motionY = ((double) packet.getMotionY() / 8000) * vertical.get() / 100.0;
+                        }
+
+                        e.setCancelled(true);
+                    }
+                }
+                break;
+            case "GrimC07":
+                final Packet<?> packet = e.getPacket();
+                if (e.isCancelled()) return;
+
+                if (packet instanceof S12PacketEntityVelocity wrapper) {
+                    if (wrapper.getEntityID() == mc.thePlayer.getEntityId()) {
+                        e.setCancelled(true);
+
+                        velocity = true;
+                    }
+                }
+                break;
         }
     }
 

@@ -8,21 +8,18 @@ import wtf.demise.gui.mainmenu.GuiMainMenu;
 
 import java.io.IOException;
 
-public class GuiIngameMenu extends GuiScreen
-{
+public class GuiIngameMenu extends GuiScreen {
     private int field_146445_a;
     private int field_146444_f;
 
-    public void initGui()
-    {
+    public void initGui() {
         this.field_146445_a = 0;
         this.buttonList.clear();
         int i = -16;
         int j = 98;
         this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + i, I18n.format("menu.returnToMenu")));
 
-        if (!this.mc.isIntegratedServerRunning())
-        {
+        if (!this.mc.isIntegratedServerRunning()) {
             this.buttonList.get(0).displayString = I18n.format("menu.disconnect");
         }
 
@@ -35,10 +32,8 @@ public class GuiIngameMenu extends GuiScreen
         guibutton.enabled = this.mc.isSingleplayer() && !this.mc.getIntegratedServer().getPublic();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
-        switch (button.id)
-        {
+    protected void actionPerformed(GuiButton button) throws IOException {
+        switch (button.id) {
             case 0:
                 this.mc.displayGuiScreen(new GuiOptions(this, this.mc.gameSettings));
                 break;
@@ -50,17 +45,12 @@ public class GuiIngameMenu extends GuiScreen
                 this.mc.theWorld.sendQuittingDisconnectingPacket();
                 this.mc.loadWorld(null);
 
-                if (flag)
-                {
+                if (flag) {
                     this.mc.displayGuiScreen(new GuiMainMenu());
-                }
-                else if (flag1)
-                {
+                } else if (flag1) {
                     RealmsBridge realmsbridge = new RealmsBridge();
                     realmsbridge.switchToRealms(new GuiMainMenu());
-                }
-                else
-                {
+                } else {
                     this.mc.displayGuiScreen(new GuiMultiplayer(new GuiMainMenu()));
                 }
 
@@ -87,14 +77,12 @@ public class GuiIngameMenu extends GuiScreen
         }
     }
 
-    public void updateScreen()
-    {
+    public void updateScreen() {
         super.updateScreen();
         ++this.field_146444_f;
     }
 
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game"), this.width / 2, 40, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);

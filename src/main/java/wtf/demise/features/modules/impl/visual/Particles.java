@@ -19,7 +19,7 @@ import wtf.demise.utils.render.RenderUtils;
 import java.util.List;
 
 @ModuleInfo(name = "Particles", category = ModuleCategory.Visual)
-public final class Particles extends Module {
+public class Particles extends Module {
 
     private final SliderValue amount = new SliderValue("Amount", 10, 1, 20, 1, this);
     private final BoolValue physics = new BoolValue("Physics", true, this);

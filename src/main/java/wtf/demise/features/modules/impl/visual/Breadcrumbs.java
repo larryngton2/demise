@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ModuleInfo(name = "Breadcrumbs", category = ModuleCategory.Visual)
-public final class Breadcrumbs extends Module {
+public class Breadcrumbs extends Module {
 
     List<Vec3> path = new ArrayList<>();
 

@@ -1265,4 +1265,31 @@ public class RenderUtils implements InstanceAccess {
         FRUSTUM.setPosition(current.posX, current.posY, current.posZ);
         return FRUSTUM.isBoundingBoxInFrustum(bb);
     }
+
+    public static void draw3DLine(double x, double y, double z, double x1, double y1, double z1, final float red, final float green, final float blue, final float alpha, final float lineWdith) {
+        x = x - mc.getRenderManager().renderPosX;
+        x1 = x1 - mc.getRenderManager().renderPosX;
+        y = y - mc.getRenderManager().renderPosY;
+        y1 = y1 - mc.getRenderManager().renderPosY;
+        z = z - mc.getRenderManager().renderPosZ;
+        z1 = z1 - mc.getRenderManager().renderPosZ;
+
+        GL11.glPushMatrix();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glBlendFunc(770, 771);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glLineWidth(lineWdith);
+        GL11.glColor4f(red, green, blue, alpha);
+        GL11.glBegin(2);
+        GL11.glVertex3d(x, y, z);
+        GL11.glVertex3d(x1, y1, z1);
+        GL11.glEnd();
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glDisable(GL11.GL_BLEND);
+        GL11.glPopMatrix();
+    }
 }
