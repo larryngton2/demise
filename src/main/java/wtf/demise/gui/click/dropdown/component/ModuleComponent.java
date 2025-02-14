@@ -53,7 +53,7 @@ public class ModuleComponent implements IComponent {
             if (value instanceof MultiBoolValue multiBoolValue) {
                 settings.add(new MultiBooleanComponent(multiBoolValue));
             }
-            if(value instanceof TextValue textValue){
+            if (value instanceof TextValue textValue) {
                 settings.add(new StringComponent(textValue));
             }
         }
@@ -66,7 +66,7 @@ public class ModuleComponent implements IComponent {
         toggleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
         hoverAnimation.setDirection(isHovered(mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
 
-        RoundedUtils.drawRound(x,y,width,yOffset - 4,3,new Color(ColorUtils.darker(INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get().getRGB(), (float) (0.15f + (0.15 * toggleAnimation.getOutput())))));
+        RoundedUtils.drawRound(x, y, width, yOffset - 4, 3, new Color(ColorUtils.darker(INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get().getRGB(), (float) (0.15f + (0.15 * toggleAnimation.getOutput())))));
 
         Fonts.interRegular.get((float) (14 - 1 * hoverAnimation.getOutput())).drawCenteredString(module.getName(), x + getWidth() / 2, y + yOffset / 2 - 3 + 0.5 * hoverAnimation.getOutput(), ColorUtils.interpolateColor2(Color.GRAY, INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get(), (float) toggleAnimation.getOutput()));
 

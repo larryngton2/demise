@@ -15,30 +15,24 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public class RenderFallingBlock extends Render<EntityFallingBlock>
-{
-    public RenderFallingBlock(RenderManager renderManagerIn)
-    {
+public class RenderFallingBlock extends Render<EntityFallingBlock> {
+    public RenderFallingBlock(RenderManager renderManagerIn) {
         super(renderManagerIn);
         this.shadowSize = 0.5F;
     }
 
-    public void doRender(EntityFallingBlock entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
-        if (entity.getBlock() != null)
-        {
+    public void doRender(EntityFallingBlock entity, double x, double y, double z, float entityYaw, float partialTicks) {
+        if (entity.getBlock() != null) {
             this.bindTexture(TextureMap.locationBlocksTexture);
             IBlockState iblockstate = entity.getBlock();
             Block block = iblockstate.getBlock();
             BlockPos blockpos = new BlockPos(entity);
             World world = entity.getWorldObj();
 
-            if (iblockstate != world.getBlockState(blockpos) && block.getRenderType() != -1)
-            {
-                if (block.getRenderType() == 3)
-                {
+            if (iblockstate != world.getBlockState(blockpos) && block.getRenderType() != -1) {
+                if (block.getRenderType() == 3) {
                     GlStateManager.pushMatrix();
-                    GlStateManager.translate((float)x, (float)y, (float)z);
+                    GlStateManager.translate((float) x, (float) y, (float) z);
                     GlStateManager.disableLighting();
                     Tessellator tessellator = Tessellator.getInstance();
                     WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -46,7 +40,7 @@ public class RenderFallingBlock extends Render<EntityFallingBlock>
                     int i = blockpos.getX();
                     int j = blockpos.getY();
                     int k = blockpos.getZ();
-                    worldrenderer.setTranslation((float)(-i) - 0.5F, -j, (float)(-k) - 0.5F);
+                    worldrenderer.setTranslation((float) (-i) - 0.5F, -j, (float) (-k) - 0.5F);
                     BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
                     IBakedModel ibakedmodel = blockrendererdispatcher.getModelFromBlockState(iblockstate, world, null);
                     blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, iblockstate, blockpos, worldrenderer, false);
@@ -60,8 +54,7 @@ public class RenderFallingBlock extends Render<EntityFallingBlock>
         }
     }
 
-    protected ResourceLocation getEntityTexture(EntityFallingBlock entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityFallingBlock entity) {
         return TextureMap.locationBlocksTexture;
     }
 }

@@ -8,8 +8,7 @@ import net.minecraft.util.JsonSerializableSet;
 
 import java.util.List;
 
-public class AchievementList
-{
+public class AchievementList {
     public static int minDisplayColumn;
     public static int minDisplayRow;
     public static int maxDisplayColumn;
@@ -50,7 +49,6 @@ public class AchievementList
     public static Achievement exploreAllBiomes = (new Achievement("achievement.exploreAllBiomes", "exploreAllBiomes", 4, 8, Items.diamond_boots, theEnd)).func_150953_b(JsonSerializableSet.class).setSpecial().registerStat();
     public static Achievement overpowered = (new Achievement("achievement.overpowered", "overpowered", 6, 4, new ItemStack(Items.golden_apple, 1, 1), buildBetterPickaxe)).setSpecial().registerStat();
 
-    public static void init()
-    {
+    public static void init() {
     }
 }

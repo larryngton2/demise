@@ -17,8 +17,7 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-public abstract class ColorPickerComponent extends ButtonComponent implements PredicateComponent, ExpandableComponent
-{
+public abstract class ColorPickerComponent extends ButtonComponent implements PredicateComponent, ExpandableComponent {
     private static final int MARGIN = 3;
     private static final int SLIDER_THICKNESS = 8;
 
@@ -119,8 +118,8 @@ public abstract class ColorPickerComponent extends ButtonComponent implements Pr
             final float colorPickerTop = expandedY + MARGIN;
             //final float colorPickerRight = colorPickerLeft + colorPickerSize;
             //final float colorPickerBottom = colorPickerTop + colorPickerSize;
-             final float colorPickerRight = colorPickerLeft + colorPickerSize;
-             final float colorPickerBottom = colorPickerTop + colorPickerSize;
+            final float colorPickerRight = colorPickerLeft + colorPickerSize;
+            final float colorPickerBottom = colorPickerTop + colorPickerSize;
 
             final int selectorWhiteOverlayColor = new Color(0xFF, 0xFF, 0xFF, Math.min(guiAlpha, 180)).getRGB();
 
@@ -343,9 +342,9 @@ public abstract class ColorPickerComponent extends ButtonComponent implements Pr
             float alphaSliderBottom = alphaSliderTop + 8.0f;
             float hueSliderLeft = colorPickerRight + 3.0f;
             float hueSliderRight = hueSliderLeft + 8.0f;
-            this.colorSelectorDragging = !this.colorSelectorDragging && (float)mouseX > colorPickerLeft && (float)mouseY > colorPickerTop && (float)mouseX < colorPickerRight && (float)mouseY < colorPickerBottom;
-            this.alphaSelectorDragging = !this.alphaSelectorDragging && (float)mouseX > colorPickerLeft && (float)mouseY > alphaSliderTop && (float)mouseX < colorPickerRight && (float)mouseY < alphaSliderBottom;
-            this.hueSelectorDragging = !this.hueSelectorDragging && (float)mouseX > hueSliderLeft && (float)mouseY > colorPickerTop && (float)mouseX < hueSliderRight && (float)mouseY < colorPickerBottom;
+            this.colorSelectorDragging = !this.colorSelectorDragging && (float) mouseX > colorPickerLeft && (float) mouseY > colorPickerTop && (float) mouseX < colorPickerRight && (float) mouseY < colorPickerBottom;
+            this.alphaSelectorDragging = !this.alphaSelectorDragging && (float) mouseX > colorPickerLeft && (float) mouseY > alphaSliderTop && (float) mouseX < colorPickerRight && (float) mouseY < alphaSliderBottom;
+            this.hueSelectorDragging = !this.hueSelectorDragging && (float) mouseX > hueSliderLeft && (float) mouseY > colorPickerTop && (float) mouseX < hueSliderRight && (float) mouseY < colorPickerBottom;
         }
     }
 
@@ -363,16 +362,18 @@ public abstract class ColorPickerComponent extends ButtonComponent implements Pr
         if (hasAlpha) {
             setColor(hex);
         } else {
-            setColor(new Color(hex.getRed(),hex.getGreen(),hex.getBlue(),(int) alpha));
+            setColor(new Color(hex.getRed(), hex.getGreen(), hex.getBlue(), (int) alpha));
         }
     }
 
     public abstract Color getColor();
 
     public abstract void setColor(Color color);
+
     public void onValueChange(int oldValue, int value) {
 
     }
+
     private void drawColorPickerRect(float left, float top, float right, float bottom) {
         final int hueBasedColor = SkeetUI.getSkeetColor(Color.HSBtoRGB(hue, 1.0F, 1.0F));
 

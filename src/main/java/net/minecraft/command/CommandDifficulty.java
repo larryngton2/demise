@@ -7,31 +7,23 @@ import net.minecraft.world.EnumDifficulty;
 
 import java.util.List;
 
-public class CommandDifficulty extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandDifficulty extends CommandBase {
+    public String getCommandName() {
         return "difficulty";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 2;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.difficulty.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
-        if (args.length <= 0)
-        {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (args.length <= 0) {
             throw new WrongUsageException("commands.difficulty.usage");
-        }
-        else
-        {
+        } else {
             EnumDifficulty enumdifficulty = this.getDifficultyFromCommand(args[0]);
             MinecraftServer.getServer().setDifficultyForAllWorlds(enumdifficulty);
             notifyOperators(sender, this, "commands.difficulty.success", new ChatComponentTranslation(enumdifficulty.getDifficultyResourceKey()));
@@ -42,8 +34,7 @@ public class CommandDifficulty extends CommandBase
         return !p_180531_1_.equalsIgnoreCase("peaceful") && !p_180531_1_.equalsIgnoreCase("p") ? (!p_180531_1_.equalsIgnoreCase("easy") && !p_180531_1_.equalsIgnoreCase("e") ? (!p_180531_1_.equalsIgnoreCase("normal") && !p_180531_1_.equalsIgnoreCase("n") ? (!p_180531_1_.equalsIgnoreCase("hard") && !p_180531_1_.equalsIgnoreCase("h") ? EnumDifficulty.getDifficultyEnum(parseInt(p_180531_1_, 0, 3)) : EnumDifficulty.HARD) : EnumDifficulty.NORMAL) : EnumDifficulty.EASY) : EnumDifficulty.PEACEFUL;
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "peaceful", "easy", "normal", "hard"): null;
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "peaceful", "easy", "normal", "hard") : null;
     }
 }

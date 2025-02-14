@@ -36,10 +36,10 @@ public class Notification implements InstanceAccess {
         final ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         this.translate = new Translate(sr.getScaledWidth() - this.getWidth(), sr.getScaledHeight() - getHeight());
     }
-    
-    public double getWidth(){
+
+    public double getWidth() {
         double width = 0;
-        switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()){
+        switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
             case "Default":
                 width = Fonts.interMedium.get(15).getStringWidth(getDescription()) + 5;
                 break;
@@ -62,9 +62,9 @@ public class Notification implements InstanceAccess {
         return width;
     }
 
-    public double getHeight(){
+    public double getHeight() {
         double height = 0;
-        switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()){
+        switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
             case "Default":
                 height = 16;
                 break;

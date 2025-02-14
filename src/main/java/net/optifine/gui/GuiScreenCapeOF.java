@@ -12,8 +12,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.util.Random;
 
-public class GuiScreenCapeOF extends GuiScreenOF
-{
+public class GuiScreenCapeOF extends GuiScreenOF {
     private final GuiScreen parentScreen;
     private String title;
     private String message;
@@ -22,14 +21,12 @@ public class GuiScreenCapeOF extends GuiScreenOF
     private GuiButtonOF buttonCopyLink;
     private final FontRenderer fontRenderer;
 
-    public GuiScreenCapeOF(GuiScreen parentScreenIn)
-    {
+    public GuiScreenCapeOF(GuiScreen parentScreenIn) {
         this.fontRenderer = Config.getMinecraft().fontRendererObj;
         this.parentScreen = parentScreenIn;
     }
 
-    public void initGui()
-    {
+    public void initGui() {
         int i = 0;
         this.title = I18n.format("of.options.capeOF.title");
         i = i + 2;
@@ -43,19 +40,14 @@ public class GuiScreenCapeOF extends GuiScreenOF
         this.buttonList.add(new GuiButtonOF(200, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), I18n.format("gui.done")));
     }
 
-    protected void actionPerformed(GuiButton button)
-    {
-        if (button.enabled)
-        {
-            if (button.id == 200)
-            {
+    protected void actionPerformed(GuiButton button) {
+        if (button.enabled) {
+            if (button.id == 200) {
                 this.mc.displayGuiScreen(this.parentScreen);
             }
 
-            if (button.id == 210)
-            {
-                try
-                {
+            if (button.id == 210) {
+                try {
                     String s = this.mc.getSession().getProfile().getName();
                     String s1 = this.mc.getSession().getProfile().getId().toString().replace("-", "");
                     String s2 = this.mc.getSession().getToken();
@@ -69,66 +61,52 @@ public class GuiScreenCapeOF extends GuiScreenOF
                     String s4 = "https://optifine.net/capeChange?u=" + s1 + "&n=" + s + "&s=" + s3;
                     boolean flag = Config.openWebLink(new URI(s4));
 
-                    if (flag)
-                    {
+                    if (flag) {
                         this.showMessage(Lang.get("of.message.capeOF.openEditor"), 10000L);
-                    }
-                    else
-                    {
+                    } else {
                         this.showMessage(Lang.get("of.message.capeOF.openEditorError"), 10000L);
                         this.setLinkUrl(s4);
                     }
-                }
-                catch (InvalidCredentialsException invalidcredentialsexception)
-                {
+                } catch (InvalidCredentialsException invalidcredentialsexception) {
                     Config.showGuiMessage(I18n.format("of.message.capeOF.error1"), I18n.format("of.message.capeOF.error2", invalidcredentialsexception.getMessage()));
                     Config.warn("Mojang authentication failed");
                     Config.warn(invalidcredentialsexception.getClass().getName() + ": " + invalidcredentialsexception.getMessage());
-                }
-                catch (Exception exception)
-                {
+                } catch (Exception exception) {
                     Config.warn("Error opening OptiFine cape link");
                     Config.warn(exception.getClass().getName() + ": " + exception.getMessage());
                 }
             }
 
-            if (button.id == 220)
-            {
+            if (button.id == 220) {
                 this.showMessage(Lang.get("of.message.capeOF.reloadCape"), 15000L);
 
-                if (this.mc.thePlayer != null)
-                {
+                if (this.mc.thePlayer != null) {
                     long i = 15000L;
                     long j = System.currentTimeMillis() + i;
                     this.mc.thePlayer.setReloadCapeTimeMs(j);
                 }
             }
 
-            if (button.id == 230 && this.linkUrl != null)
-            {
+            if (button.id == 230 && this.linkUrl != null) {
                 setClipboardString(this.linkUrl);
             }
         }
     }
 
-    private void showMessage(String msg, long timeMs)
-    {
+    private void showMessage(String msg, long timeMs) {
         this.message = msg;
         this.messageHideTimeMs = System.currentTimeMillis() + timeMs;
         this.setLinkUrl(null);
     }
 
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRenderer, this.title, this.width / 2, 20, 16777215);
 
-        if (this.message != null)
-        {
+        if (this.message != null) {
             this.drawCenteredString(this.fontRenderer, this.message, this.width / 2, this.height / 6 + 60, 16777215);
 
-            if (System.currentTimeMillis() > this.messageHideTimeMs)
-            {
+            if (System.currentTimeMillis() > this.messageHideTimeMs) {
                 this.message = null;
                 this.setLinkUrl(null);
             }
@@ -137,8 +115,7 @@ public class GuiScreenCapeOF extends GuiScreenOF
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    public void setLinkUrl(String linkUrl)
-    {
+    public void setLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl;
         this.buttonCopyLink.visible = linkUrl != null;
     }

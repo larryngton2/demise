@@ -70,6 +70,7 @@ public class GuiRoundedGroupWithLines<T> extends GuiRoundedGroup {
     public void addLine(Function<T, String> stringFunction) {
         this.lines.add(GroupSupplierLine.of(stringFunction));
     }
+
     public List<GroupLine<T>> getLines() {
         return this.linesView;
     }

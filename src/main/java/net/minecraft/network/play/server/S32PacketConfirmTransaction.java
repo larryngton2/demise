@@ -8,25 +8,21 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 
 import java.io.IOException;
 
-public class S32PacketConfirmTransaction implements Packet<INetHandlerPlayClient>
-{
+public class S32PacketConfirmTransaction implements Packet<INetHandlerPlayClient> {
     private int windowId;
     private short actionNumber;
     private boolean accepted;
 
-    public S32PacketConfirmTransaction()
-    {
+    public S32PacketConfirmTransaction() {
     }
 
-    public S32PacketConfirmTransaction(int windowIdIn, short actionNumberIn, boolean p_i45182_3_)
-    {
+    public S32PacketConfirmTransaction(int windowIdIn, short actionNumberIn, boolean p_i45182_3_) {
         this.windowId = windowIdIn;
         this.actionNumber = actionNumberIn;
         this.accepted = p_i45182_3_;
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleConfirmTransaction(this);
     }
 
@@ -40,25 +36,21 @@ public class S32PacketConfirmTransaction implements Packet<INetHandlerPlayClient
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeByte(this.windowId);
         buf.writeShort(this.actionNumber);
         buf.writeBoolean(this.accepted);
     }
 
-    public int getWindowId()
-    {
+    public int getWindowId() {
         return this.windowId;
     }
 
-    public short getActionNumber()
-    {
+    public short getActionNumber() {
         return this.actionNumber;
     }
 
-    public boolean func_148888_e()
-    {
+    public boolean func_148888_e() {
         return this.accepted;
     }
 }

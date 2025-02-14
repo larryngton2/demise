@@ -9,8 +9,7 @@ import wtf.demise.utils.animations.Translate;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RenderUtils;
 
-public abstract class TabComponent extends Component
-{
+public abstract class TabComponent extends Component {
     private final String name;
     public float highest = 0;
     public float scrollY = 0;
@@ -23,7 +22,7 @@ public abstract class TabComponent extends Component
         this.setupChildren();
         this.name = name;
     }
-    
+
     public abstract void setupChildren();
     
     /*@Override
@@ -79,7 +78,7 @@ public abstract class TabComponent extends Component
         SkeetUI.FONT_RENDERER.drawString(this.name, this.getX() + 8.0f, this.getY() + 8.0f - 3.0f, SkeetUI.getSkeetColor(16777215), true);
         float x = 8.0f;
 
-        if(MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13,mouseX, mouseY)) {
+        if (MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
             minY = getHeight() - 24;
         }
 
@@ -116,12 +115,12 @@ public abstract class TabComponent extends Component
             GL11.glDisable(GL11.GL_SCISSOR_TEST);
         }
 
-        if(MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
+        if (MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
             minY -= this.highest;
         }
 
-        if(this.highest > this.getHeight() - 13) {
-            if(!MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
+        if (this.highest > this.getHeight() - 13) {
+            if (!MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
                 Mouse.getDWheel(); //刷新滚轮
             }
             this.scrollAni = Translate.smoothAnimation(this.scrollAni, scrollY, 50, 0.3f);
@@ -178,7 +177,7 @@ public abstract class TabComponent extends Component
 
     @Override
     public void onMouseScroll(int mouseX, int mouseY, int value) {
-        if(MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
+        if (MouseUtils.isHovered2(this.getX() + 2, this.getY() + 11, this.getWidth() - 4, this.getHeight() - 13, mouseX, mouseY)) {
             scrollY += value / 6f;
             if (scrollY <= minY)
                 scrollY = minY;

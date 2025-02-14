@@ -9,8 +9,7 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.Properties;
 
-public class CustomLoadingScreen
-{
+public class CustomLoadingScreen {
     private final ResourceLocation locationTexture;
     private int scaleMode = 0;
     private int scale = 2;
@@ -20,16 +19,14 @@ public class CustomLoadingScreen
     private static final int SCALE_MODE_FULL = 1;
     private static final int SCALE_MODE_STRETCH = 2;
 
-    public CustomLoadingScreen(ResourceLocation locationTexture, int scaleMode, int scale, boolean center)
-    {
+    public CustomLoadingScreen(ResourceLocation locationTexture, int scaleMode, int scale, boolean center) {
         this.locationTexture = locationTexture;
         this.scaleMode = scaleMode;
         this.scale = scale;
         this.center = center;
     }
 
-    public static CustomLoadingScreen parseScreen(String path, int dimId, Properties props)
-    {
+    public static CustomLoadingScreen parseScreen(String path, int dimId, Properties props) {
         ResourceLocation resourcelocation = new ResourceLocation(path);
         int i = parseScaleMode(getProperty("scaleMode", dimId, props));
         int j = i == 0 ? 2 : 1;
@@ -39,83 +36,57 @@ public class CustomLoadingScreen
         return customloadingscreen;
     }
 
-    private static String getProperty(String key, int dim, Properties props)
-    {
-        if (props == null)
-        {
+    private static String getProperty(String key, int dim, Properties props) {
+        if (props == null) {
             return null;
-        }
-        else
-        {
+        } else {
             String s = props.getProperty("dim" + dim + "." + key);
 
-            if (s != null)
-            {
+            if (s != null) {
                 return s;
-            }
-            else
-            {
+            } else {
                 s = props.getProperty(key);
                 return s;
             }
         }
     }
 
-    private static int parseScaleMode(String str)
-    {
-        if (str == null)
-        {
+    private static int parseScaleMode(String str) {
+        if (str == null) {
             return 0;
-        }
-        else
-        {
+        } else {
             str = str.toLowerCase().trim();
 
-            if (str.equals("fixed"))
-            {
+            if (str.equals("fixed")) {
                 return 0;
-            }
-            else if (str.equals("full"))
-            {
+            } else if (str.equals("full")) {
                 return 1;
-            }
-            else if (str.equals("stretch"))
-            {
+            } else if (str.equals("stretch")) {
                 return 2;
-            }
-            else
-            {
+            } else {
                 CustomLoadingScreens.warn("Invalid scale mode: " + str);
                 return 0;
             }
         }
     }
 
-    private static int parseScale(String str, int def)
-    {
-        if (str == null)
-        {
+    private static int parseScale(String str, int def) {
+        if (str == null) {
             return def;
-        }
-        else
-        {
+        } else {
             str = str.trim();
             int i = Config.parseInt(str, -1);
 
-            if (i < 1)
-            {
+            if (i < 1) {
                 CustomLoadingScreens.warn("Invalid scale: " + str);
                 return def;
-            }
-            else
-            {
+            } else {
                 return i;
             }
         }
     }
 
-    public void drawBackground(int width, int height)
-    {
+    public void drawBackground(int width, int height) {
         GlStateManager.disableLighting();
         GlStateManager.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
@@ -123,28 +94,25 @@ public class CustomLoadingScreen
         Config.getTextureManager().bindTexture(this.locationTexture);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         double d0 = 16 * this.scale;
-        double d1 = (double)width / d0;
-        double d2 = (double)height / d0;
+        double d1 = (double) width / d0;
+        double d2 = (double) height / d0;
         double d3 = 0.0D;
         double d4 = 0.0D;
 
-        if (this.center)
-        {
-            d3 = (d0 - (double)width) / (d0 * 2.0D);
-            d4 = (d0 - (double)height) / (d0 * 2.0D);
+        if (this.center) {
+            d3 = (d0 - (double) width) / (d0 * 2.0D);
+            d4 = (d0 - (double) height) / (d0 * 2.0D);
         }
 
-        switch (this.scaleMode)
-        {
+        switch (this.scaleMode) {
             case 1:
                 d0 = Math.max(width, height);
-                d1 = (double)(this.scale * width) / d0;
-                d2 = (double)(this.scale * height) / d0;
+                d1 = (double) (this.scale * width) / d0;
+                d2 = (double) (this.scale * height) / d0;
 
-                if (this.center)
-                {
-                    d3 = (double)this.scale * (d0 - (double)width) / (d0 * 2.0D);
-                    d4 = (double)this.scale * (d0 - (double)height) / (d0 * 2.0D);
+                if (this.center) {
+                    d3 = (double) this.scale * (d0 - (double) width) / (d0 * 2.0D);
+                    d4 = (double) this.scale * (d0 - (double) height) / (d0 * 2.0D);
                 }
 
                 break;

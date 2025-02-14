@@ -28,9 +28,9 @@ import static wtf.demise.gui.click.neverlose.NeverLose.*;
 @Getter
 public class ConfigPanel extends Panel {
     private Map<ConfigRect, Config> configMap = new HashMap<>();
-    private final Animation animation = new DecelerateAnimation(250,1);
-    private final Animation hover = new DecelerateAnimation(250,1);
-    private final Animation hover2 = new DecelerateAnimation(250,1);
+    private final Animation animation = new DecelerateAnimation(250, 1);
+    private final Animation hover = new DecelerateAnimation(250, 1);
+    private final Animation hover2 = new DecelerateAnimation(250, 1);
     @Setter
     private boolean selected;
     private int posX, posY;
@@ -39,11 +39,13 @@ public class ConfigPanel extends Panel {
     private final Animation input = new DecelerateAnimation(250, 1);
     private boolean inputting;
     private String text = "";
+
     public ConfigPanel(ModuleCategory category) {
         super(category);
         //update configs
         refresh();
     }
+
     @Override
     public void drawScreen(int mouseX, int mouseY) {
         //set default selection
@@ -57,11 +59,11 @@ public class ConfigPanel extends Panel {
         posY = INSTANCE.getNeverLose().getPosY();
         //select anim
         animation.setDirection(selected ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover.setDirection(MouseUtils.isHovered2(posX + 148,posY + 14,70,22,mouseX,mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover2.setDirection(MouseUtils.isHovered2(posX + 228,posY + 14,70,22,mouseX,mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered2(posX + 148, posY + 14, 70, 22, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover2.setDirection(MouseUtils.isHovered2(posX + 228, posY + 14, 70, 22, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         input.setDirection(inputting ? Direction.FORWARDS : Direction.BACKWARDS);
         //render
-        if (isSelected()){
+        if (isSelected()) {
             Fonts.interSemiBold.get(16).drawString("- My Items", posX + 148, posY + 64, -1);
             RoundedUtils.drawRound(posX + 148, posY + 80, 360, .5f, 4, lineColor);
 
@@ -103,7 +105,7 @@ public class ConfigPanel extends Panel {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         //handle mouseClick
-        if (MouseUtils.isHovered2(posX + 308,posY + 14,120,22,mouseX,mouseY) && mouseButton == 0){
+        if (MouseUtils.isHovered2(posX + 308, posY + 14, 120, 22, mouseX, mouseY) && mouseButton == 0) {
             inputting = !inputting;
         } else {
             inputting = false;
@@ -111,43 +113,45 @@ public class ConfigPanel extends Panel {
         if (MouseUtils.isHovered2(posX + 148, posY + 14, 70, 22, mouseX, mouseY)) {
             refresh();
         }
-        if (MouseUtils.isHovered2(posX + 228,posY + 14,70, 22, mouseX, mouseY)) {
+        if (MouseUtils.isHovered2(posX + 228, posY + 14, 70, 22, mouseX, mouseY)) {
             Demise.INSTANCE.getConfigManager().saveConfig(new Config(text + ".json"));
             refresh();
         }
         for (ConfigRect configRect : configMap.keySet()) {
-            configRect.mouseClicked(mouseX,mouseY,mouseButton);
-            if (configRect.isHovered(mouseX,mouseY) && mouseButton == 0) {
+            configRect.mouseClicked(mouseX, mouseY, mouseButton);
+            if (configRect.isHovered(mouseX, mouseY) && mouseButton == 0) {
                 for (ConfigRect c : configMap.keySet()) {
                     c.setSelected(false);
                 }
                 configRect.setSelected(true);
             }
-            if (mouseButton == 2 && configRect.isHovered(mouseX,mouseY)){
+            if (mouseButton == 2 && configRect.isHovered(mouseX, mouseY)) {
                 Demise.INSTANCE.getConfigManager().loadConfig(configRect.getConfig());
             }
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
-    public void refresh(){
+
+    public void refresh() {
         configMap.clear();
-        Arrays.stream(Objects.requireNonNull(Demise.INSTANCE.getMainDir().listFiles())).filter(file -> file.isFile() && file.getName().endsWith(".json")).forEach(file -> configMap.put(new ConfigRect(new Config(file.getName().replaceFirst(".json",""))),new Config(file.getName().replaceFirst(".json",""))));
+        Arrays.stream(Objects.requireNonNull(Demise.INSTANCE.getMainDir().listFiles())).filter(file -> file.isFile() && file.getName().endsWith(".json")).forEach(file -> configMap.put(new ConfigRect(new Config(file.getName().replaceFirst(".json", ""))), new Config(file.getName().replaceFirst(".json", ""))));
         configMap = configMap.values().stream()
                 .sorted(Comparator.comparing(Config::getName))
-                .collect(LinkedHashMap::new, (map, file) -> map.put(new ConfigRect(new Config(file.getName().replaceFirst(".json",""))),new Config(file.getName().replaceFirst(".json",""))), LinkedHashMap::putAll);
+                .collect(LinkedHashMap::new, (map, file) -> map.put(new ConfigRect(new Config(file.getName().replaceFirst(".json", ""))), new Config(file.getName().replaceFirst(".json", ""))), LinkedHashMap::putAll);
     }
+
     @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
         for (ConfigRect configRect : configMap.keySet()) {
-            configRect.mouseReleased(mouseX,mouseY,state);
+            configRect.mouseReleased(mouseX, mouseY, state);
         }
         super.mouseReleased(mouseX, mouseY, state);
     }
 
     @Override
     public void keyTyped(char typedChar, int keyCode) {
-        if (inputting){
+        if (inputting) {
             if (keyCode == Keyboard.KEY_BACK) {
                 deleteLastCharacter();
             }
@@ -158,14 +162,16 @@ public class ConfigPanel extends Panel {
         }
         super.keyTyped(typedChar, keyCode);
     }
+
     private void deleteLastCharacter() {
         if (!text.isEmpty()) {
             text = text.substring(0, text.length() - 1);
         }
     }
+
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
-        if (MouseUtils.isHovered2(posX + 148,posY + 80,360, 338, mx, my)) {
+        if (MouseUtils.isHovered2(posX + 148, posY + 80, 360, 338, mx, my)) {
             rawScroll += (float) Mouse.getDWheel() * 20;
         }
         rawScroll = Math.max(Math.min(0, rawScroll), -maxScroll);

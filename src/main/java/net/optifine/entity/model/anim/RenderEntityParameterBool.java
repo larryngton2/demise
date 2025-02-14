@@ -8,8 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.optifine.expr.ExpressionType;
 import net.optifine.expr.IExpressionBool;
 
-public enum RenderEntityParameterBool implements IExpressionBool
-{
+public enum RenderEntityParameterBool implements IExpressionBool {
     IS_ALIVE("is_alive"),
     IS_BURNING("is_burning"),
     IS_CHILD("is_child"),
@@ -29,43 +28,33 @@ public enum RenderEntityParameterBool implements IExpressionBool
     private final RenderManager renderManager;
     private static final RenderEntityParameterBool[] VALUES = values();
 
-    RenderEntityParameterBool(String name)
-    {
+    RenderEntityParameterBool(String name) {
         this.name = name;
         this.renderManager = Minecraft.getMinecraft().getRenderManager();
     }
 
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
 
-    public ExpressionType getExpressionType()
-    {
+    public ExpressionType getExpressionType() {
         return ExpressionType.BOOL;
     }
 
-    public boolean eval()
-    {
+    public boolean eval() {
         Render render = this.renderManager.renderRender;
 
-        if (render == null)
-        {
+        if (render == null) {
             return false;
-        }
-        else
-        {
-            if (render instanceof RendererLivingEntity rendererlivingentity)
-            {
+        } else {
+            if (render instanceof RendererLivingEntity rendererlivingentity) {
                 EntityLivingBase entitylivingbase = rendererlivingentity.renderEntity;
 
-                if (entitylivingbase == null)
-                {
+                if (entitylivingbase == null) {
                     return false;
                 }
 
-                switch (this)
-                {
+                switch (this) {
                     case IS_ALIVE:
                         return entitylivingbase.isEntityAlive();
 
@@ -111,20 +100,14 @@ public enum RenderEntityParameterBool implements IExpressionBool
         }
     }
 
-    public static RenderEntityParameterBool parse(String str)
-    {
-        if (str == null)
-        {
+    public static RenderEntityParameterBool parse(String str) {
+        if (str == null) {
             return null;
-        }
-        else
-        {
-            for (int i = 0; i < VALUES.length; ++i)
-            {
+        } else {
+            for (int i = 0; i < VALUES.length; ++i) {
                 RenderEntityParameterBool renderentityparameterbool = VALUES[i];
 
-                if (renderentityparameterbool.getName().equals(str))
-                {
+                if (renderentityparameterbool.getName().equals(str)) {
                     return renderentityparameterbool;
                 }
             }

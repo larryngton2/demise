@@ -1,6 +1,6 @@
 {
-    "parent": "block/tallgrass",
-    "textures": {
-        "cross": "blocks/double_plant_grass_bottom"
-    }
+  "parent": "block/tallgrass",
+  "textures": {
+    "cross": "blocks/double_plant_grass_bottom"
+  }
 }

@@ -16,8 +16,8 @@ public final class Translate {
     }
 
     public void translate(final float targetX, final float targetY) {
-        this.x = (float)anim(this.x, targetX, 1.0);
-        this.y = (float)anim(this.y, targetY, 1.0);
+        this.x = (float) anim(this.x, targetX, 1.0);
+        this.y = (float) anim(this.y, targetY, 1.0);
     }
 
     public void animate(double newX, double newY) {

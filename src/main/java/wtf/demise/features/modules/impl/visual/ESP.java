@@ -99,7 +99,7 @@ public class ESP extends Module {
                 final FontRenderer fontRenderer = mc.fontRendererObj;
 
                 final String hacker = getModule(AntiCheat.class).isHacker(player) ? EnumChatFormatting.RED + "[Hacker] " + EnumChatFormatting.RESET : "";
-                final String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(PlayerUtils.getActualHealth(player))) + EnumChatFormatting.RED + "❤" :"";
+                final String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(PlayerUtils.getActualHealth(player))) + EnumChatFormatting.RED + "❤" : "";
                 final String name = hacker + player.getDisplayName().getFormattedText() + healthString;
                 float halfWidth = (float) fontRenderer.getStringWidth(name) / 2 * tagsSize.get();
                 final float xDif = x2 - x;
@@ -114,8 +114,8 @@ public class ESP extends Module {
                     Gui.drawRect(left, renderY - 1, right, renderY + textHeight + 1, 0x96000000);
                 }
 
-                if(tagsHealthBar.get()){
-                    RenderUtils.drawRect(left, renderY + textHeight, (halfWidth + halfWidth + 1) * healthPercentage,0.5f, ColorUtils.getHealthColor(player));
+                if (tagsHealthBar.get()) {
+                    RenderUtils.drawRect(left, renderY + textHeight, (halfWidth + halfWidth + 1) * healthPercentage, 0.5f, ColorUtils.getHealthColor(player));
                 }
 
                 fontRenderer.drawScaledString(name, middle - halfWidth, renderY + 0.5F, tagsSize.get(), -1);

@@ -6,14 +6,10 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.button.MenuButton;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.render.RoundedUtils;
-import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.MainMenu;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 

@@ -8,30 +8,25 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 
 import java.io.IOException;
 
-public class C0FPacketConfirmTransaction implements Packet<INetHandlerPlayServer>
-{
+public class C0FPacketConfirmTransaction implements Packet<INetHandlerPlayServer> {
     private int windowId;
     private short uid;
     private boolean accepted;
 
-    public C0FPacketConfirmTransaction()
-    {
+    public C0FPacketConfirmTransaction() {
     }
 
-    public C0FPacketConfirmTransaction(int windowId, short uid, boolean accepted)
-    {
+    public C0FPacketConfirmTransaction(int windowId, short uid, boolean accepted) {
         this.windowId = windowId;
         this.uid = uid;
         this.accepted = accepted;
     }
 
-    public void processPacket(INetHandlerPlayServer handler)
-    {
+    public void processPacket(INetHandlerPlayServer handler) {
         handler.processConfirmTransaction(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.windowId = buf.readByte();
         this.uid = buf.readShort();
         this.accepted = buf.readByte() != 0;
@@ -47,13 +42,11 @@ public class C0FPacketConfirmTransaction implements Packet<INetHandlerPlayServer
         }
     }
 
-    public int getWindowId()
-    {
+    public int getWindowId() {
         return this.windowId;
     }
 
-    public short getUid()
-    {
+    public short getUid() {
         return this.uid;
     }
 }

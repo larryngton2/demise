@@ -19,6 +19,7 @@ public class Blur implements InstanceAccess {
 
     private static final ShaderUtils gaussianBlur = new ShaderUtils("gaussianBlur");
     private static Framebuffer framebuffer = new Framebuffer(1, 1, false);
+
     private static void setupUniforms(float dir1, float dir2, float radius) {
         gaussianBlur.setUniformi("textureIn", 0);
         gaussianBlur.setUniformf("texelSize", 1.0F / (float) mc.displayWidth, 1.0F / (float) mc.displayHeight);
@@ -34,9 +35,10 @@ public class Blur implements InstanceAccess {
         glUniform1fv(gaussianBlur.getUniform("weights"), weightBuffer);
     }
 
-    public static void startBlur(){
+    public static void startBlur() {
         StencilUtils.initStencilToWrite();
     }
+
     public static void endBlur(float radius, float compression) {
         StencilUtils.readStencilBuffer(1);
 

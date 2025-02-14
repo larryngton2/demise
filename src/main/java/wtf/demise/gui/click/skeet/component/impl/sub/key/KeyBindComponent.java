@@ -11,8 +11,7 @@ import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class KeyBindComponent extends ButtonComponent
-{
+public final class KeyBindComponent extends ButtonComponent {
     private static final FontRenderer FONT_RENDERER = SkeetUI.KEYBIND_FONT_RENDERER;
     public static final FontRenderer abcFont = new FontRenderer(new Font("Tahoma", Font.PLAIN, 9), false);
     private final Supplier<Integer> getBind;
@@ -37,7 +36,7 @@ public final class KeyBindComponent extends ButtonComponent
         final float y = this.getY();
         final float width = this.getWidth();
         abcFont.drawString("[", x + 40.166668f - width, y, binding ? new Color(216, 56, 56).getRGB() : new Color(75, 75, 75, (int) SkeetUI.getAlpha()).getRGB());
-        abcFont.drawString(this.getBind().toUpperCase() , abcFont.getStringWidth("[") + x + 40.166668f - width, y, binding ? new Color(216, 56, 56).getRGB() : new Color(75, 75, 75, (int) SkeetUI.getAlpha()).getRGB());
+        abcFont.drawString(this.getBind().toUpperCase(), abcFont.getStringWidth("[") + x + 40.166668f - width, y, binding ? new Color(216, 56, 56).getRGB() : new Color(75, 75, 75, (int) SkeetUI.getAlpha()).getRGB());
         abcFont.drawString("]", abcFont.getStringWidth("[") + abcFont.getStringWidth(this.getBind().toUpperCase()) + x + 40.166668f - width, y, binding ? new Color(216, 56, 56).getRGB() : new Color(75, 75, 75, (int) SkeetUI.getAlpha()).getRGB());
     }
 

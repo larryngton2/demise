@@ -9,7 +9,8 @@ import wtf.demise.utils.render.RenderUtils;
 import static org.lwjgl.opengl.GL11.*;
 
 public class HealthElement extends Component {
-    private int x,y;
+    private int x, y;
+
     @Override
     public void drawScreen(int mouseX, int mouseY) {
         x = INSTANCE.getNeverLose().espPreviewComponent.getPosX() + INSTANCE.getNeverLose().getWidth() + 65;
@@ -94,6 +95,7 @@ public class HealthElement extends Component {
 
         super.drawScreen(mouseX, mouseY);
     }
+
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);

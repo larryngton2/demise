@@ -9,6 +9,7 @@ public class WidgetConfig extends Config {
     public WidgetConfig(String name) {
         super(name);
     }
+
     @Override
     public void loadConfig(JsonObject object) {
         for (Widget widget : Demise.INSTANCE.getWidgetManager().widgetList) {
@@ -19,6 +20,7 @@ public class WidgetConfig extends Config {
             }
         }
     }
+
     @Override
     public JsonObject saveConfig() {
         JsonObject object = new JsonObject();

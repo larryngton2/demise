@@ -2,8 +2,7 @@ package net.optifine.shaders;
 
 import org.lwjgl.opengl.ARBShaderObjects;
 
-public class ShaderProgramData
-{
+public class ShaderProgramData {
     public int programIDGL;
     public int uniform_texture;
     public int uniform_lightmap;
@@ -80,8 +79,7 @@ public class ShaderProgramData
     public int uniform_centerDepthSmooth;
     public int uniform_atlasSize;
 
-    public ShaderProgramData(int programID)
-    {
+    public ShaderProgramData(int programID) {
         this.programIDGL = programID;
         this.uniform_texture = ARBShaderObjects.glGetUniformLocationARB(programID, "texture");
         this.uniform_lightmap = ARBShaderObjects.glGetUniformLocationARB(programID, "lightmap");

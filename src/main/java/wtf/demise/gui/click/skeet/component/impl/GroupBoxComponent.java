@@ -12,15 +12,14 @@ import wtf.demise.gui.click.skeet.component.impl.sub.key.KeyBindComponent;
 
 import java.awt.*;
 
-public final class GroupBoxComponent extends Component
-{
+public final class GroupBoxComponent extends Component {
     private final String name;
-    
+
     public GroupBoxComponent(final Component parent, final String name, final float x, final float y, final float width, final float height) {
         super(parent, x, y, width, height);
         this.name = name;
     }
-    
+
     @Override
     public void drawComponent(final LockedResolution resolution, final int mouseX, final int mouseY) {
         final float x = this.getX() - 1.0f;
@@ -41,12 +40,11 @@ public final class GroupBoxComponent extends Component
         boolean left = true;
         for (final Component component : this.children) {
             if (component instanceof PredicateComponent) {
-                final PredicateComponent predicateComponent = (PredicateComponent)component;
+                final PredicateComponent predicateComponent = (PredicateComponent) component;
                 if (!predicateComponent.isVisible()) {
                     continue;
                 }
-            }
-            else if (component instanceof KeyBindComponent) {
+            } else if (component instanceof KeyBindComponent) {
                 continue;
             }
             if (component.getWidth() >= 80.333336f) {
@@ -57,27 +55,25 @@ public final class GroupBoxComponent extends Component
                 childYLeft += yOffset;
                 childYRight += yOffset;
                 left = true;
-            }
-            else {
+            } else {
                 component.setX(left ? 3.0f : 49.166668f);
                 component.setY(left ? childYLeft : childYRight);
                 component.drawComponent(resolution, mouseX, mouseY);
                 if (left) {
                     childYLeft += component.getHeight() + 4.0f;
-                }
-                else {
+                } else {
                     childYRight += component.getHeight() + 4.0f;
                 }
                 left = (childYRight >= childYLeft);
             }
         }
     }
-    
+
     @Override
     public void onMouseClick(final int mouseX, final int mouseY, final int button) {
         for (final Component child : this.children) {
             if (child instanceof ComboBoxTextComponent) {
-                final ComboBoxTextComponent comboBoxTextComponent = (ComboBoxTextComponent)child;
+                final ComboBoxTextComponent comboBoxTextComponent = (ComboBoxTextComponent) child;
                 final ComboBoxComponent comboBox = comboBoxTextComponent.getComboBoxComponent();
                 if (!comboBox.isExpanded()) {
                     continue;
@@ -110,7 +106,7 @@ public final class GroupBoxComponent extends Component
 
         return super.isHovered(mouseX, mouseY);
     }
-    
+
     @Override
     public float getHeight() {
         float heightLeft;
@@ -119,7 +115,7 @@ public final class GroupBoxComponent extends Component
         boolean left = true;
         for (final Component component : this.getChildren()) {
             if (component instanceof PredicateComponent) {
-                final PredicateComponent predicateComponent = (PredicateComponent)component;
+                final PredicateComponent predicateComponent = (PredicateComponent) component;
                 if (!predicateComponent.isVisible()) {
                     continue;
                 }
@@ -129,12 +125,10 @@ public final class GroupBoxComponent extends Component
                 heightLeft += yOffset;
                 heightLeft += yOffset;
                 left = true;
-            }
-            else {
+            } else {
                 if (left) {
                     heightLeft += component.getHeight() + 4.0f;
-                }
-                else {
+                } else {
                     heightRight += component.getHeight() + 4.0f;
                 }
                 left = (heightRight >= heightLeft);

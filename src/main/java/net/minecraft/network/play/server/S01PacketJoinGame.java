@@ -9,8 +9,7 @@ import net.minecraft.world.WorldType;
 
 import java.io.IOException;
 
-public class S01PacketJoinGame implements Packet<INetHandlerPlayClient>
-{
+public class S01PacketJoinGame implements Packet<INetHandlerPlayClient> {
     private int entityId;
     private boolean hardcoreMode;
     private WorldSettings.GameType gameType;
@@ -20,12 +19,10 @@ public class S01PacketJoinGame implements Packet<INetHandlerPlayClient>
     private WorldType worldType;
     private boolean reducedDebugInfo;
 
-    public S01PacketJoinGame()
-    {
+    public S01PacketJoinGame() {
     }
 
-    public S01PacketJoinGame(int entityIdIn, WorldSettings.GameType gameTypeIn, boolean hardcoreModeIn, int dimensionIn, EnumDifficulty difficultyIn, int maxPlayersIn, WorldType worldTypeIn, boolean reducedDebugInfoIn)
-    {
+    public S01PacketJoinGame(int entityIdIn, WorldSettings.GameType gameTypeIn, boolean hardcoreModeIn, int dimensionIn, EnumDifficulty difficultyIn, int maxPlayersIn, WorldType worldTypeIn, boolean reducedDebugInfoIn) {
         this.entityId = entityIdIn;
         this.dimension = dimensionIn;
         this.difficulty = difficultyIn;
@@ -36,8 +33,7 @@ public class S01PacketJoinGame implements Packet<INetHandlerPlayClient>
         this.reducedDebugInfo = reducedDebugInfoIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.entityId = buf.readInt();
         int i = buf.readUnsignedByte();
         this.hardcoreMode = (i & 8) == 8;
@@ -48,21 +44,18 @@ public class S01PacketJoinGame implements Packet<INetHandlerPlayClient>
         this.maxPlayers = buf.readUnsignedByte();
         this.worldType = WorldType.parseWorldType(buf.readStringFromBuffer(16));
 
-        if (this.worldType == null)
-        {
+        if (this.worldType == null) {
             this.worldType = WorldType.DEFAULT;
         }
 
         this.reducedDebugInfo = buf.readBoolean();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeInt(this.entityId);
         int i = this.gameType.getID();
 
-        if (this.hardcoreMode)
-        {
+        if (this.hardcoreMode) {
             i |= 8;
         }
 
@@ -74,48 +67,39 @@ public class S01PacketJoinGame implements Packet<INetHandlerPlayClient>
         buf.writeBoolean(this.reducedDebugInfo);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleJoinGame(this);
     }
 
-    public int getEntityId()
-    {
+    public int getEntityId() {
         return this.entityId;
     }
 
-    public boolean isHardcoreMode()
-    {
+    public boolean isHardcoreMode() {
         return this.hardcoreMode;
     }
 
-    public WorldSettings.GameType getGameType()
-    {
+    public WorldSettings.GameType getGameType() {
         return this.gameType;
     }
 
-    public int getDimension()
-    {
+    public int getDimension() {
         return this.dimension;
     }
 
-    public EnumDifficulty getDifficulty()
-    {
+    public EnumDifficulty getDifficulty() {
         return this.difficulty;
     }
 
-    public int getMaxPlayers()
-    {
+    public int getMaxPlayers() {
         return this.maxPlayers;
     }
 
-    public WorldType getWorldType()
-    {
+    public WorldType getWorldType() {
         return this.worldType;
     }
 
-    public boolean isReducedDebugInfo()
-    {
+    public boolean isReducedDebugInfo() {
         return this.reducedDebugInfo;
     }
 }

@@ -1,4 +1,5 @@
 package wtf.demise.events.impl;
+
 /**
  * An interface for objects that can be cancelled.
  * Implementing classes can indicate whether they are cancelled or not using the provided methods.

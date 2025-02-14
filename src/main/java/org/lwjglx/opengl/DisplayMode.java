@@ -16,7 +16,6 @@
 package org.lwjglx.opengl;
 
 /**
- *
  * This class encapsulates the properties for a given display mode. This class is not instantiable, and is aquired from
  * the <code>Display.
  * getAvailableDisplayModes()</code> method.
@@ -26,9 +25,13 @@ package org.lwjglx.opengl;
  */
 public final class DisplayMode {
 
-    /** properties of the display mode */
+    /**
+     * properties of the display mode
+     */
     private final int width, height, bpp, freq;
-    /** If true, this instance can be used for fullscreen modes */
+    /**
+     * If true, this instance can be used for fullscreen modes
+     */
     private final boolean fullscreen;
 
     /**
@@ -56,7 +59,9 @@ public final class DisplayMode {
         this.fullscreen = fullscreen;
     }
 
-    /** True if this instance can be used for fullscreen modes */
+    /**
+     * True if this instance can be used for fullscreen modes
+     */
     public boolean isFullscreenCapable() {
         return fullscreen;
     }

@@ -42,6 +42,7 @@ public class GifRenderer implements InstanceAccess {
         this.textureId = loadTextureFromBufferedImage(frames.get(index).getImage());
         this.lastUpdate = System.currentTimeMillis();
     }
+
     public void drawTexture(float x, float y, float width, float height) {
         GlStateManager.enableTexture2D();
 
@@ -84,12 +85,13 @@ public class GifRenderer implements InstanceAccess {
         this.frames.clear();
         this.frames.addAll(frames);
     }
+
     public static ArrayList<ImageFrame> decodeGif(InputStream stream) {
         GifDecoder decoder = new GifDecoder();
         decoder.read(stream);
 
         ImageFrame[] frames = new ImageFrame[decoder.getFrameCount()];
-        for(int i = 0; i < decoder.getFrameCount(); i++) {
+        for (int i = 0; i < decoder.getFrameCount(); i++) {
             frames[i] = new ImageFrame(decoder.getFrame(i), i, decoder.getDelay(i));
         }
 
@@ -128,6 +130,7 @@ public class GifRenderer implements InstanceAccess {
     public void deleteTexture() {
         deleteTexture(this.textureId);
     }
+
     public static void deleteTexture(int textureID) {
         glDeleteTextures(textureID);
     }
@@ -165,6 +168,7 @@ public class GifRenderer implements InstanceAccess {
         glBindTexture(GL_TEXTURE_2D, 0);
         return textureID;
     }
+
     public static BufferedImage scale(BufferedImage image, float scale) {
         int width = (int) (image.getWidth() * scale);
         int height = (int) (image.getHeight() * scale);

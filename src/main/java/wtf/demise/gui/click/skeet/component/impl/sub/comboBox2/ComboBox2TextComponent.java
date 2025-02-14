@@ -10,8 +10,7 @@ import wtf.demise.gui.click.skeet.component.impl.sub.text.TextComponent;
 import java.util.List;
 import java.util.function.Supplier;
 
-public final class ComboBox2TextComponent extends Component implements PredicateComponent, ExpandableComponent
-{
+public final class ComboBox2TextComponent extends Component implements PredicateComponent, ExpandableComponent {
     @Getter
     private final ComboBox2Component comboBoxComponent;
     private final TextComponent textComponent;
@@ -37,7 +36,7 @@ public final class ComboBox2TextComponent extends Component implements Predicate
     }
 
     public ComboBox2TextComponent(final Component parent, final String name, final Supplier<List<BoolValue>> getValues, final Supplier<Boolean> isVisible) {
-        this(parent, name, getValues,isVisible, 0.0f, 0.0f);
+        this(parent, name, getValues, isVisible, 0.0f, 0.0f);
     }
 
     @Override

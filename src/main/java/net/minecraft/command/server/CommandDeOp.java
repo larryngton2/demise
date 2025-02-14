@@ -10,48 +10,36 @@ import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
-public class CommandDeOp extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandDeOp extends CommandBase {
+    public String getCommandName() {
         return "deop";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 3;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.deop.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
-        if (args.length == 1 && args[0].length() > 0)
-        {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (args.length == 1 && args[0].length() > 0) {
             MinecraftServer minecraftserver = MinecraftServer.getServer();
             GameProfile gameprofile = minecraftserver.getConfigurationManager().getOppedPlayers().getGameProfileFromName(args[0]);
 
-            if (gameprofile == null)
-            {
+            if (gameprofile == null) {
                 throw new CommandException("commands.deop.failed", args[0]);
-            }
-            else
-            {
+            } else {
                 minecraftserver.getConfigurationManager().removeOp(gameprofile);
                 notifyOperators(sender, this, "commands.deop.success", args[0]);
             }
-        }
-        else
-        {
+        } else {
             throw new WrongUsageException("commands.deop.usage");
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getConfigurationManager().getOppedPlayerNames()) : null;
     }
 }

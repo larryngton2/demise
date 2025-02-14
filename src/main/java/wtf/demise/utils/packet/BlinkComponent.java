@@ -32,14 +32,14 @@ public final class BlinkComponent implements InstanceAccess {
 
     @EventTarget
     @EventPriority(-1)
-    public void onPacketSend(PacketEvent event){
+    public void onPacketSend(PacketEvent event) {
         if (mc.thePlayer == null) {
             packets.clear();
             exemptedPackets.clear();
             return;
         }
-        
-        if(event.getState() == PacketEvent.State.OUTGOING) {
+
+        if (event.getState() == PacketEvent.State.OUTGOING) {
 
             if (mc.thePlayer.isDead || mc.isSingleplayer() || !mc.getNetHandler().doneLoadingTerrain) {
                 packets.forEach(PacketUtils::sendPacketNoEvent);
@@ -68,9 +68,9 @@ public final class BlinkComponent implements InstanceAccess {
     }
 
     public static void release(boolean clear) {
-        if(!packets.isEmpty()) {
+        if (!packets.isEmpty()) {
             packets.forEach(PacketUtils::sendPacketNoEvent);
-            if(clear) {
+            if (clear) {
                 packets.clear();
                 exemptedPackets.clear();
             }

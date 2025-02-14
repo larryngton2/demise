@@ -22,11 +22,13 @@ public class SliderComponent extends Component {
     private float anim;
     private boolean dragging;
     private final Animation drag = new DecelerateAnimation(250, 1);
+
     public SliderComponent(SliderValue setting) {
         this.setting = setting;
         setHeight(24);
         drag.setDirection(Direction.BACKWARDS);
     }
+
     @Override
     public void drawScreen(int mouseX, int mouseY) {
         RoundedUtils.drawRound(getX() + 4, getY() + 10, 172, .5f, 4, lineColor2);
@@ -54,7 +56,7 @@ public class SliderComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + 90, getY() + 18, 60, 10,mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered2(getX() + 90, getY() + 18, 60, 10, mouseX, mouseY) && mouseButton == 0) {
             dragging = true;
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -62,7 +64,7 @@ public class SliderComponent extends Component {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
-        if (state == 0){
+        if (state == 0) {
             dragging = false;
         }
         super.mouseReleased(mouseX, mouseY, state);
@@ -72,6 +74,7 @@ public class SliderComponent extends Component {
     public void keyTyped(char typedChar, int keyCode) {
         super.keyTyped(typedChar, keyCode);
     }
+
     @Override
     public boolean isVisible() {
         return setting.visible.get();

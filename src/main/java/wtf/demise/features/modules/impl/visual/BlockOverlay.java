@@ -13,18 +13,18 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "BlockOverlay",category = ModuleCategory.Visual)
+@ModuleInfo(name = "BlockOverlay", category = ModuleCategory.Visual)
 public class BlockOverlay extends Module {
 
     public final BoolValue outline = new BoolValue("Outline", true, this);
     public final BoolValue filled = new BoolValue("Filled", false, this);
     public final BoolValue syncColor = new BoolValue("Sync Color", false, this);
-    public final ColorValue color = new ColorValue("Color",new Color(255,255,255),this ,() -> !syncColor.get());
+    public final ColorValue color = new ColorValue("Color", new Color(255, 255, 255), this, () -> !syncColor.get());
 
     @EventTarget
     public void onRender3D(Render3DEvent event) {
 
-        if(PlayerUtils.getBlock(mc.objectMouseOver.getBlockPos()) instanceof BlockAir)
+        if (PlayerUtils.getBlock(mc.objectMouseOver.getBlockPos()) instanceof BlockAir)
             return;
 
         if (syncColor.get()) {

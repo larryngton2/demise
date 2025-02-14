@@ -13,10 +13,11 @@ import wtf.demise.utils.player.PlayerUtils;
 @ModuleInfo(name = "AutoTool", category = ModuleCategory.Player)
 public class AutoTool extends Module {
 
-    public final BoolValue spoof = new BoolValue("Spoof",false,this);
-    public final BoolValue switchBack = new BoolValue("Switch Back",true,this,() -> !spoof.get());
+    public final BoolValue spoof = new BoolValue("Spoof", false, this);
+    public final BoolValue switchBack = new BoolValue("Switch Back", true, this, () -> !spoof.get());
     private int oldSlot;
     public boolean wasDigging;
+
     @Override
     public void onDisable() {
         if (this.wasDigging) {

@@ -31,7 +31,7 @@ public class SessionInfoWidget extends Widget {
             case "Moon":
                 if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
                     RoundedUtils.drawRound(renderX + 9, renderY, width, height, 8f, new Color(setting.color(0)));
-                } else RoundedUtils.drawRound(renderX + 9, renderY, width, height, 8f, new Color(0, 0, 0,255));
+                } else RoundedUtils.drawRound(renderX + 9, renderY, width, height, 8f, new Color(0, 0, 0, 255));
 
                 break;
         }
@@ -50,7 +50,7 @@ public class SessionInfoWidget extends Widget {
             case "Default":
                 this.width = 150;
                 this.height = 100;
-                RoundedUtils.drawRound(renderX, renderY, width, height, 10, new Color(setting.bgColor(),true));
+                RoundedUtils.drawRound(renderX, renderY, width, height, 10, new Color(setting.bgColor(), true));
 
 
                 Fonts.interRegular.get(14).drawStringWithShadow("Session Time: " + RenderUtils.sessionTime(), renderX + 7.5f, renderY + 10, -1);
@@ -97,7 +97,7 @@ public class SessionInfoWidget extends Widget {
                 this.width = 150;
                 this.height = 128;
 
-                RoundedUtils.drawRound(renderX + 9, renderY, width, height, 8f, new Color(setting.bgColor(),true));
+                RoundedUtils.drawRound(renderX + 9, renderY, width, height, 8f, new Color(setting.bgColor(), true));
                 Fonts.interSemiBold.get(26).drawCenteredStringWithShadow("Session Information", renderX + 83, renderY + 8, -1);
                 Fonts.interSemiBold.get(16).drawStringWithShadow(RenderUtils.sessionTime(), renderX + 42, renderY + 107, -1);
                 Fonts.interSemiBold.get(16).drawStringWithShadow(setting.won + " wins", renderX + 42, renderY + 82, -1);

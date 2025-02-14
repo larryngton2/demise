@@ -10,17 +10,16 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.util.function.Consumer;
 
-public final class ButtonComponentImpl extends ButtonComponent
-{
+public final class ButtonComponentImpl extends ButtonComponent {
     private final String text;
     private final Consumer<Integer> onPress;
-    
+
     public ButtonComponentImpl(final Component parent, final String text, final Consumer<Integer> onPress, final float width, final float height) {
         super(parent, 0.0f, 0.0f, width, height);
         this.text = text;
         this.onPress = onPress;
     }
-    
+
     @Override
     public void drawComponent(final LockedResolution lockedResolution, final int mouseX, final int mouseY) {
         final float x = this.getX();
@@ -35,7 +34,7 @@ public final class ButtonComponentImpl extends ButtonComponent
             SkeetUI.FONT_RENDERER.drawOutlinedString(this.text, x + width / 2.0f - SkeetUI.FONT_RENDERER.getStringWidth(this.text) / 2.0f, y + height / 2.0f, SkeetUI.getSkeetColor(16777215), SkeetUI.getSkeetColor(0));
         }
     }
-    
+
     @Override
     public void onPress(final int mouseButton) {
         this.onPress.accept(mouseButton);

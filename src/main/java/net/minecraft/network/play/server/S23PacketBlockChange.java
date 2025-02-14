@@ -10,45 +10,37 @@ import net.minecraft.world.World;
 
 import java.io.IOException;
 
-public class S23PacketBlockChange implements Packet<INetHandlerPlayClient>
-{
+public class S23PacketBlockChange implements Packet<INetHandlerPlayClient> {
     private BlockPos blockPosition;
     private IBlockState blockState;
 
-    public S23PacketBlockChange()
-    {
+    public S23PacketBlockChange() {
     }
 
-    public S23PacketBlockChange(World worldIn, BlockPos blockPositionIn)
-    {
+    public S23PacketBlockChange(World worldIn, BlockPos blockPositionIn) {
         this.blockPosition = blockPositionIn;
         this.blockState = worldIn.getBlockState(blockPositionIn);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.blockPosition = buf.readBlockPos();
         this.blockState = Block.BLOCK_STATE_IDS.getByValue(buf.readVarIntFromBuffer());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeBlockPos(this.blockPosition);
         buf.writeVarIntToBuffer(Block.BLOCK_STATE_IDS.get(this.blockState));
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleBlockChange(this);
     }
 
-    public IBlockState getBlockState()
-    {
+    public IBlockState getBlockState() {
         return this.blockState;
     }
 
-    public BlockPos getBlockPosition()
-    {
+    public BlockPos getBlockPosition() {
         return this.blockPosition;
     }
 }

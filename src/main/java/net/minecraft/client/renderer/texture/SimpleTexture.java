@@ -14,67 +14,51 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SimpleTexture extends AbstractTexture
-{
+public class SimpleTexture extends AbstractTexture {
     private static final Logger logger = LogManager.getLogger();
     protected final ResourceLocation textureLocation;
     public ResourceLocation locationEmissive;
     public boolean isEmissive;
 
-    public SimpleTexture(ResourceLocation textureResourceLocation)
-    {
+    public SimpleTexture(ResourceLocation textureResourceLocation) {
         this.textureLocation = textureResourceLocation;
     }
 
-    public void loadTexture(IResourceManager resourceManager) throws IOException
-    {
+    public void loadTexture(IResourceManager resourceManager) throws IOException {
         this.deleteGlTexture();
         InputStream inputstream = null;
 
-        try
-        {
+        try {
             IResource iresource = resourceManager.getResource(this.textureLocation);
             inputstream = iresource.getInputStream();
             BufferedImage bufferedimage = TextureUtil.readBufferedImage(inputstream);
             boolean flag = false;
             boolean flag1 = false;
 
-            if (iresource.hasMetadata())
-            {
-                try
-                {
+            if (iresource.hasMetadata()) {
+                try {
                     TextureMetadataSection texturemetadatasection = iresource.getMetadata("texture");
 
-                    if (texturemetadatasection != null)
-                    {
+                    if (texturemetadatasection != null) {
                         flag = texturemetadatasection.getTextureBlur();
                         flag1 = texturemetadatasection.getTextureClamp();
                     }
-                }
-                catch (RuntimeException runtimeexception)
-                {
+                } catch (RuntimeException runtimeexception) {
                     logger.warn("Failed reading metadata of: " + this.textureLocation, runtimeexception);
                 }
             }
 
-            if (Config.isShaders())
-            {
+            if (Config.isShaders()) {
                 ShadersTex.loadSimpleTexture(this.getGlTextureId(), bufferedimage, flag, flag1, resourceManager, this.textureLocation, this.getMultiTexID());
-            }
-            else
-            {
+            } else {
                 TextureUtil.uploadTextureImageAllocate(this.getGlTextureId(), bufferedimage, flag, flag1);
             }
 
-            if (EmissiveTextures.isActive())
-            {
+            if (EmissiveTextures.isActive()) {
                 EmissiveTextures.loadTexture(this.textureLocation, this);
             }
-        }
-        finally
-        {
-            if (inputstream != null)
-            {
+        } finally {
+            if (inputstream != null) {
                 inputstream.close();
             }
         }

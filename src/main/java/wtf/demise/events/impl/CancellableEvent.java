@@ -1,4 +1,5 @@
 package wtf.demise.events.impl;
+
 /**
  * An abstract class for cancellable events.
  * This class implements the {@link Event} and {@link Cancellable} interfaces.

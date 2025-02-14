@@ -6,31 +6,25 @@ import net.minecraft.util.EnumWorldBlockLayer;
 
 import java.util.Random;
 
-public class BlockGlass extends BlockBreakable
-{
-    public BlockGlass(Material materialIn, boolean ignoreSimilarity)
-    {
+public class BlockGlass extends BlockBreakable {
+    public BlockGlass(Material materialIn, boolean ignoreSimilarity) {
         super(materialIn, ignoreSimilarity);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
-    public int quantityDropped(Random random)
-    {
+    public int quantityDropped(Random random) {
         return 0;
     }
 
-    public EnumWorldBlockLayer getBlockLayer()
-    {
+    public EnumWorldBlockLayer getBlockLayer() {
         return EnumWorldBlockLayer.CUTOUT;
     }
 
-    public boolean isFullCube()
-    {
+    public boolean isFullCube() {
         return false;
     }
 
-    protected boolean canSilkHarvest()
-    {
+    protected boolean canSilkHarvest() {
         return true;
     }
 }

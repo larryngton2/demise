@@ -104,7 +104,7 @@ public class GLUtils {
         return null;
     }
 
-    public static void render(int mode, Runnable render){
+    public static void render(int mode, Runnable render) {
         glBegin(mode);
         render.run();
         glEnd();

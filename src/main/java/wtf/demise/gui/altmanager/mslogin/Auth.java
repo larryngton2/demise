@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 
 public class Auth {
     public static final SSLContext context;
-    
+
     private static final Logger logger = LogManager.getLogger(Auth.class);
     private static final Gson gson = new GsonBuilder().create();
-    
+
     static {
         SSLContext ctx = null;
         try {
@@ -81,7 +81,7 @@ public class Auth {
                 }
             };
             ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, new TrustManager[] { multiManager }, new SecureRandom());
+            ctx.init(null, new TrustManager[]{multiManager}, new SecureRandom());
         } catch (Throwable t) {
             logger.error("Unable to init SSL context", t);
         }

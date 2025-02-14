@@ -11,28 +11,21 @@ import net.minecraft.src.Config;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerItemsLayer implements LayerRenderer
-{
+public class PlayerItemsLayer implements LayerRenderer {
     private RenderPlayer renderPlayer = null;
 
-    public PlayerItemsLayer(RenderPlayer renderPlayer)
-    {
+    public PlayerItemsLayer(RenderPlayer renderPlayer) {
         this.renderPlayer = renderPlayer;
     }
 
-    public void doRenderLayer(EntityLivingBase entityLiving, float limbSwing, float limbSwingAmount, float partialTicks, float ticksExisted, float headYaw, float rotationPitch, float scale)
-    {
+    public void doRenderLayer(EntityLivingBase entityLiving, float limbSwing, float limbSwingAmount, float partialTicks, float ticksExisted, float headYaw, float rotationPitch, float scale) {
         this.renderEquippedItems(entityLiving, scale, partialTicks);
     }
 
-    protected void renderEquippedItems(EntityLivingBase entityLiving, float scale, float partialTicks)
-    {
-        if (Config.isShowCapes())
-        {
-            if (!entityLiving.isInvisible())
-            {
-                if (entityLiving instanceof AbstractClientPlayer abstractclientplayer)
-                {
+    protected void renderEquippedItems(EntityLivingBase entityLiving, float scale, float partialTicks) {
+        if (Config.isShowCapes()) {
+            if (!entityLiving.isInvisible()) {
+                if (entityLiving instanceof AbstractClientPlayer abstractclientplayer) {
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     GlStateManager.disableRescaleNormal();
                     GlStateManager.enableCull();
@@ -44,29 +37,24 @@ public class PlayerItemsLayer implements LayerRenderer
         }
     }
 
-    public boolean shouldCombineTextures()
-    {
+    public boolean shouldCombineTextures() {
         return false;
     }
 
-    public static void register(Map renderPlayerMap)
-    {
+    public static void register(Map renderPlayerMap) {
         Set set = renderPlayerMap.keySet();
         boolean flag = false;
 
-        for (Object object : set)
-        {
+        for (Object object : set) {
             Object object1 = renderPlayerMap.get(object);
 
-            if (object1 instanceof RenderPlayer renderplayer)
-            {
+            if (object1 instanceof RenderPlayer renderplayer) {
                 renderplayer.addLayer(new PlayerItemsLayer(renderplayer));
                 flag = true;
             }
         }
 
-        if (!flag)
-        {
+        if (!flag) {
             Config.warn("PlayerItemsLayer not registered");
         }
     }

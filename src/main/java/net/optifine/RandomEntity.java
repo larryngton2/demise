@@ -7,64 +7,49 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.UUID;
 
-public class RandomEntity implements IRandomEntity
-{
+public class RandomEntity implements IRandomEntity {
     private Entity entity;
 
-    public int getId()
-    {
+    public int getId() {
         UUID uuid = this.entity.getUniqueID();
         long i = uuid.getLeastSignificantBits();
-        int j = (int)(i & 2147483647L);
+        int j = (int) (i & 2147483647L);
         return j;
     }
 
-    public BlockPos getSpawnPosition()
-    {
+    public BlockPos getSpawnPosition() {
         return this.entity.getDataWatcher().spawnPosition;
     }
 
-    public BiomeGenBase getSpawnBiome()
-    {
+    public BiomeGenBase getSpawnBiome() {
         return this.entity.getDataWatcher().spawnBiome;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return this.entity.hasCustomName() ? this.entity.getCustomNameTag() : null;
     }
 
-    public int getHealth()
-    {
-        if (!(this.entity instanceof EntityLiving entityliving))
-        {
+    public int getHealth() {
+        if (!(this.entity instanceof EntityLiving entityliving)) {
             return 0;
-        }
-        else
-        {
-            return (int)entityliving.getHealth();
+        } else {
+            return (int) entityliving.getHealth();
         }
     }
 
-    public int getMaxHealth()
-    {
-        if (!(this.entity instanceof EntityLiving entityliving))
-        {
+    public int getMaxHealth() {
+        if (!(this.entity instanceof EntityLiving entityliving)) {
             return 0;
-        }
-        else
-        {
-            return (int)entityliving.getMaxHealth();
+        } else {
+            return (int) entityliving.getMaxHealth();
         }
     }
 
-    public Entity getEntity()
-    {
+    public Entity getEntity() {
         return this.entity;
     }
 
-    public void setEntity(Entity entity)
-    {
+    public void setEntity(Entity entity) {
         this.entity = entity;
     }
 }

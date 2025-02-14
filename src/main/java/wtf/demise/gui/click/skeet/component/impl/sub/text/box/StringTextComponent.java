@@ -12,7 +12,7 @@ public final class StringTextComponent extends Component implements PredicateCom
 
     public StringTextComponent(Component parent, String text, final Supplier<String> getValue, final Consumer<String> setValue, final Supplier<Boolean> isVisible, float x, float y) {
         super(parent, x, y, 41.0f, 16.0f);
-        this.stringComponent = new StringComponent(this, -1.0f, 6.0f, this.getWidth(), 8.5f){
+        this.stringComponent = new StringComponent(this, -1.0f, 6.0f, this.getWidth(), 8.5f) {
 
             @Override
             public void onPress(int key) {

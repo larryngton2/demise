@@ -136,7 +136,7 @@ public class Alt {
                     TEXT_SELECTED_COLOR);
         }
 
-    
+
     }
 
     private void drawSkull(@NotNull FakeEntityPlayer player, int scrolled) {
@@ -180,7 +180,7 @@ public class Alt {
                         String xblToken = Auth.authXBL(authRefreshTokens.getKey());
                         Map.Entry<String, String> xstsTokenUserhash = Auth.authXSTS(xblToken);
                         String accessToken = Auth.authMinecraft(xstsTokenUserhash.getValue(), xstsTokenUserhash.getKey());
-                        
+
                         if (Alt.accountCheck(accessToken)) {
                             session = new Session(cast.getName(), cast.getUUID().toString(), accessToken, "mojang");
 
@@ -192,13 +192,13 @@ public class Alt {
                             setLoginProperty(true);
                             setInvalid(false);
 
-                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,"Logged in! " + Alt.this);
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Logged in! " + Alt.this);
 
                         }
                     } catch (Throwable e) {
                         setLoginProperty(false);
                         setInvalid(true);
-                        Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,e.getClass().getName() + ':' + e.getMessage());
+                        Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, e.getClass().getName() + ':' + e.getMessage());
                     }
                 } else {
                     session = new AltLoginThread(credential, new SessionUpdatingAltLoginListener() {
@@ -220,7 +220,7 @@ public class Alt {
                         public void onLoginFailed() {
                             setLoginProperty(false);
                             setInvalid(true);
-                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,"Invalid credentials!");
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Invalid credentials!");
                         }
                     }).run();
                 }
@@ -231,12 +231,12 @@ public class Alt {
                 this.animationX = 0;
             } else if (isLoggingIn()) {
                 if (System.currentTimeMillis() > lastTimeAlreadyLogged + 150) {
-                    Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,"Already trying logging in!");
+                    Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Already trying logging in!");
                     this.lastTimeAlreadyLogged = System.currentTimeMillis();
                 }
             } else if (isLoginSuccessful()) {
                 if (System.currentTimeMillis() > lastTimeAlreadyLogged + 150) {
-                    Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,"Already logged in!");
+                    Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Already logged in!");
                     this.lastTimeAlreadyLogged = System.currentTimeMillis();
                 }
             }
@@ -428,8 +428,8 @@ public class Alt {
 
     private static final int UPDATE_MILLIS_DELAY = 1_000 / UPDATES_PER_SECOND;
 
-    private static final int DEFAULT_COLOR = new Color(0, 0, 0,75).getRGB();
-    private static final int SELECTED_COLOR = new Color(0, 0, 0,100).getRGB();
+    private static final int DEFAULT_COLOR = new Color(0, 0, 0, 75).getRGB();
+    private static final int SELECTED_COLOR = new Color(0, 0, 0, 100).getRGB();
     private static final int TEXT_DEFAULT_COLOR = 0xFF868386;
     private static final int TEXT_SELECTED_COLOR = new Color(198, 198, 198).getRGB();
     private static final int SUCCESS_LOGIN_COLOR = 0x6E8D3D;
@@ -450,7 +450,7 @@ public class Alt {
         FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(Objects.requireNonNull(profile), null);
 
         boolean invalid = false;
-        if(tagCompound.hasKey("invalid")){
+        if (tagCompound.hasKey("invalid")) {
             invalid = tagCompound.getBoolean("invalid");
         }
 
@@ -470,7 +470,7 @@ public class Alt {
 
         compound.setString("unbanDate", String.valueOf(unbanDate));
         compound.setString("login", credential.getLogin());
-        compound.setBoolean("invalid",invalid);
+        compound.setBoolean("invalid", invalid);
         if (credential.getPassword() != null) compound.setString("password", credential.getPassword());
         compound.setTag("profile", NBTUtil.writeGameProfile(new NBTTagCompound(), player.getGameProfile()));
 
@@ -492,7 +492,7 @@ public class Alt {
 
     public static boolean accountCheck(String token) {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer "+token);
+        headers.put("Authorization", "Bearer " + token);
         headers.put("User-Agent", "MojangSharp/0.1");
         headers.put("Charset", "UTF-8");
         headers.put("connection", "keep-alive");
@@ -500,14 +500,14 @@ public class Alt {
         try {
             String attributesRaw = HttpUtil.get(new URL("https://api.minecraftservices.com/player/attributes"), headers);
             JSONObject attributes = new JSONObject(attributesRaw);
-            
+
             JSONObject privileges = attributes.getJSONObject("privileges");
             JSONObject multiPlayerServerPrivilege = privileges.getJSONObject("multiplayerServer");
             if (!multiPlayerServerPrivilege.getBoolean("enabled")) {
-                Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,"Oops, this player don't have privilege to play online server.");
+                Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Oops, this player don't have privilege to play online server.");
                 return false;
             }
-            
+
             if (attributes.has("banStatus")) {
                 JSONObject bannedScopes = attributes.getJSONObject("banStatus").getJSONObject("bannedScopes");
                 if (bannedScopes.has("MULTIPLAYER")) {
@@ -515,13 +515,13 @@ public class Alt {
                     if (!bannedScopes.has("expires") ||
                             multiplayerBan.get("expires") == null ||
                             multiplayerBan.getLong("expires") >= System.currentTimeMillis()) {
-                        Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY,"Oops, this player got banned from mojang.");
+                        Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Oops, this player got banned from mojang.");
                         return false;
                     }
                 }
             }
         } catch (Throwable e) {
-            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING,"Failed to get player attributes.");
+            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Failed to get player attributes.");
             e.printStackTrace();
         }
 

@@ -31,14 +31,14 @@ public class Camera extends Module {
             new BoolValue("No Fire", false),
             new BoolValue("Shader Sky", false),
             new BoolValue("Bright Players", false),
-            new BoolValue("Motion Camera",false),
-            new BoolValue("Motion Blur",false),
+            new BoolValue("Motion Camera", false),
+            new BoolValue("Motion Blur", false),
             new BoolValue("World Bloom", false)
     ), this);
     public final SliderValue cameraDistance = new SliderValue("Distance", 4.0f, 1.0f, 8.0f, 1.0f, this, () -> setting.isEnabled("Third Person Distance"));
-    public final SliderValue interpolation = new SliderValue("Motion Interpolation", 0.15f, 0.05f, 0.5f, 0.05f,this, () -> setting.isEnabled("Motion Camera"));
+    public final SliderValue interpolation = new SliderValue("Motion Interpolation", 0.15f, 0.05f, 0.5f, 0.05f, this, () -> setting.isEnabled("Motion Camera"));
     public final SliderValue amount = new SliderValue("Motion Blur Amount", 1, 1, 10, 1, this, () -> setting.isEnabled("Motion Blur"));
-    public final SliderValue bloomAmount = new SliderValue("Bloom Amount", 1, 0.05f, 0.75f, 0.05f,this, () -> setting.isEnabled("World Bloom"));
+    public final SliderValue bloomAmount = new SliderValue("Bloom Amount", 1, 0.05f, 0.75f, 0.05f, this, () -> setting.isEnabled("World Bloom"));
 
     @EventTarget
     public void onTick(TickEvent event) {

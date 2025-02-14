@@ -19,9 +19,11 @@ public class Component implements IComponent {
     public void drawBackground(Color color) {
         RenderUtils.drawRect(x, y, width, height, color.getRGB());
     }
+
     public void drawRoundBackground(Color color) {
-        RoundedUtils.drawRound(x, y, width, height,3, color);
+        RoundedUtils.drawRound(x, y, width, height, 3, color);
     }
+
     public boolean isHovered(float mouseX, float mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }

@@ -69,8 +69,8 @@ public class BedNuker extends Module {
     }
 
     @EventTarget
-    public void onTeleport(TeleportEvent event){
-        if(whitelistOwnBed.get()){
+    public void onTeleport(TeleportEvent event) {
+        if (whitelistOwnBed.get()) {
             final double distance = mc.thePlayer.getDistance(event.getPosX(), event.getPosY(), event.getPosZ());
 
             if (distance > 40) {
@@ -80,7 +80,7 @@ public class BedNuker extends Module {
     }
 
     @EventTarget
-    public void onUpdate(UpdateEvent event){
+    public void onUpdate(UpdateEvent event) {
         if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).data == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
             reset(true);
             return;
@@ -144,9 +144,9 @@ public class BedNuker extends Module {
             final int width = resolution.getScaledWidth() / 4;
             final int half = width / 2;
             barAnim.animate(width * percentage, 40);
-            textAnim.animate(percentage * 100f,10);
+            textAnim.animate(percentage * 100f, 10);
 
-            RoundedUtils.drawRound(x - half, y, width, thickness, thickness / 2, new Color(getModule(Interface.class).bgColor(),true));
+            RoundedUtils.drawRound(x - half, y, width, thickness, thickness / 2, new Color(getModule(Interface.class).bgColor(), true));
 
             RoundedUtils.drawGradientHorizontal(x - half, y, barAnim.getOutput(), thickness, thickness / 2, new Color(getModule(Interface.class).color(0)), new Color(getModule(Interface.class).color(90)));
 
@@ -208,7 +208,7 @@ public class BedNuker extends Module {
             sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, bedPos, EnumFacing.UP));
 
             //test
-            mc.theWorld.sendBlockBreakProgress(mc.thePlayer.getEntityId(),blockPos, 1);
+            mc.theWorld.sendBlockBreakProgress(mc.thePlayer.getEntityId(), blockPos, 1);
 
             reset(false);
             return;
@@ -238,7 +238,7 @@ public class BedNuker extends Module {
         if (bedPos != null) {
             mc.theWorld.sendBlockBreakProgress(mc.thePlayer.getEntityId(), bedPos, -1);
             //test
-            sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK,bedPos,EnumFacing.DOWN));
+            sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, bedPos, EnumFacing.DOWN));
         }
 
         breakTicks = 0;
@@ -246,8 +246,9 @@ public class BedNuker extends Module {
         bedPos = null;
         rotate = !resetRotate;
     }
+
     private void doAutoTool(BlockPos pos) {
-        if(PlayerUtils.findTool(pos) != -1)
+        if (PlayerUtils.findTool(pos) != -1)
             mc.thePlayer.inventory.currentItem = PlayerUtils.findTool(pos);
     }
 

@@ -1,4 +1,5 @@
 package wtf.demise.events.impl;
+
 /**
  * Marker interface for events.
  */

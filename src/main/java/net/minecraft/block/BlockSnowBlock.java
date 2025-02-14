@@ -11,29 +11,23 @@ import net.minecraft.world.World;
 
 import java.util.Random;
 
-public class BlockSnowBlock extends Block
-{
-    protected BlockSnowBlock()
-    {
+public class BlockSnowBlock extends Block {
+    protected BlockSnowBlock() {
         super(Material.craftedSnow);
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         return Items.snowball;
     }
 
-    public int quantityDropped(Random random)
-    {
+    public int quantityDropped(Random random) {
         return 4;
     }
 
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
-    {
-        if (worldIn.getLightFor(EnumSkyBlock.BLOCK, pos) > 11)
-        {
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        if (worldIn.getLightFor(EnumSkyBlock.BLOCK, pos) > 11) {
             this.dropBlockAsItem(worldIn, pos, worldIn.getBlockState(pos), 0);
             worldIn.setBlockToAir(pos);
         }

@@ -30,6 +30,7 @@ public class MultiBoxComponent extends Component {
     private Animation scrollAnimation = new SmoothStepAnimation(0, 0, Direction.BACKWARDS);
     private boolean opened;
     private final Map<BoolValue, DecelerateAnimation> select = new HashMap<>();
+
     public MultiBoxComponent(MultiBoolValue setting) {
         this.setting = setting;
         setHeight(24);
@@ -39,7 +40,7 @@ public class MultiBoxComponent extends Component {
     @Override
     public void drawScreen(int mouseX, int mouseY) {
 
-            RoundedUtils.drawRound(getX() + 4, getY() + 10, 172, .5f, 4, lineColor2);
+        RoundedUtils.drawRound(getX() + 4, getY() + 10, 172, .5f, 4, lineColor2);
 
         Fonts.interSemiBold.get(17).drawString(setting.getName(), getX() + 6, getY() + 20, textRGB);
 
@@ -51,7 +52,7 @@ public class MultiBoxComponent extends Component {
             float outlineHeight = (float) ((setting.getValues().size() * 20 + 2) * open.getOutput());
             float y = (getY() + 12 - getHalfTotalHeight()) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - getHalfTotalHeight());
 
-            if (setting.getValues().size() > 6){
+            if (setting.getValues().size() > 6) {
                 GL11.glPushAttrib(GL11.GL_SCISSOR_BIT);
                 GL11.glEnable(GL11.GL_SCISSOR_TEST);
                 RenderUtils.scissor(getX() + 94,
@@ -60,10 +61,10 @@ public class MultiBoxComponent extends Component {
                         getVisibleHeight());
             }
 
-            RoundedUtils.drawRoundOutline(getX() + 94, outlineY, 80f, outlineHeight, 2, .1f,bgColor,outlineColor);
+            RoundedUtils.drawRoundOutline(getX() + 94, outlineY, 80f, outlineHeight, 2, .1f, bgColor, outlineColor);
 
             for (BoolValue boolValue : setting.getValues()) {
-                select.putIfAbsent(boolValue,new DecelerateAnimation(250, 1));
+                select.putIfAbsent(boolValue, new DecelerateAnimation(250, 1));
                 select.get(boolValue).setDirection(boolValue.get() ? Direction.FORWARDS : Direction.BACKWARDS);
 
                 if (boolValue.get()) {
@@ -72,10 +73,10 @@ public class MultiBoxComponent extends Component {
                             ColorUtils.applyOpacity(bgColor3
                                     , (float) select.get(boolValue).getOutput()));
                 }
-                Fonts.interSemiBold.get(16).drawString(boolValue.getName(),getX() + 104, (getY() + 21 + (setting.getValues().indexOf(boolValue) * 20 * open.getOutput()) - getHalfTotalHeight()) + getScroll(),ColorUtils.interpolateColor2(Color.WHITE.darker().darker(), new Color(textRGB), (float) select.get(boolValue).getOutput()));
+                Fonts.interSemiBold.get(16).drawString(boolValue.getName(), getX() + 104, (getY() + 21 + (setting.getValues().indexOf(boolValue) * 20 * open.getOutput()) - getHalfTotalHeight()) + getScroll(), ColorUtils.interpolateColor2(Color.WHITE.darker().darker(), new Color(textRGB), (float) select.get(boolValue).getOutput()));
 
             }
-            if (setting.getValues().size() > 6){
+            if (setting.getValues().size() > 6) {
                 RoundedUtils.drawRound(getX() + 172,
                         (float) (getY() + 12 - getSize() * 20 * open.getOutput() / 2f) + Math.abs((getVisibleHeight() - ((getVisibleHeight() / outlineHeight) * getVisibleHeight())) * (getScroll() / maxScroll)),
                         1f,
@@ -83,7 +84,7 @@ public class MultiBoxComponent extends Component {
                         2,
                         categoryBgColor.darker());
             }
-            onScroll(30,mouseX,mouseY);
+            onScroll(30, mouseX, mouseY);
             maxScroll = Math.max(0, setting.getValues().isEmpty() ? 0 : (setting.getValues().size() - 6) * 20);
 
             if (setting.getValues().size() > 6) {
@@ -91,7 +92,7 @@ public class MultiBoxComponent extends Component {
             }
             GlStateManager.translate(0, 0, -2f);
         } else {
-            RoundedUtils.drawRoundOutline(getX() + 94, getY() + 12, 80f, 17, 2, .1f,bgColor,outlineColor);
+            RoundedUtils.drawRoundOutline(getX() + 94, getY() + 12, 80f, 17, 2, .1f, bgColor, outlineColor);
             String enabledText = setting.isEnabled().isEmpty() ? "None" : (setting.isEnabled().length() > 15 ? setting.isEnabled().substring(0, 15) + "..." : setting.isEnabled());
             Fonts.interSemiBold.get(16).drawString(enabledText, getX() + 98, getY() + 15 + Fonts.interSemiBold.get(16).getMiddleOfBox(17), textRGB);
         }
@@ -101,49 +102,56 @@ public class MultiBoxComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouse) {
-        if (MouseUtils.isHovered2(getX() + 94,getY() + 14,80f,20,mouseX,mouseY) && mouse == 1){
+        if (MouseUtils.isHovered2(getX() + 94, getY() + 14, 80f, 20, mouseX, mouseY) && mouse == 1) {
             opened = !opened;
         }
-        if (opened){
+        if (opened) {
             for (BoolValue boolValue : setting.getValues()) {
-                if (MouseUtils.isHovered2(getX() + 98, (float) ((getY() + 15 + setting.getValues().indexOf(boolValue) * 20) - ((Math.min(4,(setting.getValues().size() - 1)) * 20) * open.getOutput()) / 2f) + getScroll(), 72, 12, mouseX, mouseY) && mouse == 0) {
+                if (MouseUtils.isHovered2(getX() + 98, (float) ((getY() + 15 + setting.getValues().indexOf(boolValue) * 20) - ((Math.min(4, (setting.getValues().size() - 1)) * 20) * open.getOutput()) / 2f) + getScroll(), 72, 12, mouseX, mouseY) && mouse == 0) {
                     boolValue.set(!boolValue.get());
                 }
             }
         }
         super.mouseClicked(mouseX, mouseY, mouse);
     }
+
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
         if (MouseUtils.isHovered2(getX() + 94,
                 (getY() + 12 - getHalfTotalHeight()) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - getHalfTotalHeight()),
                 80f,
-                (float) (((((getY() + 12 - (getSize() * 20 * open.getOutput()) / 2f) < INSTANCE.getNeverLose().getPosY() + 49) ? MathHelper.clamp_float((getY() + 12 - getHalfTotalHeight()) - INSTANCE.getNeverLose().getPosY() + 49,0,999) : 122)) * open.getOutput()), mx, my)) {
+                (float) (((((getY() + 12 - (getSize() * 20 * open.getOutput()) / 2f) < INSTANCE.getNeverLose().getPosY() + 49) ? MathHelper.clamp_float((getY() + 12 - getHalfTotalHeight()) - INSTANCE.getNeverLose().getPosY() + 49, 0, 999) : 122)) * open.getOutput()), mx, my)) {
             rawScroll += (float) Mouse.getDWheel() * 20;
         }
         rawScroll = Math.max(Math.min(0, rawScroll), -maxScroll);
         scrollAnimation = new SmoothStepAnimation(ms, rawScroll - scroll, Direction.BACKWARDS);
     }
+
     public float getScroll() {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
         return scroll;
     }
+
     @Override
     public boolean isHovered(float mouseX, float mouseY) {
         return opened && MouseUtils.isHovered2(getX() + 94,
                 (getY() + 12 - getHalfTotalHeight()) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - getHalfTotalHeight()),
                 80f,
-                (float) (((((getY() + 12 - (getSize() * 20 * open.getOutput()) / 2f) < INSTANCE.getNeverLose().getPosY() + 49) ? MathHelper.clamp_float((getY() + 12 - getHalfTotalHeight()) - INSTANCE.getNeverLose().getPosY() + 49,0,999) : 122)) * open.getOutput()), (int) mouseX, (int) mouseY);
+                (float) (((((getY() + 12 - (getSize() * 20 * open.getOutput()) / 2f) < INSTANCE.getNeverLose().getPosY() + 49) ? MathHelper.clamp_float((getY() + 12 - getHalfTotalHeight()) - INSTANCE.getNeverLose().getPosY() + 49, 0, 999) : 122)) * open.getOutput()), (int) mouseX, (int) mouseY);
     }
+
     private float getVisibleHeight() {
         return (float) ((getY() + 12 - getSize() * 20 * open.getOutput() / 2f < INSTANCE.getNeverLose().getPosY() + 49 ? MathHelper.clamp_double(getY() + 12 - getSize() * 20 * open.getOutput() / 2f - INSTANCE.getNeverLose().getPosY() + 49, 0, 999) : 122) * open.getOutput());
     }
+
     private float getHalfTotalHeight() {
         return (float) ((getSize() * 20 + 2) * open.getOutput() / 2f);
     }
-    private int getSize(){
+
+    private int getSize() {
         return Math.min(4, (setting.getValues().size() - 1));
     }
+
     @Override
     public boolean isVisible() {
         return setting.visible.get();

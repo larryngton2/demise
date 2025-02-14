@@ -11,53 +11,43 @@ import net.minecraft.world.LockCode;
 
 import java.util.Map;
 
-public class ContainerLocalMenu extends InventoryBasic implements ILockableContainer
-{
+public class ContainerLocalMenu extends InventoryBasic implements ILockableContainer {
     private final String guiID;
     private final Map<Integer, Integer> field_174895_b = Maps.newHashMap();
 
-    public ContainerLocalMenu(String id, IChatComponent title, int slotCount)
-    {
+    public ContainerLocalMenu(String id, IChatComponent title, int slotCount) {
         super(title, slotCount);
         this.guiID = id;
     }
 
-    public int getField(int id)
-    {
+    public int getField(int id) {
         return this.field_174895_b.containsKey(Integer.valueOf(id)) ? this.field_174895_b.get(Integer.valueOf(id)).intValue() : 0;
     }
 
-    public void setField(int id, int value)
-    {
+    public void setField(int id, int value) {
         this.field_174895_b.put(Integer.valueOf(id), Integer.valueOf(value));
     }
 
-    public int getFieldCount()
-    {
+    public int getFieldCount() {
         return this.field_174895_b.size();
     }
 
-    public boolean isLocked()
-    {
+    public boolean isLocked() {
         return false;
     }
 
-    public void setLockCode(LockCode code)
-    {
+    public void setLockCode(LockCode code) {
     }
 
-    public LockCode getLockCode()
-    {
+    public LockCode getLockCode() {
         return LockCode.EMPTY_CODE;
     }
 
-    public String getGuiID()
-    {
+    public String getGuiID() {
         return this.guiID;
     }
 
-    public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
-    {
+    public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
         throw new UnsupportedOperationException();
     }
 }

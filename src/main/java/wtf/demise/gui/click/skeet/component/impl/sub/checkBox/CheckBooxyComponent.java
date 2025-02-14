@@ -5,12 +5,11 @@ import wtf.demise.gui.click.skeet.component.ButtonComponent;
 import wtf.demise.gui.click.skeet.component.Component;
 import wtf.demise.gui.click.skeet.component.PredicateComponent;
 
-public abstract class CheckBooxyComponent extends ButtonComponent implements PredicateComponent
-{
+public abstract class CheckBooxyComponent extends ButtonComponent implements PredicateComponent {
     public CheckBooxyComponent(final Component parent, final float x, final float y, final float width, final float height) {
         super(parent, x, y, width, height);
     }
-    
+
     @Override
     public void drawComponent(final LockedResolution resolution, final int mouseX, final int mouseY) {
         final float x = this.getX();
@@ -22,15 +21,15 @@ public abstract class CheckBooxyComponent extends ButtonComponent implements Pre
         final boolean hovered = this.isHovered(mouseX, mouseY);
 //        RenderingUtils.drawGradientRect(x + 0.5f, y + 0.5f, x + width - 0.5f, y + height - 0.5f, false, checked ? SkeetUI.getSkeetColor() : SkeetUI.getSkeetColor(hovered ? ColorUtils.darker(4802889, 1.4f) : 4802889), checked ? ColorUtils.darker(SkeetUI.getSkeetColor(), 0.8f) : SkeetUI.getSkeetColor(hovered ? ColorUtils.darker(3158064, 1.4f) : 3158064));
     }
-    
+
     @Override
     public void onPress(final int mouseButton) {
         if (mouseButton == 0) {
             this.setChecked(!this.isChecked());
         }
     }
-    
+
     public abstract boolean isChecked();
-    
+
     public abstract void setChecked(final boolean checked);
 }

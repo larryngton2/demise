@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
-public interface IResourcePack
-{
+public interface IResourcePack {
     InputStream getInputStream(ResourceLocation location) throws IOException;
 
     boolean resourceExists(ResourceLocation location);

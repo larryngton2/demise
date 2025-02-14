@@ -8,45 +8,37 @@ import net.minecraft.world.World;
 
 import java.io.IOException;
 
-public class S19PacketEntityStatus implements Packet<INetHandlerPlayClient>
-{
+public class S19PacketEntityStatus implements Packet<INetHandlerPlayClient> {
     private int entityId;
     private byte logicOpcode;
 
-    public S19PacketEntityStatus()
-    {
+    public S19PacketEntityStatus() {
     }
 
-    public S19PacketEntityStatus(Entity entityIn, byte opCodeIn)
-    {
+    public S19PacketEntityStatus(Entity entityIn, byte opCodeIn) {
         this.entityId = entityIn.getEntityId();
         this.logicOpcode = opCodeIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.entityId = buf.readInt();
         this.logicOpcode = buf.readByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeInt(this.entityId);
         buf.writeByte(this.logicOpcode);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleEntityStatus(this);
     }
 
-    public Entity getEntity(World worldIn)
-    {
+    public Entity getEntity(World worldIn) {
         return worldIn.getEntityByID(this.entityId);
     }
 
-    public byte getOpCode()
-    {
+    public byte getOpCode() {
         return this.logicOpcode;
     }
 }

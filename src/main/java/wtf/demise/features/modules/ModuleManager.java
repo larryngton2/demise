@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
  * Manages all modules within the Demise client.
  * Responsible for initializing, registering, and handling modules.
@@ -133,7 +134,7 @@ public class ModuleManager {
 
         // Register the ModuleManager to listen for events
         Demise.INSTANCE.getEventManager().register(this);
-      //  Demise.LOGGER.INFO("ModuleManager initialized with {} modules.", modules.size());
+        //  Demise.LOGGER.INFO("ModuleManager initialized with {} modules.", modules.size());
     }
 
     /**

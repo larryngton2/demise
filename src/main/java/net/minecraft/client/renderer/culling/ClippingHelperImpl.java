@@ -6,21 +6,18 @@ import net.minecraft.util.MathHelper;
 
 import java.nio.FloatBuffer;
 
-public class ClippingHelperImpl extends ClippingHelper
-{
+public class ClippingHelperImpl extends ClippingHelper {
     private static final ClippingHelperImpl instance = new ClippingHelperImpl();
     private final FloatBuffer projectionMatrixBuffer = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer modelviewMatrixBuffer = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer field_78564_h = GLAllocation.createDirectFloatBuffer(16);
 
-    public static ClippingHelper getInstance()
-    {
+    public static ClippingHelper getInstance() {
         instance.init();
         return instance;
     }
 
-    private void normalize(float[] p_180547_1_)
-    {
+    private void normalize(float[] p_180547_1_) {
         float f = MathHelper.sqrt_float(p_180547_1_[0] * p_180547_1_[0] + p_180547_1_[1] * p_180547_1_[1] + p_180547_1_[2] * p_180547_1_[2]);
         p_180547_1_[0] /= f;
         p_180547_1_[1] /= f;
@@ -28,8 +25,7 @@ public class ClippingHelperImpl extends ClippingHelper
         p_180547_1_[3] /= f;
     }
 
-    public void init()
-    {
+    public void init() {
         this.projectionMatrixBuffer.clear();
         this.modelviewMatrixBuffer.clear();
         this.field_78564_h.clear();

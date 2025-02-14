@@ -41,6 +41,7 @@ public class MovementUtils implements InstanceAccess {
     public static boolean isMoving() {
         return isMoving(mc.thePlayer);
     }
+
     public static boolean isMoving(EntityLivingBase player) {
         return player != null && (player.moveForward != 0F || player.moveStrafing != 0F);
     }
@@ -352,6 +353,7 @@ public class MovementUtils implements InstanceAccess {
         mc.thePlayer.motionX += -MathHelper.sin((float) yaw) * increase;
         mc.thePlayer.motionZ += MathHelper.cos((float) yaw) * increase;
     }
+
     /**
      * Fixes the players movement
      */

@@ -7,8 +7,7 @@ import wtf.demise.gui.click.skeet.component.impl.sub.text.TextComponent;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class CheckBooxyTextComponent extends Component implements PredicateComponent
-{
+public class CheckBooxyTextComponent extends Component implements PredicateComponent {
     private final CheckBooxyComponent checkBox;
     private final TextComponent textComponent;
 
@@ -42,12 +41,12 @@ public class CheckBooxyTextComponent extends Component implements PredicateCompo
     public CheckBooxyTextComponent(final Component parent, final String text, final Supplier<Boolean> isChecked, final Consumer<Boolean> onChecked) {
         this(parent, text, isChecked, onChecked, () -> true);
     }
-    
+
     @Override
     public float getWidth() {
         return 8.0f + this.textComponent.getWidth();
     }
-    
+
     @Override
     public boolean isVisible() {
         return this.checkBox.isVisible();

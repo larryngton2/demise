@@ -3,8 +3,7 @@ package net.minecraft.network.play;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.*;
 
-public interface INetHandlerPlayClient extends INetHandler
-{
+public interface INetHandlerPlayClient extends INetHandler {
     void handleSpawnObject(S0EPacketSpawnObject packetIn);
 
     void handleSpawnExperienceOrb(S11PacketSpawnExperienceOrb packetIn);

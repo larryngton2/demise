@@ -15,8 +15,7 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-public abstract class ComboBoxComponent extends ButtonComponent implements PredicateComponent, ExpandableComponent
-{
+public abstract class ComboBoxComponent extends ButtonComponent implements PredicateComponent, ExpandableComponent {
     private boolean expanded;
 
     public ComboBoxComponent(final Component parent, final float x, final float y, final float width, final float height) {
@@ -36,15 +35,14 @@ public abstract class ComboBoxComponent extends ButtonComponent implements Predi
         Gui.drawRect(x, y, x + width, y + height, new Color(10, 10, 10, (int) SkeetUI.getAlpha()).getRGB());
         final boolean hovered = this.isHovered(mouseX, mouseY);
         if (hovered) {
-            Gui.drawRect(x + 0.5f, y + 0.5f, x + width - 0.5f, y + height - 0.5f, new Color(90, 90, 90, (int)SkeetUI.getAlpha()).getRGB());
+            Gui.drawRect(x + 0.5f, y + 0.5f, x + width - 0.5f, y + height - 0.5f, new Color(90, 90, 90, (int) SkeetUI.getAlpha()).getRGB());
         }
         if (hovered) {
-            RenderUtils.drawGradientRect(x + 1.0f, y + 1.0f, width - 1.0f, height - 1.0f, false, new Color(31, 31, 31, (int)SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int)SkeetUI.getAlpha()).getRGB());
+            RenderUtils.drawGradientRect(x + 1.0f, y + 1.0f, width - 1.0f, height - 1.0f, false, new Color(31, 31, 31, (int) SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int) SkeetUI.getAlpha()).getRGB());
+        } else {
+            RenderUtils.drawGradientRect(x + 0.5f, y + 0.5f, width - 0.5f, height - 0.5f, false, new Color(31, 31, 31, (int) SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int) SkeetUI.getAlpha()).getRGB());
         }
-        else {
-            RenderUtils.drawGradientRect(x + 0.5f, y + 0.5f, width - 0.5f, height - 0.5f, false, new Color(31, 31, 31, (int)SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int)SkeetUI.getAlpha()).getRGB());
-        }
-        GL11.glColor4f(0.6f, 0.6f, 0.6f, (float)SkeetUI.getAlpha() / 255.0f);
+        GL11.glColor4f(0.6f, 0.6f, 0.6f, (float) SkeetUI.getAlpha() / 255.0f);
         RenderUtils.drawArrow(x + width - 5.0f, y + height / 2.0f - 0.5f, 3.0f, this.isExpanded());
         if (SkeetUI.shouldRenderText()) {
             //GL11.glEnable(3089);

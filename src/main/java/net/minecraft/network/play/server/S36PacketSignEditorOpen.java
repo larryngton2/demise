@@ -7,36 +7,29 @@ import net.minecraft.util.BlockPos;
 
 import java.io.IOException;
 
-public class S36PacketSignEditorOpen implements Packet<INetHandlerPlayClient>
-{
+public class S36PacketSignEditorOpen implements Packet<INetHandlerPlayClient> {
     private BlockPos signPosition;
 
-    public S36PacketSignEditorOpen()
-    {
+    public S36PacketSignEditorOpen() {
     }
 
-    public S36PacketSignEditorOpen(BlockPos signPositionIn)
-    {
+    public S36PacketSignEditorOpen(BlockPos signPositionIn) {
         this.signPosition = signPositionIn;
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleSignEditorOpen(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.signPosition = buf.readBlockPos();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeBlockPos(this.signPosition);
     }
 
-    public BlockPos getSignPosition()
-    {
+    public BlockPos getSignPosition() {
         return this.signPosition;
     }
 }

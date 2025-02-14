@@ -237,13 +237,19 @@ public class LWJGLUtil {
             + "\217\265\325\377\305\331\351\377\367\372\374\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"
             + "\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377";
 
-    /** LWJGL Logo - 16 by 16 pixels */
+    /**
+     * LWJGL Logo - 16 by 16 pixels
+     */
     public static final ByteBuffer LWJGLIcon16x16 = loadIcon(LWJGL_ICON_DATA_16x16);
 
-    /** LWJGL Logo - 32 by 32 pixels */
+    /**
+     * LWJGL Logo - 32 by 32 pixels
+     */
     public static final ByteBuffer LWJGLIcon32x32 = loadIcon(LWJGL_ICON_DATA_32x32);
 
-    /** Debug flag. */
+    /**
+     * Debug flag.
+     */
     public static final boolean DEBUG = getPrivilegedBoolean("org.lwjgl.util.Debug");
 
     public static final boolean CHECKS = !getPrivilegedBoolean("org.lwjgl.util.NoChecks");
@@ -273,26 +279,26 @@ public class LWJGLUtil {
     }
 
     /**
+     * @return the current platform type
      * @see #PLATFORM_WINDOWS
      * @see #PLATFORM_LINUX
      * @see #PLATFORM_MACOSX
-     * @return the current platform type
      */
     public static int getPlatform() {
         return PLATFORM;
     }
 
     /**
+     * @return current platform name
      * @see #PLATFORM_WINDOWS_NAME
      * @see #PLATFORM_LINUX_NAME
      * @see #PLATFORM_MACOSX_NAME
-     * @return current platform name
      */
     public static String getPlatformName() {
-        return LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_LINUX ? PLATFORM_LINUX_NAME:
-            LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_MACOSX ? PLATFORM_MACOSX_NAME:
-            LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_WINDOWS ? PLATFORM_WINDOWS_NAME:
-            "unknown";
+        return LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_LINUX ? PLATFORM_LINUX_NAME :
+                LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_MACOSX ? PLATFORM_MACOSX_NAME :
+                        LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_WINDOWS ? PLATFORM_WINDOWS_NAME :
+                                "unknown";
     }
 
     /**
@@ -304,7 +310,7 @@ public class LWJGLUtil {
      * @return Paths to located libraries, if any
      */
     public static String[] getLibraryPaths(String libname, String platform_lib_name, ClassLoader classloader) {
-        return getLibraryPaths(libname, new String[] { platform_lib_name }, classloader);
+        return getLibraryPaths(libname, new String[]{platform_lib_name}, classloader);
     }
 
     /**
@@ -363,7 +369,7 @@ public class LWJGLUtil {
     }
 
     private static String getPrivilegedProperty(String property_name) {
-        return  System.getProperty(property_name);
+        return System.getProperty(property_name);
     }
 
     /**
@@ -399,7 +405,6 @@ public class LWJGLUtil {
      * Gets an integer property as a privileged action.
      *
      * @param property_name the integer property name
-     *
      * @return the property value
      */
     public static Integer getPrivilegedInteger(String property_name) {
@@ -411,7 +416,6 @@ public class LWJGLUtil {
      *
      * @param property_name the integer property name
      * @param default_val   the default value to use if the property is not defined
-     *
      * @return the property value
      */
     public static Integer getPrivilegedInteger(String property_name, int default_val) {
@@ -461,11 +465,10 @@ public class LWJGLUtil {
      * @param filter       the filter to use (optional)
      * @param target       the target map (optional)
      * @param tokenClasses an array of classes to get tokens from
-     *
      * @return the token map
      */
     public static Map<Integer, String> getClassTokens(final TokenFilter filter, final Map<Integer, String> target,
-            final Class... tokenClasses) {
+                                                      final Class... tokenClasses) {
         return getClassTokens(filter, target, Arrays.asList(tokenClasses));
     }
 
@@ -479,11 +482,10 @@ public class LWJGLUtil {
      * @param filter       the filter to use (optional)
      * @param target       the target map (optional)
      * @param tokenClasses the classes to get tokens from
-     *
      * @return the token map
      */
     public static Map<Integer, String> getClassTokens(final TokenFilter filter, Map<Integer, String> target,
-            final Iterable<Class> tokenClasses) {
+                                                      final Iterable<Class> tokenClasses) {
         if (target == null) target = new HashMap<>();
 
         final int TOKEN_MODIFIERS = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -514,14 +516,15 @@ public class LWJGLUtil {
      * be uppercase and will have a leading '0x'.
      *
      * @param value the integer value
-     *
      * @return the hex string representation
      */
     public static String toHexString(final int value) {
         return "0x" + Integer.toHexString(value).toUpperCase();
     }
 
-    /** Simple interface for Field filtering. */
+    /**
+     * Simple interface for Field filtering.
+     */
     public interface TokenFilter {
 
         /**
@@ -529,7 +532,6 @@ public class LWJGLUtil {
          *
          * @param field the Field to test
          * @param value the integer value of the field
-         *
          * @result true if the Field is accepted
          */
         boolean accept(Field field, int value);

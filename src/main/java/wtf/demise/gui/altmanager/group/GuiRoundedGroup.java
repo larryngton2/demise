@@ -28,7 +28,7 @@ public class GuiRoundedGroup extends AbstractGroup {
         if (this.hidden) return;
 
         RenderUtils.drawRoundedRect(this.xPosition,
-                this.yPosition, this.width, this.height, this.radius, new Color(0, 0, 0,80).getRGB());
+                this.yPosition, this.width, this.height, this.radius, new Color(0, 0, 0, 80).getRGB());
 
         if (this.title != null) {
             this.titleFontRenderer.drawString(this.title,

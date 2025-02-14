@@ -17,8 +17,8 @@ public class NameElement extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
-            x = INSTANCE.getNeverLose().espPreviewComponent.getPosX() + INSTANCE.getNeverLose().getWidth() + 120;
-            y = (int) (INSTANCE.getNeverLose().espPreviewComponent.getPosY() + 35 + 75 * (1 - INSTANCE.getNeverLose().espPreviewComponent.getElementsManage().open.getOutput()));
+        x = INSTANCE.getNeverLose().espPreviewComponent.getPosX() + INSTANCE.getNeverLose().getWidth() + 120;
+        y = (int) (INSTANCE.getNeverLose().espPreviewComponent.getPosY() + 35 + 75 * (1 - INSTANCE.getNeverLose().espPreviewComponent.getElementsManage().open.getOutput()));
 
         if (INSTANCE.getModuleManager().getModule(ESP.class).tags.get()) {
             final FontRenderer fontRenderer = mc.fontRendererObj;

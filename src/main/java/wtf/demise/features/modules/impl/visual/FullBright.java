@@ -8,11 +8,11 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "FullBright",category = ModuleCategory.Visual)
+@ModuleInfo(name = "FullBright", category = ModuleCategory.Visual)
 public class FullBright extends Module {
 
     @EventTarget
-    public void onUpdate(UpdateEvent event){
+    public void onUpdate(UpdateEvent event) {
         mc.thePlayer.addPotionEffect(new PotionEffect(Potion.nightVision.id, 5200, 1));
     }
 

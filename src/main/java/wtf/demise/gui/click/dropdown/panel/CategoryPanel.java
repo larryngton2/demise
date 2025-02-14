@@ -46,7 +46,7 @@ public class CategoryPanel implements IComponent {
 
         RenderUtils.scaleStart((float) new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth() / 2, (float) new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight() / 2, (float) INSTANCE.getDropdownGUI().getOpeningAnimation().getOutput());
 
-        RoundedUtils.drawRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 6, new Color(ColorUtils.darker(INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get().getRGB(),0.2f)));
+        RoundedUtils.drawRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 6, new Color(ColorUtils.darker(INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get().getRGB(), 0.2f)));
         //RoundedUtils.drawRound(x, y - 2, width, 19, 3, ColorUtils.reAlpha(INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get(), 25));
         //RoundedUtils.drawRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 3, ColorUtils.reAlpha(INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get(), 50));
 

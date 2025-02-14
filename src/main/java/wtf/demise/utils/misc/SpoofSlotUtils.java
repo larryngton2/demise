@@ -31,7 +31,7 @@ public class SpoofSlotUtils implements InstanceAccess {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event){
+    public void onWorld(WorldEvent event) {
         stopSpoofing();
     }
 }

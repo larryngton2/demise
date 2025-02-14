@@ -1,6 +1,5 @@
 package wtf.demise.gui.click.skeet.component;
 
-public interface PredicateComponent
-{
+public interface PredicateComponent {
     boolean isVisible();
 }

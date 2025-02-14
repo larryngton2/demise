@@ -7,44 +7,36 @@ import net.minecraft.util.IChatComponent;
 
 import java.io.IOException;
 
-public class S47PacketPlayerListHeaderFooter implements Packet<INetHandlerPlayClient>
-{
+public class S47PacketPlayerListHeaderFooter implements Packet<INetHandlerPlayClient> {
     private IChatComponent header;
     private IChatComponent footer;
 
-    public S47PacketPlayerListHeaderFooter()
-    {
+    public S47PacketPlayerListHeaderFooter() {
     }
 
-    public S47PacketPlayerListHeaderFooter(IChatComponent headerIn)
-    {
+    public S47PacketPlayerListHeaderFooter(IChatComponent headerIn) {
         this.header = headerIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.header = buf.readChatComponent();
         this.footer = buf.readChatComponent();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeChatComponent(this.header);
         buf.writeChatComponent(this.footer);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handlePlayerListHeaderFooter(this);
     }
 
-    public IChatComponent getHeader()
-    {
+    public IChatComponent getHeader() {
         return this.header;
     }
 
-    public IChatComponent getFooter()
-    {
+    public IChatComponent getFooter() {
         return this.footer;
     }
 }

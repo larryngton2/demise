@@ -10,8 +10,7 @@ import net.minecraft.world.IInteractionObject;
 
 import java.util.Random;
 
-public class TileEntityEnchantmentTable extends TileEntity implements ITickable, IInteractionObject
-{
+public class TileEntityEnchantmentTable extends TileEntity implements ITickable, IInteractionObject {
     public int tickCount;
     public float pageFlip;
     public float pageFlipPrev;
@@ -25,89 +24,72 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
     private static final Random rand = new Random();
     private String customName;
 
-    public void writeToNBT(NBTTagCompound compound)
-    {
+    public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
-        if (this.hasCustomName())
-        {
+        if (this.hasCustomName()) {
             compound.setString("CustomName", this.customName);
         }
     }
 
-    public void readFromNBT(NBTTagCompound compound)
-    {
+    public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
 
-        if (compound.hasKey("CustomName", 8))
-        {
+        if (compound.hasKey("CustomName", 8)) {
             this.customName = compound.getString("CustomName");
         }
     }
 
-    public void update()
-    {
+    public void update() {
         this.bookSpreadPrev = this.bookSpread;
         this.bookRotationPrev = this.bookRotation;
-        EntityPlayer entityplayer = this.worldObj.getClosestPlayer((float)this.pos.getX() + 0.5F, (float)this.pos.getY() + 0.5F, (float)this.pos.getZ() + 0.5F, 3.0D);
+        EntityPlayer entityplayer = this.worldObj.getClosestPlayer((float) this.pos.getX() + 0.5F, (float) this.pos.getY() + 0.5F, (float) this.pos.getZ() + 0.5F, 3.0D);
 
-        if (entityplayer != null)
-        {
-            double d0 = entityplayer.posX - (double)((float)this.pos.getX() + 0.5F);
-            double d1 = entityplayer.posZ - (double)((float)this.pos.getZ() + 0.5F);
-            this.field_145924_q = (float)MathHelper.atan2(d1, d0);
+        if (entityplayer != null) {
+            double d0 = entityplayer.posX - (double) ((float) this.pos.getX() + 0.5F);
+            double d1 = entityplayer.posZ - (double) ((float) this.pos.getZ() + 0.5F);
+            this.field_145924_q = (float) MathHelper.atan2(d1, d0);
             this.bookSpread += 0.1F;
 
-            if (this.bookSpread < 0.5F || rand.nextInt(40) == 0)
-            {
+            if (this.bookSpread < 0.5F || rand.nextInt(40) == 0) {
                 float f1 = this.field_145932_k;
 
-                while (true)
-                {
-                    this.field_145932_k += (float)(rand.nextInt(4) - rand.nextInt(4));
+                while (true) {
+                    this.field_145932_k += (float) (rand.nextInt(4) - rand.nextInt(4));
 
-                    if (f1 != this.field_145932_k)
-                    {
+                    if (f1 != this.field_145932_k) {
                         break;
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             this.field_145924_q += 0.02F;
             this.bookSpread -= 0.1F;
         }
 
-        while (this.bookRotation >= (float)Math.PI)
-        {
-            this.bookRotation -= ((float)Math.PI * 2F);
+        while (this.bookRotation >= (float) Math.PI) {
+            this.bookRotation -= ((float) Math.PI * 2F);
         }
 
-        while (this.bookRotation < -(float)Math.PI)
-        {
-            this.bookRotation += ((float)Math.PI * 2F);
+        while (this.bookRotation < -(float) Math.PI) {
+            this.bookRotation += ((float) Math.PI * 2F);
         }
 
-        while (this.field_145924_q >= (float)Math.PI)
-        {
-            this.field_145924_q -= ((float)Math.PI * 2F);
+        while (this.field_145924_q >= (float) Math.PI) {
+            this.field_145924_q -= ((float) Math.PI * 2F);
         }
 
-        while (this.field_145924_q < -(float)Math.PI)
-        {
-            this.field_145924_q += ((float)Math.PI * 2F);
+        while (this.field_145924_q < -(float) Math.PI) {
+            this.field_145924_q += ((float) Math.PI * 2F);
         }
 
         float f2;
 
-        for (f2 = this.field_145924_q - this.bookRotation; f2 >= (float)Math.PI; f2 -= ((float)Math.PI * 2F))
-        {
+        for (f2 = this.field_145924_q - this.bookRotation; f2 >= (float) Math.PI; f2 -= ((float) Math.PI * 2F)) {
         }
 
-        while (f2 < -(float)Math.PI)
-        {
-            f2 += ((float)Math.PI * 2F);
+        while (f2 < -(float) Math.PI) {
+            f2 += ((float) Math.PI * 2F);
         }
 
         this.bookRotation += f2 * 0.4F;
@@ -121,33 +103,27 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
         this.pageFlip += this.field_145929_l;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return this.hasCustomName() ? this.customName : "container.enchant";
     }
 
-    public boolean hasCustomName()
-    {
+    public boolean hasCustomName() {
         return this.customName != null && this.customName.length() > 0;
     }
 
-    public void setCustomName(String customNameIn)
-    {
+    public void setCustomName(String customNameIn) {
         this.customName = customNameIn;
     }
 
-    public IChatComponent getDisplayName()
-    {
+    public IChatComponent getDisplayName() {
         return this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName());
     }
 
-    public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
-    {
+    public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
         return new ContainerEnchantment(playerInventory, this.worldObj, this.pos);
     }
 
-    public String getGuiID()
-    {
+    public String getGuiID() {
         return "minecraft:enchanting_table";
     }
 }

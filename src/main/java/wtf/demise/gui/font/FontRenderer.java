@@ -79,7 +79,7 @@ public class FontRenderer {
         this.textureHeight = resizeToOpenGLSupportResolution(fontHeight * 16);
     }
 
-    public FontRenderer(Font font,boolean antiAlias) {
+    public FontRenderer(Font font, boolean antiAlias) {
         this.antiAlias = antiAlias;
         this.font = font;
         size = font.getSize2D();
@@ -132,7 +132,7 @@ public class FontRenderer {
     }
 
     public final void drawStringWithShadowNoFormat(String str, float x, float y, int color) {
-        drawStringNoFormat(str,x + 0.5f,y + 0.5f,color,true);
+        drawStringNoFormat(str, x + 0.5f, y + 0.5f, color, true);
         drawStringNoFormat(str, x, y, color, false);
     }
 
@@ -460,7 +460,7 @@ public class FontRenderer {
     }
 
     public String trimStringToWidth(final String p_trimStringToWidth_1_, final int p_trimStringToWidth_2_) {
-        return trimStringToWidth(p_trimStringToWidth_1_,p_trimStringToWidth_2_,false);
+        return trimStringToWidth(p_trimStringToWidth_1_, p_trimStringToWidth_2_, false);
     }
 
     public String trimStringToWidth(final String p_trimStringToWidth_1_, final int p_trimStringToWidth_2_, final boolean p_trimStringToWidth_3_) {
@@ -479,15 +479,12 @@ public class FontRenderer {
                     if (c0 == 'r' || c0 == 'R') {
                         flag2 = false;
                     }
-                }
-                else {
+                } else {
                     flag2 = true;
                 }
-            }
-            else if (i2 < 0) {
+            } else if (i2 < 0) {
                 flag = true;
-            }
-            else {
+            } else {
                 i += i2;
                 if (flag2) {
                     ++i;
@@ -498,8 +495,7 @@ public class FontRenderer {
             }
             if (p_trimStringToWidth_3_) {
                 stringbuilder.insert(0, c0);
-            }
-            else {
+            } else {
                 stringbuilder.append(c0);
             }
         }

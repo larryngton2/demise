@@ -9,18 +9,14 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public abstract class StateMapperBase implements IStateMapper
-{
+public abstract class StateMapperBase implements IStateMapper {
     protected Map<IBlockState, ModelResourceLocation> mapStateModelLocations = Maps.newLinkedHashMap();
 
-    public String getPropertyString(Map<IProperty, Comparable> p_178131_1_)
-    {
+    public String getPropertyString(Map<IProperty, Comparable> p_178131_1_) {
         StringBuilder stringbuilder = new StringBuilder();
 
-        for (Entry<IProperty, Comparable> entry : p_178131_1_.entrySet())
-        {
-            if (stringbuilder.length() != 0)
-            {
+        for (Entry<IProperty, Comparable> entry : p_178131_1_.entrySet()) {
+            if (stringbuilder.length() != 0) {
                 stringbuilder.append(",");
             }
 
@@ -31,18 +27,15 @@ public abstract class StateMapperBase implements IStateMapper
             stringbuilder.append(iproperty.getName(comparable));
         }
 
-        if (stringbuilder.length() == 0)
-        {
+        if (stringbuilder.length() == 0) {
             stringbuilder.append("normal");
         }
 
         return stringbuilder.toString();
     }
 
-    public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn)
-    {
-        for (IBlockState iblockstate : blockIn.getBlockState().getValidStates())
-        {
+    public Map<IBlockState, ModelResourceLocation> putStateModelLocations(Block blockIn) {
+        for (IBlockState iblockstate : blockIn.getBlockState().getValidStates()) {
             this.mapStateModelLocations.put(iblockstate, this.getModelResourceLocation(iblockstate));
         }
 

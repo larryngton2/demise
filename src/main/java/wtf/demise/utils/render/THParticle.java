@@ -6,6 +6,7 @@ public class THParticle {
     public float x, y, adjustedX, adjustedY, deltaX, deltaY, size;
     public int opacity;
     public Color color;
+
     public void render2D() {
         RenderUtils.drawGoodCircle(x + adjustedX + size / 2, y + adjustedY + size / 2, size / 2, ColorUtils.applyOpacity(color, opacity / 255f).getRGB());
     }

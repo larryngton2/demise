@@ -5,8 +5,7 @@ import net.minecraft.util.BlockPos;
 import java.util.List;
 import java.util.Map;
 
-public interface ICommandManager
-{
+public interface ICommandManager {
     int executeCommand(ICommandSender sender, String rawCommand);
 
     List<String> getTabCompletionOptions(ICommandSender sender, String input, BlockPos pos);

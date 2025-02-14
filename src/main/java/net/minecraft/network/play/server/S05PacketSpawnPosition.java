@@ -7,36 +7,29 @@ import net.minecraft.util.BlockPos;
 
 import java.io.IOException;
 
-public class S05PacketSpawnPosition implements Packet<INetHandlerPlayClient>
-{
+public class S05PacketSpawnPosition implements Packet<INetHandlerPlayClient> {
     private BlockPos spawnBlockPos;
 
-    public S05PacketSpawnPosition()
-    {
+    public S05PacketSpawnPosition() {
     }
 
-    public S05PacketSpawnPosition(BlockPos spawnBlockPosIn)
-    {
+    public S05PacketSpawnPosition(BlockPos spawnBlockPosIn) {
         this.spawnBlockPos = spawnBlockPosIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.spawnBlockPos = buf.readBlockPos();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeBlockPos(this.spawnBlockPos);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleSpawnPosition(this);
     }
 
-    public BlockPos getSpawnPos()
-    {
+    public BlockPos getSpawnPos() {
         return this.spawnBlockPos;
     }
 }

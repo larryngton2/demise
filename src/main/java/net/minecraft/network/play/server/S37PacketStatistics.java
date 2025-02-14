@@ -11,54 +11,44 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class S37PacketStatistics implements Packet<INetHandlerPlayClient>
-{
+public class S37PacketStatistics implements Packet<INetHandlerPlayClient> {
     private Map<StatBase, Integer> field_148976_a;
 
-    public S37PacketStatistics()
-    {
+    public S37PacketStatistics() {
     }
 
-    public S37PacketStatistics(Map<StatBase, Integer> p_i45173_1_)
-    {
+    public S37PacketStatistics(Map<StatBase, Integer> p_i45173_1_) {
         this.field_148976_a = p_i45173_1_;
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleStatistics(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         int i = buf.readVarIntFromBuffer();
         this.field_148976_a = Maps.newHashMap();
 
-        for (int j = 0; j < i; ++j)
-        {
+        for (int j = 0; j < i; ++j) {
             StatBase statbase = StatList.getOneShotStat(buf.readStringFromBuffer(32767));
             int k = buf.readVarIntFromBuffer();
 
-            if (statbase != null)
-            {
+            if (statbase != null) {
                 this.field_148976_a.put(statbase, Integer.valueOf(k));
             }
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeVarIntToBuffer(this.field_148976_a.size());
 
-        for (Entry<StatBase, Integer> entry : this.field_148976_a.entrySet())
-        {
+        for (Entry<StatBase, Integer> entry : this.field_148976_a.entrySet()) {
             buf.writeString(entry.getKey().statId);
             buf.writeVarIntToBuffer(entry.getValue().intValue());
         }
     }
 
-    public Map<StatBase, Integer> func_148974_c()
-    {
+    public Map<StatBase, Integer> func_148974_c() {
         return this.field_148976_a;
     }
 }

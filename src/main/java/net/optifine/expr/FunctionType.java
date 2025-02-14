@@ -10,8 +10,7 @@ import net.optifine.util.MathUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum FunctionType
-{
+public enum FunctionType {
     PLUS(10, ExpressionType.FLOAT, "+", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
     MINUS(10, ExpressionType.FLOAT, "-", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
     MUL(11, ExpressionType.FLOAT, "*", new ExpressionType[]{ExpressionType.FLOAT, ExpressionType.FLOAT}),
@@ -71,63 +70,51 @@ public enum FunctionType
     public static FunctionType[] VALUES = values();
     private static final Map<Integer, Float> mapSmooth = new HashMap();
 
-    FunctionType(ExpressionType expressionType, String name, ExpressionType[] parameterTypes)
-    {
+    FunctionType(ExpressionType expressionType, String name, ExpressionType[] parameterTypes) {
         this(0, expressionType, name, parameterTypes);
     }
 
-    FunctionType(int precedence, ExpressionType expressionType, String name, ExpressionType[] parameterTypes)
-    {
+    FunctionType(int precedence, ExpressionType expressionType, String name, ExpressionType[] parameterTypes) {
         this(precedence, expressionType, name, new Parameters(parameterTypes));
     }
 
-    FunctionType(ExpressionType expressionType, String name, IParameters parameters)
-    {
+    FunctionType(ExpressionType expressionType, String name, IParameters parameters) {
         this(0, expressionType, name, parameters);
     }
 
-    FunctionType(int precedence, ExpressionType expressionType, String name, IParameters parameters)
-    {
+    FunctionType(int precedence, ExpressionType expressionType, String name, IParameters parameters) {
         this.precedence = precedence;
         this.expressionType = expressionType;
         this.name = name;
         this.parameters = parameters;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
 
-    public int getPrecedence()
-    {
+    public int getPrecedence() {
         return this.precedence;
     }
 
-    public ExpressionType getExpressionType()
-    {
+    public ExpressionType getExpressionType() {
         return this.expressionType;
     }
 
-    public IParameters getParameters()
-    {
+    public IParameters getParameters() {
         return this.parameters;
     }
 
-    public int getParameterCount(IExpression[] arguments)
-    {
+    public int getParameterCount(IExpression[] arguments) {
         return this.parameters.getParameterTypes(arguments).length;
     }
 
-    public ExpressionType[] getParameterTypes(IExpression[] arguments)
-    {
+    public ExpressionType[] getParameterTypes(IExpression[] arguments) {
         return this.parameters.getParameterTypes(arguments);
     }
 
-    public float evalFloat(IExpression[] args)
-    {
-        switch (this)
-        {
+    public float evalFloat(IExpression[] args) {
+        switch (this) {
             case PLUS:
                 return evalFloat(args, 0) + evalFloat(args, 1);
 
@@ -143,7 +130,7 @@ public enum FunctionType
             case MOD:
                 float f = evalFloat(args, 0);
                 float f1 = evalFloat(args, 1);
-                return f - f1 * (float)((int)(f / f1));
+                return f - f1 * (float) ((int) (f / f1));
 
             case NEG:
                 return -evalFloat(args, 0);
@@ -164,13 +151,13 @@ public enum FunctionType
                 return MathUtils.acos(evalFloat(args, 0));
 
             case TAN:
-                return (float)Math.tan(evalFloat(args, 0));
+                return (float) Math.tan(evalFloat(args, 0));
 
             case ATAN:
-                return (float)Math.atan(evalFloat(args, 0));
+                return (float) Math.atan(evalFloat(args, 0));
 
             case ATAN2:
-                return (float)MathHelper.atan2(evalFloat(args, 0), evalFloat(args, 1));
+                return (float) MathHelper.atan2(evalFloat(args, 0), evalFloat(args, 1));
 
             case TORAD:
                 return MathUtils.toRad(evalFloat(args, 0));
@@ -191,28 +178,28 @@ public enum FunctionType
                 return MathHelper.abs(evalFloat(args, 0));
 
             case EXP:
-                return (float)Math.exp(evalFloat(args, 0));
+                return (float) Math.exp(evalFloat(args, 0));
 
             case FLOOR:
-                return (float)MathHelper.floor_float(evalFloat(args, 0));
+                return (float) MathHelper.floor_float(evalFloat(args, 0));
 
             case CEIL:
-                return (float)MathHelper.ceiling_float_int(evalFloat(args, 0));
+                return (float) MathHelper.ceiling_float_int(evalFloat(args, 0));
 
             case FRAC:
-                return (float)MathHelper.func_181162_h(evalFloat(args, 0));
+                return (float) MathHelper.func_181162_h(evalFloat(args, 0));
 
             case LOG:
-                return (float)Math.log(evalFloat(args, 0));
+                return (float) Math.log(evalFloat(args, 0));
 
             case POW:
-                return (float)Math.pow(evalFloat(args, 0), evalFloat(args, 1));
+                return (float) Math.pow(evalFloat(args, 0), evalFloat(args, 1));
 
             case RANDOM:
-                return (float)Math.random();
+                return (float) Math.random();
 
             case ROUND:
-                return (float)Math.round(evalFloat(args, 0));
+                return (float) Math.round(evalFloat(args, 0));
 
             case SIGNUM:
                 return Math.signum(evalFloat(args, 0));
@@ -223,28 +210,25 @@ public enum FunctionType
             case FMOD:
                 float f2 = evalFloat(args, 0);
                 float f3 = evalFloat(args, 1);
-                return f2 - f3 * (float)MathHelper.floor_float(f2 / f3);
+                return f2 - f3 * (float) MathHelper.floor_float(f2 / f3);
 
             case TIME:
                 Minecraft minecraft = Minecraft.getMinecraft();
                 World world = minecraft.theWorld;
 
-                if (world == null)
-                {
+                if (world == null) {
                     return 0.0F;
                 }
 
-                return (float)(world.getTotalWorldTime() % 24000L) + Config.renderPartialTicks;
+                return (float) (world.getTotalWorldTime() % 24000L) + Config.renderPartialTicks;
 
             case IF:
                 int i = (args.length - 1) / 2;
 
-                for (int k = 0; k < i; ++k)
-                {
+                for (int k = 0; k < i; ++k) {
                     int l = k * 2;
 
-                    if (evalBool(args, l))
-                    {
+                    if (evalBool(args, l)) {
                         return evalFloat(args, l + 1);
                     }
                 }
@@ -252,7 +236,7 @@ public enum FunctionType
                 return evalFloat(args, i * 2);
 
             case SMOOTH:
-                int j = (int)evalFloat(args, 0);
+                int j = (int) evalFloat(args, 0);
                 float f4 = evalFloat(args, 1);
                 float f5 = args.length > 2 ? evalFloat(args, 2) : 1.0F;
                 float f6 = args.length > 3 ? evalFloat(args, 3) : f5;
@@ -265,22 +249,16 @@ public enum FunctionType
         }
     }
 
-    private float getMin(IExpression[] exprs)
-    {
-        if (exprs.length == 2)
-        {
+    private float getMin(IExpression[] exprs) {
+        if (exprs.length == 2) {
             return Math.min(evalFloat(exprs, 0), evalFloat(exprs, 1));
-        }
-        else
-        {
+        } else {
             float f = evalFloat(exprs, 0);
 
-            for (int i = 1; i < exprs.length; ++i)
-            {
+            for (int i = 1; i < exprs.length; ++i) {
                 float f1 = evalFloat(exprs, i);
 
-                if (f1 < f)
-                {
+                if (f1 < f) {
                     f = f1;
                 }
             }
@@ -289,22 +267,16 @@ public enum FunctionType
         }
     }
 
-    private float getMax(IExpression[] exprs)
-    {
-        if (exprs.length == 2)
-        {
+    private float getMax(IExpression[] exprs) {
+        if (exprs.length == 2) {
             return Math.max(evalFloat(exprs, 0), evalFloat(exprs, 1));
-        }
-        else
-        {
+        } else {
             float f = evalFloat(exprs, 0);
 
-            for (int i = 1; i < exprs.length; ++i)
-            {
+            for (int i = 1; i < exprs.length; ++i) {
                 float f1 = evalFloat(exprs, i);
 
-                if (f1 > f)
-                {
+                if (f1 > f) {
                     f = f1;
                 }
             }
@@ -313,17 +285,14 @@ public enum FunctionType
         }
     }
 
-    private static float evalFloat(IExpression[] exprs, int index)
-    {
-        IExpressionFloat iexpressionfloat = (IExpressionFloat)exprs[index];
+    private static float evalFloat(IExpression[] exprs, int index) {
+        IExpressionFloat iexpressionfloat = (IExpressionFloat) exprs[index];
         float f = iexpressionfloat.eval();
         return f;
     }
 
-    public boolean evalBool(IExpression[] args)
-    {
-        switch (this)
-        {
+    public boolean evalBool(IExpression[] args) {
+        switch (this) {
             case TRUE:
                 return true;
 
@@ -369,12 +338,10 @@ public enum FunctionType
             case IN:
                 float f3 = evalFloat(args, 0);
 
-                for (int i = 1; i < args.length; ++i)
-                {
+                for (int i = 1; i < args.length; ++i) {
                     float f4 = evalFloat(args, i);
 
-                    if (f3 == f4)
-                    {
+                    if (f3 == f4) {
                         return true;
                     }
                 }
@@ -387,37 +354,31 @@ public enum FunctionType
         }
     }
 
-    private static boolean evalBool(IExpression[] exprs, int index)
-    {
-        IExpressionBool iexpressionbool = (IExpressionBool)exprs[index];
+    private static boolean evalBool(IExpression[] exprs, int index) {
+        IExpressionBool iexpressionbool = (IExpressionBool) exprs[index];
         boolean flag = iexpressionbool.eval();
         return flag;
     }
 
-    public float[] evalFloatArray(IExpression[] args)
-    {
-        switch (this)
-        {
+    public float[] evalFloatArray(IExpression[] args) {
+        switch (this) {
             case VEC2:
-                return new float[] {evalFloat(args, 0), evalFloat(args, 1)};
+                return new float[]{evalFloat(args, 0), evalFloat(args, 1)};
             case VEC3:
-                return new float[] {evalFloat(args, 0), evalFloat(args, 1), evalFloat(args, 2)};
+                return new float[]{evalFloat(args, 0), evalFloat(args, 1), evalFloat(args, 2)};
             case VEC4:
-                return new float[] {evalFloat(args, 0), evalFloat(args, 1), evalFloat(args, 2), evalFloat(args, 3)};
+                return new float[]{evalFloat(args, 0), evalFloat(args, 1), evalFloat(args, 2), evalFloat(args, 3)};
             default:
                 Config.warn("Unknown function type: " + this);
                 return null;
         }
     }
 
-    public static FunctionType parse(String str)
-    {
-        for (int i = 0; i < VALUES.length; ++i)
-        {
+    public static FunctionType parse(String str) {
+        for (int i = 0; i < VALUES.length; ++i) {
             FunctionType functiontype = VALUES[i];
 
-            if (functiontype.getName().equals(str))
-            {
+            if (functiontype.getName().equals(str)) {
                 return functiontype;
             }
         }

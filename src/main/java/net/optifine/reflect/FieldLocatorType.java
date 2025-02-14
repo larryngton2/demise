@@ -4,19 +4,16 @@ import net.optifine.Log;
 
 import java.lang.reflect.Field;
 
-public class FieldLocatorType implements IFieldLocator
-{
+public class FieldLocatorType implements IFieldLocator {
     private ReflectorClass reflectorClass;
     private Class targetFieldType;
     private final int targetFieldIndex;
 
-    public FieldLocatorType(ReflectorClass reflectorClass, Class targetFieldType)
-    {
+    public FieldLocatorType(ReflectorClass reflectorClass, Class targetFieldType) {
         this(reflectorClass, targetFieldType, 0);
     }
 
-    public FieldLocatorType(ReflectorClass reflectorClass, Class targetFieldType, int targetFieldIndex)
-    {
+    public FieldLocatorType(ReflectorClass reflectorClass, Class targetFieldType, int targetFieldIndex) {
         this.reflectorClass = null;
         this.targetFieldType = null;
         this.reflectorClass = reflectorClass;
@@ -24,29 +21,21 @@ public class FieldLocatorType implements IFieldLocator
         this.targetFieldIndex = targetFieldIndex;
     }
 
-    public Field getField()
-    {
+    public Field getField() {
         Class oclass = this.reflectorClass.getTargetClass();
 
-        if (oclass == null)
-        {
+        if (oclass == null) {
             return null;
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 Field[] afield = oclass.getDeclaredFields();
                 int i = 0;
 
-                for (int j = 0; j < afield.length; ++j)
-                {
+                for (int j = 0; j < afield.length; ++j) {
                     Field field = afield[j];
 
-                    if (field.getType() == this.targetFieldType)
-                    {
-                        if (i == this.targetFieldIndex)
-                        {
+                    if (field.getType() == this.targetFieldType) {
+                        if (i == this.targetFieldIndex) {
                             field.setAccessible(true);
                             return field;
                         }
@@ -57,14 +46,10 @@ public class FieldLocatorType implements IFieldLocator
 
                 Log.log("(Reflector) Field not present: " + oclass.getName() + ".(type: " + this.targetFieldType + ", index: " + this.targetFieldIndex + ")");
                 return null;
-            }
-            catch (SecurityException securityexception)
-            {
+            } catch (SecurityException securityexception) {
                 securityexception.printStackTrace();
                 return null;
-            }
-            catch (Throwable throwable)
-            {
+            } catch (Throwable throwable) {
                 throwable.printStackTrace();
                 return null;
             }

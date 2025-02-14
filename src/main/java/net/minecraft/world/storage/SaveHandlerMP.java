@@ -7,51 +7,40 @@ import net.minecraft.world.chunk.storage.IChunkLoader;
 
 import java.io.File;
 
-public class SaveHandlerMP implements ISaveHandler
-{
-    public WorldInfo loadWorldInfo()
-    {
+public class SaveHandlerMP implements ISaveHandler {
+    public WorldInfo loadWorldInfo() {
         return null;
     }
 
-    public void checkSessionLock() throws MinecraftException
-    {
+    public void checkSessionLock() throws MinecraftException {
     }
 
-    public IChunkLoader getChunkLoader(WorldProvider provider)
-    {
+    public IChunkLoader getChunkLoader(WorldProvider provider) {
         return null;
     }
 
-    public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound)
-    {
+    public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound) {
     }
 
-    public void saveWorldInfo(WorldInfo worldInformation)
-    {
+    public void saveWorldInfo(WorldInfo worldInformation) {
     }
 
-    public IPlayerFileData getPlayerNBTManager()
-    {
+    public IPlayerFileData getPlayerNBTManager() {
         return null;
     }
 
-    public void flush()
-    {
+    public void flush() {
     }
 
-    public File getMapFileFromName(String mapName)
-    {
+    public File getMapFileFromName(String mapName) {
         return null;
     }
 
-    public String getWorldDirectoryName()
-    {
+    public String getWorldDirectoryName() {
         return "none";
     }
 
-    public File getWorldDirectory()
-    {
+    public File getWorldDirectory() {
         return null;
     }
 }

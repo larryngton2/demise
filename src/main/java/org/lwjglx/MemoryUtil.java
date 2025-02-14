@@ -28,13 +28,13 @@ import java.nio.*;
  */
 public final class MemoryUtil {
 
-    private MemoryUtil() {}
+    private MemoryUtil() {
+    }
 
     /**
      * Returns the memory address of the specified buffer. [INTERNAL USE ONLY]
      *
      * @param buffer the buffer
-     *
      * @return the memory address
      */
     public static long getAddress0(Buffer buffer) {
@@ -192,9 +192,7 @@ public final class MemoryUtil {
      * returned.
      *
      * @param text the text to encode
-     *
      * @return the encoded text or null
-     *
      * @see String#getBytes()
      */
     public static ByteBuffer encodeASCII(final CharSequence text) {
@@ -206,9 +204,7 @@ public final class MemoryUtil {
      * returned.
      *
      * @param text the text to encode
-     *
      * @return the encoded text or null
-     *
      * @see String#getBytes()
      */
     public static ByteBuffer encodeUTF8(final CharSequence text) {
@@ -220,7 +216,6 @@ public final class MemoryUtil {
      * returned.
      *
      * @param text the text to encode
-     *
      * @return the encoded text
      */
     public static ByteBuffer encodeUTF16(final CharSequence text) {

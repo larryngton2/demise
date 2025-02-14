@@ -23,18 +23,21 @@ import java.nio.*;
  * <p>
  * A class to check buffer boundaries in general. If there is unsufficient space in the buffer when the call is made
  * then a buffer overflow would otherwise occur and cause unexpected behaviour, a crash, or worse, a security risk.
- *
+ * <p>
  * Internal class, don't use.
  * </p>
- * 
+ *
  * @author cix_foo <cix_foo@users.sourceforge.net>
  * @author elias_naur <elias_naur@users.sourceforge.net>
  * @version $Revision$ $Id$
  */
 public class BufferChecks {
 
-    /** Static methods only! */
-    private BufferChecks() {}
+    /**
+     * Static methods only!
+     */
+    private BufferChecks() {
+    }
 
     /**
      * Helper methods to ensure a function pointer is not-null (0)
@@ -65,21 +68,27 @@ public class BufferChecks {
         }
     }
 
-    /** Helper method to ensure an IntBuffer is null-terminated */
+    /**
+     * Helper method to ensure an IntBuffer is null-terminated
+     */
     public static void checkNullTerminated(IntBuffer buf) {
         if (LWJGLUtil.CHECKS && buf.get(buf.limit() - 1) != 0) {
             throw new IllegalArgumentException("Missing null termination");
         }
     }
 
-    /** Helper method to ensure a LongBuffer is null-terminated */
+    /**
+     * Helper method to ensure a LongBuffer is null-terminated
+     */
     public static void checkNullTerminated(LongBuffer buf) {
         if (LWJGLUtil.CHECKS && buf.get(buf.limit() - 1) != 0) {
             throw new IllegalArgumentException("Missing null termination");
         }
     }
 
-    /** Helper method to ensure a PointerBuffer is null-terminated */
+    /**
+     * Helper method to ensure a PointerBuffer is null-terminated
+     */
     public static void checkNullTerminated(PointerBuffer buf) {
         if (LWJGLUtil.CHECKS && buf.get(buf.limit() - 1) != 0) {
             throw new IllegalArgumentException("Missing null termination");
@@ -186,7 +195,6 @@ public class BufferChecks {
      *
      * @param buffer the buffer to check
      * @param size   the size to check
-     *
      * @return the buffer position in bytes
      */
     public static int checkBuffer(final Buffer buffer, final int size) {

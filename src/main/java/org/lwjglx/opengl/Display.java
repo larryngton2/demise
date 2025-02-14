@@ -576,6 +576,7 @@ public class Display {
     public static void sync(int fps) {
         Sync.sync(fps);
     }
+
     private static class Window {
 
         static long handle;

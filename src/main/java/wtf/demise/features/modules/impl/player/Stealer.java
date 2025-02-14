@@ -222,7 +222,7 @@ public class Stealer extends Module {
 
             float[] projectedCenter = project(x, y, z, factor);
             if (projectedCenter != null && projectedCenter[2] >= 0.0D && projectedCenter[2] < 1.0D) {
-                return new float[]{projectedCenter[0],projectedCenter[1],projectedCenter[0],projectedCenter[1]};
+                return new float[]{projectedCenter[0], projectedCenter[1], projectedCenter[0], projectedCenter[1]};
             }
             return null;
         } catch (Exception e) {
@@ -244,69 +244,69 @@ public class Stealer extends Module {
 
     @EventTarget
     private void onUpdate(UpdateEvent event) {
-            if (mc.thePlayer.openContainer != null) {
-                if (mc.thePlayer.openContainer instanceof ContainerChest) {
-                    if (isStealing) {
-                        ContainerChest container = (ContainerChest) mc.thePlayer.openContainer;
-                        if (menuCheck.get()) {
+        if (mc.thePlayer.openContainer != null) {
+            if (mc.thePlayer.openContainer instanceof ContainerChest) {
+                if (isStealing) {
+                    ContainerChest container = (ContainerChest) mc.thePlayer.openContainer;
+                    if (menuCheck.get()) {
 
-                            String name = container.getLowerChestInventory().getDisplayName().getUnformattedText().toLowerCase();
-                            for (String str : list) {
-                                if (name.contains(str))
-                                    return;
-                            }
+                        String name = container.getLowerChestInventory().getDisplayName().getUnformattedText().toLowerCase();
+                        for (String str : list) {
+                            if (name.contains(str))
+                                return;
                         }
+                    }
 
-                        for (int i = 0; i < container.getLowerChestInventory().getSizeInventory(); ++i) {
-                            if (container.getLowerChestInventory().getStackInSlot(i) != null && (timer.hasTimeElapsed((long) (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get())) * 100L) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0) && InventoryUtils.isValid(container.getLowerChestInventory().getStackInSlot(i))) {
-                                slot = i;
-                                mc.playerController.windowClick(container.windowId, i, 0, 1, mc.thePlayer);
+                    for (int i = 0; i < container.getLowerChestInventory().getSizeInventory(); ++i) {
+                        if (container.getLowerChestInventory().getStackInSlot(i) != null && (timer.hasTimeElapsed((long) (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get())) * 100L) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0) && InventoryUtils.isValid(container.getLowerChestInventory().getStackInSlot(i))) {
+                            slot = i;
+                            mc.playerController.windowClick(container.windowId, i, 0, 1, mc.thePlayer);
+                            timer.reset();
+                        }
+                    }
+                    if (InventoryUtils.isInventoryFull() || InventoryUtils.isInventoryEmpty(container.getLowerChestInventory())) {
+                        mc.thePlayer.closeScreen();
+                        isStealing = false;
+                    }
+                }
+            }
+
+            if (furnace.get()) {
+                if (mc.thePlayer.openContainer instanceof ContainerFurnace container) {
+                    if (isStealing) {
+                        for (index = 0; index < container.tileFurnace.getSizeInventory(); ++index) {
+                            if (container.tileFurnace.getStackInSlot(index) != null || (timer.hasTimeElapsed((long) (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) * 100L)) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0)) {
+                                mc.playerController.windowClick(container.windowId, index, 0, 1, mc.thePlayer);
                                 timer.reset();
                             }
                         }
-                        if (InventoryUtils.isInventoryFull() || InventoryUtils.isInventoryEmpty(container.getLowerChestInventory())) {
+
+                        if (isFurnaceEmpty(container)) {
                             mc.thePlayer.closeScreen();
                             isStealing = false;
                         }
                     }
                 }
+            }
 
-                if (furnace.get()) {
-                    if (mc.thePlayer.openContainer instanceof ContainerFurnace container) {
-                        if (isStealing) {
-                            for (index = 0; index < container.tileFurnace.getSizeInventory(); ++index) {
-                                if (container.tileFurnace.getStackInSlot(index) != null || (timer.hasTimeElapsed((long) (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) * 100L)) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0)) {
-                                    mc.playerController.windowClick(container.windowId, index, 0, 1, mc.thePlayer);
-                                    timer.reset();
-                                }
-                            }
-
-                            if (isFurnaceEmpty(container)) {
-                                mc.thePlayer.closeScreen();
-                                isStealing = false;
+            if (brewingStand.get()) {
+                if (mc.thePlayer.openContainer instanceof ContainerBrewingStand container) {
+                    if (isStealing) {
+                        for (index = 0; index < container.tileBrewingStand.getSizeInventory(); ++index) {
+                            if (container.tileBrewingStand.getStackInSlot(index) != null || (timer.hasTimeElapsed((long) (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) * 100L)) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0)) {
+                                mc.playerController.windowClick(container.windowId, index, 0, 1, mc.thePlayer);
+                                timer.reset();
                             }
                         }
-                    }
-                }
 
-                if (brewingStand.get()) {
-                    if (mc.thePlayer.openContainer instanceof ContainerBrewingStand container) {
-                        if (isStealing) {
-                            for (index = 0; index < container.tileBrewingStand.getSizeInventory(); ++index) {
-                                if (container.tileBrewingStand.getStackInSlot(index) != null || (timer.hasTimeElapsed((long) (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) * 100L)) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0)) {
-                                    mc.playerController.windowClick(container.windowId, index, 0, 1, mc.thePlayer);
-                                    timer.reset();
-                                }
-                            }
-
-                            if (isBrewingStandEmpty(container)) {
-                                mc.thePlayer.closeScreen();
-                                isStealing = false;
-                            }
+                        if (isBrewingStandEmpty(container)) {
+                            mc.thePlayer.closeScreen();
+                            isStealing = false;
                         }
                     }
                 }
             }
+        }
     }
 
     @EventTarget
@@ -318,7 +318,7 @@ public class Stealer extends Module {
                     return;
                 }
             }
-            if(startDelay.get())
+            if (startDelay.get())
                 timer.reset();
             isStealing = packetOpenWindow.getGuiId().equals("minecraft:chest") || furnace.get() && packetOpenWindow.getGuiId().equals("minecraft:furnace")
             //bug

@@ -8,44 +8,34 @@ import net.optifine.CustomLoadingScreens;
 
 import java.io.IOException;
 
-public class GuiDownloadTerrain extends GuiScreen
-{
+public class GuiDownloadTerrain extends GuiScreen {
     private final NetHandlerPlayClient netHandlerPlayClient;
     private int progress;
     private final CustomLoadingScreen customLoadingScreen = CustomLoadingScreens.getCustomLoadingScreen();
 
-    public GuiDownloadTerrain(NetHandlerPlayClient netHandler)
-    {
+    public GuiDownloadTerrain(NetHandlerPlayClient netHandler) {
         this.netHandlerPlayClient = netHandler;
     }
 
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
     }
 
-    public void initGui()
-    {
+    public void initGui() {
         this.buttonList.clear();
     }
 
-    public void updateScreen()
-    {
+    public void updateScreen() {
         ++this.progress;
 
-        if (this.progress % 20 == 0)
-        {
+        if (this.progress % 20 == 0) {
             this.netHandlerPlayClient.addToSendQueue(new C00PacketKeepAlive());
         }
     }
 
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
-        if (this.customLoadingScreen != null)
-        {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (this.customLoadingScreen != null) {
             this.customLoadingScreen.drawBackground(this.width, this.height);
-        }
-        else
-        {
+        } else {
             this.drawBackground(0);
         }
 
@@ -53,8 +43,7 @@ public class GuiDownloadTerrain extends GuiScreen
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    public boolean doesGuiPauseGame()
-    {
+    public boolean doesGuiPauseGame() {
         return false;
     }
 }

@@ -5,8 +5,7 @@ import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.Component;
 import wtf.demise.gui.font.FontRenderer;
 
-public class TextMickgaComponent extends Component
-{
+public class TextMickgaComponent extends Component {
     private static final FontRenderer FONT_RENDERER = SkeetUI.FONT_RENDERER;
     private final String text;
 

@@ -9,59 +9,47 @@ import net.minecraft.world.World;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class BlockAir extends Block
-{
+public class BlockAir extends Block {
     private static final Map mapOriginalOpacity = new IdentityHashMap();
 
-    protected BlockAir()
-    {
+    protected BlockAir() {
         super(Material.air);
     }
 
-    public int getRenderType()
-    {
+    public int getRenderType() {
         return -1;
     }
 
-    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
-    {
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
         return null;
     }
 
-    public boolean isOpaqueCube()
-    {
+    public boolean isOpaqueCube() {
         return false;
     }
 
-    public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
-    {
+    public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid) {
         return false;
     }
 
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
-    {
+    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
     }
 
-    public boolean isReplaceable(World worldIn, BlockPos pos)
-    {
+    public boolean isReplaceable(World worldIn, BlockPos pos) {
         return true;
     }
 
-    public static void setLightOpacity(Block p_setLightOpacity_0_, int p_setLightOpacity_1_)
-    {
-        if (!mapOriginalOpacity.containsKey(p_setLightOpacity_0_))
-        {
+    public static void setLightOpacity(Block p_setLightOpacity_0_, int p_setLightOpacity_1_) {
+        if (!mapOriginalOpacity.containsKey(p_setLightOpacity_0_)) {
             mapOriginalOpacity.put(p_setLightOpacity_0_, Integer.valueOf(p_setLightOpacity_0_.lightOpacity));
         }
 
         p_setLightOpacity_0_.lightOpacity = p_setLightOpacity_1_;
     }
 
-    public static void restoreLightOpacity(Block p_restoreLightOpacity_0_)
-    {
-        if (mapOriginalOpacity.containsKey(p_restoreLightOpacity_0_))
-        {
-            int i = ((Integer)mapOriginalOpacity.get(p_restoreLightOpacity_0_)).intValue();
+    public static void restoreLightOpacity(Block p_restoreLightOpacity_0_) {
+        if (mapOriginalOpacity.containsKey(p_restoreLightOpacity_0_)) {
+            int i = ((Integer) mapOriginalOpacity.get(p_restoreLightOpacity_0_)).intValue();
             setLightOpacity(p_restoreLightOpacity_0_, i);
         }
     }

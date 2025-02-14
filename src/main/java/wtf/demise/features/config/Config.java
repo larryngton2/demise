@@ -16,11 +16,11 @@ public class Config {
         this.file = new File(Demise.INSTANCE.getMainDir(), name + ".json");
     }
 
-    public void loadConfig(JsonObject object){
+    public void loadConfig(JsonObject object) {
 
     }
 
-    public JsonObject saveConfig(){
+    public JsonObject saveConfig() {
         return null;
     }
 }

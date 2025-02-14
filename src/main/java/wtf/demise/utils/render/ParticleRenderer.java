@@ -33,7 +33,7 @@ public class ParticleRenderer implements InstanceAccess {
             for (int i = 0; i <= 10; i++) {
                 THParticle particle = new THParticle();
                 particle.init(x + 20, y + 20, (float) (((Math.random() - 0.5) * 2) * 1.4), (float) (((Math.random() - 0.5) * 2) * 1.4),
-                        (float) (MathUtils.randomizeDouble(4, 5)), i % 2 == 0 ? INSTANCE.getModuleManager().getModule(Interface.class).color(i * 100, 255) :INSTANCE.getModuleManager().getModule(Interface.class).color(-i * 100, 255));
+                        (float) (MathUtils.randomizeDouble(4, 5)), i % 2 == 0 ? INSTANCE.getModuleManager().getModule(Interface.class).color(i * 100, 255) : INSTANCE.getModuleManager().getModule(Interface.class).color(-i * 100, 255));
                 particles.add(particle);
             }
             sentParticles = true;

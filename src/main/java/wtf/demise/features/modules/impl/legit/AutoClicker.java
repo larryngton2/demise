@@ -20,7 +20,7 @@ public class AutoClicker extends Module {
     private final TimerUtils clickTimer = new TimerUtils();
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         clickTimer.reset();
     }
 

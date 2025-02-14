@@ -7,80 +7,65 @@ import com.mojang.util.UUIDTypeAdapter;
 import java.util.Map;
 import java.util.UUID;
 
-public class Session
-{
+public class Session {
     private final String username;
     private final String playerID;
     private final String token;
     private final Session.Type sessionType;
 
-    public Session(String usernameIn, String playerIDIn, String tokenIn, String sessionTypeIn)
-    {
+    public Session(String usernameIn, String playerIDIn, String tokenIn, String sessionTypeIn) {
         this.username = usernameIn;
         this.playerID = playerIDIn;
         this.token = tokenIn;
         this.sessionType = Session.Type.setSessionType(sessionTypeIn);
     }
 
-    public String getSessionID()
-    {
+    public String getSessionID() {
         return "token:" + this.token + ":" + this.playerID;
     }
 
-    public String getPlayerID()
-    {
+    public String getPlayerID() {
         return this.playerID;
     }
 
-    public String getUsername()
-    {
+    public String getUsername() {
         return this.username;
     }
 
-    public String getToken()
-    {
+    public String getToken() {
         return this.token;
     }
 
-    public GameProfile getProfile()
-    {
-        try
-        {
+    public GameProfile getProfile() {
+        try {
             UUID uuid = UUIDTypeAdapter.fromString(this.getPlayerID());
             return new GameProfile(uuid, this.getUsername());
-        }
-        catch (IllegalArgumentException var2)
-        {
+        } catch (IllegalArgumentException var2) {
             return new GameProfile(null, this.getUsername());
         }
     }
 
-    public Session.Type getSessionType()
-    {
+    public Session.Type getSessionType() {
         return this.sessionType;
     }
 
-    public enum Type
-    {
+    public enum Type {
         LEGACY("legacy"),
         MOJANG("mojang");
 
         private static final Map<String, Session.Type> SESSION_TYPES = Maps.newHashMap();
         private final String sessionType;
 
-        Type(String sessionTypeIn)
-        {
+        Type(String sessionTypeIn) {
             this.sessionType = sessionTypeIn;
         }
 
-        public static Session.Type setSessionType(String sessionTypeIn)
-        {
+        public static Session.Type setSessionType(String sessionTypeIn) {
             return SESSION_TYPES.get(sessionTypeIn.toLowerCase());
         }
 
         static {
-            for (Session.Type session$type : values())
-            {
+            for (Session.Type session$type : values()) {
                 SESSION_TYPES.put(session$type.sessionType, session$type);
             }
         }

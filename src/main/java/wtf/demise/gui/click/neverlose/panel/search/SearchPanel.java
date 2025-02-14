@@ -35,13 +35,14 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
     private boolean selected;
     private int posX, posY;
     private float maxScroll = Float.MAX_VALUE, rawScroll, scroll;
-    private final Animation animation = new DecelerateAnimation(250,1);
+    private final Animation animation = new DecelerateAnimation(250, 1);
     private Animation scrollAnimation = new SmoothStepAnimation(0, 0, Direction.BACKWARDS);
     private final ObjectArrayList<ModuleComponent> moduleComponents = new ObjectArrayList<>();
     private ObjectArrayList<ModuleComponent> filtered = new ObjectArrayList<>();
     private final Animation input = new DecelerateAnimation(250, 1);
     private boolean inputting;
     private String text = "";
+
     public SearchPanel(ModuleCategory category) {
         super(category);
         for (Module module : INSTANCE.getModuleManager().getModules()) {
@@ -58,7 +59,7 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
         posX = INSTANCE.getNeverLose().getPosX();
         posY = INSTANCE.getNeverLose().getPosY();
         //render
-        if (isSelected()){
+        if (isSelected()) {
             RoundedUtils.drawRoundOutline(posX + 140, posY + 12, 340, (float) 22, 2, 0.1f, ColorUtils.applyOpacity(bgColor4, (float) animation.getOutput()), ColorUtils.applyOpacity(outlineColor, (float) animation.getOutput()));
             //drawTextWithLineBreaks(text + (inputting && text.length() < 67 && System.currentTimeMillis() % 1000 > 500 ? "|" : ""), posX + 144, posY + 21, 180);
             Fonts.interSemiBold.get(18).drawString(text + (inputting && text.length() < 67 && System.currentTimeMillis() % 1000 > 500 ? "|" : ""), posX + 146, posY + 21, Color.WHITE.darker().darker().getRGB());
@@ -118,24 +119,24 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(posX + 140, posY + 12, 340,22,mouseX,mouseY) && mouseButton == 0){
+        if (MouseUtils.isHovered2(posX + 140, posY + 12, 340, 22, mouseX, mouseY) && mouseButton == 0) {
             inputting = !inputting;
         } else {
             inputting = false;
         }
-        filtered.forEach(moduleComponent -> moduleComponent.mouseClicked(mouseX,mouseY,mouseButton));
+        filtered.forEach(moduleComponent -> moduleComponent.mouseClicked(mouseX, mouseY, mouseButton));
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
-        filtered.forEach(moduleComponent -> moduleComponent.mouseReleased(mouseX,mouseY,state));
+        filtered.forEach(moduleComponent -> moduleComponent.mouseReleased(mouseX, mouseY, state));
         super.mouseReleased(mouseX, mouseY, state);
     }
 
     @Override
     public void keyTyped(char typedChar, int keyCode) {
-        if (inputting){
+        if (inputting) {
             if (keyCode == Keyboard.KEY_BACK) {
                 deleteLastCharacter();
             }
@@ -143,14 +144,16 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
                 text += typedChar;
             }
         }
-        filtered.forEach(moduleComponent -> moduleComponent.keyTyped(typedChar,keyCode));
+        filtered.forEach(moduleComponent -> moduleComponent.keyTyped(typedChar, keyCode));
         super.keyTyped(typedChar, keyCode);
     }
+
     private void deleteLastCharacter() {
         if (!text.isEmpty()) {
             text = text.substring(0, text.length() - 1);
         }
     }
+
     private StringBuilder breakAndAddWord(String word, StringBuilder currentLine, float maxWidth, List<String> lines) {
         int wordLength = word.length();
         for (int i = 0; i < wordLength; i++) {
@@ -165,14 +168,16 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
         }
         return currentLine;
     }
+
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
-        if (MouseUtils.isHovered2(getPosX() + 140, getPosY() + 49, 380, 368, mx, my) && moduleComponents.stream().noneMatch(moduleComponent -> moduleComponent.getComponents().stream().anyMatch(component -> component.isHovered(mx,my)))) {
+        if (MouseUtils.isHovered2(getPosX() + 140, getPosY() + 49, 380, 368, mx, my) && moduleComponents.stream().noneMatch(moduleComponent -> moduleComponent.getComponents().stream().anyMatch(component -> component.isHovered(mx, my)))) {
             rawScroll += (float) Mouse.getDWheel() * 20;
         }
         rawScroll = Math.max(Math.min(0, rawScroll), -maxScroll);
         scrollAnimation = new SmoothStepAnimation(ms, rawScroll - scroll, Direction.BACKWARDS);
     }
+
     public float getScroll() {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
         return scroll;

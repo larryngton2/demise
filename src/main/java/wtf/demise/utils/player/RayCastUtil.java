@@ -7,6 +7,7 @@ import net.minecraft.util.*;
 import org.lwjglx.util.vector.Vector2f;
 
 import java.util.List;
+
 public final class RayCastUtil {
     private static final Minecraft mc = Minecraft.getMinecraft();
 

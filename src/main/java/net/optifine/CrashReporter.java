@@ -12,49 +12,39 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CrashReporter
-{
-    public static void onCrashReport(CrashReport crashReport, CrashReportCategory category)
-    {
-        try
-        {
+public class CrashReporter {
+    public static void onCrashReport(CrashReport crashReport, CrashReportCategory category) {
+        try {
             Throwable throwable = crashReport.getCrashCause();
 
-            if (throwable == null)
-            {
+            if (throwable == null) {
                 return;
             }
 
-            if (throwable.getClass().getName().contains(".fml.client.SplashProgress"))
-            {
+            if (throwable.getClass().getName().contains(".fml.client.SplashProgress")) {
                 return;
             }
 
-            if (throwable.getClass() == Throwable.class)
-            {
+            if (throwable.getClass() == Throwable.class) {
                 return;
             }
 
             extendCrashReport(category);
             GameSettings gamesettings = Config.getGameSettings();
 
-            if (gamesettings == null)
-            {
+            if (gamesettings == null) {
                 return;
             }
 
-            if (!gamesettings.snooperEnabled)
-            {
+            if (!gamesettings.snooperEnabled) {
                 return;
             }
 
             String s = "http://optifine.net/crashReport";
             String s1 = makeReport(crashReport);
             byte[] abyte = s1.getBytes(StandardCharsets.US_ASCII);
-            IFileUploadListener ifileuploadlistener = new IFileUploadListener()
-            {
-                public void fileUploadFinished(String url, byte[] content, Throwable exception)
-                {
+            IFileUploadListener ifileuploadlistener = new IFileUploadListener() {
+                public void fileUploadFinished(String url, byte[] content, Throwable exception) {
                 }
             };
             Map map = new HashMap();
@@ -64,15 +54,12 @@ public class CrashReporter
             fileuploadthread.setPriority(10);
             fileuploadthread.start();
             Thread.sleep(1000L);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             Config.dbg(exception.getClass().getName() + ": " + exception.getMessage());
         }
     }
 
-    private static String makeReport(CrashReport crashReport)
-    {
+    private static String makeReport(CrashReport crashReport) {
         String stringbuffer = "OptiFineVersion: " + Config.getVersion() + "\n" +
                 "Summary: " + makeSummary(crashReport) + "\n" +
                 "\n" +
@@ -81,21 +68,16 @@ public class CrashReporter
         return stringbuffer;
     }
 
-    private static String makeSummary(CrashReport crashReport)
-    {
+    private static String makeSummary(CrashReport crashReport) {
         Throwable throwable = crashReport.getCrashCause();
 
-        if (throwable == null)
-        {
+        if (throwable == null) {
             return "Unknown";
-        }
-        else
-        {
+        } else {
             StackTraceElement[] astacktraceelement = throwable.getStackTrace();
             String s = "unknown";
 
-            if (astacktraceelement.length > 0)
-            {
+            if (astacktraceelement.length > 0) {
                 s = astacktraceelement[0].toString().trim();
             }
 
@@ -104,13 +86,11 @@ public class CrashReporter
         }
     }
 
-    public static void extendCrashReport(CrashReportCategory cat)
-    {
+    public static void extendCrashReport(CrashReportCategory cat) {
         cat.addCrashSection("OptiFine Version", Config.getVersion());
         cat.addCrashSection("OptiFine Build", Config.getBuild());
 
-        if (Config.getGameSettings() != null)
-        {
+        if (Config.getGameSettings() != null) {
             cat.addCrashSection("Render Distance Chunks", "" + Config.getChunkViewDistance());
             cat.addCrashSection("Mipmaps", "" + Config.getMipmapLevels());
             cat.addCrashSection("Anisotropic Filtering", "" + Config.getAnisotropicFilterLevel());

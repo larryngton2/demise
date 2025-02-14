@@ -291,7 +291,7 @@ public class RotationUtils implements InstanceAccess {
         currentCorrection = MovementCorrection.OFF;
     }
 
-    public static float[] smoothLinear(final float[] currentRotation, final float[] targetRotation,float hSpeed,float vSpeed) {
+    public static float[] smoothLinear(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
         float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
         float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
@@ -353,13 +353,13 @@ public class RotationUtils implements InstanceAccess {
         float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
         if (mc.thePlayer.getDistanceToEntity(currentTarget) <= rangeToLimit) {
-        if (Math.abs(yawDifference) > maxYawChange) {
-            yawDifference = Math.signum(yawDifference) * maxYawChange;
-        }
+            if (Math.abs(yawDifference) > maxYawChange) {
+                yawDifference = Math.signum(yawDifference) * maxYawChange;
+            }
 
-        if (Math.abs(pitchDifference) > maxPitchChange) {
-            pitchDifference = Math.signum(pitchDifference) * maxPitchChange;
-        }
+            if (Math.abs(pitchDifference) > maxPitchChange) {
+                pitchDifference = Math.signum(pitchDifference) * maxPitchChange;
+            }
         }
 
         float newYaw = currentRotation[0] + (yawDifference * hSpeed / 180);

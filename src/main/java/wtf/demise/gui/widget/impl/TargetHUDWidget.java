@@ -160,7 +160,7 @@ class TargetHUD implements InstanceAccess {
             break;
 
             case "Moon": {
-                float healthPercentage = PlayerUtils.getActualHealth(target)/ target.getMaxHealth();
+                float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
                 float space = (width - 48) / 100;
 
                 target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);

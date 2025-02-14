@@ -18,8 +18,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ComboBox2Component extends ButtonComponent implements PredicateComponent, ExpandableComponent
-{
+public abstract class ComboBox2Component extends ButtonComponent implements PredicateComponent, ExpandableComponent {
     private boolean expanded;
 
     public ComboBox2Component(final Component parent, final float x, final float y, final float width, final float height) {
@@ -30,8 +29,8 @@ public abstract class ComboBox2Component extends ButtonComponent implements Pred
         final List<BoolValue> values = this.getValues();
         final List<BoolValue> selected = new ArrayList<>();
 
-        for (BoolValue value : values){
-            if(value.get())
+        for (BoolValue value : values) {
+            if (value.get())
                 selected.add(value);
             else selected.remove(value);
         }
@@ -91,8 +90,8 @@ public abstract class ComboBox2Component extends ButtonComponent implements Pred
 
             final List<BoolValue> selectedV = new ArrayList<>();
 
-            for (BoolValue value : values){
-                if(value.get() && value.canDisplay())
+            for (BoolValue value : values) {
+                if (value.get() && value.canDisplay())
                     selectedV.add(value);
                 else selectedV.remove(value);
             }
@@ -153,23 +152,29 @@ public abstract class ComboBox2Component extends ButtonComponent implements Pred
             this.expandOrClose();
         }
     }
+
     @Override
     public float getExpandedX() {
         return this.getX();
     }
+
     @Override
     public float getExpandedY() {
         return this.getY();
     }
+
     public abstract List<BoolValue> getValues();
+
     @Override
     public boolean isExpanded() {
         return this.expanded;
     }
+
     @Override
     public void setExpanded(final boolean expanded) {
         this.expanded = expanded;
     }
+
     @Override
     public float getExpandedWidth() {
         return this.getWidth();

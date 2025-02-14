@@ -58,7 +58,7 @@ public class AntiCheat extends Module {
         for (EntityPlayer player : mc.theWorld.playerEntities) {
             for (Check check : checks) {
                 if ((selfCheck.get() || player != mc.thePlayer) && !player.isDead && !Demise.INSTANCE.getFriendManager().isFriend(player)) {
-                    if(isEnabled(AntiBot.class) && getModule(AntiBot.class).bots.contains(player))
+                    if (isEnabled(AntiBot.class) && getModule(AntiBot.class).bots.contains(player))
                         continue;
                     if (options.isEnabled(check.getName())) {
                         check.onUpdate(player);
@@ -75,7 +75,7 @@ public class AntiCheat extends Module {
             for (EntityPlayer player : mc.theWorld.playerEntities) {
                 for (Check check : checks) {
                     if ((selfCheck.get() || player != mc.thePlayer) && !player.isDead && !Demise.INSTANCE.getFriendManager().isFriend(player)) {
-                        if(isEnabled(AntiBot.class) && getModule(AntiBot.class).isBot(player))
+                        if (isEnabled(AntiBot.class) && getModule(AntiBot.class).isBot(player))
                             continue;
                         if (options.isEnabled(check.getName())) {
                             check.onPacketReceive(event, player);

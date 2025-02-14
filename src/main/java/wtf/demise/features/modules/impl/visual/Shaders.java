@@ -19,7 +19,7 @@ import wtf.demise.utils.render.shader.impl.Shadow;
 public class Shaders extends Module {
     public final BoolValue blur = new BoolValue("Blur", true, this);
     private final SliderValue blurRadius = new SliderValue("Blur Radius", 25, 1, 50, 1, this, this.blur::get);
-    private final SliderValue blurCompression = new SliderValue("Blur Compression",1, 1, 50, 1f, this, this.blur::get);
+    private final SliderValue blurCompression = new SliderValue("Blur Compression", 1, 1, 50, 1f, this, this.blur::get);
     private final BoolValue shadow = new BoolValue("Shadow", true, this);
     private final SliderValue shadowRadius = new SliderValue("Shadow Radius", 20, 1, 20, 1, this, shadow::get);
     private final SliderValue shadowOffset = new SliderValue("Shadow Offset", 1, 1, 15, 1, this, shadow::get);
@@ -93,7 +93,7 @@ public class Shaders extends Module {
 
     public void stuffToBlur() {
         if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Interface.class).elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc),false);
+            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
         }
     }
 }

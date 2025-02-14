@@ -1,10 +1,7 @@
 package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.MotionEvent;

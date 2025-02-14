@@ -7,20 +7,16 @@ import net.minecraft.server.management.ServerConfigurationManager;
 
 import java.net.SocketAddress;
 
-public class IntegratedPlayerList extends ServerConfigurationManager
-{
+public class IntegratedPlayerList extends ServerConfigurationManager {
     private NBTTagCompound hostPlayerData;
 
-    public IntegratedPlayerList(IntegratedServer server)
-    {
+    public IntegratedPlayerList(IntegratedServer server) {
         super(server);
         this.setViewDistance(10);
     }
 
-    protected void writePlayerData(EntityPlayerMP playerIn)
-    {
-        if (playerIn.getName().equals(this.getServerInstance().getServerOwner()))
-        {
+    protected void writePlayerData(EntityPlayerMP playerIn) {
+        if (playerIn.getName().equals(this.getServerInstance().getServerOwner())) {
             this.hostPlayerData = new NBTTagCompound();
             playerIn.writeToNBT(this.hostPlayerData);
         }
@@ -28,18 +24,15 @@ public class IntegratedPlayerList extends ServerConfigurationManager
         super.writePlayerData(playerIn);
     }
 
-    public String allowUserToConnect(SocketAddress address, GameProfile profile)
-    {
+    public String allowUserToConnect(SocketAddress address, GameProfile profile) {
         return profile.getName().equalsIgnoreCase(this.getServerInstance().getServerOwner()) && this.getPlayerByUsername(profile.getName()) != null ? "That name is already taken." : super.allowUserToConnect(address, profile);
     }
 
-    public IntegratedServer getServerInstance()
-    {
-        return (IntegratedServer)super.getServerInstance();
+    public IntegratedServer getServerInstance() {
+        return (IntegratedServer) super.getServerInstance();
     }
 
-    public NBTTagCompound getHostPlayerData()
-    {
+    public NBTTagCompound getHostPlayerData() {
         return this.hostPlayerData;
     }
 }

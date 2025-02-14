@@ -6,33 +6,27 @@ import net.minecraft.src.Config;
 import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 
-public class CacheObjectArray
-{
+public class CacheObjectArray {
     private static final ArrayDeque<int[]> arrays = new ArrayDeque();
     private static final int maxCacheSize = 10;
 
-    private static synchronized int[] allocateArray(int size)
-    {
+    private static synchronized int[] allocateArray(int size) {
         int[] aint = arrays.pollLast();
 
-        if (aint == null || aint.length < size)
-        {
+        if (aint == null || aint.length < size) {
             aint = new int[size];
         }
 
         return aint;
     }
 
-    public static synchronized void freeArray(int[] ints)
-    {
-        if (arrays.size() < maxCacheSize)
-        {
+    public static synchronized void freeArray(int[] ints) {
+        if (arrays.size() < maxCacheSize) {
             arrays.add(ints);
         }
     }
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         int i = 4096;
         int j = 500000;
         testNew(i, j);
@@ -52,13 +46,11 @@ public class CacheObjectArray
         Config.dbg("NewObjDyn: " + k1);
     }
 
-    private static long testClone(int size, int count)
-    {
+    private static long testClone(int size, int count) {
         long i = System.currentTimeMillis();
         int[] aint = new int[size];
 
-        for (int j = 0; j < count; ++j)
-        {
+        for (int j = 0; j < count; ++j) {
             int[] aint1 = aint.clone();
         }
 
@@ -66,12 +58,10 @@ public class CacheObjectArray
         return k - i;
     }
 
-    private static long testNew(int size, int count)
-    {
+    private static long testNew(int size, int count) {
         long i = System.currentTimeMillis();
 
-        for (int j = 0; j < count; ++j)
-        {
+        for (int j = 0; j < count; ++j) {
             int[] aint = (int[]) Array.newInstance(Integer.TYPE, size);
         }
 
@@ -79,13 +69,11 @@ public class CacheObjectArray
         return k - i;
     }
 
-    private static long testCloneObj(int size, int count)
-    {
+    private static long testCloneObj(int size, int count) {
         long i = System.currentTimeMillis();
         IBlockState[] aiblockstate = new IBlockState[size];
 
-        for (int j = 0; j < count; ++j)
-        {
+        for (int j = 0; j < count; ++j) {
             IBlockState[] aiblockstate1 = aiblockstate.clone();
         }
 
@@ -93,12 +81,10 @@ public class CacheObjectArray
         return k - i;
     }
 
-    private static long testNewObj(int size, int count)
-    {
+    private static long testNewObj(int size, int count) {
         long i = System.currentTimeMillis();
 
-        for (int j = 0; j < count; ++j)
-        {
+        for (int j = 0; j < count; ++j) {
             IBlockState[] aiblockstate = new IBlockState[size];
         }
 
@@ -106,12 +92,10 @@ public class CacheObjectArray
         return k - i;
     }
 
-    private static long testNewObjDyn(Class cls, int size, int count)
-    {
+    private static long testNewObjDyn(Class cls, int size, int count) {
         long i = System.currentTimeMillis();
 
-        for (int j = 0; j < count; ++j)
-        {
+        for (int j = 0; j < count; ++j) {
             Object[] aobject = (Object[]) Array.newInstance(cls, size);
         }
 

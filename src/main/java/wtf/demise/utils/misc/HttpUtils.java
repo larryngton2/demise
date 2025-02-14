@@ -38,7 +38,7 @@ public class HttpUtils {
     }
 
     private static HttpURLConnection make(String url, String method) throws IOException {
-        return make(url,method,DEFAULT_AGENT);
+        return make(url, method, DEFAULT_AGENT);
     }
 
     public static String request(String url, String method, String agent) throws IOException {
@@ -64,18 +64,18 @@ public class HttpUtils {
     }
 
 
-    public static JSONObject obtainJson(String url){
-        try{
+    public static JSONObject obtainJson(String url) {
+        try {
             URL u = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) u.openConnection();
             connection.setRequestMethod("GET");
-            connection.addRequestProperty("User-Agent","Mozilla/4.76 (Sk1er-UHCStars V1.0)");
+            connection.addRequestProperty("User-Agent", "Mozilla/4.76 (Sk1er-UHCStars V1.0)");
             InputStream is = connection.getInputStream();
             return new JSONObject(IOUtils.toString(is, Charset.defaultCharset()));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return new JSONObject().put("succcess",false).put("cause","API_DOWN");
+        return new JSONObject().put("succcess", false).put("cause", "API_DOWN");
     }
 
     public static HttpResponse postFormData(String urlStr, Map<String, File> filePathMap, Map<String, Object> keyValues, Map<String, Object> headers) throws IOException {
@@ -170,7 +170,7 @@ public class HttpUtils {
             out.write(contentType.getBytes());
 
             int bt = fileReader.read();
-            while (bt != -1){
+            while (bt != -1) {
                 out.write(bt);
                 bt = fileReader.read();
             }

@@ -23,10 +23,10 @@ public class AntiFireball extends Module {
     private final SliderValue aps = new SliderValue("Aps", 9, 1, 20, this);
     public final SliderValue range = new SliderValue("Range", 6.0F, 2.0F, 6F, .1f, this);
     private final BoolValue customRotationSetting = new BoolValue("Custom Rotation Setting", false, this);
-    private final SliderValue minYawRotSpeed = new SliderValue("Min Yaw Rotation Speed", 180, 0, 180, 1, this, () ->  customRotationSetting.get());
-    private final SliderValue minPitchRotSpeed = new SliderValue("Min Pitch Rotation Speed", 180, 0, 180, 1, this, () ->  customRotationSetting.get());
-    private final SliderValue maxYawRotSpeed = new SliderValue("Max Yaw Rotation Speed", 180, 0, 180, 1, this, () ->  customRotationSetting.get());
-    private final SliderValue maxPitchRotSpeed = new SliderValue("Max Pitch Rotation Speed", 180, 0, 180, 1, this, () ->  customRotationSetting.get());
+    private final SliderValue minYawRotSpeed = new SliderValue("Min Yaw Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
+    private final SliderValue minPitchRotSpeed = new SliderValue("Min Pitch Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
+    private final SliderValue maxYawRotSpeed = new SliderValue("Max Yaw Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
+    private final SliderValue maxPitchRotSpeed = new SliderValue("Max Pitch Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
     public final BoolValue smoothlyResetRotation = new BoolValue("Smoothly Reset Rotation", true, this, customRotationSetting::get);
     private final BoolValue moveFix = new BoolValue("Move Fix", false, this);
     private final TimerUtils attackTimer = new TimerUtils();
@@ -44,12 +44,12 @@ public class AntiFireball extends Module {
                     float[] finalRotation = RotationUtils.getAngles(entity);
 
                     if (customRotationSetting.get()) {
-                        RotationUtils.setRotation(finalRotation, moveFix.get() ?  MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()), smoothlyResetRotation.get());
+                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()), smoothlyResetRotation.get());
                     } else {
-                        RotationUtils.setRotation(finalRotation, moveFix.get() ?  MovementCorrection.SILENT : MovementCorrection.OFF);
+                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF);
                     }
 
-                    AttackOrder.sendFixedAttack(mc.thePlayer,entity);
+                    AttackOrder.sendFixedAttack(mc.thePlayer, entity);
                     attackTimer.reset();
                 }
             }

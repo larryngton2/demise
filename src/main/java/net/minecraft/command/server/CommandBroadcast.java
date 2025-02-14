@@ -11,38 +11,29 @@ import net.minecraft.util.IChatComponent;
 
 import java.util.List;
 
-public class CommandBroadcast extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandBroadcast extends CommandBase {
+    public String getCommandName() {
         return "say";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 1;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.say.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
-        if (args.length > 0 && args[0].length() > 0)
-        {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (args.length > 0 && args[0].length() > 0) {
             IChatComponent ichatcomponent = getChatComponentFromNthArg(sender, args, 0, true);
             MinecraftServer.getServer().getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.announcement", sender.getDisplayName(), ichatcomponent));
-        }
-        else
-        {
+        } else {
             throw new WrongUsageException("commands.say.usage");
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         return args.length >= 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 }

@@ -23,7 +23,7 @@ public abstract class StringComponent extends ButtonComponent implements Predica
 
     public StringComponent(Component parent, float x, float y, float width, float height) {
         super(parent, x, y, width, height);
-        content  = "";
+        content = "";
     }
 
     @Override
@@ -35,19 +35,19 @@ public abstract class StringComponent extends ButtonComponent implements Predica
         Gui.drawRect(x, y, x + width, y + height, new Color(10, 10, 10, (int) SkeetUI.getAlpha()).getRGB());
         boolean hovered = this.isHovered(mouseX, mouseY);
         if (hovered) {
-            Gui.drawRect(x + 0.5f, y + 0.5f, x + width - 0.5f, y + height - 0.5f, new Color(90, 90, 90, (int)SkeetUI.getAlpha()).getRGB());
+            Gui.drawRect(x + 0.5f, y + 0.5f, x + width - 0.5f, y + height - 0.5f, new Color(90, 90, 90, (int) SkeetUI.getAlpha()).getRGB());
         }
         if (hovered) {
-            RenderUtils.drawGradientRect(x + 1.0f, y + 1.0f, width - 1.0f, height - 1.0f, false, new Color(31, 31, 31, (int)SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int)SkeetUI.getAlpha()).getRGB());
+            RenderUtils.drawGradientRect(x + 1.0f, y + 1.0f, width - 1.0f, height - 1.0f, false, new Color(31, 31, 31, (int) SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int) SkeetUI.getAlpha()).getRGB());
         } else {
-            RenderUtils.drawGradientRect(x + 0.5f, y + 0.5f,  width - 0.5f, height - 0.5f, false, new Color(31, 31, 31, (int)SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int)SkeetUI.getAlpha()).getRGB());
+            RenderUtils.drawGradientRect(x + 0.5f, y + 0.5f, width - 0.5f, height - 0.5f, false, new Color(31, 31, 31, (int) SkeetUI.getAlpha()).getRGB(), new Color(36, 36, 36, (int) SkeetUI.getAlpha()).getRGB());
         }
         if (this.timer.hasTimeElapsed(600L) && this.isEditing()) {
             this.rightTick ^= true;
             this.timer.reset();
         }
-        SkeetUI.FONT_RENDERER.drawString(this.getValue(), x + 2.0f, y + 2.5f, new Color(210, 210, 210, (int)SkeetUI.getAlpha()).getRGB());
-        SkeetUI.FONT_RENDERER.drawString(this.isEditing() ? (this.rightTick ? "_" : "") : this.getValue(), x + 2.0f + SkeetUI.FONT_RENDERER.getStringWidth(this.getValue()), y + 2.5f, new Color(210, 210, 210, (int)SkeetUI.getAlpha()).getRGB());
+        SkeetUI.FONT_RENDERER.drawString(this.getValue(), x + 2.0f, y + 2.5f, new Color(210, 210, 210, (int) SkeetUI.getAlpha()).getRGB());
+        SkeetUI.FONT_RENDERER.drawString(this.isEditing() ? (this.rightTick ? "_" : "") : this.getValue(), x + 2.0f + SkeetUI.FONT_RENDERER.getStringWidth(this.getValue()), y + 2.5f, new Color(210, 210, 210, (int) SkeetUI.getAlpha()).getRGB());
     }
 
     @Override
@@ -81,7 +81,7 @@ public abstract class StringComponent extends ButtonComponent implements Predica
             }
 
             if (GuiScreen.isCtrlKeyDown()) return;
-            content +=  ChatAllowedCharacters.filterAllowedCharacters(String.valueOf(typed));
+            content += ChatAllowedCharacters.filterAllowedCharacters(String.valueOf(typed));
             setValue(content);
         }
     }
@@ -103,7 +103,7 @@ public abstract class StringComponent extends ButtonComponent implements Predica
     }
 
     public boolean mouseWithinBounds(int mouseX, int mouseY, double x, double y, double width, double height) {
-        return (double)mouseX >= x && (double)mouseX <= x + width && (double)mouseY >= y && (double)mouseY <= y + height;
+        return (double) mouseX >= x && (double) mouseX <= x + width && (double) mouseY >= y && (double) mouseY <= y + height;
     }
 }
 

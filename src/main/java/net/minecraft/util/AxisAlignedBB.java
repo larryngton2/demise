@@ -27,6 +27,7 @@ public class AxisAlignedBB {
         this.maxY = pos2.getY();
         this.maxZ = pos2.getZ();
     }
+
     public AxisAlignedBB(Vec3 pos) {
         this(pos.xCoord, pos.yCoord, pos.zCoord);
     }

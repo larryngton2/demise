@@ -6,8 +6,7 @@ import net.minecraft.world.World;
 
 import java.util.Random;
 
-public interface IGrowable
-{
+public interface IGrowable {
     boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient);
 
     boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state);

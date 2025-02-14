@@ -112,7 +112,7 @@ public class Util {
         /* Determine number of components per pixel */
         return switch (format) {
             case GL11.GL_COLOR_INDEX, GL11.GL_STENCIL_INDEX, GL11.GL_DEPTH_COMPONENT, GL11.GL_RED, GL11.GL_GREEN,
-                    GL11.GL_BLUE, GL11.GL_ALPHA, GL11.GL_LUMINANCE -> 1;
+                 GL11.GL_BLUE, GL11.GL_ALPHA, GL11.GL_LUMINANCE -> 1;
             case GL11.GL_LUMINANCE_ALPHA -> 2;
             case GL11.GL_RGB, GL_BGR -> 3;
             case GL11.GL_RGBA, GL_BGRA -> 4;
@@ -160,7 +160,7 @@ public class Util {
 
         n = switch (format) {
             case GL11.GL_COLOR_INDEX, GL11.GL_STENCIL_INDEX, GL11.GL_DEPTH_COMPONENT, GL11.GL_RED, GL11.GL_GREEN,
-                    GL11.GL_BLUE, GL11.GL_ALPHA, GL11.GL_LUMINANCE -> 1;
+                 GL11.GL_BLUE, GL11.GL_ALPHA, GL11.GL_LUMINANCE -> 1;
             case GL11.GL_LUMINANCE_ALPHA -> 2;
             case GL11.GL_RGB, GL_BGR -> 3;
             case GL11.GL_RGBA, GL_BGRA -> 4;

@@ -86,13 +86,16 @@ public class ViaLoadingBase {
     }
 
     public ComparableProtocolVersion getTargetVersion() {
-        if (forceNativeVersionCondition != null && forceNativeVersionCondition.getAsBoolean()) return nativeProtocolVersion;
+        if (forceNativeVersionCondition != null && forceNativeVersionCondition.getAsBoolean())
+            return nativeProtocolVersion;
 
         return targetProtocolVersion;
     }
+
     public void reload(final int version) {
         reload(ProtocolVersion.getProtocol(version));
     }
+
     public void reload(final ProtocolVersion protocolVersion) {
         reload(fromProtocolVersion(protocolVersion));
     }
@@ -105,7 +108,8 @@ public class ViaLoadingBase {
 
     public void initPlatform() {
         for (Platform platform : platforms) platform.createProtocolPath();
-        for (ProtocolVersion preProtocol : Platform.TEMP_INPUT_PROTOCOLS) PROTOCOLS.put(preProtocol, new ComparableProtocolVersion(preProtocol.getVersion(), preProtocol.getName(), Platform.TEMP_INPUT_PROTOCOLS.indexOf(preProtocol)));
+        for (ProtocolVersion preProtocol : Platform.TEMP_INPUT_PROTOCOLS)
+            PROTOCOLS.put(preProtocol, new ComparableProtocolVersion(preProtocol.getVersion(), preProtocol.getName(), Platform.TEMP_INPUT_PROTOCOLS.indexOf(preProtocol)));
 
         this.nativeProtocolVersion = fromProtocolVersion(ProtocolVersion.getProtocol(this.nativeVersion));
         this.targetProtocolVersion = this.nativeProtocolVersion;
@@ -115,8 +119,7 @@ public class ViaLoadingBase {
                 platform(viaVersionPlatform).
                 loader(new VLBViaProviders()).
                 injector(new VLBViaInjector()).
-                commandHandler(new VLBViaCommandHandler())
-                ;
+                commandHandler(new VLBViaCommandHandler());
 
         if (this.managerBuilderConsumer != null) this.managerBuilderConsumer.accept(builder);
 

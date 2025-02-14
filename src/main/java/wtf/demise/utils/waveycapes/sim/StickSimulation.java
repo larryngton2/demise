@@ -5,11 +5,11 @@ import wtf.demise.utils.waveycapes.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Java port of <a href="https://www.youtube.com/watch?v=PGk0rnyTa1U">this</a> by Sebastian Lague
  * Has some changes like maximizing bends, only designed to simulate a single
  * "rope"(cape). Point 0 is the part fixed to the player
- *
  */
 public class StickSimulation {
 
@@ -23,7 +23,7 @@ public class StickSimulation {
         gravity = Config.gravity;
         //maxBend = WaveyCapesBase.config.maxBend;
 
-        float deltaTime = 50f/1000f; // fixed timescale
+        float deltaTime = 50f / 1000f; // fixed timescale
         Vector2 down = new Vector2(0, gravity * deltaTime);
         Vector2 tmp = new Vector2(0, 0);
         for (Point p : points) {
@@ -110,11 +110,11 @@ public class StickSimulation {
         public Vector2 position = new Vector2(0, 0);
         public Vector2 prevPosition = new Vector2(0, 0);
         public boolean locked;
-        
+
         public float getLerpX(float delta) {
             return Mth.lerp(delta, prevPosition.x, position.x);
         }
-        
+
         public float getLerpY(float delta) {
             return Mth.lerp(delta, prevPosition.y, position.y);
         }

@@ -10,6 +10,7 @@ import wtf.demise.events.impl.CancellableEvent;
 @Getter
 public class PlayerTickEvent extends CancellableEvent {
     public State state;
+
     public enum State {
         PRE,
         POST

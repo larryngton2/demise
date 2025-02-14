@@ -14,13 +14,13 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "ChestESP",category = ModuleCategory.Visual)
+@ModuleInfo(name = "ChestESP", category = ModuleCategory.Visual)
 public class ChestESP extends Module {
 
     public final BoolValue outline = new BoolValue("Outline", false, this);
     public final BoolValue filled = new BoolValue("Filled", true, this);
     public final BoolValue syncColor = new BoolValue("Sync Color", false, this);
-    public final ColorValue color = new ColorValue("Color",new Color(255,255,128),this ,() -> !syncColor.get());
+    public final ColorValue color = new ColorValue("Color", new Color(255, 255, 128), this, () -> !syncColor.get());
 
     @EventTarget
     public void onRender3D(Render3DEvent event) {
@@ -29,9 +29,9 @@ public class ChestESP extends Module {
             if (tileEntity instanceof TileEntityChest || tileEntity instanceof TileEntityEnderChest) {
                 if (!tileEntity.isInvalid() && mc.theWorld.getBlockState(tileEntity.getPos()) != null) {
                     if (syncColor.get()) {
-                        RenderUtils.renderBlock(tileEntity.getPos(),getModule(Interface.class).color(0),outline.get(),filled.get());
+                        RenderUtils.renderBlock(tileEntity.getPos(), getModule(Interface.class).color(0), outline.get(), filled.get());
                     } else {
-                        RenderUtils.renderBlock(tileEntity.getPos(),color.get().getRGB(),outline.get(),filled.get());
+                        RenderUtils.renderBlock(tileEntity.getPos(), color.get().getRGB(), outline.get(), filled.get());
                     }
                 }
             }

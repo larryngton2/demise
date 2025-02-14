@@ -12,8 +12,7 @@ import org.lwjglx.util.vector.Matrix4f;
 import java.io.IOException;
 import java.util.List;
 
-public class Shader
-{
+public class Shader {
     private final ShaderManager manager;
     public final Framebuffer framebufferIn;
     public final Framebuffer framebufferOut;
@@ -23,28 +22,24 @@ public class Shader
     private final List<Integer> listAuxHeights = Lists.newArrayList();
     private Matrix4f projectionMatrix;
 
-    public Shader(IResourceManager p_i45089_1_, String p_i45089_2_, Framebuffer p_i45089_3_, Framebuffer p_i45089_4_) throws IOException
-    {
+    public Shader(IResourceManager p_i45089_1_, String p_i45089_2_, Framebuffer p_i45089_3_, Framebuffer p_i45089_4_) throws IOException {
         this.manager = new ShaderManager(p_i45089_1_, p_i45089_2_);
         this.framebufferIn = p_i45089_3_;
         this.framebufferOut = p_i45089_4_;
     }
 
-    public void deleteShader()
-    {
+    public void deleteShader() {
         this.manager.deleteShader();
     }
 
-    public void addAuxFramebuffer(String p_148041_1_, Object p_148041_2_, int p_148041_3_, int p_148041_4_)
-    {
+    public void addAuxFramebuffer(String p_148041_1_, Object p_148041_2_, int p_148041_3_, int p_148041_4_) {
         this.listAuxNames.add(this.listAuxNames.size(), p_148041_1_);
         this.listAuxFramebuffers.add(this.listAuxFramebuffers.size(), p_148041_2_);
         this.listAuxWidths.add(this.listAuxWidths.size(), Integer.valueOf(p_148041_3_));
         this.listAuxHeights.add(this.listAuxHeights.size(), Integer.valueOf(p_148041_4_));
     }
 
-    private void preLoadShader()
-    {
+    private void preLoadShader() {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();
         GlStateManager.disableDepth();
@@ -56,32 +51,29 @@ public class Shader
         GlStateManager.bindTexture(0);
     }
 
-    public void setProjectionMatrix(Matrix4f p_148045_1_)
-    {
+    public void setProjectionMatrix(Matrix4f p_148045_1_) {
         this.projectionMatrix = p_148045_1_;
     }
 
-    public void loadShader(float p_148042_1_)
-    {
+    public void loadShader(float p_148042_1_) {
         this.preLoadShader();
         this.framebufferIn.unbindFramebuffer();
-        float f = (float)this.framebufferOut.framebufferTextureWidth;
-        float f1 = (float)this.framebufferOut.framebufferTextureHeight;
-        GlStateManager.viewport(0, 0, (int)f, (int)f1);
+        float f = (float) this.framebufferOut.framebufferTextureWidth;
+        float f1 = (float) this.framebufferOut.framebufferTextureHeight;
+        GlStateManager.viewport(0, 0, (int) f, (int) f1);
         this.manager.addSamplerTexture("DiffuseSampler", this.framebufferIn);
 
-        for (int i = 0; i < this.listAuxFramebuffers.size(); ++i)
-        {
+        for (int i = 0; i < this.listAuxFramebuffers.size(); ++i) {
             this.manager.addSamplerTexture(this.listAuxNames.get(i), this.listAuxFramebuffers.get(i));
             this.manager.getShaderUniformOrDefault("AuxSize" + i).set((float) this.listAuxWidths.get(i).intValue(), (float) this.listAuxHeights.get(i).intValue());
         }
 
         this.manager.getShaderUniformOrDefault("ProjMat").set(this.projectionMatrix);
-        this.manager.getShaderUniformOrDefault("InSize").set((float)this.framebufferIn.framebufferTextureWidth, (float)this.framebufferIn.framebufferTextureHeight);
+        this.manager.getShaderUniformOrDefault("InSize").set((float) this.framebufferIn.framebufferTextureWidth, (float) this.framebufferIn.framebufferTextureHeight);
         this.manager.getShaderUniformOrDefault("OutSize").set(f, f1);
         this.manager.getShaderUniformOrDefault("Time").set(p_148042_1_);
         Minecraft minecraft = Minecraft.getMinecraft();
-        this.manager.getShaderUniformOrDefault("ScreenSize").set((float)minecraft.displayWidth, (float)minecraft.displayHeight);
+        this.manager.getShaderUniformOrDefault("ScreenSize").set((float) minecraft.displayWidth, (float) minecraft.displayHeight);
         this.manager.useShader();
         this.framebufferOut.framebufferClear();
         this.framebufferOut.bindFramebuffer(false);
@@ -101,17 +93,14 @@ public class Shader
         this.framebufferOut.unbindFramebuffer();
         this.framebufferIn.unbindFramebufferTexture();
 
-        for (Object object : this.listAuxFramebuffers)
-        {
-            if (object instanceof Framebuffer)
-            {
-                ((Framebuffer)object).unbindFramebufferTexture();
+        for (Object object : this.listAuxFramebuffers) {
+            if (object instanceof Framebuffer) {
+                ((Framebuffer) object).unbindFramebufferTexture();
             }
         }
     }
 
-    public ShaderManager getShaderManager()
-    {
+    public ShaderManager getShaderManager() {
         return this.manager;
     }
 }

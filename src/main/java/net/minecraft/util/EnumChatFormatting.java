@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public enum EnumChatFormatting
-{
+public enum EnumChatFormatting {
     BLACK("BLACK", '0', 0),
     DARK_BLUE("DARK_BLUE", '1', 1),
     DARK_GREEN("DARK_GREEN", '2', 2),
@@ -41,23 +40,19 @@ public enum EnumChatFormatting
     private final String controlString;
     private final int colorIndex;
 
-    private static String func_175745_c(String p_175745_0_)
-    {
+    private static String func_175745_c(String p_175745_0_) {
         return p_175745_0_.toLowerCase().replaceAll("[^a-z]", "");
     }
 
-    EnumChatFormatting(String formattingName, char formattingCodeIn, int colorIndex)
-    {
+    EnumChatFormatting(String formattingName, char formattingCodeIn, int colorIndex) {
         this(formattingName, formattingCodeIn, false, colorIndex);
     }
 
-    EnumChatFormatting(String formattingName, char formattingCodeIn, boolean fancyStylingIn)
-    {
+    EnumChatFormatting(String formattingName, char formattingCodeIn, boolean fancyStylingIn) {
         this(formattingName, formattingCodeIn, fancyStylingIn, -1);
     }
 
-    EnumChatFormatting(String formattingName, char formattingCodeIn, boolean fancyStylingIn, int colorIndex)
-    {
+    EnumChatFormatting(String formattingName, char formattingCodeIn, boolean fancyStylingIn, int colorIndex) {
         this.name = formattingName;
         this.formattingCode = formattingCodeIn;
         this.fancyStyling = fancyStylingIn;
@@ -65,53 +60,40 @@ public enum EnumChatFormatting
         this.controlString = "\u00a7" + formattingCodeIn;
     }
 
-    public int getColorIndex()
-    {
+    public int getColorIndex() {
         return this.colorIndex;
     }
 
-    public boolean isFancyStyling()
-    {
+    public boolean isFancyStyling() {
         return this.fancyStyling;
     }
 
-    public boolean isColor()
-    {
+    public boolean isColor() {
         return !this.fancyStyling && this != RESET;
     }
 
-    public String getFriendlyName()
-    {
+    public String getFriendlyName() {
         return this.name().toLowerCase();
     }
 
-    public String toString()
-    {
+    public String toString() {
         return this.controlString;
     }
 
-    public static String getTextWithoutFormattingCodes(String text)
-    {
+    public static String getTextWithoutFormattingCodes(String text) {
         return text == null ? null : formattingCodePattern.matcher(text).replaceAll("");
     }
 
-    public static EnumChatFormatting getValueByName(String friendlyName)
-    {
+    public static EnumChatFormatting getValueByName(String friendlyName) {
         return friendlyName == null ? null : nameMapping.get(func_175745_c(friendlyName));
     }
 
-    public static EnumChatFormatting func_175744_a(int p_175744_0_)
-    {
-        if (p_175744_0_ < 0)
-        {
+    public static EnumChatFormatting func_175744_a(int p_175744_0_) {
+        if (p_175744_0_ < 0) {
             return RESET;
-        }
-        else
-        {
-            for (EnumChatFormatting enumchatformatting : values())
-            {
-                if (enumchatformatting.getColorIndex() == p_175744_0_)
-                {
+        } else {
+            for (EnumChatFormatting enumchatformatting : values()) {
+                if (enumchatformatting.getColorIndex() == p_175744_0_) {
                     return enumchatformatting;
                 }
             }
@@ -120,14 +102,11 @@ public enum EnumChatFormatting
         }
     }
 
-    public static Collection<String> getValidValues(boolean p_96296_0_, boolean p_96296_1_)
-    {
+    public static Collection<String> getValidValues(boolean p_96296_0_, boolean p_96296_1_) {
         List<String> list = Lists.newArrayList();
 
-        for (EnumChatFormatting enumchatformatting : values())
-        {
-            if ((!enumchatformatting.isColor() || p_96296_0_) && (!enumchatformatting.isFancyStyling() || p_96296_1_))
-            {
+        for (EnumChatFormatting enumchatformatting : values()) {
+            if ((!enumchatformatting.isColor() || p_96296_0_) && (!enumchatformatting.isFancyStyling() || p_96296_1_)) {
                 list.add(enumchatformatting.getFriendlyName());
             }
         }
@@ -136,8 +115,7 @@ public enum EnumChatFormatting
     }
 
     static {
-        for (EnumChatFormatting enumchatformatting : values())
-        {
+        for (EnumChatFormatting enumchatformatting : values()) {
             nameMapping.put(func_175745_c(enumchatformatting.name), enumchatformatting);
         }
     }

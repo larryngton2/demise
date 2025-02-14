@@ -23,47 +23,37 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class RealmsServerStatusPinger
-{
+public class RealmsServerStatusPinger {
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<NetworkManager> connections = Collections.synchronizedList(Lists.newArrayList());
 
-    public void pingServer(final String p_pingServer_1_, final RealmsServerPing p_pingServer_2_) throws UnknownHostException
-    {
-        if (p_pingServer_1_ != null && !p_pingServer_1_.startsWith("0.0.0.0") && !p_pingServer_1_.isEmpty())
-        {
+    public void pingServer(final String p_pingServer_1_, final RealmsServerPing p_pingServer_2_) throws UnknownHostException {
+        if (p_pingServer_1_ != null && !p_pingServer_1_.startsWith("0.0.0.0") && !p_pingServer_1_.isEmpty()) {
             RealmsServerAddress realmsserveraddress = RealmsServerAddress.parseString(p_pingServer_1_);
             final NetworkManager networkmanager = NetworkManager.createNetworkManagerAndConnect(InetAddress.getByName(realmsserveraddress.getHost()), realmsserveraddress.getPort(), false);
             this.connections.add(networkmanager);
-            networkmanager.setNetHandler(new INetHandlerStatusClient()
-            {
+            networkmanager.setNetHandler(new INetHandlerStatusClient() {
                 private boolean field_154345_e = false;
-                public void handleServerInfo(S00PacketServerInfo packetIn)
-                {
+
+                public void handleServerInfo(S00PacketServerInfo packetIn) {
                     ServerStatusResponse serverstatusresponse = packetIn.getResponse();
 
-                    if (serverstatusresponse.getPlayerCountData() != null)
-                    {
+                    if (serverstatusresponse.getPlayerCountData() != null) {
                         p_pingServer_2_.nrOfPlayers = String.valueOf(serverstatusresponse.getPlayerCountData().getOnlinePlayerCount());
 
-                        if (ArrayUtils.isNotEmpty(serverstatusresponse.getPlayerCountData().getPlayers()))
-                        {
+                        if (ArrayUtils.isNotEmpty(serverstatusresponse.getPlayerCountData().getPlayers())) {
                             StringBuilder stringbuilder = new StringBuilder();
 
-                            for (GameProfile gameprofile : serverstatusresponse.getPlayerCountData().getPlayers())
-                            {
-                                if (stringbuilder.length() > 0)
-                                {
+                            for (GameProfile gameprofile : serverstatusresponse.getPlayerCountData().getPlayers()) {
+                                if (stringbuilder.length() > 0) {
                                     stringbuilder.append("\n");
                                 }
 
                                 stringbuilder.append(gameprofile.getName());
                             }
 
-                            if (serverstatusresponse.getPlayerCountData().getPlayers().length < serverstatusresponse.getPlayerCountData().getOnlinePlayerCount())
-                            {
-                                if (stringbuilder.length() > 0)
-                                {
+                            if (serverstatusresponse.getPlayerCountData().getPlayers().length < serverstatusresponse.getPlayerCountData().getOnlinePlayerCount()) {
+                                if (stringbuilder.length() > 0) {
                                     stringbuilder.append("\n");
                                 }
 
@@ -72,56 +62,44 @@ public class RealmsServerStatusPinger
 
                             p_pingServer_2_.playerList = stringbuilder.toString();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         p_pingServer_2_.playerList = "";
                     }
 
                     networkmanager.sendPacket(new C01PacketPing(Realms.currentTimeMillis()));
                     this.field_154345_e = true;
                 }
-                public void handlePong(S01PacketPong packetIn)
-                {
+
+                public void handlePong(S01PacketPong packetIn) {
                     networkmanager.closeChannel(new ChatComponentText("Finished"));
                 }
-                public void onDisconnect(IChatComponent reason)
-                {
-                    if (!this.field_154345_e)
-                    {
+
+                public void onDisconnect(IChatComponent reason) {
+                    if (!this.field_154345_e) {
                         RealmsServerStatusPinger.LOGGER.error("Can't ping " + p_pingServer_1_ + ": " + reason.getUnformattedText());
                     }
                 }
             });
 
-            try
-            {
+            try {
                 networkmanager.sendPacket(new C00Handshake(RealmsSharedConstants.NETWORK_PROTOCOL_VERSION, realmsserveraddress.getHost(), realmsserveraddress.getPort(), EnumConnectionState.STATUS));
                 networkmanager.sendPacket(new C00PacketServerQuery());
-            }
-            catch (Throwable throwable)
-            {
+            } catch (Throwable throwable) {
                 LOGGER.error(throwable);
             }
         }
     }
 
-    public void tick()
-    {
-        synchronized (this.connections)
-        {
+    public void tick() {
+        synchronized (this.connections) {
             Iterator<NetworkManager> iterator = this.connections.iterator();
 
-            while (iterator.hasNext())
-            {
+            while (iterator.hasNext()) {
                 NetworkManager networkmanager = iterator.next();
 
-                if (networkmanager.isChannelOpen())
-                {
+                if (networkmanager.isChannelOpen()) {
                     networkmanager.processReceivedPackets();
-                }
-                else
-                {
+                } else {
                     iterator.remove();
                     networkmanager.checkDisconnected();
                 }
@@ -129,18 +107,14 @@ public class RealmsServerStatusPinger
         }
     }
 
-    public void removeAll()
-    {
-        synchronized (this.connections)
-        {
+    public void removeAll() {
+        synchronized (this.connections) {
             Iterator<NetworkManager> iterator = this.connections.iterator();
 
-            while (iterator.hasNext())
-            {
+            while (iterator.hasNext()) {
                 NetworkManager networkmanager = iterator.next();
 
-                if (networkmanager.isChannelOpen())
-                {
+                if (networkmanager.isChannelOpen()) {
                     iterator.remove();
                     networkmanager.closeChannel(new ChatComponentText("Cancelled"));
                 }

@@ -29,24 +29,24 @@ public enum Fonts {
     public FontRenderer get(float size) {
         return this.fontMap.computeIfAbsent(size, font -> {
             try {
-                return create(this.file, size,true);
+                return create(this.file, size, true);
             } catch (Exception var5) {
                 throw new RuntimeException("Unable to load font: " + this, var5);
             }
         });
     }
 
-    public FontRenderer get(float size,boolean antiAlias) {
+    public FontRenderer get(float size, boolean antiAlias) {
         return this.fontMap.computeIfAbsent(size, font -> {
             try {
-                return create(this.file, size,antiAlias);
+                return create(this.file, size, antiAlias);
             } catch (Exception var5) {
                 throw new RuntimeException("Unable to load font: " + this, var5);
             }
         });
     }
 
-    public FontRenderer create(String file, float size,boolean antiAlias) {
+    public FontRenderer create(String file, float size, boolean antiAlias) {
         Font font = null;
 
         try {
@@ -58,7 +58,7 @@ public enum Fonts {
             throw new RuntimeException("Failed to create font", ex);
         }
         if (font != null) {
-            return new FontRenderer(font,antiAlias);
+            return new FontRenderer(font, antiAlias);
         } else {
             throw new RuntimeException("Failed to create font");
         }

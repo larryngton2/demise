@@ -8,51 +8,43 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 
 import java.io.IOException;
 
-public class C0BPacketEntityAction implements Packet<INetHandlerPlayServer>
-{
+public class C0BPacketEntityAction implements Packet<INetHandlerPlayServer> {
     private int entityID;
     @Getter
     private C0BPacketEntityAction.Action action;
     @Getter
     private int auxData;
 
-    public C0BPacketEntityAction()
-    {
+    public C0BPacketEntityAction() {
     }
 
-    public C0BPacketEntityAction(Entity entity, C0BPacketEntityAction.Action action)
-    {
+    public C0BPacketEntityAction(Entity entity, C0BPacketEntityAction.Action action) {
         this(entity, action, 0);
     }
 
-    public C0BPacketEntityAction(Entity entity, C0BPacketEntityAction.Action action, int auxData)
-    {
+    public C0BPacketEntityAction(Entity entity, C0BPacketEntityAction.Action action, int auxData) {
         this.entityID = entity.getEntityId();
         this.action = action;
         this.auxData = auxData;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.entityID = buf.readVarIntFromBuffer();
         this.action = buf.readEnumValue(Action.class);
         this.auxData = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeVarIntToBuffer(this.entityID);
         buf.writeEnumValue(this.action);
         buf.writeVarIntToBuffer(this.auxData);
     }
 
-    public void processPacket(INetHandlerPlayServer handler)
-    {
+    public void processPacket(INetHandlerPlayServer handler) {
         handler.processEntityAction(this);
     }
 
-    public enum Action
-    {
+    public enum Action {
         START_SNEAKING,
         STOP_SNEAKING,
         STOP_SLEEPING,

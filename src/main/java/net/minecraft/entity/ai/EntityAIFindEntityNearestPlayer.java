@@ -12,50 +12,37 @@ import org.apache.logging.log4j.Logger;
 import java.util.Collections;
 import java.util.List;
 
-public class EntityAIFindEntityNearestPlayer extends EntityAIBase
-{
+public class EntityAIFindEntityNearestPlayer extends EntityAIBase {
     private static final Logger LOGGER = LogManager.getLogger();
     private final EntityLiving entityLiving;
     private final Predicate<Entity> predicate;
     private final EntityAINearestAttackableTarget.Sorter sorter;
     private EntityLivingBase entityTarget;
 
-    public EntityAIFindEntityNearestPlayer(EntityLiving entityLivingIn)
-    {
+    public EntityAIFindEntityNearestPlayer(EntityLiving entityLivingIn) {
         this.entityLiving = entityLivingIn;
 
-        if (entityLivingIn instanceof EntityCreature)
-        {
+        if (entityLivingIn instanceof EntityCreature) {
             LOGGER.warn("Use NearestAttackableTargetGoal.class for PathfinerMob mobs!");
         }
 
-        this.predicate = new Predicate<Entity>()
-        {
-            public boolean apply(Entity p_apply_1_)
-            {
-                if (!(p_apply_1_ instanceof EntityPlayer))
-                {
+        this.predicate = new Predicate<Entity>() {
+            public boolean apply(Entity p_apply_1_) {
+                if (!(p_apply_1_ instanceof EntityPlayer)) {
                     return false;
-                }
-                else if (((EntityPlayer)p_apply_1_).capabilities.disableDamage)
-                {
+                } else if (((EntityPlayer) p_apply_1_).capabilities.disableDamage) {
                     return false;
-                }
-                else
-                {
+                } else {
                     double d0 = EntityAIFindEntityNearestPlayer.this.maxTargetRange();
 
-                    if (p_apply_1_.isSneaking())
-                    {
+                    if (p_apply_1_.isSneaking()) {
                         d0 *= 0.800000011920929D;
                     }
 
-                    if (p_apply_1_.isInvisible())
-                    {
-                        float f = ((EntityPlayer)p_apply_1_).getArmorVisibility();
+                    if (p_apply_1_.isInvisible()) {
+                        float f = ((EntityPlayer) p_apply_1_).getArmorVisibility();
 
-                        if (f < 0.1F)
-                        {
+                        if (f < 0.1F) {
                             f = 0.1F;
                         }
 
@@ -69,70 +56,52 @@ public class EntityAIFindEntityNearestPlayer extends EntityAIBase
         this.sorter = new EntityAINearestAttackableTarget.Sorter(entityLivingIn);
     }
 
-    public boolean shouldExecute()
-    {
+    public boolean shouldExecute() {
         double d0 = this.maxTargetRange();
         List<EntityPlayer> list = this.entityLiving.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.entityLiving.getEntityBoundingBox().expand(d0, 4.0D, d0), this.predicate);
         Collections.sort(list, this.sorter);
 
-        if (list.isEmpty())
-        {
+        if (list.isEmpty()) {
             return false;
-        }
-        else
-        {
+        } else {
             this.entityTarget = list.get(0);
             return true;
         }
     }
 
-    public boolean continueExecuting()
-    {
+    public boolean continueExecuting() {
         EntityLivingBase entitylivingbase = this.entityLiving.getAttackTarget();
 
-        if (entitylivingbase == null)
-        {
+        if (entitylivingbase == null) {
             return false;
-        }
-        else if (!entitylivingbase.isEntityAlive())
-        {
+        } else if (!entitylivingbase.isEntityAlive()) {
             return false;
-        }
-        else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).capabilities.disableDamage)
-        {
+        } else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer) entitylivingbase).capabilities.disableDamage) {
             return false;
-        }
-        else
-        {
+        } else {
             Team team = this.entityLiving.getTeam();
             Team team1 = entitylivingbase.getTeam();
 
-            if (team != null && team1 == team)
-            {
+            if (team != null && team1 == team) {
                 return false;
-            }
-            else
-            {
+            } else {
                 double d0 = this.maxTargetRange();
                 return !(this.entityLiving.getDistanceSqToEntity(entitylivingbase) > d0 * d0) && (!(entitylivingbase instanceof EntityPlayerMP) || !((EntityPlayerMP) entitylivingbase).theItemInWorldManager.isCreative());
             }
         }
     }
 
-    public void startExecuting()
-    {
+    public void startExecuting() {
         this.entityLiving.setAttackTarget(this.entityTarget);
         super.startExecuting();
     }
 
-    public void resetTask()
-    {
+    public void resetTask() {
         this.entityLiving.setAttackTarget(null);
         super.startExecuting();
     }
 
-    protected double maxTargetRange()
-    {
+    protected double maxTargetRange() {
         IAttributeInstance iattributeinstance = this.entityLiving.getEntityAttribute(SharedMonsterAttributes.followRange);
         return iattributeinstance == null ? 16.0D : iattributeinstance.getAttributeValue();
     }

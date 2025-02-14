@@ -7,36 +7,29 @@ import net.minecraft.util.IChatComponent;
 
 import java.io.IOException;
 
-public class S40PacketDisconnect implements Packet<INetHandlerPlayClient>
-{
+public class S40PacketDisconnect implements Packet<INetHandlerPlayClient> {
     private IChatComponent reason;
 
-    public S40PacketDisconnect()
-    {
+    public S40PacketDisconnect() {
     }
 
-    public S40PacketDisconnect(IChatComponent reasonIn)
-    {
+    public S40PacketDisconnect(IChatComponent reasonIn) {
         this.reason = reasonIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.reason = buf.readChatComponent();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeChatComponent(this.reason);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleDisconnect(this);
     }
 
-    public IChatComponent getReason()
-    {
+    public IChatComponent getReason() {
         return this.reason;
     }
 }

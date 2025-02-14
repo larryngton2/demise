@@ -5,8 +5,7 @@ import net.minecraft.util.IProgressUpdate;
 
 import java.util.List;
 
-public interface ISaveFormat
-{
+public interface ISaveFormat {
     String getName();
 
     ISaveHandler getSaveLoader(String saveName, boolean storePlayerdata);

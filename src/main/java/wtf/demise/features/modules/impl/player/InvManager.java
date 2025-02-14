@@ -52,7 +52,7 @@ public class InvManager extends Module {
         if (packet instanceof C16PacketClientStatus clientStatus) {
 
             if (clientStatus.getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
-                if(startDelay.get())
+                if (startDelay.get())
                     timer.reset();
                 this.clientOpen = true;
                 this.serverOpen = true;

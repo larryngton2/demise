@@ -9,14 +9,12 @@ import org.lwjgl.opengl.GL12;
 
 import java.nio.ByteBuffer;
 
-public class CustomTextureRaw implements ICustomTexture
-{
+public class CustomTextureRaw implements ICustomTexture {
     private final TextureType type;
     private final int textureUnit;
     private int textureId;
 
-    public CustomTextureRaw(TextureType type, InternalFormat internalFormat, int width, int height, int depth, PixelFormat pixelFormat, PixelType pixelType, ByteBuffer data, int textureUnit, boolean blur, boolean clamp)
-    {
+    public CustomTextureRaw(TextureType type, InternalFormat internalFormat, int width, int height, int depth, PixelFormat pixelFormat, PixelType pixelType, ByteBuffer data, int textureUnit, boolean blur, boolean clamp) {
         this.type = type;
         this.textureUnit = textureUnit;
         this.textureId = GL11.glGenTextures();
@@ -24,8 +22,7 @@ public class CustomTextureRaw implements ICustomTexture
         int i = clamp ? 33071 : 10497;
         int j = blur ? 9729 : 9728;
 
-        switch (type)
-        {
+        switch (type) {
             case TEXTURE_1D:
                 GL11.glTexImage1D(GL11.GL_TEXTURE_1D, 0, internalFormat.getId(), width, 0, pixelFormat.getId(), pixelType.getId(), data);
                 GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_WRAP_S, i);
@@ -61,25 +58,20 @@ public class CustomTextureRaw implements ICustomTexture
         GL11.glBindTexture(this.getTarget(), 0);
     }
 
-    public int getTarget()
-    {
+    public int getTarget() {
         return this.type.getId();
     }
 
-    public int getTextureId()
-    {
+    public int getTextureId() {
         return this.textureId;
     }
 
-    public int getTextureUnit()
-    {
+    public int getTextureUnit() {
         return this.textureUnit;
     }
 
-    public void deleteTexture()
-    {
-        if (this.textureId > 0)
-        {
+    public void deleteTexture() {
+        if (this.textureId > 0) {
             GL11.glDeleteTextures(this.textureId);
             this.textureId = 0;
         }

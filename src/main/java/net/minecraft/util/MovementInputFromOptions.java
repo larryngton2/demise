@@ -4,12 +4,10 @@ import net.minecraft.client.settings.GameSettings;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.MoveInputEvent;
 
-public class MovementInputFromOptions extends MovementInput
-{
+public class MovementInputFromOptions extends MovementInput {
     private final GameSettings gameSettings;
 
-    public MovementInputFromOptions(GameSettings gameSettingsIn)
-    {
+    public MovementInputFromOptions(GameSettings gameSettingsIn) {
         this.gameSettings = gameSettingsIn;
     }
 
@@ -36,7 +34,7 @@ public class MovementInputFromOptions extends MovementInput
         this.jump = this.gameSettings.keyBindJump.isKeyDown();
         this.sneak = this.gameSettings.keyBindSneak.isKeyDown();
 
-        MoveInputEvent event = new MoveInputEvent(moveForward,moveStrafe, jump, sneak);
+        MoveInputEvent event = new MoveInputEvent(moveForward, moveStrafe, jump, sneak);
 
         Demise.INSTANCE.getEventManager().call(event);
 

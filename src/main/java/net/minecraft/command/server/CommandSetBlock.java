@@ -14,92 +14,69 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class CommandSetBlock extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandSetBlock extends CommandBase {
+    public String getCommandName() {
         return "setblock";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 2;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.setblock.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
-        if (args.length < 4)
-        {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (args.length < 4) {
             throw new WrongUsageException("commands.setblock.usage");
-        }
-        else
-        {
+        } else {
             sender.setCommandStat(CommandResultStats.Type.AFFECTED_BLOCKS, 0);
             BlockPos blockpos = parseBlockPos(sender, args, 0, false);
             Block block = CommandBase.getBlockByText(sender, args[3]);
             int i = 0;
 
-            if (args.length >= 5)
-            {
+            if (args.length >= 5) {
                 i = parseInt(args[4], 0, 15);
             }
 
             World world = sender.getEntityWorld();
 
-            if (!world.isBlockLoaded(blockpos))
-            {
+            if (!world.isBlockLoaded(blockpos)) {
                 throw new CommandException("commands.setblock.outOfWorld");
-            }
-            else
-            {
+            } else {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
                 boolean flag = false;
 
-                if (args.length >= 7 && block.hasTileEntity())
-                {
+                if (args.length >= 7 && block.hasTileEntity()) {
                     String s = getChatComponentFromNthArg(sender, args, 6).getUnformattedText();
 
-                    try
-                    {
+                    try {
                         nbttagcompound = JsonToNBT.getTagFromJson(s);
                         flag = true;
-                    }
-                    catch (NBTException nbtexception)
-                    {
+                    } catch (NBTException nbtexception) {
                         throw new CommandException("commands.setblock.tagError", nbtexception.getMessage());
                     }
                 }
 
-                if (args.length >= 6)
-                {
-                    if (args[5].equals("destroy"))
-                    {
+                if (args.length >= 6) {
+                    if (args[5].equals("destroy")) {
                         world.destroyBlock(blockpos, true);
 
-                        if (block == Blocks.air)
-                        {
+                        if (block == Blocks.air) {
                             notifyOperators(sender, this, "commands.setblock.success");
                             return;
                         }
-                    }
-                    else if (args[5].equals("keep") && !world.isAirBlock(blockpos))
-                    {
+                    } else if (args[5].equals("keep") && !world.isAirBlock(blockpos)) {
                         throw new CommandException("commands.setblock.noChange");
                     }
                 }
 
                 TileEntity tileentity1 = world.getTileEntity(blockpos);
 
-                if (tileentity1 != null)
-                {
-                    if (tileentity1 instanceof IInventory)
-                    {
-                        ((IInventory)tileentity1).clear();
+                if (tileentity1 != null) {
+                    if (tileentity1 instanceof IInventory) {
+                        ((IInventory) tileentity1).clear();
                     }
 
                     world.setBlockState(blockpos, Blocks.air.getDefaultState(), block == Blocks.air ? 2 : 4);
@@ -107,18 +84,13 @@ public class CommandSetBlock extends CommandBase
 
                 IBlockState iblockstate = block.getStateFromMeta(i);
 
-                if (!world.setBlockState(blockpos, iblockstate, 2))
-                {
+                if (!world.setBlockState(blockpos, iblockstate, 2)) {
                     throw new CommandException("commands.setblock.noChange");
-                }
-                else
-                {
-                    if (flag)
-                    {
+                } else {
+                    if (flag) {
                         TileEntity tileentity = world.getTileEntity(blockpos);
 
-                        if (tileentity != null)
-                        {
+                        if (tileentity != null) {
                             nbttagcompound.setInteger("x", blockpos.getX());
                             nbttagcompound.setInteger("y", blockpos.getY());
                             nbttagcompound.setInteger("z", blockpos.getZ());
@@ -134,8 +106,7 @@ public class CommandSetBlock extends CommandBase
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
-        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length == 4 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : (args.length == 6 ? getListOfStringsMatchingLastWord(args, "replace", "destroy", "keep"): null));
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : (args.length == 4 ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : (args.length == 6 ? getListOfStringsMatchingLastWord(args, "replace", "destroy", "keep") : null));
     }
 }

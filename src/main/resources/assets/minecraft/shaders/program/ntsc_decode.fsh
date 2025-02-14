@@ -83,36 +83,36 @@ void main() {
 
         // These zero-checks could be made more efficient, but we are trying to support
         // downlevel GLSL
-        if(SincYIn1.x == 0.0) SincY1.x = 1.0;
-        if(SincYIn1.y == 0.0) SincY1.y = 1.0;
-        if(SincYIn1.z == 0.0) SincY1.z = 1.0;
-        if(SincYIn1.w == 0.0) SincY1.w = 1.0;
-        if(SincYIn2.x == 0.0) SincY2.x = 1.0;
-        if(SincYIn2.y == 0.0) SincY2.y = 1.0;
-        if(SincYIn2.z == 0.0) SincY2.z = 1.0;
-        if(SincYIn2.w == 0.0) SincY2.w = 1.0;
-        if(SincYIn3.x == 0.0) SincY3.x = 1.0;
-        if(SincYIn3.y == 0.0) SincY3.y = 1.0;
-        if(SincYIn3.z == 0.0) SincY3.z = 1.0;
-        if(SincYIn3.w == 0.0) SincY3.w = 1.0;
+        if (SincYIn1.x == 0.0) SincY1.x = 1.0;
+        if (SincYIn1.y == 0.0) SincY1.y = 1.0;
+        if (SincYIn1.z == 0.0) SincY1.z = 1.0;
+        if (SincYIn1.w == 0.0) SincY1.w = 1.0;
+        if (SincYIn2.x == 0.0) SincY2.x = 1.0;
+        if (SincYIn2.y == 0.0) SincY2.y = 1.0;
+        if (SincYIn2.z == 0.0) SincY2.z = 1.0;
+        if (SincYIn2.w == 0.0) SincY2.w = 1.0;
+        if (SincYIn3.x == 0.0) SincY3.x = 1.0;
+        if (SincYIn3.y == 0.0) SincY3.y = 1.0;
+        if (SincYIn3.z == 0.0) SincY3.z = 1.0;
+        if (SincYIn3.w == 0.0) SincY3.w = 1.0;
         vec4 IdealY = (Fc_y1_2 * SincY1 - Fc_y2_2 * SincY2) + Fc_y3_2 * SincY3;
         vec4 FilterY = Cosine * IdealY;
 
         vec4 SincIIn = Pi2Fc_i * n4;
         vec4 SincI = sin(SincIIn) / SincIIn;
-        if(SincIIn.x == 0.0) SincI.x = 1.0;
-        if(SincIIn.y == 0.0) SincI.y = 1.0;
-        if(SincIIn.z == 0.0) SincI.z = 1.0;
-        if(SincIIn.w == 0.0) SincI.w = 1.0;
+        if (SincIIn.x == 0.0) SincI.x = 1.0;
+        if (SincIIn.y == 0.0) SincI.y = 1.0;
+        if (SincIIn.z == 0.0) SincI.z = 1.0;
+        if (SincIIn.w == 0.0) SincI.w = 1.0;
         vec4 IdealI = Fc_i_2 * SincI;
         vec4 FilterI = Cosine * IdealI;
 
         vec4 SincQIn = Pi2Fc_q * n4;
         vec4 SincQ = sin(SincQIn) / SincQIn;
-        if(SincQIn.x == 0.0) SincQ.x = 1.0;
-        if(SincQIn.y == 0.0) SincQ.y = 1.0;
-        if(SincQIn.z == 0.0) SincQ.z = 1.0;
-        if(SincQIn.w == 0.0) SincQ.w = 1.0;
+        if (SincQIn.x == 0.0) SincQ.x = 1.0;
+        if (SincQIn.y == 0.0) SincQ.y = 1.0;
+        if (SincQIn.z == 0.0) SincQ.z = 1.0;
+        if (SincQIn.w == 0.0) SincQ.w = 1.0;
         vec4 IdealQ = Fc_q_2 * SincQ;
         vec4 FilterQ = Cosine * IdealQ;
 

@@ -6,31 +6,25 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 
 import java.io.IOException;
 
-public class C0DPacketCloseWindow implements Packet<INetHandlerPlayServer>
-{
+public class C0DPacketCloseWindow implements Packet<INetHandlerPlayServer> {
     public int windowId;
 
-    public C0DPacketCloseWindow()
-    {
+    public C0DPacketCloseWindow() {
     }
 
-    public C0DPacketCloseWindow(int windowId)
-    {
+    public C0DPacketCloseWindow(int windowId) {
         this.windowId = windowId;
     }
 
-    public void processPacket(INetHandlerPlayServer handler)
-    {
+    public void processPacket(INetHandlerPlayServer handler) {
         handler.processCloseWindow(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.windowId = buf.readByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeByte(this.windowId);
     }
 }

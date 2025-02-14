@@ -4,8 +4,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.List;
 
-public interface ICrafting
-{
+public interface ICrafting {
     void updateCraftingInventory(Container containerToSend, List<ItemStack> itemsList);
 
     void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack);

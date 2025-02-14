@@ -8,66 +8,53 @@ import net.minecraft.world.storage.SaveFormatComparator;
 
 import java.util.List;
 
-public class RealmsAnvilLevelStorageSource
-{
+public class RealmsAnvilLevelStorageSource {
     private final ISaveFormat levelStorageSource;
 
-    public RealmsAnvilLevelStorageSource(ISaveFormat levelStorageSourceIn)
-    {
+    public RealmsAnvilLevelStorageSource(ISaveFormat levelStorageSourceIn) {
         this.levelStorageSource = levelStorageSourceIn;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return this.levelStorageSource.getName();
     }
 
-    public boolean levelExists(String p_levelExists_1_)
-    {
+    public boolean levelExists(String p_levelExists_1_) {
         return this.levelStorageSource.canLoadWorld(p_levelExists_1_);
     }
 
-    public boolean convertLevel(String p_convertLevel_1_, IProgressUpdate p_convertLevel_2_)
-    {
+    public boolean convertLevel(String p_convertLevel_1_, IProgressUpdate p_convertLevel_2_) {
         return this.levelStorageSource.convertMapFormat(p_convertLevel_1_, p_convertLevel_2_);
     }
 
-    public boolean requiresConversion(String p_requiresConversion_1_)
-    {
+    public boolean requiresConversion(String p_requiresConversion_1_) {
         return this.levelStorageSource.isOldMapFormat(p_requiresConversion_1_);
     }
 
-    public boolean isNewLevelIdAcceptable(String p_isNewLevelIdAcceptable_1_)
-    {
+    public boolean isNewLevelIdAcceptable(String p_isNewLevelIdAcceptable_1_) {
         return this.levelStorageSource.isNewLevelIdAcceptable(p_isNewLevelIdAcceptable_1_);
     }
 
-    public boolean deleteLevel(String p_deleteLevel_1_)
-    {
+    public boolean deleteLevel(String p_deleteLevel_1_) {
         return this.levelStorageSource.deleteWorldDirectory(p_deleteLevel_1_);
     }
 
-    public boolean isConvertible(String p_isConvertible_1_)
-    {
+    public boolean isConvertible(String p_isConvertible_1_) {
         return this.levelStorageSource.isConvertible(p_isConvertible_1_);
     }
 
-    public void renameLevel(String p_renameLevel_1_, String p_renameLevel_2_)
-    {
+    public void renameLevel(String p_renameLevel_1_, String p_renameLevel_2_) {
         this.levelStorageSource.renameWorld(p_renameLevel_1_, p_renameLevel_2_);
     }
 
-    public void clearAll()
-    {
+    public void clearAll() {
         this.levelStorageSource.flushCache();
     }
 
-    public List<RealmsLevelSummary> getLevelList() throws AnvilConverterException
-    {
+    public List<RealmsLevelSummary> getLevelList() throws AnvilConverterException {
         List<RealmsLevelSummary> list = Lists.newArrayList();
 
-        for (SaveFormatComparator saveformatcomparator : this.levelStorageSource.getSaveList())
-        {
+        for (SaveFormatComparator saveformatcomparator : this.levelStorageSource.getSaveList()) {
             list.add(new RealmsLevelSummary(saveformatcomparator));
         }
 

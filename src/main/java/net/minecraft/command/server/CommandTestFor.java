@@ -14,53 +14,39 @@ import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
-public class CommandTestFor extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandTestFor extends CommandBase {
+    public String getCommandName() {
         return "testfor";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 2;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.testfor.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
-        if (args.length < 1)
-        {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if (args.length < 1) {
             throw new WrongUsageException("commands.testfor.usage");
-        }
-        else
-        {
+        } else {
             Entity entity = getEntity(sender, args[0]);
             NBTTagCompound nbttagcompound = null;
 
-            if (args.length >= 2)
-            {
-                try
-                {
+            if (args.length >= 2) {
+                try {
                     nbttagcompound = JsonToNBT.getTagFromJson(buildString(args, 1));
-                }
-                catch (NBTException nbtexception)
-                {
+                } catch (NBTException nbtexception) {
                     throw new CommandException("commands.testfor.tagError", nbtexception.getMessage());
                 }
             }
 
-            if (nbttagcompound != null)
-            {
+            if (nbttagcompound != null) {
                 NBTTagCompound nbttagcompound1 = new NBTTagCompound();
                 entity.writeToNBT(nbttagcompound1);
 
-                if (!NBTUtil.func_181123_a(nbttagcompound, nbttagcompound1, true))
-                {
+                if (!NBTUtil.func_181123_a(nbttagcompound, nbttagcompound1, true)) {
                     throw new CommandException("commands.testfor.failure", entity.getName());
                 }
             }
@@ -69,13 +55,11 @@ public class CommandTestFor extends CommandBase
         }
     }
 
-    public boolean isUsernameIndex(String[] args, int index)
-    {
+    public boolean isUsernameIndex(String[] args, int index) {
         return index == 0;
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }
 }

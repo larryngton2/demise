@@ -17,9 +17,12 @@ public class Sys {
         if (!glfwInit()) throw new IllegalStateException("Unable to initialize glfw");
     }
 
-    public static void initialize() {}
+    public static void initialize() {
+    }
 
-    /** Returns the LWJGL version. */
+    /**
+     * Returns the LWJGL version.
+     */
     public static String getVersion() {
         return Version.getVersion();
     }

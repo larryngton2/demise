@@ -1221,8 +1221,8 @@ public class SimulatedPlayer implements InstanceAccess {
 
         return Pair.of(d3, d5);
     }
-    public float getEyeHeight()
-    {
+
+    public float getEyeHeight() {
         return this.height * 0.85F;
     }
 }

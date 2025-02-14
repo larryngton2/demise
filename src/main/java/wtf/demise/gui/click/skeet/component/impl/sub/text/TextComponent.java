@@ -5,11 +5,10 @@ import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.click.skeet.component.Component;
 import wtf.demise.gui.font.FontRenderer;
 
-public class TextComponent extends Component
-{
+public class TextComponent extends Component {
     private static final FontRenderer FONT_RENDERER = SkeetUI.FONT_RENDERER;
     private final String text;
-    
+
     public TextComponent(final Component parent, final String text, final float x, final float y) {
         super(parent, x, y, FONT_RENDERER.getStringWidth(text), FONT_RENDERER.getHeight());
         this.text = text;

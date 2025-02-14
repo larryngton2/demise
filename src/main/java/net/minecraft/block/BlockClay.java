@@ -8,21 +8,17 @@ import net.minecraft.item.Item;
 
 import java.util.Random;
 
-public class BlockClay extends Block
-{
-    public BlockClay()
-    {
+public class BlockClay extends Block {
+    public BlockClay() {
         super(Material.clay);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         return Items.clay_ball;
     }
 
-    public int quantityDropped(Random random)
-    {
+    public int quantityDropped(Random random) {
         return 4;
     }
 }

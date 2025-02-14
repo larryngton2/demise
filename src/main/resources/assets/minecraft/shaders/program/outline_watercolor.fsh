@@ -7,20 +7,20 @@ varying vec2 oneTexel;
 
 uniform float LumaRamp;
 
-void main(){
+void main() {
     vec4 center = texture2D(DiffuseSampler, texCoord);
-    vec4 up     = texture2D(DiffuseSampler, texCoord + vec2(        0.0, -oneTexel.y));
-    vec4 up2    = texture2D(DiffuseSampler, texCoord + vec2(        0.0, -oneTexel.y) * 2.0);
-    vec4 down   = texture2D(DiffuseSampler, texCoord + vec2( oneTexel.x,         0.0));
-    vec4 down2  = texture2D(DiffuseSampler, texCoord + vec2( oneTexel.x,         0.0) * 2.0);
-    vec4 left   = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x,         0.0));
-    vec4 left2  = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x,         0.0) * 2.0);
-    vec4 right  = texture2D(DiffuseSampler, texCoord + vec2(        0.0,  oneTexel.y));
-    vec4 right2 = texture2D(DiffuseSampler, texCoord + vec2(        0.0,  oneTexel.y) * 2.0);
-    vec4 ul     = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x, -oneTexel.y));
-    vec4 ur     = texture2D(DiffuseSampler, texCoord + vec2( oneTexel.x, -oneTexel.y));
-    vec4 bl     = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x,  oneTexel.y));
-    vec4 br     = texture2D(DiffuseSampler, texCoord + vec2( oneTexel.x,  oneTexel.y));
+    vec4 up = texture2D(DiffuseSampler, texCoord + vec2(0.0, -oneTexel.y));
+    vec4 up2 = texture2D(DiffuseSampler, texCoord + vec2(0.0, -oneTexel.y) * 2.0);
+    vec4 down = texture2D(DiffuseSampler, texCoord + vec2(oneTexel.x, 0.0));
+    vec4 down2 = texture2D(DiffuseSampler, texCoord + vec2(oneTexel.x, 0.0) * 2.0);
+    vec4 left = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x, 0.0));
+    vec4 left2 = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x, 0.0) * 2.0);
+    vec4 right = texture2D(DiffuseSampler, texCoord + vec2(0.0, oneTexel.y));
+    vec4 right2 = texture2D(DiffuseSampler, texCoord + vec2(0.0, oneTexel.y) * 2.0);
+    vec4 ul = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x, -oneTexel.y));
+    vec4 ur = texture2D(DiffuseSampler, texCoord + vec2(oneTexel.x, -oneTexel.y));
+    vec4 bl = texture2D(DiffuseSampler, texCoord + vec2(-oneTexel.x, oneTexel.y));
+    vec4 br = texture2D(DiffuseSampler, texCoord + vec2(oneTexel.x, oneTexel.y));
     vec4 gray = vec4(0.3, 0.59, 0.11, 0.0);
     float uDiff = dot(abs(center - up), gray);
     float dDiff = dot(abs(center - down), gray);

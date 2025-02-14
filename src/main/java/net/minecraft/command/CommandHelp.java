@@ -13,51 +13,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CommandHelp extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandHelp extends CommandBase {
+    public String getCommandName() {
         return "help";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 0;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.help.usage";
     }
 
-    public List<String> getCommandAliases()
-    {
+    public List<String> getCommandAliases() {
         return List.of("?");
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         List<ICommand> list = this.getSortedPossibleCommands(sender);
         int i = 7;
         int j = (list.size() - 1) / 7;
         int k = 0;
 
-        try
-        {
+        try {
             k = args.length == 0 ? 0 : parseInt(args[0], 1, j + 1) - 1;
-        }
-        catch (NumberInvalidException numberinvalidexception)
-        {
+        } catch (NumberInvalidException numberinvalidexception) {
             Map<String, ICommand> map = this.getCommands();
             ICommand icommand = map.get(args[0]);
 
-            if (icommand != null)
-            {
+            if (icommand != null) {
                 throw new WrongUsageException(icommand.getCommandUsage(sender));
             }
 
-            if (MathHelper.parseIntWithDefault(args[0], -1) != -1)
-            {
+            if (MathHelper.parseIntWithDefault(args[0], -1) != -1) {
                 throw numberinvalidexception;
             }
 
@@ -69,43 +58,35 @@ public class CommandHelp extends CommandBase
         chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.DARK_GREEN);
         sender.addChatMessage(chatcomponenttranslation1);
 
-        for (int i1 = k * 7; i1 < l; ++i1)
-        {
+        for (int i1 = k * 7; i1 < l; ++i1) {
             ICommand icommand1 = list.get(i1);
             ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation(icommand1.getCommandUsage(sender));
             chatcomponenttranslation.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + icommand1.getCommandName() + " "));
             sender.addChatMessage(chatcomponenttranslation);
         }
 
-        if (k == 0 && sender instanceof EntityPlayer)
-        {
+        if (k == 0 && sender instanceof EntityPlayer) {
             ChatComponentTranslation chatcomponenttranslation2 = new ChatComponentTranslation("commands.help.footer");
             chatcomponenttranslation2.getChatStyle().setColor(EnumChatFormatting.GREEN);
             sender.addChatMessage(chatcomponenttranslation2);
         }
     }
 
-    protected List<ICommand> getSortedPossibleCommands(ICommandSender p_71534_1_)
-    {
+    protected List<ICommand> getSortedPossibleCommands(ICommandSender p_71534_1_) {
         List<ICommand> list = MinecraftServer.getServer().getCommandManager().getPossibleCommands(p_71534_1_);
         Collections.sort(list);
         return list;
     }
 
-    protected Map<String, ICommand> getCommands()
-    {
+    protected Map<String, ICommand> getCommands() {
         return MinecraftServer.getServer().getCommandManager().getCommands();
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
-        if (args.length == 1)
-        {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        if (args.length == 1) {
             Set<String> set = this.getCommands().keySet();
             return getListOfStringsMatchingLastWord(args, set.toArray(new String[set.size()]));
-        }
-        else
-        {
+        } else {
             return null;
         }
     }

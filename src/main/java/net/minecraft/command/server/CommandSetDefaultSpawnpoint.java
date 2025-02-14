@@ -10,35 +10,26 @@ import net.minecraft.util.BlockPos;
 
 import java.util.List;
 
-public class CommandSetDefaultSpawnpoint extends CommandBase
-{
-    public String getCommandName()
-    {
+public class CommandSetDefaultSpawnpoint extends CommandBase {
+    public String getCommandName() {
         return "setworldspawn";
     }
 
-    public int getRequiredPermissionLevel()
-    {
+    public int getRequiredPermissionLevel() {
         return 2;
     }
 
-    public String getCommandUsage(ICommandSender sender)
-    {
+    public String getCommandUsage(ICommandSender sender) {
         return "commands.setworldspawn.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
-    {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         BlockPos blockpos;
 
-        if (args.length == 0)
-        {
+        if (args.length == 0) {
             blockpos = getCommandSenderAsPlayer(sender).getPosition();
-        }
-        else
-        {
-            if (args.length != 3 || sender.getEntityWorld() == null)
-            {
+        } else {
+            if (args.length != 3 || sender.getEntityWorld() == null) {
                 throw new WrongUsageException("commands.setworldspawn.usage");
             }
 
@@ -50,8 +41,7 @@ public class CommandSetDefaultSpawnpoint extends CommandBase
         notifyOperators(sender, this, "commands.setworldspawn.success", Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ()));
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
-    {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : null;
     }
 }

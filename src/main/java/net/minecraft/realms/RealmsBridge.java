@@ -8,49 +8,39 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 
-public class RealmsBridge extends RealmsScreen
-{
+public class RealmsBridge extends RealmsScreen {
     private static final Logger LOGGER = LogManager.getLogger();
     private GuiScreen previousScreen;
 
-    public void switchToRealms(GuiScreen p_switchToRealms_1_)
-    {
+    public void switchToRealms(GuiScreen p_switchToRealms_1_) {
         this.previousScreen = p_switchToRealms_1_;
 
-        try
-        {
+        try {
             Class<?> oclass = Class.forName("com.mojang.realmsclient.RealmsMainScreen");
             Constructor<?> constructor = oclass.getDeclaredConstructor(RealmsScreen.class);
             constructor.setAccessible(true);
             Object object = constructor.newInstance(this);
-            Minecraft.getMinecraft().displayGuiScreen(((RealmsScreen)object).getProxy());
-        }
-        catch (Exception exception)
-        {
+            Minecraft.getMinecraft().displayGuiScreen(((RealmsScreen) object).getProxy());
+        } catch (Exception exception) {
             LOGGER.error("Realms module missing", exception);
         }
     }
 
-    public GuiScreenRealmsProxy getNotificationScreen(GuiScreen p_getNotificationScreen_1_)
-    {
-        try
-        {
+    public GuiScreenRealmsProxy getNotificationScreen(GuiScreen p_getNotificationScreen_1_) {
+        try {
             this.previousScreen = p_getNotificationScreen_1_;
             Class<?> oclass = Class.forName("com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen");
             Constructor<?> constructor = oclass.getDeclaredConstructor(RealmsScreen.class);
             constructor.setAccessible(true);
             Object object = constructor.newInstance(this);
-            return ((RealmsScreen)object).getProxy();
-        }
-        catch (Exception exception)
-        {
+            return ((RealmsScreen) object).getProxy();
+        } catch (Exception exception) {
             LOGGER.error("Realms module missing", exception);
             return null;
         }
     }
 
-    public void init()
-    {
+    public void init() {
         Minecraft.getMinecraft().displayGuiScreen(this.previousScreen);
     }
 }

@@ -15,6 +15,7 @@ public class ModuleConfig extends Config {
     public ModuleConfig(String name) {
         super(name);
     }
+
     @Override
     public void loadConfig(JsonObject object) {
         for (Module module : Demise.INSTANCE.getModuleManager().getModules()) {

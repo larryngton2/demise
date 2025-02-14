@@ -24,7 +24,7 @@ public class ModuleCommand extends Command {
 
     @Override
     public String getUsage() {
-        return module.getName().toLowerCase(Locale.getDefault()) +  " <setting> <value>";
+        return module.getName().toLowerCase(Locale.getDefault()) + " <setting> <value>";
     }
 
     @Override

@@ -17,75 +17,61 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class BlockEndPortal extends BlockContainer
-{
-    protected BlockEndPortal(Material materialIn)
-    {
+public class BlockEndPortal extends BlockContainer {
+    protected BlockEndPortal(Material materialIn) {
         super(materialIn);
         this.setLightLevel(1.0F);
     }
 
-    public TileEntity createNewTileEntity(World worldIn, int meta)
-    {
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileEntityEndPortal();
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
-    {
+    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {
         float f = 0.0625F;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
     }
 
-    public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
-    {
+    public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
         return side == EnumFacing.DOWN && super.shouldSideBeRendered(worldIn, pos, side);
     }
 
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
-    {
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity) {
     }
 
-    public boolean isOpaqueCube()
-    {
+    public boolean isOpaqueCube() {
         return false;
     }
 
-    public boolean isFullCube()
-    {
+    public boolean isFullCube() {
         return false;
     }
 
-    public int quantityDropped(Random random)
-    {
+    public int quantityDropped(Random random) {
         return 0;
     }
 
-    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
-    {
-        if (entityIn.ridingEntity == null && entityIn.riddenByEntity == null && !worldIn.isRemote)
-        {
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (entityIn.ridingEntity == null && entityIn.riddenByEntity == null && !worldIn.isRemote) {
             entityIn.travelToDimension(1);
         }
     }
 
-    public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
-    {
-        double d0 = (float)pos.getX() + rand.nextFloat();
-        double d1 = (float)pos.getY() + 0.8F;
-        double d2 = (float)pos.getZ() + rand.nextFloat();
+    public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        double d0 = (float) pos.getX() + rand.nextFloat();
+        double d1 = (float) pos.getY() + 0.8F;
+        double d2 = (float) pos.getZ() + rand.nextFloat();
         double d3 = 0.0D;
         double d4 = 0.0D;
         double d5 = 0.0D;
         worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5);
     }
 
-    public Item getItem(World worldIn, BlockPos pos)
-    {
+    public Item getItem(World worldIn, BlockPos pos) {
         return null;
     }
 
-    public MapColor getMapColor(IBlockState state)
-    {
+    public MapColor getMapColor(IBlockState state) {
         return MapColor.blackColor;
     }
 }

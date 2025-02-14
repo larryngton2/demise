@@ -81,7 +81,7 @@ javafx {
     ]
     version = '22'
     platform = 'windows'
-    configurations = [ 'implementation', 'testImplementation' ]
+    configurations = ['implementation', 'testImplementation']
 }
 
 shadowJar {

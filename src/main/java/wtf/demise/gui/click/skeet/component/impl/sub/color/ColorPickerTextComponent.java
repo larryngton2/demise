@@ -10,8 +10,7 @@ import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ColorPickerTextComponent extends Component implements PredicateComponent, ExpandableComponent
-{
+public class ColorPickerTextComponent extends Component implements PredicateComponent, ExpandableComponent {
     private final ColorPickerComponent colorPicker;
     private final TextComponent textComponent;
     private static final int COLOR_PICKER_WIDTH = 11;
@@ -24,12 +23,12 @@ public class ColorPickerTextComponent extends Component implements PredicateComp
             public Color getColor() {
                 return getColor.get();
             }
-            
+
             @Override
             public void setColor(final Color color) {
                 setColor.accept(color);
             }
-            
+
             @Override
             public boolean isVisible() {
                 return isVisible.get();
@@ -37,6 +36,7 @@ public class ColorPickerTextComponent extends Component implements PredicateComp
         });
         this.addChild(this.textComponent);
     }
+
     public ColorPickerTextComponent(final Component parent, final String text, final Supplier<Color> getColor, final Consumer<Color> setColor, final Supplier<Boolean> isVisible) {
         this(parent, text, getColor, setColor, isVisible, 0.0f, 0.0f);
     }
@@ -45,36 +45,37 @@ public class ColorPickerTextComponent extends Component implements PredicateComp
     public float getWidth() {
         return 13.0f + textComponent.getWidth();
     }
+
     @Override
     public boolean isVisible() {
         return this.colorPicker.isVisible();
     }
-    
+
     @Override
     public float getExpandedX() {
         return this.colorPicker.getExpandedX();
     }
-    
+
     @Override
     public float getExpandedY() {
         return this.colorPicker.getY() + this.colorPicker.getHeight();
     }
-    
+
     @Override
     public float getExpandedWidth() {
         return this.colorPicker.getExpandedWidth();
     }
-    
+
     @Override
     public float getExpandedHeight() {
         return this.colorPicker.getExpandedHeight();
     }
-    
+
     @Override
     public void setExpanded(final boolean expanded) {
         this.colorPicker.setExpanded(expanded);
     }
-    
+
     @Override
     public boolean isExpanded() {
         return this.colorPicker.isExpanded();

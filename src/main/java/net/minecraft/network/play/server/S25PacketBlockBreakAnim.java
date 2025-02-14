@@ -7,54 +7,45 @@ import net.minecraft.util.BlockPos;
 
 import java.io.IOException;
 
-public class S25PacketBlockBreakAnim implements Packet<INetHandlerPlayClient>
-{
+public class S25PacketBlockBreakAnim implements Packet<INetHandlerPlayClient> {
     private int breakerId;
     private BlockPos position;
     private int progress;
 
-    public S25PacketBlockBreakAnim()
-    {
+    public S25PacketBlockBreakAnim() {
     }
 
-    public S25PacketBlockBreakAnim(int breakerId, BlockPos pos, int progress)
-    {
+    public S25PacketBlockBreakAnim(int breakerId, BlockPos pos, int progress) {
         this.breakerId = breakerId;
         this.position = pos;
         this.progress = progress;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.breakerId = buf.readVarIntFromBuffer();
         this.position = buf.readBlockPos();
         this.progress = buf.readUnsignedByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeVarIntToBuffer(this.breakerId);
         buf.writeBlockPos(this.position);
         buf.writeByte(this.progress);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleBlockBreakAnim(this);
     }
 
-    public int getBreakerId()
-    {
+    public int getBreakerId() {
         return this.breakerId;
     }
 
-    public BlockPos getPosition()
-    {
+    public BlockPos getPosition() {
         return this.position;
     }
 
-    public int getProgress()
-    {
+    public int getProgress() {
         return this.progress;
     }
 }

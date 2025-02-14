@@ -11,21 +11,18 @@ import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.init.Items;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderFireball extends Render<EntityFireball>
-{
+public class RenderFireball extends Render<EntityFireball> {
     private final float scale;
 
-    public RenderFireball(RenderManager renderManagerIn, float scaleIn)
-    {
+    public RenderFireball(RenderManager renderManagerIn, float scaleIn) {
         super(renderManagerIn);
         this.scale = scaleIn;
     }
 
-    public void doRender(EntityFireball entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityFireball entity, double x, double y, double z, float entityYaw, float partialTicks) {
         GlStateManager.pushMatrix();
         this.bindEntityTexture(entity);
-        GlStateManager.translate((float)x, (float)y, (float)z);
+        GlStateManager.translate((float) x, (float) y, (float) z);
         GlStateManager.enableRescaleNormal();
         GlStateManager.scale(this.scale, this.scale, this.scale);
         TextureAtlasSprite textureatlassprite = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(Items.fire_charge);
@@ -51,8 +48,7 @@ public class RenderFireball extends Render<EntityFireball>
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
-    protected ResourceLocation getEntityTexture(EntityFireball entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityFireball entity) {
         return TextureMap.locationBlocksTexture;
     }
 }

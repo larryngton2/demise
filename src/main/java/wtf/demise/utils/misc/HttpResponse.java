@@ -25,7 +25,7 @@ public class HttpResponse {
         this.content = content;
     }
 
-    public String toString(){
+    public String toString() {
         return new StringBuilder("[ code = ").append(code)
                 .append(" , content = ").append(content).append(" ]").toString();
     }

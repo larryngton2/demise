@@ -7,63 +7,53 @@ import net.minecraft.util.BlockPos;
 
 import java.io.IOException;
 
-public class S28PacketEffect implements Packet<INetHandlerPlayClient>
-{
+public class S28PacketEffect implements Packet<INetHandlerPlayClient> {
     private int soundType;
     private BlockPos soundPos;
     private int soundData;
     private boolean serverWide;
 
-    public S28PacketEffect()
-    {
+    public S28PacketEffect() {
     }
 
-    public S28PacketEffect(int soundTypeIn, BlockPos soundPosIn, int soundDataIn, boolean serverWideIn)
-    {
+    public S28PacketEffect(int soundTypeIn, BlockPos soundPosIn, int soundDataIn, boolean serverWideIn) {
         this.soundType = soundTypeIn;
         this.soundPos = soundPosIn;
         this.soundData = soundDataIn;
         this.serverWide = serverWideIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException
-    {
+    public void readPacketData(PacketBuffer buf) throws IOException {
         this.soundType = buf.readInt();
         this.soundPos = buf.readBlockPos();
         this.soundData = buf.readInt();
         this.serverWide = buf.readBoolean();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException
-    {
+    public void writePacketData(PacketBuffer buf) throws IOException {
         buf.writeInt(this.soundType);
         buf.writeBlockPos(this.soundPos);
         buf.writeInt(this.soundData);
         buf.writeBoolean(this.serverWide);
     }
 
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) {
         handler.handleEffect(this);
     }
 
-    public boolean isSoundServerwide()
-    {
+    public boolean isSoundServerwide() {
         return this.serverWide;
     }
 
-    public int getSoundType()
-    {
+    public int getSoundType() {
         return this.soundType;
     }
 
-    public int getSoundData()
-    {
+    public int getSoundData() {
         return this.soundData;
     }
 
-    public BlockPos getSoundPos()
-    {
+    public BlockPos getSoundPos() {
         return this.soundPos;
     }
 }

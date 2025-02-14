@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.combat;
 
 import de.florianmichael.viamcp.fixes.AttackOrder;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -31,7 +30,6 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.*;

@@ -8,8 +8,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.List;
 
-public interface IChunkProvider
-{
+public interface IChunkProvider {
     boolean chunkExists(int x, int z);
 
     Chunk provideChunk(int x, int z);

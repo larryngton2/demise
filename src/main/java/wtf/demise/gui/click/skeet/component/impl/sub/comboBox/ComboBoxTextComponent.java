@@ -8,8 +8,7 @@ import wtf.demise.gui.click.skeet.component.impl.sub.text.TextComponent;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public final class ComboBoxTextComponent extends Component implements PredicateComponent, ExpandableComponent
-{
+public final class ComboBoxTextComponent extends Component implements PredicateComponent, ExpandableComponent {
     private final ComboBoxComponent comboBoxComponent;
     private final TextComponent textComponent;
 
@@ -22,17 +21,17 @@ public final class ComboBoxTextComponent extends Component implements PredicateC
             public boolean isVisible() {
                 return isVisible.get();
             }
-            
+
             @Override
             public String getValue() {
                 return getValue.get();
             }
-            
+
             @Override
             public void setValue(final int index) {
                 setValueByIndex.accept(index);
             }
-            
+
             @Override
             public String[] getValues() {
                 return getValues.get();
@@ -42,45 +41,45 @@ public final class ComboBoxTextComponent extends Component implements PredicateC
         this.addChild(this.comboBoxComponent);
         this.addChild(this.textComponent);
     }
-    
-    public ComboBoxTextComponent(final Component parent, final String name, final Supplier<String[]> getValues, final Consumer<Integer> setValueByIndex, final Supplier<String> getValue,  final Supplier<Boolean> isVisible) {
+
+    public ComboBoxTextComponent(final Component parent, final String name, final Supplier<String[]> getValues, final Consumer<Integer> setValueByIndex, final Supplier<String> getValue, final Supplier<Boolean> isVisible) {
         this(parent, name, getValues, setValueByIndex, getValue, isVisible, 0.0f, 0.0f);
     }
-    
+
     @Override
     public boolean isVisible() {
         return this.comboBoxComponent.isVisible();
     }
-    
+
     public ComboBoxComponent getComboBoxComponent() {
         return this.comboBoxComponent;
     }
-    
+
     @Override
     public float getExpandedX() {
         return this.comboBoxComponent.getExpandedX();
     }
-    
+
     @Override
     public float getExpandedY() {
         return this.getY() + this.textComponent.getHeight();
     }
-    
+
     @Override
     public float getExpandedWidth() {
         return this.comboBoxComponent.getExpandedWidth();
     }
-    
+
     @Override
     public float getExpandedHeight() {
         return this.comboBoxComponent.getExpandedHeight();
     }
-    
+
     @Override
     public void setExpanded(final boolean expanded) {
         this.comboBoxComponent.setExpanded(expanded);
     }
-    
+
     @Override
     public boolean isExpanded() {
         return this.comboBoxComponent.isExpanded();

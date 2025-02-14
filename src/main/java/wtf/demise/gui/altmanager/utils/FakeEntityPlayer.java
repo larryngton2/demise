@@ -47,12 +47,12 @@ public final class FakeEntityPlayer extends EntityOtherPlayerMP {
             }).ifPresent(jsonObject -> {
                 this.skinType = jsonObject.has("metadata") ? jsonObject.getAsJsonObject("metadata").get("model").getAsString() : "default";
             });
-        } catch(Throwable ignored) {
+        } catch (Throwable ignored) {
         } finally {
-            if(skinType == null) this.skinType = "slim";
+            if (skinType == null) this.skinType = "slim";
         }
 
-        if(locationSkin != null) {
+        if (locationSkin != null) {
             this.locationSkin = locationSkin;
         } else {
             this.locationSkin = skinType.equals("default") ? TEXTURE_STEVE : TEXTURE_ALEX;

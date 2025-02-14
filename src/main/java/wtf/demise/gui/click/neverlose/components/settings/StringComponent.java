@@ -23,6 +23,7 @@ public class StringComponent extends Component {
     private final Animation input = new DecelerateAnimation(250, 1);
     private boolean inputting;
     private String text = "";
+
     public StringComponent(TextValue setting) {
         this.setting = setting;
         setHeight(24);
@@ -49,7 +50,7 @@ public class StringComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + 94,getY() + 13,80,16,mouseX,mouseY) && mouseButton == 0){
+        if (MouseUtils.isHovered2(getX() + 94, getY() + 13, 80, 16, mouseX, mouseY) && mouseButton == 0) {
             inputting = !inputting;
         } else {
             inputting = false;
@@ -67,7 +68,7 @@ public class StringComponent extends Component {
         if (setting.isOnlyNumber() && !NumberUtils.isNumber(String.valueOf(typedChar))) {
             return;
         }
-        if (inputting){
+        if (inputting) {
             if (keyCode == Keyboard.KEY_BACK) {
                 deleteLastCharacter();
             }
@@ -79,6 +80,7 @@ public class StringComponent extends Component {
         }
         super.keyTyped(typedChar, keyCode);
     }
+
     private void drawTextWithLineBreaks(String text, float x, float y, float maxWidth) {
         String[] lines = text.split("\n");
         float currentY = y;
@@ -122,12 +124,14 @@ public class StringComponent extends Component {
 
         return lines;
     }
+
     private void deleteLastCharacter() {
         if (!text.isEmpty()) {
             text = text.substring(0, text.length() - 1);
             setting.setText(text);
         }
     }
+
     private StringBuilder breakAndAddWord(String word, StringBuilder currentLine, float maxWidth, List<String> lines) {
         int wordLength = word.length();
         for (int i = 0; i < wordLength; i++) {
@@ -142,6 +146,7 @@ public class StringComponent extends Component {
         }
         return currentLine;
     }
+
     @Override
     public boolean isVisible() {
         return setting.visible.get();

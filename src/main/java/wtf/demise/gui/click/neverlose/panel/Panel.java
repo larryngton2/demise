@@ -29,15 +29,17 @@ public class Panel implements IComponent, InstanceAccess {
     @Setter
     private boolean selected;
     private final ObjectArrayList<ModuleComponent> moduleComponents = new ObjectArrayList<>();
-    private final Animation animation = new DecelerateAnimation(250,1);
+    private final Animation animation = new DecelerateAnimation(250, 1);
+
     public Panel(ModuleCategory category) {
         this.category = category;
-        for (Module module : INSTANCE.getModuleManager().getModules()){
-            if (module.getCategory().equals(this.category)){
+        for (Module module : INSTANCE.getModuleManager().getModules()) {
+            if (module.getCategory().equals(this.category)) {
                 moduleComponents.add(new ModuleComponent(module));
             }
         }
     }
+
     @Override
     public void drawScreen(int mouseX, int mouseY) {
         //update coordinate
@@ -55,7 +57,7 @@ public class Panel implements IComponent, InstanceAccess {
             float left = 0, right = 0;
             for (int i = 0; i < moduleComponents.size(); i++) {
                 ModuleComponent module = moduleComponents.get(i);
-                float componentOffset = getComponentOffset(i,left,right);
+                float componentOffset = getComponentOffset(i, left, right);
 
                 module.drawScreen(mouseX, mouseY);
 
@@ -95,20 +97,22 @@ public class Panel implements IComponent, InstanceAccess {
 
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
-        if (MouseUtils.isHovered2(getPosX() + 140, getPosY() + 49, 380, 368, mx, my) && moduleComponents.stream().noneMatch(moduleComponent -> moduleComponent.getComponents().stream().anyMatch(component -> component.isHovered(mx,my)))) {
+        if (MouseUtils.isHovered2(getPosX() + 140, getPosY() + 49, 380, 368, mx, my) && moduleComponents.stream().noneMatch(moduleComponent -> moduleComponent.getComponents().stream().anyMatch(component -> component.isHovered(mx, my)))) {
             rawScroll += (float) Mouse.getDWheel() * 20;
         }
         rawScroll = Math.max(Math.min(0, rawScroll), -maxScroll);
         scrollAnimation = new SmoothStepAnimation(ms, rawScroll - scroll, Direction.BACKWARDS);
     }
+
     public float getScroll() {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
         return scroll;
     }
+
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (isSelected()) {
-            moduleComponents.forEach(moduleComponent -> moduleComponent.mouseClicked(mouseX,mouseY,mouseButton));
+            moduleComponents.forEach(moduleComponent -> moduleComponent.mouseClicked(mouseX, mouseY, mouseButton));
         }
         IComponent.super.mouseClicked(mouseX, mouseY, mouseButton);
     }
@@ -116,7 +120,7 @@ public class Panel implements IComponent, InstanceAccess {
     @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
         if (isSelected()) {
-            moduleComponents.forEach(moduleComponent -> moduleComponent.mouseReleased(mouseX,mouseY,state));
+            moduleComponents.forEach(moduleComponent -> moduleComponent.mouseReleased(mouseX, mouseY, state));
         }
         IComponent.super.mouseReleased(mouseX, mouseY, state);
     }
@@ -124,7 +128,7 @@ public class Panel implements IComponent, InstanceAccess {
     @Override
     public void keyTyped(char typedChar, int keyCode) {
         if (isSelected()) {
-            moduleComponents.forEach(moduleComponent -> moduleComponent.keyTyped(typedChar,keyCode));
+            moduleComponents.forEach(moduleComponent -> moduleComponent.keyTyped(typedChar, keyCode));
         }
         IComponent.super.keyTyped(typedChar, keyCode);
     }

@@ -58,6 +58,7 @@ public final class CommandManager {
             }
         }
     }
+
     public void addCommands(Command... checks) {
         this.cmd.addAll(Arrays.asList(checks));
     }

@@ -8,11 +8,11 @@ uniform vec2 InSize;
 varying vec2 texCoord;
 
 uniform float MosaicSize = 1.0;
-uniform vec3 RedMatrix   = vec3(1.0, 0.0, 0.0);
+uniform vec3 RedMatrix = vec3(1.0, 0.0, 0.0);
 uniform vec3 GreenMatrix = vec3(0.0, 1.0, 0.0);
-uniform vec3 BlueMatrix  = vec3(0.0, 0.0, 1.0);
+uniform vec3 BlueMatrix = vec3(0.0, 0.0, 1.0);
 
-void main(){
+void main() {
     vec2 mosaicInSize = InSize / MosaicSize;
     vec2 fractPix = fract(texCoord * mosaicInSize) / mosaicInSize;
 
