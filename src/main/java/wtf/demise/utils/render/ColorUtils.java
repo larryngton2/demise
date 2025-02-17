@@ -186,4 +186,11 @@ public class ColorUtils {
         int bluePart = (int) ((double) color1.getBlue() * inverse_percent + (double) color2.getBlue() * offset);
         return new Color(redPart, greenPart, bluePart);
     }
+
+    public static Color getRainbow(int speed, int index, float saturation, float brightness, float opacity) {
+        int angle = (int) ((System.currentTimeMillis() / speed + index) % 360);
+        float hue = angle / 360f;
+        Color color = new Color(Color.HSBtoRGB(hue, saturation, brightness));
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), Math.max(0, Math.min(255, (int) (opacity * 255))));
+    }
 }

@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.exploit;
+package wtf.demise.features.modules.impl.player;
 
 import net.minecraft.network.play.client.C03PacketPlayer;
 import wtf.demise.events.annotations.EventTarget;
@@ -10,7 +10,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PacketUtils;
 
-@ModuleInfo(name = "FastUse", category = ModuleCategory.Exploit)
+@ModuleInfo(name = "FastUse", category = ModuleCategory.Player)
 public class FastUse extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Instant", "NCP", "AAC"}, "Instant", this);
     private final SliderValue timer = new SliderValue("Timer", 1, 0.1f, 5, 0.1f, this);

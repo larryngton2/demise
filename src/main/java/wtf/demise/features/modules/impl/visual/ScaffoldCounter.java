@@ -28,7 +28,7 @@ public class ScaffoldCounter implements InstanceAccess {
         switch (scaffold.counter.get().toLowerCase()) {
             case "normal": {
                 anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                //if (!scaffold.isEnabled() && anim.isDone()) return;
+                if (!scaffold.isEnabled() && anim.isDone()) return;
                 int slot = scaffold.getBlockSlot();
                 ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
                 int count = slot == -1 ? 0 : scaffold.getBlockCount();

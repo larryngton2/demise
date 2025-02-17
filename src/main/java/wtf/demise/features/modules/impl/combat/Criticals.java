@@ -5,6 +5,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.MotionEvent;
+import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
@@ -24,6 +25,11 @@ public class Criticals extends Module {
     public void onDisable() {
         mc.timer.timerSpeed = 1f;
         attacked = false;
+    }
+
+    @EventTarget
+    public void onUpdate(UpdateEvent e) {
+        this.setTag(mode.get());
     }
 
     @EventTarget

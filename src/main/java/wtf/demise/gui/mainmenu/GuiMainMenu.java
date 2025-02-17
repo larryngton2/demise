@@ -17,7 +17,7 @@ public class GuiMainMenu extends GuiScreen {
     private final List<MenuButton> buttons = List.of(
             new MenuButton("Singleplayer"),
             new MenuButton("Multiplayer"),
-            new MenuButton("Alts"),
+            new MenuButton("Alt Manager"),
             new MenuButton("Options"),
             new MenuButton("Shutdown"));
 
@@ -30,13 +30,13 @@ public class GuiMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
 
-        float buttonWidth = 100;
-        float buttonHeight = 20;
+        float buttonWidth = 140;
+        float buttonHeight = 25;
 
         int count = 20;
 
         Fonts.interBold.get(35).drawCenteredStringWithShadow(Demise.INSTANCE.getClientName(), (width / 2f - buttonWidth / 2f) + buttonWidth / 2, (height / 2f) + count - (buttons.size() * buttonHeight) / 2f, -1);
-        Fonts.interMedium.get(14).drawStringWithShadow("Welcome back, " + EnumChatFormatting.AQUA + Demise.INSTANCE.getDiscordRP().getName(), width - (2 + Fonts.interMedium.get(14).getStringWidth("Welcome back," + Demise.INSTANCE.getDiscordRP().getName())), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
+        Fonts.interMedium.get(14).drawStringWithShadow("Welcome back, " + EnumChatFormatting.AQUA + Demise.INSTANCE.getDiscordRP().getName(), width - (2 + Fonts.interMedium.get(14).getStringWidth("Welcome back, " + Demise.INSTANCE.getDiscordRP().getName())), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
 
         for (MenuButton button : buttons) {
             button.x = width / 2f - buttonWidth / 2f;
@@ -47,7 +47,7 @@ public class GuiMainMenu extends GuiScreen {
                 switch (button.text) {
                     case "Singleplayer" -> mc.displayGuiScreen(new GuiSelectWorld(this));
                     case "Multiplayer" -> mc.displayGuiScreen(new GuiMultiplayer(this));
-                    case "Alts" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
+                    case "Alt Manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
                     case "Options" -> mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
                     case "Shutdown" -> mc.shutdown();
                 }

@@ -115,8 +115,7 @@ public class Demise {
     }
 
     private void setupDisplayTitle() {
-        String osVersion = Sys.getVersion();
-        String title = String.format("%s %s | %s", clientName, version, osVersion);
+        String title = String.format("%s %s", clientName, version);
         Display.setTitle(title);
         LOGGER.info("Display title set to: {}", title);
     }

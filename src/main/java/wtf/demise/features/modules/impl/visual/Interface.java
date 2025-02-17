@@ -82,7 +82,7 @@ public class Interface extends Module {
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
     public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Default", "Nursultan", "Exhi", "Sexy", "Type 1", "NeverLose", "Mod"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
-    public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Astolfo", "MoonLight", "Moon"}, "Moon", this, () -> elements.isEnabled("Target HUD"));
+    public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Moon", "Demise"}, "Demise", this, () -> elements.isEnabled("Target HUD"));
     public final BoolValue targetHudParticle = new BoolValue("TargetHUD Particle", true, this, () -> elements.isEnabled("Target HUD"));
     public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Test", "Type 2", "Type 3", "Test2", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
     public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
@@ -664,7 +664,7 @@ public class Interface extends Module {
         mainColor.setRainbow(color.is("Rainbow"));
         KillAura aura = getModule(KillAura.class);
         if (aura.isEnabled()) {
-            animationEntityPlayerMap.entrySet().removeIf(entry -> entry.getKey().isDead || (!aura.targets.contains(entry.getKey()) && entry.getKey() != mc.thePlayer));
+            animationEntityPlayerMap.entrySet().removeIf(entry -> entry.getKey().isDead || (KillAura.currentTarget != entry.getKey() && entry.getKey() != mc.thePlayer));
         }
         if (!aura.isEnabled() && !(mc.currentScreen instanceof GuiChat)) {
             Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
@@ -678,14 +678,12 @@ public class Interface extends Module {
                 }
             }
         }
-        if (aura.targets != null && !(mc.currentScreen instanceof GuiChat)) {
-            for (EntityLivingBase entity : aura.targets) {
-                if (entity instanceof EntityPlayer && entity != mc.thePlayer) {
-                    animationEntityPlayerMap.putIfAbsent((EntityPlayer) entity, new DecelerateAnimation(175, 1));
-                    animationEntityPlayerMap.get(entity).setDirection(Direction.FORWARDS);
-                }
-            }
+
+        if (KillAura.currentTarget != null && !(mc.currentScreen instanceof GuiChat)) {
+            animationEntityPlayerMap.putIfAbsent((EntityPlayer) KillAura.currentTarget, new DecelerateAnimation(175, 1));
+            animationEntityPlayerMap.get(KillAura.currentTarget).setDirection(Direction.FORWARDS);
         }
+
         if (aura.isEnabled() && KillAura.currentTarget == null && !(mc.currentScreen instanceof GuiChat)) {
             Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
             while (iterator.hasNext()) {

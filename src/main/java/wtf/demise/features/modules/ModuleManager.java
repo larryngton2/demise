@@ -76,7 +76,6 @@ public class ModuleManager {
                 Regen.class,
                 TPAura.class,
                 ResetVL.class,
-                FastUse.class,
 
                 // Other
                 Twerk.class,
@@ -106,6 +105,8 @@ public class ModuleManager {
                 Stealer.class,
                 BedNuker.class,
                 NoRot.class,
+                FastUse.class,
+                FastBreak.class,
 
                 // Visual
                 Atmosphere.class,

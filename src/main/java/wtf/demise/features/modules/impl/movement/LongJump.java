@@ -80,7 +80,6 @@ public class LongJump extends Module {
                 mc.thePlayer.inventory.currentItem = lastSlot;
             }
 
-
             ticks = lastSlot = -1;
             setSpeed = stopModules = sentPlace = false;
             initTicks = 0;
@@ -128,7 +127,6 @@ public class LongJump extends Module {
                     }
                 }
                 break;
-
             case "Miniblox":
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), false);
@@ -183,8 +181,8 @@ public class LongJump extends Module {
                         MovementUtils.stop();
                         toggle();
                     }
-                    break;
                 }
+                break;
         }
     }
 
