@@ -27,7 +27,6 @@ public class AntiFireball extends Module {
     private final SliderValue minPitchRotSpeed = new SliderValue("Min Pitch Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
     private final SliderValue maxYawRotSpeed = new SliderValue("Max Yaw Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
     private final SliderValue maxPitchRotSpeed = new SliderValue("Max Pitch Rotation Speed", 180, 0, 180, 1, this, () -> customRotationSetting.get());
-    public final BoolValue smoothlyResetRotation = new BoolValue("Smoothly Reset Rotation", true, this, customRotationSetting::get);
     private final BoolValue moveFix = new BoolValue("Move Fix", false, this);
     private final TimerUtils attackTimer = new TimerUtils();
 
@@ -44,7 +43,7 @@ public class AntiFireball extends Module {
                     float[] finalRotation = RotationUtils.getAngles(entity);
 
                     if (customRotationSetting.get()) {
-                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()), smoothlyResetRotation.get());
+                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
                     } else {
                         RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF);
                     }

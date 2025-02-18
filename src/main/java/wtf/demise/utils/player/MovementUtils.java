@@ -465,4 +465,39 @@ public class MovementUtils implements InstanceAccess {
     public static double predictedMotion(final double motion) {
         return (motion - 0.08) * 0.98F;
     }
+
+    public static void setSpeed(double speed) {
+        double forward = mc.gameSettings.keyBindForward.isKeyDown()
+                ? 1.0
+                : (mc.gameSettings.keyBindBack.isKeyDown() ? -1.0 : 0.0);
+        double strafe = mc.gameSettings.keyBindLeft.isKeyDown()
+                ? 1.0
+                : (mc.gameSettings.keyBindRight.isKeyDown() ? -1.0 : 0.0);
+        float yaw = mc.thePlayer.rotationYaw;
+
+        if (isMoving()) {
+            if (forward != 0.0) {
+                if (strafe > 0.0) {
+                    yaw += (float)(forward > 0.0 ? -45 : 45);
+                } else if (strafe < 0.0) {
+                    yaw += (float)(forward > 0.0 ? 45 : -45);
+                }
+
+                strafe = 0.0;
+                if (forward > 0.0) {
+                    forward = 1.0;
+                } else if (forward < 0.0) {
+                    forward = -1.0;
+                }
+            }
+
+            double cos = Math.cos(Math.toRadians((double)(yaw + 89.5F)));
+            double sin = Math.sin(Math.toRadians((double)(yaw + 89.5F)));
+            mc.thePlayer.motionX = forward * speed * cos + strafe * speed * sin;
+            mc.thePlayer.motionZ = forward * speed * sin - strafe * speed * cos;
+        } else {
+            mc.thePlayer.motionX = 0.0;
+            mc.thePlayer.motionZ = 0.0;
+        }
+    }
 }

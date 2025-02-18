@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
-import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.ModeValue;
@@ -15,7 +14,6 @@ import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.ParticleRenderer;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
@@ -24,8 +22,6 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-
-import static net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen;
 
 public class TargetHUDWidget extends Widget {
     public TargetHUDWidget() {
@@ -156,7 +152,7 @@ class TargetHUD implements InstanceAccess {
                     RoundedUtils.drawRound(x + 38.5f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
                     String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
                     double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
-                    String diff = initialDiff > 0 ? "+" + initialDiff : String.valueOf(initialDiff);
+                    String diff = initialDiff >= 0 ? "+" + initialDiff : String.valueOf(initialDiff);
 
                     RoundedUtils.drawRound(x + 38.5f, y + 28, target.healthAnimation.getOutput(), 4.5f, 2, new Color(setting.color(0)));
                     RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);

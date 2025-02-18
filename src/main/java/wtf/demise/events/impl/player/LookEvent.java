@@ -5,6 +5,5 @@ import wtf.demise.events.impl.Event;
 
 @AllArgsConstructor
 public class LookEvent implements Event {
-
     public float[] rotation;
 }

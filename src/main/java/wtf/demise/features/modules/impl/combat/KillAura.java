@@ -15,7 +15,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
-import org.lwjglx.util.vector.Vector2f;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.MouseOverEvent;
@@ -50,8 +49,8 @@ public class KillAura extends Module {
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
 
     // attack
-    private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet"}, "Packet", this);
-    private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
+    private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
+    //private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
     private final BoolValue noSwing = new BoolValue("No swing", false, this, () -> Objects.equals(clickMode.get(), "Packet"));
     private final SliderValue attackDelayMin = new SliderValue("Attack delay (min)", 25, 25, 1000, 25, this);
     private final SliderValue attackDelayMax = new SliderValue("Attack delay (max)", 25, 25, 1000, 25, this);
@@ -73,7 +72,6 @@ public class KillAura extends Module {
     private final SliderValue xzTrim = new SliderValue("XZ trim", 0, 0, 0.5f, 0.01f, this);
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "LerpLimit", "Correlation"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final BoolValue smoothReset = new BoolValue("Smooth reset", false, this);
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -158,6 +156,8 @@ public class KillAura extends Module {
             return;
         }
 
+        this.setTag(targetMode.get());
+
         switch (targetMode.get()) {
             case "Single":
                 currentTarget = findTarget();
@@ -214,8 +214,6 @@ public class KillAura extends Module {
         }
 
         targets.removeIf(target -> nullTargetCheck());
-
-        this.setTag(targetMode.get());
     }
 
     private void setRotationToTarget(Entity target) {
@@ -227,19 +225,19 @@ public class KillAura extends Module {
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()),
-                        smoothReset.get(), SmoothMode.Linear);
+                        SmoothMode.Linear);
                 break;
             case Lerp:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()),
-                        smoothReset.get(), SmoothMode.Lerp);
+                        SmoothMode.Lerp);
                 break;
             case LerpLimit:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()),
-                        smoothReset.get(), SmoothMode.LerpLimit,
+                        SmoothMode.LerpLimit,
                         MathUtils.randomizeInt(limitYawSpeedMin.get(), limitYawSpeedMax.get()),
                         MathUtils.randomizeInt(limitPitchSpeedMin.get(), limitPitchSpeedMax.get()),
                         rangeToLimit.get() + 0.4f, target);
@@ -248,7 +246,7 @@ public class KillAura extends Module {
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get()),
-                        smoothReset.get(), SmoothMode.Correlation,
+                        SmoothMode.Correlation,
                         MathUtils.randomizeInt(limitYawSpeedMin.get(), limitYawSpeedMax.get()),
                         MathUtils.randomizeInt(limitPitchSpeedMin.get(), limitPitchSpeedMax.get()),
                         rangeToLimit.get() + 0.4f, target, threshold.get());
@@ -289,9 +287,9 @@ public class KillAura extends Module {
         double leastHealth = Float.MAX_VALUE;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
-            double distanceToEntity = mc.thePlayer.getDistanceToEntity(entity);
+            double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
 
-            if (entity instanceof EntityPlayer && entity != mc.thePlayer && !Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity) && distanceToEntity <= searchRange.get() + 0.4) {
+            if (entity instanceof EntityPlayer && entity != mc.thePlayer && !Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity) && distanceToEntity <= searchRange.get()) {
                 if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
                     continue;
                 }
@@ -318,6 +316,7 @@ public class KillAura extends Module {
                 }
             }
         }
+
         return target;
     }
 
@@ -367,18 +366,13 @@ public class KillAura extends Module {
             return;
         }
 
-        MovingObjectPosition mov = performRayCast();
-
-        handleAttack(mov);
-        lastTargetTime.reset();
-    }
-
-    private void handleAttack(MovingObjectPosition mov) {
-        if (shouldFailSwing(mov)) {
-            handleFailSwing(mov);
+        if (rayCast.get() && (mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)) {
+            handleFailSwing(mc.objectMouseOver);
         } else {
             attack();
         }
+
+        lastTargetTime.reset();
     }
 
     private boolean isWithinAttackRange() {
@@ -388,16 +382,6 @@ public class KillAura extends Module {
     private boolean isAttackReady() {
         long delay = MathUtils.nextInt((int) attackDelayMin.get(), (int) attackDelayMax.get());
         return lastTargetTime.hasTimeElapsed(delay);
-    }
-
-    private MovingObjectPosition performRayCast() {
-        float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
-        float pitch = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[1] : mc.thePlayer.rotationPitch;
-        return RayCastUtil.rayCast(new Vector2f(yaw, pitch), attackRange.get() + 0.4, -0.1f);
-    }
-
-    private boolean shouldFailSwing(MovingObjectPosition movingObjectPosition) {
-        return rayCast.get() && (movingObjectPosition == null || movingObjectPosition.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY);
     }
 
     private void handleFailSwing(MovingObjectPosition movingObjectPosition) {
@@ -410,6 +394,9 @@ public class KillAura extends Module {
                     break;
                 case "Legit":
                     KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
+                    break;
+                case "PlayerController":
+                    AttackOrder.sendConditionalSwing(movingObjectPosition);
                     break;
             }
         }
@@ -456,7 +443,7 @@ public class KillAura extends Module {
     }
 
     private void resetBlocking() {
-        if ((mc.thePlayer.isUsingItem() && isHoldingSword()) || isBlocking) {
+        if (isBlocking && isHoldingSword()) {
             setBlocking(false);
             mc.thePlayer.stopUsingItem();
         }
@@ -481,11 +468,6 @@ public class KillAura extends Module {
     private void attack() {
         int attackCount = 1;
 
-        if (smartClicking.get() && !shouldClick()) {
-            lastTargetTime.reset();
-            return;
-        }
-
         if (extraClicks.get() && rand.nextInt(100) <= eChance.get()) {
             attackCount = (int) clicks.get() + 1;
         }
@@ -493,18 +475,25 @@ public class KillAura extends Module {
         if (targetMode.is("Multi")) {
             for (EntityLivingBase target : targets) {
                 for (int i = 0; i < attackCount; i++) {
-                    if (clickMode.get().equals("Packet")) {
-                        if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                            if (!noSwing.get()) {
-                                mc.thePlayer.swingItem();
+                    switch (clickMode.get()) {
+                        case "Packet":
+                            if (clickMode.get().equals("Packet")) {
+                                if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
+                                    if (!noSwing.get()) {
+                                        mc.thePlayer.swingItem();
+                                    }
+                                    PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
+                                } else {
+                                    PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
+                                    if (!noSwing.get()) {
+                                        mc.thePlayer.swingItem();
+                                    }
+                                }
                             }
-                            PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
-                        } else {
-                            PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
-                            if (!noSwing.get()) {
-                                mc.thePlayer.swingItem();
-                            }
-                        }
+                            break;
+                        case "PlayerController":
+                            AttackOrder.sendFixedAttack(mc.thePlayer, target);
+                            break;
                     }
                 }
             }
@@ -527,15 +516,22 @@ public class KillAura extends Module {
                             }
                         }
                         break;
+                    case "PlayerController":
+                        AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                        break;
                 }
             }
         }
     }
 
     @EventTarget
-    public void onMouseOver(MouseOverEvent event) {
+    public void onMouseOver(MouseOverEvent e) {
         if (Objects.equals(clickMode.get(), "Legit")) {
-            event.setRange(attackRange.get());
+            e.setRange(attackRange.get());
+        }
+
+        if (!getModule(HitBox.class).isEnabled()) {
+            e.setExpand(-0.1f);
         }
     }
 

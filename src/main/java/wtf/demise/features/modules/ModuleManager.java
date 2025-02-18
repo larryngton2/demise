@@ -60,6 +60,7 @@ public class ModuleManager {
                 Criticals.class,
                 FakeLag.class,
                 MoreKB.class,
+                HitBox.class,
 
                 // Legit
                 AutoClicker.class,

@@ -1,13 +1,11 @@
 package wtf.demise.utils.player;
 
-import com.google.common.base.Predicates;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
-import net.optifine.reflect.Reflector;
 import org.jetbrains.annotations.NotNull;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
@@ -18,7 +16,6 @@ import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 
-import java.util.List;
 import java.util.Objects;
 
 import static java.lang.Math.abs;
@@ -28,7 +25,6 @@ public class RotationUtils implements InstanceAccess {
     public static float[] currentRotation = null, serverRotation = new float[]{}, previousRotation = null;
     public static MovementCorrection currentCorrection = MovementCorrection.OFF;
     private static boolean enabled;
-    private static boolean smoothlyReset;
     public static float cachedHSpeed;
     public static float cachedVSpeed;
     public static SmoothMode smoothMode = SmoothMode.Linear;
@@ -50,11 +46,10 @@ public class RotationUtils implements InstanceAccess {
             mc.thePlayer.rotationPitch = applyGCDFix(serverRotation, rotation)[1];
         }
         currentCorrection = correction;
-        smoothlyReset = false;
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed) {
         if (moduleRotation.silent.get()) {
             RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
         } else {
@@ -63,7 +58,6 @@ public class RotationUtils implements InstanceAccess {
         }
 
         currentCorrection = correction;
-        RotationUtils.smoothlyReset = smoothlyReset;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         RotationUtils.smoothMode = SmoothMode.Linear;
@@ -71,7 +65,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode) {
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -95,7 +89,6 @@ public class RotationUtils implements InstanceAccess {
         }
 
         currentCorrection = correction;
-        RotationUtils.smoothlyReset = smoothlyReset;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         RotationUtils.smoothMode = smoothMode;
@@ -103,7 +96,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget) {
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -134,7 +127,6 @@ public class RotationUtils implements InstanceAccess {
         }
 
         currentCorrection = correction;
-        RotationUtils.smoothlyReset = smoothlyReset;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         RotationUtils.smoothMode = smoothMode;
@@ -142,7 +134,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, boolean smoothlyReset, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget, float threshold) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget, float threshold) {
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -180,7 +172,6 @@ public class RotationUtils implements InstanceAccess {
         }
 
         currentCorrection = correction;
-        RotationUtils.smoothlyReset = smoothlyReset;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         RotationUtils.smoothMode = smoothMode;
@@ -194,7 +185,7 @@ public class RotationUtils implements InstanceAccess {
         if (!enabled && currentRotation != null) {
             double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
-            if (!smoothlyReset || distanceToPlayerRotation < 1) {
+            if (distanceToPlayerRotation < 1) {
                 resetRotation();
                 return;
             }
@@ -261,11 +252,11 @@ public class RotationUtils implements InstanceAccess {
     @EventTarget
     @EventPriority(-100)
     public void onMotion(MotionEvent event) {
-        if ((event.isPost() || !smoothlyReset) && currentRotation != null) {
+        if (event.isPost() && currentRotation != null) {
             double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
             if (!enabled) {
-                if (!smoothlyReset || distanceToPlayerRotation < 1) {
+                if (distanceToPlayerRotation < 1) {
                     resetRotation();
                     return;
                 }
@@ -543,80 +534,6 @@ public class RotationUtils implements InstanceAccess {
 
     public static float getPitch(@NotNull Vec3 pos) {
         return getPitch(mc.thePlayer, pos);
-    }
-
-    public static MovingObjectPosition rayCast(final float[] rotation, final double range) {
-        return rayCast(rotation, range, 0, 1f);
-    }
-
-    public static MovingObjectPosition rayCast(final float[] rots, final double range, final double hitBoxExpand, final float partialTicks) {
-        MovingObjectPosition objectMouseOver = null;
-        final Entity entity = mc.getRenderViewEntity();
-        if (entity != null && mc.theWorld != null) {
-            mc.mcProfiler.startSection("pick");
-            mc.pointedEntity = null;
-            double d0 = range;
-            objectMouseOver = entity.rayTraceCustom(d0, partialTicks, rots[0], rots[1]);
-            double d2 = d0;
-            final Vec3 vec3 = entity.getPositionEyes(partialTicks);
-            boolean flag = false;
-            if (mc.playerController.extendedReach()) {
-                d0 = 6.0;
-                d2 = 6.0;
-            } else {
-                if (d0 > 3.0) {
-                    flag = true;
-                }
-            }
-            if (objectMouseOver != null) {
-                d2 = objectMouseOver.hitVec.distanceTo(vec3);
-            }
-            final Vec3 vec4 = entity.getLookCustom(rots[0], rots[1]);
-            final Vec3 vec5 = vec3.addVector(vec4.xCoord * d0, vec4.yCoord * d0, vec4.zCoord * d0);
-            Entity pointedEntity = null;
-            Vec3 vec6 = null;
-            final float f = 1.0f;
-            final List<Entity> list = mc.theWorld.getEntitiesInAABBexcluding(entity, entity.getEntityBoundingBox().addCoord(vec4.xCoord * d0, vec4.yCoord * d0, vec4.zCoord * d0).expand(f, f, f), Predicates.and(EntitySelectors.NOT_SPECTATING));
-            double d3 = d2;
-            for (Entity value : list) {
-                final float f2 = (float) (value.getCollisionBorderSize() + hitBoxExpand);
-                final AxisAlignedBB axisalignedbb = value.getEntityBoundingBox().expand(f2, f2, f2);
-                final MovingObjectPosition movingobjectposition = axisalignedbb.calculateIntercept(vec3, vec5);
-                if (axisalignedbb.isVecInside(vec3)) {
-                    if (d3 >= 0.0) {
-                        pointedEntity = value;
-                        vec6 = ((movingobjectposition == null) ? vec3 : movingobjectposition.hitVec);
-                        d3 = 0.0;
-                    }
-                } else if (movingobjectposition != null) {
-                    final double d4 = vec3.distanceTo(movingobjectposition.hitVec);
-                    if (d4 < d3 || d3 == 0.0) {
-                        boolean flag3 = false;
-                        if (Reflector.ForgeEntity_canRiderInteract.exists()) {
-                            flag3 = Reflector.callBoolean(value, Reflector.ForgeEntity_canRiderInteract, new Object[0]);
-                        }
-                        if (value == entity.ridingEntity && !flag3) {
-                            if (d3 == 0.0) {
-                                pointedEntity = value;
-                                vec6 = movingobjectposition.hitVec;
-                            }
-                        } else {
-                            pointedEntity = value;
-                            vec6 = movingobjectposition.hitVec;
-                            d3 = d4;
-                        }
-                    }
-                }
-            }
-            if (pointedEntity != null && flag && vec3.distanceTo(vec6) > range) {
-                pointedEntity = null;
-                objectMouseOver = new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, vec6, null, new BlockPos(vec6));
-            }
-            if (pointedEntity != null && (d3 < d2 || objectMouseOver == null)) {
-                objectMouseOver = new MovingObjectPosition(pointedEntity, vec6);
-            }
-        }
-        return objectMouseOver;
     }
 
     public static float angleDifference(float a, float b) {
