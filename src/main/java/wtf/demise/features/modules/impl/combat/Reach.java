@@ -16,6 +16,8 @@ public class Reach extends Module {
 
     @EventTarget
     public void onMouseOver(MouseOverEvent event) {
-        event.setRange(MathUtils.randomizeDouble(min.getMin(), max.getMax()));
+        if (!getModule(KillAura.class).isEnabled()) {
+            event.setRange(rand.nextDouble(min.getMin(), max.getMax()));
+        }
     }
 }

@@ -3,7 +3,7 @@ package wtf.demise.features.modules.impl.legit;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.TickEvent;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
@@ -25,7 +25,7 @@ public class AutoClicker extends Module {
     }
 
     @EventTarget
-    public void onTick(TickEvent event) {
+    public void onGameEvent(GameEvent e) {
         if (breakBlocks.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
             return;
 

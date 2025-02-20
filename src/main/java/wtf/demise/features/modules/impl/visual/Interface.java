@@ -7,7 +7,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -36,7 +35,6 @@ import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
-import wtf.demise.utils.animations.Translate;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.player.MovementUtils;
 import wtf.demise.utils.render.ColorUtils;
@@ -71,8 +69,7 @@ public class Interface extends Module {
     public final BoolValue cFont = new BoolValue("C Fonts", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue fontMode = new ModeValue("C Fonts Mode", new String[]{"Bold", "Semi Bold", "Regular", "Tahoma"}, "Regular", this, () -> cFont.canDisplay() && cFont.get());
     public final SliderValue fontSize = new SliderValue("Font Size", 17, 10, 25, this, cFont::get);
-    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Styles", "Nursultan", "Exhi", "Type 1", "NeverLose"}, "Text", this, () -> elements.isEnabled("Watermark"));
-    public final ModeValue animation = new ModeValue("Animation", new String[]{"ScaleIn", "MoveIn", "SlideIn"}, "MoveIn", this, () -> elements.isEnabled("Module List"));
+    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi"}, "Text", this, () -> elements.isEnabled("Watermark"));
     public final ModeValue arrayPosition = new ModeValue("Position", new String[]{"Right", "Left"}, "Right", this, () -> elements.isEnabled("Module List"));
     public final SliderValue x = new SliderValue("Module List X", -5, -50, 50, this, () -> elements.isEnabled("Module List"));
     public final SliderValue y = new SliderValue("Module List Y", 5, -50, 50, this, () -> elements.isEnabled("Module List"));
@@ -93,7 +90,7 @@ public class Interface extends Module {
     public final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
     public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue bgColor = new ModeValue("Background Color", new String[]{"Dark", "Synced", "Custom", "NeverLose"}, "Dark", this, background::get);
-    private final ColorValue bgCustomColor = new ColorValue("Background Custom Color", new Color(32, 32, 64), this, () -> bgColor.canDisplay() && bgColor.is("Custom"));
+    private final ColorValue bgCustomColor = new ColorValue("Background Custom Color", new Color(0, 0, 0), this, () -> bgColor.canDisplay() && bgColor.is("Custom"));
     private final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
     public final BoolValue hideScoreboard = new BoolValue("Hide Scoreboard", false, this);
     public final BoolValue hideScoreRed = new BoolValue("Hide Scoreboard Red Points", true, this, () -> !hideScoreboard.get());
@@ -114,139 +111,11 @@ public class Interface extends Module {
                 case "Text":
                     Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
                     break;
-                case "Styles":
-                    String dateString = dateFormat.format(new Date());
-
-                    String name = " | " + Demise.INSTANCE.getVersion() +
-                            EnumChatFormatting.GRAY + " | " + EnumChatFormatting.WHITE + dateString +
-                            EnumChatFormatting.GRAY + " | " + EnumChatFormatting.WHITE + mc.thePlayer.getName() +
-                            EnumChatFormatting.GRAY + " | " + EnumChatFormatting.WHITE + mc.getCurrentServerData().serverIP;
-
-                    int x = 7;
-                    int y = 7;
-                    int width = Fonts.interBold.get(17).getStringWidth("ML") + Fonts.interRegular.get(17).getStringWidth(name) + 5;
-                    int height = Fonts.interRegular.get(17).getHeight() + 3;
-
-                    RoundedUtils.drawRound(x, y, width, height, 4, new Color(getModule(Interface.class).bgColor(), true));
-                    Fonts.interBold.get(17).drawOutlinedString("ML", x + 2, y + 4.5f, -1, color());
-                    Fonts.interRegular.get(17).drawStringWithShadow(name, Fonts.interBold.get(17).getStringWidth("ML") + x + 2, y + 4.5f, -1);
-                    break;
-                case "Nursultan":
-                    RoundedUtils.drawRound(7, 7.5f, 20 + Fonts.interMedium.get(15).getStringWidth(INSTANCE.getVersion()) + 5, 15, 4, new Color(bgColor(0)));
-                    Fonts.nursultan.get(16).drawString("P", 13, 14, color(0));
-                    RenderUtils.drawRect(25, 10.5f, 1, 8.5f, new Color(47, 47, 47).getRGB());
-                    Fonts.interMedium.get(15).drawString(INSTANCE.getVersion(), 29, 13, color(0));
-
-                    RenderUtils.drawRect(7 + 20 + Fonts.interMedium.get(15).getStringWidth(INSTANCE.getVersion()) + 2.5f + 11 + 15, 10.5f, 1, 8.5f, new Color(47, 47, 47).getRGB());
-                    RoundedUtils.drawRound(7 + 20 + Fonts.interMedium.get(15).getStringWidth(INSTANCE.getVersion()) + 2.5f + 11, 7.5f, Fonts.interMedium.get(15).getStringWidth("user") + 25, 15, 4, new Color(bgColor(0)));
-                    Fonts.nursultan.get(16).drawString("W", 7 + 20 + Fonts.interMedium.get(15).getStringWidth(INSTANCE.getVersion()) + 2.5f + 11 + 5, 14, color(0));
-                    Fonts.interMedium.get(15).drawString("user", 7 + 20 + Fonts.interMedium.get(15).getStringWidth(INSTANCE.getVersion()) + 2.5f + 11 + 15 + 5, 13, -1);
-                    break;
                 case "Exhi":
                     boolean shouldChange = RenderUtils.COLOR_PATTERN.matcher(clientName.get()).find();
                     String text = shouldChange ? "§r" + clientName.get() : clientName.get().charAt(0) + "§r§f" + clientName.get().substring(1) +
                             "§7[§f" + Minecraft.getDebugFPS() + " FPS§7]§r ";
                     mc.fontRendererObj.drawStringWithShadow(text, 2.0f, 2.0f, color());
-                    break;
-                case "Type 1":
-                    float posX = 4.0F;
-                    float posY = 4.0F;
-                    float fontSize = 15f;
-                    float iconSize = 5.0F;
-                    float rectWidth = 10.0F;
-                    String title = "demise";
-                    float titleWidth = Fonts.interMedium.get(fontSize).getStringWidth(title);
-
-                    RoundedUtils.drawRound(posX, posY, rectWidth + iconSize * 2.5F + titleWidth, rectWidth + iconSize * 2.0F, 4.0F, new Color(getModule(Interface.class).bgColor(), true));
-
-                    Fonts.nursultan.get(18).drawString("S", posX + iconSize, posY + 2 + iconSize - 1.0F + 2F, color());
-
-                    Fonts.interMedium.get(fontSize).drawString(title, posX + rectWidth + iconSize * 1.5F, posY + rectWidth / 2.0F + 1.5F + 2F, color());
-
-                    String playerName = mc.thePlayer.getName();
-                    float playerNameWidth = Fonts.interMedium.get(fontSize).getStringWidth(playerName);
-                    float playerNameX = posX + rectWidth + iconSize * 2.5F + titleWidth + iconSize;
-
-                    RoundedUtils.drawRound(playerNameX, posY, rectWidth + iconSize * 2.5F + playerNameWidth, rectWidth + iconSize * 2.0F, 4.0F, new Color(getModule(Interface.class).bgColor(), true));
-
-                    Fonts.nursultan.get(fontSize).drawString("W", playerNameX + iconSize, posY + 1 + iconSize + 2F, color());
-
-                    Fonts.interMedium.get(fontSize).drawString(playerName, playerNameX + iconSize * 1.5F + rectWidth, posY + rectWidth / 2.0F + 1.5F + 2F, -1);
-
-                    int fps = Minecraft.getDebugFPS();
-                    String fpsText = fps + " Fps";
-                    float fpsTextWidth = Fonts.interMedium.get(fontSize).getStringWidth(fpsText);
-                    float fpsX = playerNameX + rectWidth + iconSize * 2.5F + playerNameWidth + iconSize;
-
-                    RoundedUtils.drawRound(fpsX, posY, rectWidth + iconSize * 2.5F + fpsTextWidth, rectWidth + iconSize * 2.0F, 4.0F, new Color(getModule(Interface.class).bgColor(), true));
-
-                    Fonts.nursultan.get(18).drawString("X", fpsX + iconSize, posY + 1 + iconSize + 2F, color());
-
-                    Fonts.interMedium.get(fontSize).drawString(fpsText, fpsX + rectWidth + iconSize * 1.5F, posY + rectWidth / 2.0F + 1.5F + 2F, -1);
-
-                    String playerPosition = (int) mc.thePlayer.posX + " " + (int) mc.thePlayer.posY + " " + (int) mc.thePlayer.posZ;
-                    float positionTextWidth = Fonts.interMedium.get(fontSize).getStringWidth(playerPosition);
-                    float positionY = posY + rectWidth + iconSize * 2.0F + iconSize;
-
-                    RoundedUtils.drawRound(posX, positionY, rectWidth + iconSize * 2.5F + positionTextWidth, rectWidth + iconSize * 2.0F, 4.0F, new Color(getModule(Interface.class).bgColor(), true));
-
-                    Fonts.nursultan.get(18).drawString("F", posX + iconSize, positionY + 1.5F + iconSize + 2F, color());
-
-                    Fonts.interMedium.get(fontSize).drawString(playerPosition, posX + iconSize * 1.5F + rectWidth, positionY + rectWidth / 2.0F + 1.5F + 2F, -1);
-
-                    String pingText = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID()).getResponseTime() + " Ping";
-                    float pingTextWidth = Fonts.interMedium.get(fontSize).getStringWidth(pingText);
-                    float pingX = posX + rectWidth + iconSize * 2.5F + positionTextWidth + iconSize;
-
-                    RoundedUtils.drawRound(pingX, positionY, rectWidth + iconSize * 2.5F + pingTextWidth, rectWidth + iconSize * 2.0F, 4.0F, new Color(getModule(Interface.class).bgColor(), true));
-
-                    Fonts.nursultan.get(18).drawString("Q", pingX + iconSize, positionY + 1 + iconSize + 2F, color());
-
-                    Fonts.interMedium.get(fontSize).drawString(pingText, pingX + iconSize * 1.5F + rectWidth, positionY + rectWidth / 2.0F + 1.5F + 2F, -1);
-                    break;
-                case "NeverLose":
-                    //title
-                    FontRenderer titleFont = Fonts.interBold.get(20);
-
-                    //info
-                    FontRenderer info = Fonts.interRegular.get(16);
-                    String userIcon = "W ";
-                    String fpsIcon = "X ";
-                    String timeIcon = "V ";
-                    float userIconX = 3 + titleFont.getStringWidth(clientName.getText()) + 9 + 7;
-                    float fpsIconX = Fonts.nursultan.get(20).getStringWidth(userIcon) + userIconX + info.getStringWidth(mc.thePlayer.getName()) + Fonts.nursultan.get(20).getStringWidth(fpsIcon) - 10;
-                    float clockIconX = fpsIconX + info.getStringWidth(Minecraft.getDebugFPS() + "fps") + Fonts.nursultan.get(20).getStringWidth(timeIcon);
-                    String times = dateFormat.format(new Date());
-
-                    int bgY = 5;
-
-                    int textY = 11;
-
-                    //title
-                    RoundedUtils.drawRound(3, bgY, titleFont.getStringWidth(clientName.getText()) + 10, Fonts.interRegular.get(20).getHeight() + 2, 4, ColorUtils.applyOpacity(NeverLose.bgColor, 1f));
-                    titleFont.drawOutlinedString(clientName.getText(), 8, textY - 2, textRGB, outlineTextRGB);
-
-
-                    //info
-                    RoundedUtils.drawRound(3 + titleFont.getStringWidth(clientName.getText()) + 14, bgY,
-                            Fonts.nursultan.get(20).getStringWidth(userIcon) +
-                                    info.getStringWidth(mc.thePlayer.getName()) +
-                                    Fonts.nursultan.get(20).getStringWidth(fpsIcon) +
-                                    info.getStringWidth(String.valueOf(Minecraft.getDebugFPS())) +
-                                    Fonts.nursultan.get(20).getStringWidth(timeIcon) +
-                                    info.getStringWidth(times)
-                                    + 27
-                            , Fonts.interRegular.get(20).getHeight() + 2, 4, ColorUtils.applyOpacity(NeverLose.bgColor, 1f));
-
-                    Fonts.nursultan.get(20).drawString(userIcon, userIconX, textY, iconRGB);
-                    info.drawString(mc.thePlayer.getName(), userIconX + Fonts.nursultan.get(20).getStringWidth(userIcon), 11, textRGB);
-
-                    Fonts.nursultan.get(20).drawString(fpsIcon, fpsIconX, textY, iconRGB);
-                    info.drawString(Minecraft.getDebugFPS() + "fps", fpsIconX + Fonts.nursultan.get(20).getStringWidth(fpsIcon), textY, textRGB);
-
-                    Fonts.nursultan.get(20).drawString(timeIcon, clockIconX, textY, iconRGB);
-                    info.drawString(times, clockIconX + Fonts.nursultan.get(20).getStringWidth(timeIcon) - 7, textY, textRGB);
-
                     break;
             }
         }
@@ -297,106 +166,43 @@ public class Interface extends Module {
             };
             ArrayList<Module> enabledMods = new ArrayList<>(INSTANCE.getModuleManager().getModules());
 
-            if (animation.is("Slide In")) {
-                enabledMods.sort(sort);
-                for (Module module : enabledMods) {
-                    if (module.isHidden())
-                        continue;
-                    Translate translate = module.getTranslate();
-                    float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
-                    if (arrayPosition.is("Right")) {
-                        if (module.isEnabled() && !module.isHidden()) {
-                            translate.translate((screenWidth - moduleWidth - 1.0f) + this.x.get(), y);
-                            y += (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-                        } else {
-                            translate.animate((screenWidth - 1) + this.x.get(), -25.0);
-                        }
-                    } else if (module.isEnabled() && !module.isHidden()) {
-                        translate.translate((2.0f) + this.x.get(), y);
-                        y += (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-                    } else {
-                        translate.animate((-moduleWidth) + this.x.get(), -25.0);
-                    }
-                    if (translate.getX() >= screenWidth) {
-                        continue;
-                    }
+            enabledMods.sort(sort);
+            for (Module module : enabledMods) {
+                if (module.isHidden() || module.getCategory() == ModuleCategory.Visual)
+                    continue;
+                Animation moduleAnimation = module.getAnimation();
+                moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
+                if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
+                float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
+                float x = (arrayPosition.is("Right") ? screenWidth - moduleWidth - 1.0f : 2) + this.x.get();
+                float alphaAnimation = 1.0f;
 
-                    final float leftSide = (float) (translate.getX() - 2f);
-                    final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
+                x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
 
-                    if (background.get()) {
-                        RenderUtils.drawRect(leftSide, (float) translate.getY(), moduleWidth + 3, bottom, bgColor(count));
-                    }
 
-                    if (outline.is("Left")) {
-                        RenderUtils.drawRect(leftSide - 1, (float) translate.getY(), 1, bottom, color(count));
-                    }
+                final float leftSide = x - 2f;
+                final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
 
-                    if (outline.is("Right")) {
-                        RenderUtils.drawRect((float) (translate.getX() + moduleWidth), (float) translate.getY(), 1, bottom, color(count));
-                    }
-
-                    if (cFont.get()) {
-                        getFr().drawStringWithShadow(module.getName() + module.getTag(), (float) translate.getX() - 1, (float) translate.getY() + 2f, color(count));
-                    } else {
-                        mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), (float) translate.getX() - 1, (float) translate.getY() + 2f, color(count));
-                    }
-
-                    count -= 1;
+                if (background.get()) {
+                    RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
                 }
-            }
 
-            if (!animation.is("Slide In")) {
-                enabledMods.sort(sort);
-                for (Module module : enabledMods) {
-                    if (module.isHidden())
-                        continue;
-                    Animation moduleAnimation = module.getAnimation();
-                    moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                    if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
-                    float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
-                    float x = (arrayPosition.is("Right") ? screenWidth - moduleWidth - 1.0f : 2) + this.x.get();
-                    float alphaAnimation = 1.0f;
-
-                    switch (animation.get()) {
-                        case "MoveIn": {
-                            x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
-                            break;
-                        }
-                        case "ScaleIn": {
-                            RenderUtils.scaleStart(x + (moduleWidth / 2.0f), y + mc.fontRendererObj.FONT_HEIGHT, (float) moduleAnimation.getOutput());
-                            alphaAnimation = (float) moduleAnimation.getOutput();
-                        }
-                    }
-
-                    final float leftSide = x - 2f;
-                    final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-
-                    if (background.get()) {
-                        RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
-                    }
-
-                    if (outline.is("Left")) {
-                        RenderUtils.drawRect(leftSide - 1, y, 1, bottom, color(count));
-                    }
-
-                    if (outline.is("Right")) {
-                        RenderUtils.drawRect(x + moduleWidth, y, 1, bottom, color(count));
-                    }
-
-                    if (cFont.get()) {
-                        getFr().drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), (int) alphaAnimation * 255));
-                    } else {
-                        mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), (int) alphaAnimation * 255));
-                    }
-
-                    if (animation.get().equals("ScaleIn")) {
-                        RenderUtils.scaleEnd();
-                    }
-
-                    y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
-                    count -= 2;
+                if (outline.is("Left")) {
+                    RenderUtils.drawRect(leftSide - 1, y, 1, bottom, color(count));
                 }
+
+                if (outline.is("Right")) {
+                    RenderUtils.drawRect(x + moduleWidth, y, 1, bottom, color(count));
+                }
+
+                if (cFont.get()) {
+                    getFr().drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), (int) alphaAnimation * 255));
+                } else {
+                    mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), (int) alphaAnimation * 255));
+                }
+
+                y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
+                count -= 2;
             }
         }
 
@@ -540,122 +346,55 @@ public class Interface extends Module {
             };
             ArrayList<Module> enabledMods = new ArrayList<>(INSTANCE.getModuleManager().getModules());
 
-            if (animation.is("Slide In")) {
-                enabledMods.sort(sort);
-                for (Module module : enabledMods) {
-                    if (module.isHidden())
-                        continue;
-                    Translate translate = module.getTranslate();
-                    float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
-                    if (arrayPosition.is("Right")) {
-                        if (module.isEnabled() && !module.isHidden()) {
-                            translate.translate((screenWidth - moduleWidth - 1.0f) + this.x.get(), y);
-                            y += (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-                        } else {
-                            translate.animate((screenWidth - 1) + this.x.get(), -25.0);
-                        }
-                    } else if (module.isEnabled() && !module.isHidden()) {
-                        translate.translate((2.0f) + this.x.get(), y);
-                        y += (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-                    } else {
-                        translate.animate((-moduleWidth) + this.x.get(), -25.0);
-                    }
-                    if (translate.getX() >= screenWidth) {
-                        continue;
-                    }
+            enabledMods.sort(sort);
+            for (Module module : enabledMods) {
+                if (module.isHidden() || module.getCategory() == ModuleCategory.Visual)
+                    continue;
+                Animation moduleAnimation = module.getAnimation();
+                moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
+                if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
+                float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
+                float x = (arrayPosition.is("Right") ? screenWidth - moduleWidth - 1.0f : 2) + this.x.get();
+
+                x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
 
 
-                    final float leftSide = (float) (translate.getX() - 2f);
-                    final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
+                final float leftSide = x - 2f;
+                final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
 
+                if (background.get()) {
                     if (event.getShaderType() == Shader2DEvent.ShaderType.BLUR || event.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
-                        if (background.get()) {
-                            RenderUtils.drawRect(leftSide, (float) translate.getY(), moduleWidth + 3, bottom, bgColor(count));
-                        }
+                        RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, color(count));
                     }
-
                     if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
+                        RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
 
-                        if (outline.is("Left")) {
-                            RenderUtils.drawRect(leftSide - 1, (float) translate.getY(), 1, bottom, color(count));
-                        }
+                    }
+                }
 
-                        if (outline.is("Right")) {
-                            RenderUtils.drawRect((float) (translate.getX() + moduleWidth), (float) translate.getY(), 1, bottom, color(count));
-                        }
-
-                        if (cFont.get()) {
-                            getFr().drawStringWithShadow(module.getName() + module.getTag(), (float) translate.getX() - 1, (float) translate.getY() + 2f, color(count));
-                        } else {
-                            mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), (float) translate.getX() - 1, (float) translate.getY() + 2f, color(count));
-                        }
+                if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
+                    if (outline.is("Left")) {
+                        RenderUtils.drawRect(leftSide - 1, y, 1, bottom, color(count));
                     }
 
-                    count -= 1;
+                    if (outline.is("Right")) {
+                        RenderUtils.drawRect(x + moduleWidth, y, 1, bottom, color(count));
+                    }
+
                 }
+
+                if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
+                    if (cFont.get()) {
+                        getFr().drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), 255));
+                    } else {
+                        mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), 255));
+                    }
+                }
+
+                y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
+                count -= 2;
             }
 
-            if (!animation.is("Slide In")) {
-                enabledMods.sort(sort);
-                for (Module module : enabledMods) {
-                    if (module.isHidden())
-                        continue;
-                    Animation moduleAnimation = module.getAnimation();
-                    moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                    if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
-                    float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
-                    float x = (arrayPosition.is("Right") ? screenWidth - moduleWidth - 1.0f : 2) + this.x.get();
-
-                    switch (animation.get()) {
-                        case "MoveIn": {
-                            x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
-                            break;
-                        }
-                        case "ScaleIn": {
-                            RenderUtils.scaleStart(x + (moduleWidth / 2.0f), y + mc.fontRendererObj.FONT_HEIGHT, (float) moduleAnimation.getOutput());
-                        }
-                    }
-
-                    final float leftSide = x - 2f;
-                    final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-
-                    if (background.get()) {
-                        if (event.getShaderType() == Shader2DEvent.ShaderType.BLUR || event.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
-                            RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, color(count));
-                        }
-                        if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                            RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
-
-                        }
-                    }
-
-                    if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                        if (outline.is("Left")) {
-                            RenderUtils.drawRect(leftSide - 1, y, 1, bottom, color(count));
-                        }
-
-                        if (outline.is("Right")) {
-                            RenderUtils.drawRect(x + moduleWidth, y, 1, bottom, color(count));
-                        }
-
-                    }
-
-                    if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                        if (cFont.get()) {
-                            getFr().drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), 255));
-                        } else {
-                            mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), 255));
-                        }
-                    }
-
-                    if (animation.get().equals("ScaleIn")) {
-                        RenderUtils.scaleEnd();
-                    }
-
-                    y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
-                    count -= 2;
-                }
-            }
         }
     }
 

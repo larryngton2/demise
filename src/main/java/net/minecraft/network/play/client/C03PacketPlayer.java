@@ -1,5 +1,7 @@
 package net.minecraft.network.play.client;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
@@ -10,9 +12,14 @@ public class C03PacketPlayer implements Packet<INetHandlerPlayServer> {
     protected double x;
     protected double y;
     protected double z;
+    @Getter
     public float yaw;
+    @Getter
     public float pitch;
+    @Getter
     protected boolean onGround;
+    @Getter
+    @Setter
     protected boolean moving;
     public boolean rotating;
 
@@ -47,28 +54,8 @@ public class C03PacketPlayer implements Packet<INetHandlerPlayServer> {
         return this.z;
     }
 
-    public float getYaw() {
-        return this.yaw;
-    }
-
-    public float getPitch() {
-        return this.pitch;
-    }
-
-    public boolean isOnGround() {
-        return this.onGround;
-    }
-
-    public boolean isMoving() {
-        return this.moving;
-    }
-
     public boolean getRotating() {
         return this.rotating;
-    }
-
-    public void setMoving(boolean isMoving) {
-        this.moving = isMoving;
     }
 
     public static class C04PacketPlayerPosition extends C03PacketPlayer {

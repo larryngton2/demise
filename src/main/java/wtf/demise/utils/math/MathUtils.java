@@ -81,10 +81,6 @@ public class MathUtils {
         return min + ((max - min) * Math.random());
     }
 
-    public static double interporate(double p_219803_0_, double p_219803_2_, double p_219803_4_) {
-        return p_219803_2_ + p_219803_0_ * (p_219803_4_ - p_219803_2_);
-    }
-
     public static float normalize(float value, float min, float max) {
         return (value - min) / (max - min);
     }

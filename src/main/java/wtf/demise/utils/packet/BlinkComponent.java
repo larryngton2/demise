@@ -5,6 +5,7 @@ import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
+import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.network.status.client.C01PacketPing;
 import wtf.demise.events.annotations.EventPriority;
@@ -51,9 +52,15 @@ public final class BlinkComponent implements InstanceAccess {
 
             final Packet<?> packet = event.getPacket();
 
-            if (packet instanceof C00Handshake || packet instanceof C00PacketLoginStart ||
-                    packet instanceof C00PacketServerQuery || packet instanceof C01PacketPing ||
-                    packet instanceof C01PacketEncryptionResponse || packet instanceof C00PacketKeepAlive) {
+            if (
+                    packet instanceof C00Handshake ||
+                    packet instanceof C00PacketLoginStart ||
+                    packet instanceof C00PacketServerQuery ||
+                    packet instanceof C01PacketPing ||
+                    packet instanceof C01PacketEncryptionResponse ||
+                    packet instanceof C00PacketKeepAlive ||
+                    packet instanceof S12PacketEntityVelocity s12 && s12.getEntityID() == mc.thePlayer.getEntityId()
+            ) {
                 return;
             }
 

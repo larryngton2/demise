@@ -12,7 +12,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.packet.PingSpoofComponent;
+import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -20,14 +20,13 @@ import java.awt.*;
 
 @ModuleInfo(name = "FakeLag", category = ModuleCategory.Combat)
 public class FakeLag extends Module {
-    private final SliderValue minRange = new SliderValue("Min range", 4, 1, 15, this);
-    private final SliderValue maxRange = new SliderValue("Max range", 6, 4, 15, this);
+    private final SliderValue minRange = new SliderValue("Min range", 4, 0, 15, 0.1f, this);
+    private final SliderValue maxRange = new SliderValue("Max range", 6, 1, 15, 0.1f, this);
     private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 1, 0, 1000, this);
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
-    private final BoolValue velocity = new BoolValue("Pause on velocity", true, this);
-    private final BoolValue teleport = new BoolValue("Pause on teleport", true, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
+
     private boolean blinking = false, picked = false;
     private final TimerUtils delay = new TimerUtils();
     private final TimerUtils ever = new TimerUtils();
@@ -40,8 +39,8 @@ public class FakeLag extends Module {
     }
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
-        this.setTag(delayMax.get() + " - " + delayMax.get());
+    public void onUpdate(UpdateEvent e) {
+        this.setTag(delayMin.get() + " - " + delayMax.get());
 
         target = PlayerUtils.getTarget(maxRange.get() + 1);
 
@@ -64,14 +63,14 @@ public class FakeLag extends Module {
                     z = mc.thePlayer.posZ;
                     picked = true;
                 }
-                PingSpoofComponent.spoof(999999999, true, teleport.get(), velocity.get(), true, true, true);
+                BlinkComponent.blinking = true;
                 ever.reset();
             } else {
-                PingSpoofComponent.dispatch();
+                BlinkComponent.dispatch();
                 picked = false;
             }
         } else {
-            PingSpoofComponent.dispatch();
+            BlinkComponent.dispatch();
             picked = false;
             if (delay.hasTimeElapsed(ms) && blinking) {
                 blinking = false;

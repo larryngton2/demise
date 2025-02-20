@@ -21,7 +21,6 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
@@ -93,7 +92,7 @@ public class Velocity extends Module {
                             for (int i = 0; i < packets.get(); i++) {
                                 AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
 
-                                DebugUtils.sendMessage(String.valueOf(i));
+                                DebugUtils.sendMessage(String.valueOf(i + 1));
                             }
 
                             currentTarget = null;
@@ -169,7 +168,7 @@ public class Velocity extends Module {
         switch (mode.get()) {
             case "Reduce":
                 if (mc.thePlayer.hurtTime == rHurtTime.get()) {
-                    double factor = MathUtils.randomizeDouble(rFactorMin.get(), rFactorMax.get());
+                    double factor = rand.nextDouble(rFactorMin.get(), rFactorMax.get());
 
                     mc.thePlayer.motionX *= factor;
                     mc.thePlayer.motionZ *= factor;
@@ -180,7 +179,7 @@ public class Velocity extends Module {
                     mc.thePlayer.motionX *= iFactor;
                     mc.thePlayer.motionZ *= iFactor;
 
-                    iFactor += MathUtils.nextDouble(0.2, 0.5);
+                    iFactor += rand.nextDouble(0.2, 0.5);
 
                     attacked = true;
                 }

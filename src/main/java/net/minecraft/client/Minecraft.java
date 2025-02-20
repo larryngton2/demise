@@ -102,10 +102,12 @@ import org.lwjglx.opengl.GLContext;
 import org.lwjglx.opengl.PixelFormat;
 import org.lwjglx.util.glu.GLU;
 import wtf.demise.Demise;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
+import wtf.demise.utils.math.TimerUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -235,6 +237,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     int fpsCounter;
     long prevFrameTime = -1L;
     private String debugProfilerName = "root";
+    private TimerUtils gameEvent = new TimerUtils();
 
     public Minecraft(GameConfiguration gameConfig) {
         theMinecraft = this;
@@ -799,10 +802,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         TickBase tickBase = Demise.INSTANCE.getModuleManager().getModule(TickBase.class);
 
+        Demise.INSTANCE.getEventManager().call(new GameEvent());
+
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
             if (tickBase.handleTick()) {
                 continue;
             }
+
             this.runTick();
         }
 

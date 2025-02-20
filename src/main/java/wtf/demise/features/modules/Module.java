@@ -43,6 +43,7 @@ public abstract class Module implements InstanceAccess {
     private final EaseInOutQuad animation = new EaseInOutQuad(175, 1);
     @Getter
     private final Translate translate = new Translate(0.0, 0.0);
+    public final Random rand = new Random();
 
     protected Module() {
         this.moduleInfo = this.getClass().getAnnotation(ModuleInfo.class);

@@ -20,6 +20,7 @@ import wtf.demise.features.modules.impl.legit.AutoClicker;
 import wtf.demise.features.modules.impl.legit.LegitScaffold;
 import wtf.demise.features.modules.impl.legit.NoHitDelay;
 import wtf.demise.features.modules.impl.misc.AntiCheat;
+import wtf.demise.features.modules.impl.misc.AutoMeow;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.features.modules.impl.misc.Twerk;
 import wtf.demise.features.modules.impl.movement.*;
@@ -82,6 +83,7 @@ public class ModuleManager {
                 Twerk.class,
                 AntiCheat.class,
                 Options.class,
+                AutoMeow.class,
 
                 // Movement
                 Freeze.class,
@@ -128,7 +130,8 @@ public class ModuleManager {
                 Breadcrumbs.class,
                 ChinaHat.class,
                 Particles.class,
-                MoveStatus.class
+                MoveStatus.class,
+                ItemPhysics.class
         );
 
         // Sort modules by name for better organization
