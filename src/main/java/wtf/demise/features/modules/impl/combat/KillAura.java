@@ -95,17 +95,12 @@ public class KillAura extends Module {
     private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay() && predictTicks.get() != 0);
 
     // offset
-    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "SinCos", "Intave"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
-    private final SliderValue frequency = new SliderValue("SpeedSinCos", 1.5f, 0f, 5.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    private final SliderValue yStrengthAimPattern = new SliderValue("YStrengthAmplitudeSinCos", 3.5f, 0f, 15.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    private final SliderValue xStrengthAimPattern = new SliderValue("XStrengthAmplitudeSinCos", 3.5f, 0f, 15.0f, 0.01f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    private final SliderValue yawStrengthAddon = new SliderValue("Yaw Strength Randomize", 5f, 1, 35f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
-    private final SliderValue pitchStrengthAddon = new SliderValue("Pitch Strength Randomize", 5f, 1, 35f, this, () -> Objects.equals(offsetMode.get(), "SinCos"));
 
     //target
     private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch", "Multi"}, "Single", this);
@@ -187,13 +182,13 @@ public class KillAura extends Module {
             if (nullTargetCheck()) {
                 resetBlocking();
                 currentTarget = null;
+            } else {
+                handleAutoBlock();
             }
 
             if (!isWithinAttackRange()) {
                 resetBlocking();
             }
-
-            handleAutoBlock();
 
             if (Objects.equals(rotationMode.get(), "Silent") && PlayerUtils.getDistanceToEntityBox(currentTarget) <= searchRange.get()) {
                 setRotationToTarget(currentTarget);
@@ -224,32 +219,32 @@ public class KillAura extends Module {
         switch (mode) {
             case Linear:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        rand.nextInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        rand.nextInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
                         SmoothMode.Linear);
                 break;
             case Lerp:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        rand.nextInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        rand.nextInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
                         SmoothMode.Lerp);
                 break;
             case LerpLimit:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        rand.nextInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        rand.nextInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
                         SmoothMode.LerpLimit,
-                        rand.nextInt((int) limitYawSpeedMin.get(), (int) limitYawSpeedMax.get()),
-                        rand.nextInt((int) limitPitchSpeedMin.get(), (int) limitPitchSpeedMax.get()),
+                        MathUtils.randomizeInt((int) limitYawSpeedMin.get(), (int) limitYawSpeedMax.get()),
+                        MathUtils.randomizeInt((int) limitPitchSpeedMin.get(), (int) limitPitchSpeedMax.get()),
                         rangeToLimit.get() + 0.4f, target);
                 break;
             case Correlation:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        rand.nextInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        rand.nextInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
+                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
                         SmoothMode.Correlation,
-                        rand.nextInt((int) limitYawSpeedMin.get(), (int) limitYawSpeedMax.get()),
-                        rand.nextInt((int) limitPitchSpeedMin.get(), (int) limitPitchSpeedMax.get()),
+                        MathUtils.randomizeInt((int) limitYawSpeedMin.get(), (int) limitYawSpeedMax.get()),
+                        MathUtils.randomizeInt((int) limitPitchSpeedMin.get(), (int) limitPitchSpeedMax.get()),
                         rangeToLimit.get() + 0.4f, target, threshold.get());
                 break;
         }
@@ -404,10 +399,6 @@ public class KillAura extends Module {
             }
         }
 
-        if (unBlockOnRayCastFail.get()) {
-            resetBlocking();
-        }
-
         lastTargetTime.reset();
     }
 
@@ -416,6 +407,13 @@ public class KillAura extends Module {
     }
 
     private void handleAutoBlock() {
+        boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
+
+        if (rayCastFailed && unBlockOnRayCastFail.get()) {
+            resetBlocking();
+            return;
+        }
+
         if (canAutoBlock()) {
             switch (autoBlockMode.get()) {
                 case "None":
@@ -695,8 +693,8 @@ public class KillAura extends Module {
 
         switch (offsetMode.get()) {
             case "Gaussian":
-                double yawFactor = rand.nextDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
-                double pitchFactor = rand.nextDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
+                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
+                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
 
                 double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
                 double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
@@ -712,23 +710,11 @@ public class KillAura extends Module {
                     pitch += (float) lastPitchOffset;
                 }
                 break;
-            case "SinCos":
-                double time = System.currentTimeMillis() / 1000.0D;
-                double frequency = this.frequency.get();
-                double yawAmplitude = this.xStrengthAimPattern.get();
-                double pitchAmplitude = this.yStrengthAimPattern.get();
-
-                yaw += (float) (Math.sin(time * frequency) * yawAmplitude);
-                pitch += (float) (Math.cos(time * frequency) * pitchAmplitude);
-
-                yaw += rand.nextFloat(-this.yawStrengthAddon.get(), this.yawStrengthAddon.get());
-                pitch += rand.nextFloat(-this.pitchStrengthAddon.get(), this.pitchStrengthAddon.get());
-                break;
             case "Intave":
                 boolean dynamicCheck = entity.hurtTime >= 7;
 
-                double initialYawFactor = rand.nextDouble(0.7, 0.8) * 30;
-                double initialPitchFactor = rand.nextDouble(0.25, 0.5) * 30;
+                double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
+                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
 
                 double iyawFactor = dynamicCheck ? initialYawFactor + MovementUtils.getSpeed() * 6.5 : initialYawFactor;
                 double ipitchFactor = dynamicCheck ? initialPitchFactor + MovementUtils.getSpeed() : initialPitchFactor;
@@ -750,8 +736,8 @@ public class KillAura extends Module {
                     targetPitch += (float) lastPitchOffset;
                 }
 
-                float yawLerp = dynamicCheck ? 1.0f : (float) rand.nextDouble(0.5, 0.7);
-                float pitchLerp = dynamicCheck ? 1.0f : (float) rand.nextDouble(0.5, 0.7);
+                float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+                float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
 
                 yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
                 pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
@@ -787,12 +773,14 @@ public class KillAura extends Module {
 
         for (int i = 0; i < (predict.get() ? predictTicks.get() : 1); i++) {
             simulatedPlayer.tick();
-            predictProcesses.add(new PlayerUtils.PredictProcess(
-                    simulatedPlayer.getPos(),
-                    simulatedPlayer.fallDistance,
-                    simulatedPlayer.onGround,
-                    simulatedPlayer.isCollidedHorizontally
-            ));
+            predictProcesses.add(
+                    new PlayerUtils.PredictProcess(
+                            simulatedPlayer.getPos(),
+                            simulatedPlayer.fallDistance,
+                            simulatedPlayer.onGround,
+                            simulatedPlayer.isCollidedHorizontally
+                    )
+            );
         }
     }
 
