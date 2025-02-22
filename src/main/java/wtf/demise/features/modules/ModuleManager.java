@@ -19,10 +19,7 @@ import wtf.demise.features.modules.impl.exploit.*;
 import wtf.demise.features.modules.impl.legit.AutoClicker;
 import wtf.demise.features.modules.impl.legit.LegitScaffold;
 import wtf.demise.features.modules.impl.legit.NoHitDelay;
-import wtf.demise.features.modules.impl.misc.AntiCheat;
-import wtf.demise.features.modules.impl.misc.AutoMeow;
-import wtf.demise.features.modules.impl.misc.Options;
-import wtf.demise.features.modules.impl.misc.Twerk;
+import wtf.demise.features.modules.impl.misc.*;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
@@ -79,11 +76,12 @@ public class ModuleManager {
                 TPAura.class,
                 ResetVL.class,
 
-                // Other
+                // Misc
                 Twerk.class,
                 AntiCheat.class,
                 Options.class,
                 AutoMeow.class,
+                MurderMystery.class,
 
                 // Movement
                 Freeze.class,
@@ -98,6 +96,7 @@ public class ModuleManager {
                 Strafe.class,
                 Fly.class,
                 Scaffold.class,
+                Phase.class,
 
                 // Player
                 AntiFireball.class,

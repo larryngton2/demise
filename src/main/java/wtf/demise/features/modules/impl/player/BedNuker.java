@@ -37,7 +37,7 @@ import java.text.DecimalFormat;
 
 @ModuleInfo(name = "BedNuker", category = ModuleCategory.Player)
 public class BedNuker extends Module {
-    public final SliderValue breakRange = new SliderValue("Break Range", 4, 1, 5, 1, this);
+    public final SliderValue breakRange = new SliderValue("Break Range", 4.5f, 1, 6, 0.1f, this);
     public final BoolValue breakSurroundings = new BoolValue("Break Top", true, this);
     public final BoolValue rotOnPacket = new BoolValue("Rot On Packet", true, this);
     public final BoolValue autoTool = new BoolValue("Auto Tool", true, this);

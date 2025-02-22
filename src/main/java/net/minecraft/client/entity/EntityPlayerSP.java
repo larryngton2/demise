@@ -89,7 +89,6 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     }
 
     public void onUpdate() {
-
         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
 
             PlayerTickEvent event = new PlayerTickEvent(PlayerTickEvent.State.PRE);
@@ -122,7 +121,6 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     }
 
     public void onUpdateWalkingPlayer() {
-
         MotionEvent motionEvent = new MotionEvent(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround, MotionEvent.State.PRE);
         Demise.INSTANCE.getEventManager().call(motionEvent);
 

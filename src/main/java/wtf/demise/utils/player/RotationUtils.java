@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
@@ -96,7 +96,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float steepness, float midpoint) {
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -105,8 +105,8 @@ public class RotationUtils implements InstanceAccess {
                 case Lerp:
                     RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
                     break;
-                case LerpLimit:
-                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget);
+                case Sigmoid:
+                    RotationUtils.currentRotation = smoothSigmoid(serverRotation, rotation, hSpeed, vSpeed, steepness, midpoint);
                     break;
             }
         } else {
@@ -119,54 +119,9 @@ public class RotationUtils implements InstanceAccess {
                     mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
                     mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
                     break;
-                case LerpLimit:
-                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[0];
-                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[1];
-                    break;
-            }
-        }
-
-        currentCorrection = correction;
-        cachedHSpeed = hSpeed;
-        cachedVSpeed = vSpeed;
-        RotationUtils.smoothMode = smoothMode;
-
-        enabled = true;
-    }
-
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float yawLimiter, float pitchLimiter, float rangeToLimit, Entity currentTarget, float threshold) {
-        if (moduleRotation.silent.get()) {
-            switch (smoothMode) {
-                case Linear:
-                    RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-                case Lerp:
-                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-                case LerpLimit:
-                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget);
-                    break;
-                case Correlation:
-                    RotationUtils.currentRotation = smoothCorrelation(serverRotation, rotation, hSpeed, vSpeed, threshold);
-                    break;
-            }
-        } else {
-            switch (smoothMode) {
-                case Linear:
-                    mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-                case Lerp:
-                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-                case LerpLimit:
-                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[0];
-                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed, yawLimiter, pitchLimiter, rangeToLimit, currentTarget)[1];
-                    break;
-                case Correlation:
-                    mc.thePlayer.rotationYaw = smoothCorrelation(serverRotation, rotation, hSpeed, vSpeed, threshold)[0];
-                    mc.thePlayer.rotationPitch = smoothCorrelation(serverRotation, rotation, hSpeed, vSpeed, threshold)[1];
+                case Sigmoid:
+                    mc.thePlayer.rotationYaw = smoothSigmoid(serverRotation, rotation, hSpeed, vSpeed, steepness, midpoint)[0];
+                    mc.thePlayer.rotationPitch = smoothSigmoid(serverRotation, rotation, hSpeed, vSpeed, steepness, midpoint)[1];
                     break;
             }
         }
@@ -245,7 +200,7 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         resetRotation();
     }
 
@@ -339,26 +294,32 @@ public class RotationUtils implements InstanceAccess {
         return applyGCDFix(currentRotation, finalTargetRotation);
     }
 
-    public static float[] smoothLerp(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float maxYawChange, float maxPitchChange, float rangeToLimit, Entity currentTarget) {
+    public static float[] smoothSigmoid(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float steepness, float midpoint) {
         float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
         float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
-        if (mc.thePlayer.getDistanceToEntity(currentTarget) <= rangeToLimit) {
-            if (Math.abs(yawDifference) > maxYawChange) {
-                yawDifference = Math.signum(yawDifference) * maxYawChange;
-            }
+        double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
 
-            if (Math.abs(pitchDifference) > maxPitchChange) {
-                pitchDifference = Math.signum(pitchDifference) * maxPitchChange;
-            }
-        }
+        float factorH = computeSigmoidFactor(rotationDifference, hSpeed, steepness, midpoint);
+        float factorV = computeSigmoidFactor(rotationDifference, vSpeed, steepness, midpoint);
 
-        float newYaw = currentRotation[0] + (yawDifference * hSpeed / 180);
-        float newPitch = currentRotation[1] + (pitchDifference * vSpeed / 180);
+        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * factorH);
+        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * factorV);
 
-        float[] finalTargetRotation = new float[]{newYaw, newPitch};
+        float[] finalTargetRotation = new float[]{
+                currentRotation[0] + Math.max(-straightLineYaw, Math.min(straightLineYaw, yawDifference)),
+                currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
+        };
 
         return applyGCDFix(currentRotation, finalTargetRotation);
+    }
+
+    private static float computeSigmoidFactor(double rotationDifference, float speed, float steepness, float midpoint) {
+        float scaledDifference = (float) (rotationDifference / 120f);
+        double sigmoid = 1 / (1 + Math.exp(-steepness * (scaledDifference - midpoint)));
+        double interpolatedSpeed = sigmoid * speed;
+
+        return (float) Math.max(0, Math.min(interpolatedSpeed, 180f));
     }
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
@@ -538,5 +499,32 @@ public class RotationUtils implements InstanceAccess {
 
     public static float angleDifference(float a, float b) {
         return MathHelper.wrapAngleTo180_float(a - b);
+    }
+
+    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize,float gravity,float velocity) {
+        EntityPlayerSP player = mc.thePlayer;
+
+        double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (player.posX + (predict ? player.posX - player.prevPosX : 0.0));
+        double posY = target.getEntityBoundingBox().minY + (predict ? (target.getEntityBoundingBox().minY - target.prevPosY) * predictSize : 0.0) + target.getEyeHeight() - 0.15 - (player.getEntityBoundingBox().minY + (predict ? player.posY - player.prevPosY : 0.0)) - player.getEyeHeight();
+        double posZ = target.posZ + (predict ? (target.posZ - target.prevPosZ) * predictSize : 0.0) - (player.posZ + (predict ? player.posZ - player.prevPosZ : 0.0));
+        double posSqrt = Math.sqrt(posX * posX + posZ * posZ);
+
+        velocity = Math.min((velocity * velocity + velocity * 2) / 3, 1f);
+
+        float gravityModifier = 0.12f * gravity;
+
+        return new float[]{
+                (float) Math.toDegrees(Math.atan2(posZ, posX)) - 90f,
+                (float) -Math.toDegrees(Math.atan((velocity * velocity - Math.sqrt(
+                        velocity * velocity * velocity * velocity - gravityModifier * (gravityModifier * posSqrt * posSqrt + 2 * posY * velocity * velocity)
+                )) / (gravityModifier * posSqrt)))
+        };
+    }
+
+    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize) {
+        float gravity = 0.03f;
+        float velocity = 0;
+
+        return faceTrajectory(target,predict,predictSize,gravity,velocity);
     }
 }

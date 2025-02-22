@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
@@ -442,7 +442,7 @@ public class Interface extends Module {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         prevMatchKilled = matchKilled;
         matchKilled = 0;
         match += 1;

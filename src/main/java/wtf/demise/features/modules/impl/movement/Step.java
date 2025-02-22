@@ -18,7 +18,6 @@ import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "Step", category = ModuleCategory.Movement)
 public class Step extends Module {
-
     public final ModeValue mode = new ModeValue("Mode", new String[]{"NCP"}, "NCP", this);
     public final SliderValue timer = new SliderValue("Timer", 1, 0.05f, 1, 0.05f, this);
     public final SliderValue delay = new SliderValue("Delay", 1000, 0, 2500, 1, this);

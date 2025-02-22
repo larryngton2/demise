@@ -5,12 +5,11 @@ import net.minecraft.network.handshake.client.C00Handshake;
 import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
-import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.network.status.client.C01PacketPing;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
@@ -58,8 +57,7 @@ public final class BlinkComponent implements InstanceAccess {
                     packet instanceof C00PacketServerQuery ||
                     packet instanceof C01PacketPing ||
                     packet instanceof C01PacketEncryptionResponse ||
-                    packet instanceof C00PacketKeepAlive ||
-                    packet instanceof S12PacketEntityVelocity s12 && s12.getEntityID() == mc.thePlayer.getEntityId()
+                    packet instanceof C00PacketKeepAlive
             ) {
                 return;
             }
@@ -97,7 +95,7 @@ public final class BlinkComponent implements InstanceAccess {
 
     @EventTarget
     @EventPriority(-1)
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         packets.clear();
         BlinkComponent.blinking = false;
     }

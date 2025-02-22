@@ -6,7 +6,7 @@ import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import org.joml.Vector2f;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
@@ -74,7 +74,7 @@ public class Freeze extends Module {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         setEnabled(false);
     }
 

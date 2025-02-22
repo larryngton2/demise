@@ -42,7 +42,7 @@ public class PlayerControllerMP {
 
     public static void clickBlockCreative(Minecraft mcIn, PlayerControllerMP playerController, BlockPos pos, EnumFacing facing) {
         if (!mcIn.theWorld.extinguishFire(mcIn.thePlayer, pos, facing)) {
-            playerController.onPlayerDestroyBlock(pos, facing);
+            playerController.onPlayerDestroyBlock(pos);
         }
     }
 
@@ -67,7 +67,7 @@ public class PlayerControllerMP {
         return this.currentGameType.isSurvivalOrAdventure();
     }
 
-    public boolean onPlayerDestroyBlock(BlockPos pos, EnumFacing side) {
+    public boolean onPlayerDestroyBlock(BlockPos pos) {
         if (this.currentGameType.isAdventure()) {
             if (this.currentGameType == WorldSettings.GameType.SPECTATOR) {
                 return false;
@@ -164,7 +164,7 @@ public class PlayerControllerMP {
                 }
 
                 if (flag && block1.getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, loc) >= 1.0F) {
-                    this.onPlayerDestroyBlock(loc, face);
+                    this.onPlayerDestroyBlock(loc);
                 } else {
                     this.isHittingBlock = true;
                     this.currentBlock = loc;
@@ -217,7 +217,7 @@ public class PlayerControllerMP {
                 if (this.curBlockDamageMP >= 1.0F) {
                     this.isHittingBlock = false;
                     this.netClientHandler.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, posBlock, directionFacing));
-                    this.onPlayerDestroyBlock(posBlock, directionFacing);
+                    this.onPlayerDestroyBlock(posBlock);
                     this.curBlockDamageMP = 0.0F;
                     this.stepSoundTickCounter = 0.0F;
                     this.blockHitDelay = 5;

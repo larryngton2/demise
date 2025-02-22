@@ -6,9 +6,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
+import org.lwjglx.input.Keyboard;
+import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 
 import java.util.Arrays;
 
@@ -37,6 +40,8 @@ public class MovementUtils implements InstanceAccess {
 
     public static final double UNLOADED_CHUNK_MOTION = -0.09800000190735147;
     public static final double HEAD_HITTER_MOTION = -0.0784000015258789;
+
+    private static float lastYaw;
 
     public static boolean isMoving() {
         return isMoving(mc.thePlayer);
@@ -478,9 +483,9 @@ public class MovementUtils implements InstanceAccess {
         if (isMoving()) {
             if (forward != 0.0) {
                 if (strafe > 0.0) {
-                    yaw += (float)(forward > 0.0 ? -45 : 45);
+                    yaw += (float) (forward > 0.0 ? -45 : 45);
                 } else if (strafe < 0.0) {
-                    yaw += (float)(forward > 0.0 ? 45 : -45);
+                    yaw += (float) (forward > 0.0 ? 45 : -45);
                 }
 
                 strafe = 0.0;
@@ -491,13 +496,56 @@ public class MovementUtils implements InstanceAccess {
                 }
             }
 
-            double cos = Math.cos(Math.toRadians((double)(yaw + 89.5F)));
-            double sin = Math.sin(Math.toRadians((double)(yaw + 89.5F)));
+            double cos = Math.cos(Math.toRadians(yaw + 89.5F));
+            double sin = Math.sin(Math.toRadians(yaw + 89.5F));
             mc.thePlayer.motionX = forward * speed * cos + strafe * speed * sin;
             mc.thePlayer.motionZ = forward * speed * sin - strafe * speed * cos;
         } else {
             mc.thePlayer.motionX = 0.0;
             mc.thePlayer.motionZ = 0.0;
         }
+    }
+
+    public static void smoothStrafe(MotionEvent e) {
+        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(MovementUtils.getDirection()) - lastYaw);
+        double maxAngle = 20;
+        double angle = lastYaw + (deltaYaw > 0 ? maxAngle : -maxAngle);
+
+        if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(MovementUtils.getDirection());
+
+        mc.thePlayer.setSprinting(true);
+
+        if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+            mc.thePlayer.jump();
+            mc.thePlayer.motionY -= 0.02;
+
+            double groundSpeed = 0.47;
+
+            angle = lastYaw = (float) Math.toDegrees(MovementUtils.getDirection());
+
+            MovementUtils.strafe(groundSpeed, Math.toRadians(angle));
+        }
+
+        if (MovementUtils.isMoving()) {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), false);
+            MovementUtils.strafe(MovementUtils.getSpeed(), Math.toRadians(angle));
+
+            if (MovementUtils.getSpeed() < 0.2) {
+                MovementUtils.strafe(Math.max(0.05, MovementUtils.getSpeed() * 1.1));
+            }
+        } else {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), (
+                            Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && mc.currentScreen == null
+                    )
+            );
+        }
+
+        mc.thePlayer.jumpMovementFactor = 0.028f;
+        lastYaw = MathHelper.wrapAngleTo180_float((float) angle);
+        e.setYaw((float) angle);
+
+        mc.thePlayer.rotationYawHead = e.getYaw();
+        float f = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYawHead - mc.thePlayer.renderYawOffset);
+        mc.thePlayer.renderYawOffset += f * 0.3F;
     }
 }

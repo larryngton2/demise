@@ -24,7 +24,7 @@ import org.lwjglx.input.Keyboard;
 import org.lwjglx.opengl.Display;
 import org.lwjglx.util.glu.GLU;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -67,7 +67,7 @@ public class Stealer extends Module {
     public final BoolValue brewingStand = new BoolValue("Brewing Stand", false, this);
     public final BoolValue avoid = new BoolValue("Avoid", false, this, aura::get);
     public final BoolValue display = new BoolValue("Display", true, this);
-    private final SliderValue range = new SliderValue("Range", 4f, 1.5f, 4f, this);
+    private final SliderValue range = new SliderValue("Range", 4.5f, 1.5f, 6f, 0.1f, this);
     private final TimerUtils timer = new TimerUtils(), timerAura = new TimerUtils(), timerAvoid = new TimerUtils();
     public boolean isStealing;
     private int index;
@@ -85,7 +85,7 @@ public class Stealer extends Module {
     public void rotate(BlockPos blockPos, EnumFacing enumFacing) {
         rotation = RotationUtils.getRotations(blockPos, enumFacing);
 
-        RotationUtils.setRotation(rotation, MovementCorrection.SILENT);
+        RotationUtils.setRotation(rotation, MovementCorrection.SILENT, 180, 180);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class Stealer extends Module {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         posList.clear();
         chestIndex = 0;
     }

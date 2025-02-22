@@ -10,7 +10,7 @@ import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import org.apache.commons.lang3.Range;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.StrafeEvent;
@@ -368,7 +368,7 @@ public class LongJump extends Module {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         setEnabled(false);
     }
 

@@ -60,7 +60,7 @@ public class Camera extends Module {
     @EventTarget
     public void onRender2D(Render2DEvent event) {
         if (setting.isEnabled("FPS Hurt Cam")) {
-            final float hurtTimePercentage = (this.mc.thePlayer.hurtTime - event.getPartialTicks()) / this.mc.thePlayer.maxHurtTime;
+            final float hurtTimePercentage = (mc.thePlayer.hurtTime - event.getPartialTicks()) / mc.thePlayer.maxHurtTime;
 
             if (hurtTimePercentage > 0.0) {
                 glDisable(GL_TEXTURE_2D);

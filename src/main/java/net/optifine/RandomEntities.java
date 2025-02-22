@@ -17,7 +17,7 @@ import net.optifine.util.PropertiesOrdered;
 import net.optifine.util.ResUtils;
 import net.optifine.util.StrUtils;
 import wtf.demise.Demise;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class RandomEntities {
     }
 
     public static void worldChanged(World oldWorld, World newWorld) {
-        Demise.INSTANCE.getEventManager().call(new WorldEvent());
+        Demise.INSTANCE.getEventManager().call(new WorldChangeEvent());
         if (newWorld != null) {
             List list = newWorld.getLoadedEntityList();
 

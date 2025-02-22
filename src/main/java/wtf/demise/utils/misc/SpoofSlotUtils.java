@@ -3,7 +3,7 @@ package wtf.demise.utils.misc;
 import lombok.Getter;
 import net.minecraft.item.ItemStack;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.utils.InstanceAccess;
 
 public class SpoofSlotUtils implements InstanceAccess {
@@ -31,7 +31,7 @@ public class SpoofSlotUtils implements InstanceAccess {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         stopSpoofing();
     }
 }

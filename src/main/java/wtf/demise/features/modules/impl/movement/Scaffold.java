@@ -12,7 +12,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldEvent;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
@@ -464,7 +464,7 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onWorld(WorldEvent event) {
+    public void onWorld(WorldChangeEvent event) {
         setEnabled(false);
     }
 

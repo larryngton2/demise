@@ -32,7 +32,6 @@ public class AntiFireball extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
-
         if (isEnabled(LongJump.class) || isEnabled(Scaffold.class) || mc.thePlayer.getHeldItem().getItem() instanceof ItemFireball)
             return;
 

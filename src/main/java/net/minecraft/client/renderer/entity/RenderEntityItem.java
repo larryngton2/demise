@@ -90,7 +90,7 @@ public class RenderEntityItem extends Render<EntityItem> {
             final Minecraft mc = Minecraft.getMinecraft();
 
             // pro
-            rotation = 2;
+            rotation = itemPhysics.rotationSpeed.get();
             if (!mc.inGameHasFocus) rotation = 0;
 
             final ItemStack itemstack = entity.getEntityItem();

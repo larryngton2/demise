@@ -14,15 +14,13 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import org.apache.commons.lang3.Range;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.player.MotionEvent;
-import wtf.demise.events.impl.player.MoveEvent;
-import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
@@ -46,13 +44,13 @@ import java.util.concurrent.ThreadLocalRandom;
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
 
-    //reach
+    // reach
     private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
 
     // attack
     private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
-    //private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
+    private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
     private final BoolValue noSwing = new BoolValue("No swing", false, this, () -> Objects.equals(clickMode.get(), "Packet"));
     private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
     private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
@@ -61,6 +59,7 @@ public class KillAura extends Module {
     private final SliderValue clicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
     private final BoolValue rayCast = new BoolValue("RayCast", false, this);
     private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
+    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, failSwing::get);
 
     // autoBlock
     private final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
@@ -73,17 +72,13 @@ public class KillAura extends Module {
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue xzTrim = new SliderValue("XZ trim", 0, 0, 0.5f, 0.01f, this);
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "LerpLimit", "Correlation"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Sigmoid"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue threshold = new SliderValue("Threshold", 0.5f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Correlation"));
-    private final SliderValue rangeToLimit = new SliderValue("Range to limit (<)", 1.5f, 0, 8, 0.1f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
-    private final SliderValue limitYawSpeedMin = new SliderValue("Yaw limit speed (min)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
-    private final SliderValue limitYawSpeedMax = new SliderValue("Yaw limit speed (max)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
-    private final SliderValue limitPitchSpeedMin = new SliderValue("Pitch limit speed (min)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
-    private final SliderValue limitPitchSpeedMax = new SliderValue("Pitch limit speed (max)", 180, 0.01f, 180, 0.01f, this, () -> Objects.equals(smoothMode.get(), "LerpLimit"));
+    private final SliderValue steepness = new SliderValue("Steepness", 10, 0, 20, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Sigmoid"));
+    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Sigmoid"));
     private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
@@ -104,7 +99,7 @@ public class KillAura extends Module {
 
     //target
     private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch", "Multi"}, "Single", this);
-    private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health"}, "Distance", this, () -> targetMode.is("Single"));
+    private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health", "HurtTime"}, "Distance", this, () -> targetMode.is("Single"));
     private final SliderValue targetSwitchDelay = new SliderValue("Target Switch Delay (ms)", 500, 50, 1000, 50, this, () -> targetMode.is("Switch"));
     private final BoolValue botCheck = new BoolValue("Bot Check", false, this);
 
@@ -139,7 +134,9 @@ public class KillAura extends Module {
 
     @Override
     public void onDisable() {
-        resetBlocking();
+        if (isBlocking) {
+            setBlocking(false);
+        }
         blink = false;
         currentTarget = null;
         targets.clear();
@@ -179,15 +176,17 @@ public class KillAura extends Module {
         if (currentTarget != null) {
             lastSwitchTime.reset();
 
-            if (nullTargetCheck()) {
-                resetBlocking();
+            if (isTargetInvalid()) {
+                if (isBlocking) {
+                    setBlocking(false);
+                }
                 currentTarget = null;
             } else {
                 handleAutoBlock();
             }
 
-            if (!isWithinAttackRange()) {
-                resetBlocking();
+            if (!isWithinAttackRange() && isBlocking) {
+                setBlocking(false);
             }
 
             if (Objects.equals(rotationMode.get(), "Silent") && PlayerUtils.getDistanceToEntityBox(currentTarget) <= searchRange.get()) {
@@ -197,7 +196,9 @@ public class KillAura extends Module {
             predictProcesses.clear();
             positionHistory.clear();
 
-            resetBlocking();
+            if (isBlocking) {
+                setBlocking(false);
+            }
         }
 
         if (Objects.equals(clickMode.get(), "Packet")) {
@@ -209,7 +210,20 @@ public class KillAura extends Module {
             }
         }
 
-        targets.removeIf(target -> nullTargetCheck());
+        targets.removeIf(target -> isTargetInvalid());
+    }
+
+    @EventTarget
+    public void onPlayerTick(PlayerTickEvent e) {
+        if (e.state == PlayerTickEvent.State.PRE && currentTarget != null) {
+            double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
+
+            if (Range.between(attackRange.get(), swingRange.get()).contains((float) distance) && failSwing.get() && isAttackReady()) {
+                handleFailSwing(mc.objectMouseOver);
+            }
+
+            sendAttack();
+        }
     }
 
     private void setRotationToTarget(Entity target) {
@@ -221,31 +235,22 @@ public class KillAura extends Module {
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                        SmoothMode.Linear);
+                        SmoothMode.Linear
+                );
                 break;
             case Lerp:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                        SmoothMode.Lerp);
+                        SmoothMode.Lerp
+                );
                 break;
-            case LerpLimit:
+            case Sigmoid:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                        SmoothMode.LerpLimit,
-                        MathUtils.randomizeInt((int) limitYawSpeedMin.get(), (int) limitYawSpeedMax.get()),
-                        MathUtils.randomizeInt((int) limitPitchSpeedMin.get(), (int) limitPitchSpeedMax.get()),
-                        rangeToLimit.get() + 0.4f, target);
-                break;
-            case Correlation:
-                RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                        SmoothMode.Correlation,
-                        MathUtils.randomizeInt((int) limitYawSpeedMin.get(), (int) limitYawSpeedMax.get()),
-                        MathUtils.randomizeInt((int) limitPitchSpeedMin.get(), (int) limitPitchSpeedMax.get()),
-                        rangeToLimit.get() + 0.4f, target, threshold.get());
+                        SmoothMode.Sigmoid, steepness.get(), midpoint.get()
+                );
                 break;
         }
     }
@@ -282,6 +287,7 @@ public class KillAura extends Module {
         EntityLivingBase target = null;
         double closestDistance = searchRange.get() + 0.4;
         double leastHealth = Float.MAX_VALUE;
+        double leastHurtTime = 10;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
             double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
@@ -308,6 +314,14 @@ public class KillAura extends Module {
                         if (potentialHealth < leastHealth) {
                             target = potentialTarget;
                             leastHealth = potentialHealth;
+                        }
+                        break;
+                    case "HurtTime":
+                        EntityLivingBase potentialTarget2 = (EntityLivingBase) entity;
+                        float potentionalHurtTime = potentialTarget2.hurtTime;
+                        if (potentionalHurtTime <= leastHurtTime) {
+                            target = potentialTarget2;
+                            leastHurtTime = potentionalHurtTime;
                         }
                         break;
                 }
@@ -355,7 +369,9 @@ public class KillAura extends Module {
 
     private void sendAttack() {
         if (!isWithinAttackRange()) {
-            resetBlocking();
+            if (isBlocking) {
+                setBlocking(false);
+            }
             return;
         }
 
@@ -379,7 +395,13 @@ public class KillAura extends Module {
     }
 
     private boolean isAttackReady() {
-        return lastTargetTime.hasTimeElapsed(1000 / ThreadLocalRandom.current().nextInt((int) minCPS.get(), (int) maxCPS.get() + 1));
+        boolean check = lastTargetTime.hasTimeElapsed(1000 / (ThreadLocalRandom.current().nextInt((int) minCPS.get(), (int) maxCPS.get() + 1) * 1.5));
+
+        if (smartClicking.get() && check) {
+            return shouldClick();
+        } else {
+            return check;
+        }
     }
 
     private void handleFailSwing(MovingObjectPosition movingObjectPosition) {
@@ -402,7 +424,7 @@ public class KillAura extends Module {
         lastTargetTime.reset();
     }
 
-    private boolean nullTargetCheck() {
+    private boolean isTargetInvalid() {
         return currentTarget.isDead || PlayerUtils.getDistanceToEntityBox(currentTarget) > searchRange.get() || currentTarget.getEntityWorld() != mc.thePlayer.getEntityWorld();
     }
 
@@ -410,14 +432,18 @@ public class KillAura extends Module {
         boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
 
         if (rayCastFailed && unBlockOnRayCastFail.get()) {
-            resetBlocking();
+            if (isBlocking) {
+                setBlocking(false);
+            }
             return;
         }
 
         if (canAutoBlock()) {
             switch (autoBlockMode.get()) {
                 case "None":
-                    resetBlocking();
+                    if (isBlocking) {
+                        setBlocking(false);
+                    }
                     break;
                 case "Fake":
                     isBlocking = true;
@@ -438,28 +464,17 @@ public class KillAura extends Module {
                     blinkAb(currentTarget);
                     break;
             }
-        } else {
-            resetBlocking();
-        }
-    }
-
-    private void resetBlocking() {
-        if (isBlocking && isHoldingSword()) {
+        } else if (isBlocking) {
             setBlocking(false);
-            mc.thePlayer.stopUsingItem();
         }
     }
 
     private boolean shouldClick() {
-        if (mc.thePlayer.hurtTime != 0 || mc.thePlayer.motionY < 0) {
-            return true;
+        if (currentTarget instanceof EntityLivingBase target) {
+            return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY >= 0 || target.hurtTime <= 5;
+        } else {
+            return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY >= 0;
         }
-
-        if (currentTarget instanceof EntityLivingBase) {
-            return ((EntityLivingBase) currentTarget).hurtTime <= 3;
-        }
-
-        return false;
     }
 
     private boolean canAutoBlock() {
@@ -522,13 +537,6 @@ public class KillAura extends Module {
                         break;
                 }
             }
-        }
-    }
-
-    @EventTarget
-    public void onGameEvent(GameEvent e) {
-        if (currentTarget != null) {
-            sendAttack();
         }
     }
 
@@ -725,7 +733,7 @@ public class KillAura extends Module {
                 float targetYaw = yaw;
                 float targetPitch = pitch;
 
-                if (dynamicCheck ? rand.nextInt(100) <= 75 : rand.nextInt(100) <= 25) {
+                if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
                     targetYaw += (float) iyawOffset;
                     targetPitch += (float) ipitchOffset;
 

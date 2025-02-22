@@ -7,6 +7,8 @@ import net.minecraft.block.BlockAir;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -173,12 +175,6 @@ public class PlayerUtils implements InstanceAccess {
         EntityPlayer target = null;
         if (mc.theWorld == null) {
             return null;
-        }
-
-        KillAura aura = INSTANCE.getModuleManager().getModule(KillAura.class);
-
-        if (aura.isEnabled() && KillAura.currentTarget instanceof EntityPlayer) {
-            return (EntityPlayer) KillAura.currentTarget;
         }
 
         for (EntityPlayer entity : mc.theWorld.playerEntities) {
@@ -477,5 +473,27 @@ public class PlayerUtils implements InstanceAccess {
             this.onGround = onGround;
             this.isCollidedHorizontally = isCollidedHorizontally;
         }
+    }
+
+    public static boolean insideBlock() {
+        if (mc.thePlayer.ticksExisted < 5) {
+            return false;
+        }
+
+        final EntityPlayerSP player = mc.thePlayer;
+        final WorldClient world = mc.theWorld;
+        final AxisAlignedBB bb = player.getEntityBoundingBox();
+        for (int x = MathHelper.floor_double(bb.minX); x < MathHelper.floor_double(bb.maxX) + 1; ++x) {
+            for (int y = MathHelper.floor_double(bb.minY); y < MathHelper.floor_double(bb.maxY) + 1; ++y) {
+                for (int z = MathHelper.floor_double(bb.minZ); z < MathHelper.floor_double(bb.maxZ) + 1; ++z) {
+                    final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                    final AxisAlignedBB boundingBox;
+                    if (block != null && !(block instanceof BlockAir) && (boundingBox = block.getCollisionBoundingBox(world, new BlockPos(x, y, z), world.getBlockState(new BlockPos(x, y, z)))) != null && player.getEntityBoundingBox().intersectsWith(boundingBox)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

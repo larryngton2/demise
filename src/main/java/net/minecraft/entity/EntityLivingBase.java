@@ -1384,6 +1384,7 @@ public abstract class EntityLivingBase extends Entity {
                 rotationYaw = RotationUtils.currentRotation[0];
             }
         }
+
         float f = MathHelper.wrapAngleTo180_float(p_110146_1_ - this.renderYawOffset);
         this.renderYawOffset += f * 0.3F;
         float f1 = MathHelper.wrapAngleTo180_float(rotationYaw - this.renderYawOffset);
