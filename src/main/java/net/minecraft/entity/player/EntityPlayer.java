@@ -941,15 +941,15 @@ public abstract class EntityPlayer extends EntityLivingBase {
 
                     if (flag2) {
                         if (i > 0) {
-                            if (!Demise.INSTANCE.getModuleManager().getModule(KeepSprint.class).isEnabled()) {
+                            KeepSprint keepSprint = Demise.INSTANCE.getModuleManager().getModule(KeepSprint.class);
+                            float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : this.rotationYaw;
 
-                                float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : this.rotationYaw;
+                            targetEntity.addVelocity(-MathHelper.sin(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F, 0.1D, MathHelper.cos(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F);
 
-                                targetEntity.addVelocity(-MathHelper.sin(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F, 0.1D, MathHelper.cos(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F);
-                                this.motionX *= 0.6D;
-                                this.motionZ *= 0.6D;
-                                this.setSprinting(false);
-                            }
+                            this.motionX *= keepSprint.isEnabled() ? keepSprint.motion.get() : 0.6D;
+                            this.motionZ *= keepSprint.isEnabled() ? keepSprint.motion.get() : 0.6D;
+
+                            this.setSprinting(keepSprint.isEnabled() && keepSprint.sprint.get());
                         }
 
                         if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged) {

@@ -11,7 +11,6 @@ import wtf.demise.features.values.impl.SliderValue;
 @ModuleInfo(name = "Animations", category = ModuleCategory.Visual)
 @Getter
 public class Animations extends Module {
-
     private final BoolValue old = new BoolValue("Old", false, this);
     private final ModeValue type = new ModeValue("Block Anim", new String[]{"Swank", "Swing", "Swang", "Swong", "Swaing", "Punch", "Push", "Stella", "Styles", "Slide", "Interia", "Ethereal", "1.7", "Sigma", "Exhibition", "Old Exhibition", "Smooth"}, "1.7", this, () -> !old.get());
     private final BoolValue blockWhenSwing = new BoolValue("Block When Swing", false, this);

@@ -9,7 +9,6 @@ import wtf.demise.events.impl.CancellableEvent;
 @Setter
 @AllArgsConstructor
 public class MoveMathEvent extends CancellableEvent {
-
     public float strafe;
     public float forward;
 }

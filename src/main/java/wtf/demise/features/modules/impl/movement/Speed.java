@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.client.settings.KeyBinding;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -16,13 +17,14 @@ import wtf.demise.utils.player.MovementUtils;
 
 @ModuleInfo(name = "Speed", category = ModuleCategory.Movement)
 public class Speed extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus"}, "Strafe Hop", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave"}, "Strafe Hop", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));
     private final BoolValue air = new BoolValue("Air", true, this, () -> mode.is("Strafe Hop"));
     private final ModeValue ncpMode = new ModeValue("NCP mode", new String[]{"On tick 4", "On tick 5", "Old BHop"}, "On tick 5", this, () -> mode.is("NCP"));
     private final ModeValue verusMode = new ModeValue("Verus mode", new String[]{"Low"}, "Low", this, () -> mode.is("Verus"));
-    private final SliderValue speedMulti = new SliderValue("Extra speed multiplier", 0.4f, 0f, 1f, 0.1f, this, () -> ncpMode.is("Old BHop") && ncpMode.canDisplay());
+    private final SliderValue speedMulti = new SliderValue("Extra speed multiplier", 0.4f, 0f, 1f, 0.01f, this, () -> ncpMode.is("Old BHop") && ncpMode.canDisplay());
+    private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave"));
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.05f, this, minSpeedLimiter::get);
     private final SliderValue minMoveTicks = new SliderValue("Move ticks for limit", 15, 0, 40, 1, this, minSpeedLimiter::get);
@@ -49,7 +51,7 @@ public class Speed extends Module {
             stoppedTicks++;
             return;
         } else {
-            if (mc.thePlayer.onGround) {
+            if (mc.thePlayer.onGround && !mode.is("Legit")) {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), false);
             }
 
@@ -65,30 +67,46 @@ public class Speed extends Module {
             MovementUtils.strafe(minSpeed.get());
         }
 
-        if (mode.is("NCP") && ncpMode.is("On tick 4")) {
-            switch (mc.thePlayer.offGroundTicks) {
-                case 4:
-                    mc.thePlayer.motionY = -0.09800000190734863;
-                    break;
+        switch (mode.get()) {
+            case "NCP":
+                if (ncpMode.is("On tick 4")) {
+                    switch (mc.thePlayer.offGroundTicks) {
+                        case 4:
+                            mc.thePlayer.motionY = -0.09800000190734863;
+                            break;
 
-                case 6:
-                    if (MovementUtils.isMoving()) MovementUtils.strafe();
-                    break;
-            }
+                        case 6:
+                            if (MovementUtils.isMoving()) MovementUtils.strafe();
+                            break;
+                    }
 
-            if (mc.thePlayer.hurtTime >= 1 && mc.thePlayer.motionY > 0) {
-                mc.thePlayer.motionY -= 0.15;
-            }
+                    if (mc.thePlayer.hurtTime >= 1 && mc.thePlayer.motionY > 0) {
+                        mc.thePlayer.motionY -= 0.15;
+                    }
 
-            if (mc.thePlayer.onGround) {
-                mc.thePlayer.jump();
+                    if (mc.thePlayer.onGround) {
+                        mc.thePlayer.jump();
 
-                if (MovementUtils.getSpeed() < 0.281) {
-                    MovementUtils.strafe(0.281);
-                } else {
-                    MovementUtils.strafe();
+                        if (MovementUtils.getSpeed() < 0.281) {
+                            MovementUtils.strafe(0.281);
+                        } else {
+                            MovementUtils.strafe();
+                        }
+                    }
                 }
-            }
+                break;
+            case "Intave":
+                if (mc.thePlayer.onGround) {
+                    MovementUtils.strafe(MovementUtils.getSpeed(), 0.27);
+
+                    mc.thePlayer.jump();
+                }
+
+                if (mc.thePlayer.motionY > 0.003 && mc.thePlayer.isSprinting()) {
+                    mc.thePlayer.motionX *= 1f + (0.003 * iBoostMulti.get());
+                    mc.thePlayer.motionX *= 1f + (0.003 * iBoostMulti.get());
+                }
+                break;
         }
     }
 
@@ -167,6 +185,11 @@ public class Speed extends Module {
                         break;
                 }
                 break;
+            case "Legit":
+                if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+                    mc.gameSettings.keyBindJump.setPressed(true);
+                }
+                break;
         }
     }
 
@@ -190,6 +213,13 @@ public class Speed extends Module {
                     }
                 }
             }
+        }
+    }
+
+    @EventTarget
+    public void onJump(JumpEvent e) {
+        if (mode.is("Intave")) {
+            e.setMotionY(0.42f - 1.7E-14f);
         }
     }
 

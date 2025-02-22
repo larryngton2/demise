@@ -9,7 +9,5 @@ import wtf.demise.events.impl.Event;
 @Setter
 @AllArgsConstructor
 public class PostStepEvent implements Event {
-
     private float height;
-
 }

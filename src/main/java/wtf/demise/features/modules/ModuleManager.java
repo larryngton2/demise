@@ -75,6 +75,7 @@ public class ModuleManager {
                 Regen.class,
                 TPAura.class,
                 ResetVL.class,
+                ComboOneHit.class,
 
                 // Misc
                 Twerk.class,
@@ -82,12 +83,13 @@ public class ModuleManager {
                 Options.class,
                 AutoMeow.class,
                 MurderMystery.class,
+                InventorySync.class,
 
                 // Movement
                 Freeze.class,
                 InvMove.class,
                 LongJump.class,
-                NoJumpDelay.class,
+                JumpDelay.class,
                 NoSlow.class,
                 SafeWalk.class,
                 Speed.class,
@@ -130,7 +132,9 @@ public class ModuleManager {
                 ChinaHat.class,
                 Particles.class,
                 MoveStatus.class,
-                ItemPhysics.class
+                ItemPhysics.class,
+                ItemESP.class,
+                FreeCam.class
         );
 
         // Sort modules by name for better organization

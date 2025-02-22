@@ -237,7 +237,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     int fpsCounter;
     long prevFrameTime = -1L;
     private String debugProfilerName = "root";
-    private TimerUtils gameEvent = new TimerUtils();
 
     public Minecraft(GameConfiguration gameConfig) {
         theMinecraft = this;

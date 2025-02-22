@@ -16,7 +16,6 @@ import java.util.List;
 
 @ModuleInfo(name = "Breadcrumbs", category = ModuleCategory.Visual)
 public class Breadcrumbs extends Module {
-
     List<Vec3> path = new ArrayList<>();
 
     private final BoolValue timeoutBool = new BoolValue("Timeout", true, this);

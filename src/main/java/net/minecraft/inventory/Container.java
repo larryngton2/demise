@@ -16,7 +16,7 @@ public abstract class Container {
     public List<ItemStack> inventoryItemStacks = Lists.newArrayList();
     public List<Slot> inventorySlots = Lists.newArrayList();
     public int windowId;
-    private short transactionID;
+    public short transactionID;
     private int dragMode = -1;
     private int dragEvent;
     private final Set<Slot> dragSlots = Sets.newHashSet();

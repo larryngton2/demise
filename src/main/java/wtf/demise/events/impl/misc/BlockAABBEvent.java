@@ -13,11 +13,9 @@ import wtf.demise.events.impl.CancellableEvent;
 @Setter
 @AllArgsConstructor
 public class BlockAABBEvent extends CancellableEvent {
-
     private final World world;
     private final Block block;
     private final BlockPos blockPos;
     private AxisAlignedBB boundingBox;
     private final AxisAlignedBB maskBoundingBox;
-
 }

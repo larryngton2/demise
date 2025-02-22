@@ -3,6 +3,7 @@ package net.minecraft.item;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentDurability;
@@ -32,6 +33,7 @@ public final class ItemStack {
     public static final DecimalFormat DECIMALFORMAT = new DecimalFormat("#.###");
     public int stackSize;
     public int animationsToGo;
+    @Getter
     private Item item;
     private NBTTagCompound stackTagCompound;
     private int itemDamage;
@@ -97,10 +99,6 @@ public final class ItemStack {
 
         this.stackSize -= amount;
         return itemstack;
-    }
-
-    public Item getItem() {
-        return this.item;
     }
 
     public boolean onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {

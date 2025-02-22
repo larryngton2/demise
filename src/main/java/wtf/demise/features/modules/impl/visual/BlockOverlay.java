@@ -15,7 +15,6 @@ import java.awt.*;
 
 @ModuleInfo(name = "BlockOverlay", category = ModuleCategory.Visual)
 public class BlockOverlay extends Module {
-
     public final BoolValue outline = new BoolValue("Outline", true, this);
     public final BoolValue filled = new BoolValue("Filled", false, this);
     public final BoolValue syncColor = new BoolValue("Sync Color", false, this);
@@ -32,6 +31,5 @@ public class BlockOverlay extends Module {
         } else {
             RenderUtils.renderBlock(mc.objectMouseOver.getBlockPos(), color.get().getRGB(), outline.get(), filled.get());
         }
-
     }
 }

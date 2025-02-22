@@ -36,6 +36,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveMathEvent;
+import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.modules.impl.visual.Animations;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.animations.ContinualAnimation;

@@ -22,7 +22,6 @@ import java.util.List;
 
 @ModuleInfo(name = "BedPlates", category = ModuleCategory.Visual)
 public class BedPlates extends Module {
-
     public final SliderValue distance = new SliderValue("Distance", 50, 10, 75, 1, this);
     public final SliderValue updateRate = new SliderValue("Update Rate", 1000, 250, 5000, 250, this);
     public final SliderValue layers = new SliderValue("Layers", 5, 1, 10, 1, this);

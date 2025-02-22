@@ -16,7 +16,6 @@ import wtf.demise.utils.player.MovementUtils;
 public class MoreKB extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit Fast", "Packet"}, "Legit Test", this);
     private final BoolValue onlyGround = new BoolValue("Only Ground", true, this);
-    public int ticks;
 
     EntityLivingBase target = null;
 
@@ -24,7 +23,6 @@ public class MoreKB extends Module {
     public void onAttack(AttackEvent event) {
         if (event.getTargetEntity() != null && event.getTargetEntity() instanceof EntityLivingBase) {
             target = (EntityLivingBase) event.getTargetEntity();
-            ticks = 2;
         }
     }
 

@@ -5,11 +5,14 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.*;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.Event;
 import wtf.demise.events.impl.misc.BlockAABBEvent;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.DebugUtils;
@@ -20,11 +23,13 @@ import wtf.demise.utils.player.PlayerUtils;
 public class Phase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Intave"}, "Vanilla", this);
     private final SliderValue amount = new SliderValue("Amount", 52, 1, 100, 1, this, () -> mode.is("Intave"));
+    private final BoolValue packet = new BoolValue("Packet", true, this, () -> mode.is("Intave"));
 
     private boolean phasing;
     private boolean handle;
     private BlockPos pos;
     private EnumFacing sideHit;
+    private boolean canClip;
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
@@ -54,27 +59,79 @@ public class Phase extends Module {
             case "Intave":
                 boolean check = mc.gameSettings.keyBindAttack.isKeyDown() && !handle && mc.thePlayer.rotationPitch > 80;
 
-                if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && check) {
-                    pos = mc.objectMouseOver.getBlockPos();
-                    sideHit = mc.objectMouseOver.sideHit;
-                    handle = true;
-                }
-
-                if (handle) {
-                    PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, sideHit));
-                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - (amount.get() * 0.0001), mc.thePlayer.posZ);
-                }
-
-                if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK && handle) {
-                    switch (mc.objectMouseOver.typeOfHit) {
-                        case ENTITY -> DebugUtils.sendMessage("A fatass is blocking the way, can't phase");
-                        case MISS -> DebugUtils.sendMessage("Stopped");
+                if (packet.get()) {
+                    if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && check) {
+                        pos = mc.objectMouseOver.getBlockPos();
+                        sideHit = mc.objectMouseOver.sideHit;
+                        handle = true;
                     }
 
-                    mc.thePlayer.jump();
+                    if (handle) {
+                        PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, sideHit));
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - (amount.get() * 0.0001), mc.thePlayer.posZ);
+                    }
+
+                    if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK && handle) {
+                        switch (mc.objectMouseOver.typeOfHit) {
+                            case ENTITY -> DebugUtils.sendMessage("A fatass is blocking the way, can't phase");
+                            case MISS -> DebugUtils.sendMessage("Stopped");
+                        }
+
+                        mc.thePlayer.jump();
+                        handle = false;
+                    }
+                } else {
                     handle = false;
+
+                    mc.thePlayer.capabilities.allowEdit = true;
+
+                    if (canClip) {
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY - 0.0052, mc.thePlayer.posZ);
+                    }
+
+                    if (mc.thePlayer.isSneaking()) {
+                        final double wDist = 0.00001D;
+                        final double aDist = 0.00001D;
+                        final double sDist = -0.00001D;
+                        final double dDist = -0.00001D;
+
+                        final double rotationn = Math.toRadians(mc.thePlayer.rotationYaw);
+
+                        if (mc.gameSettings.keyBindForward.isKeyDown()) {
+                            final double xx = Math.sin(rotationn) * wDist;
+                            final double zz = Math.cos(rotationn) * wDist;
+
+                            mc.thePlayer.setPosition(mc.thePlayer.posX - xx, mc.thePlayer.posY, mc.thePlayer.posZ + zz);
+                        }
+
+                        if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+                            final double xx = Math.sin(rotationn) * aDist;
+
+                            mc.thePlayer.setPosition(mc.thePlayer.posX + xx, mc.thePlayer.posY, mc.thePlayer.posZ);
+                        }
+
+                        if (mc.gameSettings.keyBindBack.isKeyDown()) {
+                            final double xx = Math.sin(rotationn) * sDist;
+                            final double zz = Math.cos(rotationn) * sDist;
+
+                            mc.thePlayer.setPosition(mc.thePlayer.posX - xx, mc.thePlayer.posY, mc.thePlayer.posZ + zz);
+                        }
+
+                        if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+                            final double xx = Math.sin(rotationn) * dDist;
+
+                            mc.thePlayer.setPosition(mc.thePlayer.posX + xx, mc.thePlayer.posY, mc.thePlayer.posZ);
+                        }
+                    }
                 }
                 break;
+        }
+    }
+
+    @EventTarget
+    public void onGameEvent(GameEvent e) {
+        if (mode.is("Intave") && !packet.get()) {
+            canClip = mc.playerController.curBlockDamageMP > 0.75;
         }
     }
 
