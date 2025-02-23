@@ -7,6 +7,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
@@ -97,16 +100,23 @@ public class KillAura extends Module {
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
 
-    //target
+    // target
     private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch", "Multi"}, "Single", this);
     private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health", "HurtTime"}, "Distance", this, () -> targetMode.is("Single"));
     private final SliderValue targetSwitchDelay = new SliderValue("Target Switch Delay (ms)", 500, 50, 1000, 50, this, () -> targetMode.is("Switch"));
-    private final BoolValue botCheck = new BoolValue("Bot Check", false, this);
 
     // visual
     private final BoolValue targetESP = new BoolValue("Target ESP", false, this);
     private final BoolValue targetOnPlayer = new BoolValue("Target on player", false, this);
     private final SliderValue dotScale = new SliderValue("Target scale", 0.04f, 0.01f, 1, 0.01f, this, targetOnPlayer::get);
+
+    // targetS
+    private final BoolValue players = new BoolValue("Players", true, this);
+    private final BoolValue nonPlayers = new BoolValue("Non players", true, this);
+    private final BoolValue teams = new BoolValue("Teams", true, this);
+    private final BoolValue botCheck = new BoolValue("Bot check", false, this);
+    private final BoolValue invisibles = new BoolValue("Invisibles", false, this);
+    private final BoolValue dead = new BoolValue("Dead", false, this);
 
     public final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
     private final Queue<Vec3> positionHistory = new LinkedList<>();
@@ -259,16 +269,34 @@ public class KillAura extends Module {
         List<Entity> targets = new ArrayList<>();
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
-            if (entity instanceof EntityPlayer && entity != mc.thePlayer) {
-                if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
-                    continue;
+            if (entity != mc.thePlayer) {
+                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
+                    if (!nonPlayers.get())
+                        continue;
                 }
 
-                if (PlayerUtils.isInTeam(entity)) {
+                if (entity.isInvisible() && !invisibles.get())
                     continue;
+
+                if (entity.isDead && !dead.get())
+                    continue;
+
+                if (entity instanceof EntityPlayer) {
+                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) {
+                        continue;
+                    }
+
+                    if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
+                        continue;
+                    }
+
+                    if (PlayerUtils.isInTeam(entity) && teams.get()) {
+                        continue;
+                    }
                 }
 
                 double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
+
                 if (distanceToEntity <= searchRange.get()) {
                     targets.add(entity);
                 }
@@ -292,13 +320,30 @@ public class KillAura extends Module {
         for (Entity entity : mc.theWorld.loadedEntityList) {
             double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
 
-            if (entity instanceof EntityPlayer && entity != mc.thePlayer && !Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity) && distanceToEntity <= searchRange.get()) {
-                if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
-                    continue;
+            if (entity != mc.thePlayer && distanceToEntity <= searchRange.get()) {
+                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
+                    if (!nonPlayers.get())
+                        continue;
                 }
 
-                if (PlayerUtils.isInTeam(entity)) {
+                if (entity.isInvisible() && !invisibles.get())
                     continue;
+
+                if (entity.isDead && !dead.get())
+                    continue;
+
+                if (entity instanceof EntityPlayer) {
+                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) {
+                        continue;
+                    }
+
+                    if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
+                        continue;
+                    }
+
+                    if (PlayerUtils.isInTeam(entity) && teams.get()) {
+                        continue;
+                    }
                 }
 
                 switch (targetPriority.get()) {

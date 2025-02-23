@@ -46,7 +46,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     private double lastReportedPosZ;
     private float lastReportedYaw;
     private float lastReportedPitch;
-    private boolean serverSneakState;
+    public boolean serverSneakState;
     public boolean serverSprintState;
     public int positionUpdateTicks;
     private boolean hasValidHealth;

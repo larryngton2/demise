@@ -12,7 +12,6 @@ import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "FastPlace", category = ModuleCategory.Player)
 public class FastPlace extends Module {
-
     public final SliderValue speed = new SliderValue("Speed", 1, 0, 4, this);
 
     @EventTarget

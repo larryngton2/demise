@@ -44,6 +44,7 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.*;
 import net.minecraft.world.*;
 import wtf.demise.Demise;
+import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.features.modules.impl.combat.KeepSprint;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.utils.player.RotationUtils;
@@ -941,15 +942,16 @@ public abstract class EntityPlayer extends EntityLivingBase {
 
                     if (flag2) {
                         if (i > 0) {
-                            KeepSprint keepSprint = Demise.INSTANCE.getModuleManager().getModule(KeepSprint.class);
                             float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : this.rotationYaw;
 
                             targetEntity.addVelocity(-MathHelper.sin(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F, 0.1D, MathHelper.cos(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F);
 
-                            this.motionX *= keepSprint.isEnabled() ? keepSprint.motion.get() : 0.6D;
-                            this.motionZ *= keepSprint.isEnabled() ? keepSprint.motion.get() : 0.6D;
+                            HitSlowDownEvent hitSlowDown = new HitSlowDownEvent(0.6D, false);
+                            Demise.INSTANCE.getEventManager().call(hitSlowDown);
 
-                            this.setSprinting(keepSprint.isEnabled() && keepSprint.sprint.get());
+                            this.motionX *= hitSlowDown.getSlowDown();
+                            this.motionZ *= hitSlowDown.getSlowDown();
+                            this.setSprinting(hitSlowDown.isSprint());
                         }
 
                         if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged) {

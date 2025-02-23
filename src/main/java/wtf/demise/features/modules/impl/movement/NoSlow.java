@@ -37,7 +37,10 @@ public class NoSlow extends Module {
     public final SliderValue speed = new SliderValue("Speed", 1, 0, 1, 0.1f, this);
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "GrimAC", "Intave", "Old Intave", "Watchdog", "NCP"}, "Vanilla", this);
     private final BoolValue sprint = new BoolValue("Sprint", true, this);
-    private final BoolValue onlyConsumable = new BoolValue("Only consumable", false, this);
+    private final BoolValue sword = new BoolValue("Sword", true, this);
+    private final BoolValue consumable = new BoolValue("Consumable", true, this);
+    private final BoolValue bow = new BoolValue("Bow", true, this);
+
     private boolean eat = true;
     private int lastFoodAmount;
     private float foodSpeed;
@@ -47,6 +50,8 @@ public class NoSlow extends Module {
     @EventTarget
     public void onMotion(MotionEvent event) {
         setTag(mode.get());
+
+        if (!check()) return;
 
         switch (mode.get()) {
             case "Old Intave":
@@ -136,6 +141,8 @@ public class NoSlow extends Module {
 
     @EventTarget
     public void onPacket(PacketEvent event) {
+        if (!check()) return;
+
         final Packet packet = event.getPacket();
         switch (mode.get()) {
             case "NCP": {
@@ -187,8 +194,16 @@ public class NoSlow extends Module {
         }
     }
 
+    private boolean check() {
+        if (isUsingConsumable() && !consumable.get()) return false;
+        if (isUsingBow() && !bow.get()) return false;
+        return !isUsingSword() || sword.get();
+    }
+
     @EventTarget
     private void onUpdate(UpdateEvent event) {
+        if (!check()) return;
+
         if (Objects.equals(mode.get(), "GrimAC")) {
             if (eat) {
                 foodSpeed = 0.2f;
@@ -207,15 +222,15 @@ public class NoSlow extends Module {
         return mc.thePlayer.isUsingItem() && isHoldingConsumable();
     }
 
-    private boolean isUsingSword() {
+    public boolean isUsingSword() {
         return mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
     }
 
-    private boolean isUsingBow() {
+    public boolean isUsingBow() {
         return mc.thePlayer.isUsingItem() && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow;
     }
 
-    private boolean isInteractBlock(Block block) {
+    public boolean isInteractBlock(Block block) {
         return block instanceof BlockFence ||
                 block instanceof BlockFenceGate ||
                 block instanceof BlockDoor ||
@@ -241,14 +256,11 @@ public class NoSlow extends Module {
 
     @EventTarget
     public void onSlowDown(SlowDownEvent event) {
-        if (mode.is("GrimAC") && isUsingConsumable()//&& mc.thePlayer.inventory.getItemStack().stackSize <= 1
-        ) {
+        if (!check()) return;
+
+        if (mode.is("GrimAC") && isUsingConsumable()) {
             event.setForward(foodSpeed);
             event.setStrafe(foodSpeed);
-            return;
-        }
-
-        if (onlyConsumable.get() && !isUsingConsumable()) {
             return;
         }
 

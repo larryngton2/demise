@@ -1123,7 +1123,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         }
     }
 
-    private void clickMouse() {
+    public void clickMouse() {
         if (this.leftClickCounter <= 0) {
             AttackOrder.sendConditionalSwing(this.objectMouseOver);
 
@@ -1158,7 +1158,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     }
 
     @SuppressWarnings("incomplete-switch")
-    private void rightClickMouse() {
+    public void rightClickMouse() {
         if (!this.playerController.getIsHittingBlock()) {
             this.rightClickDelayTimer = 4;
             boolean flag = true;

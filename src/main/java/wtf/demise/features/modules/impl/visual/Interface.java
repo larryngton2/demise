@@ -403,8 +403,9 @@ public class Interface extends Module {
         mainColor.setRainbow(color.is("Rainbow"));
         KillAura aura = getModule(KillAura.class);
         if (aura.isEnabled()) {
-            animationEntityPlayerMap.entrySet().removeIf(entry -> entry.getKey().isDead || (KillAura.currentTarget != entry.getKey() && entry.getKey() != mc.thePlayer));
+            animationEntityPlayerMap.entrySet().removeIf(entry -> entry.getKey().isDead || KillAura.currentTarget != entry.getKey());
         }
+
         if (!aura.isEnabled() && !(mc.currentScreen instanceof GuiChat)) {
             Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -418,23 +419,26 @@ public class Interface extends Module {
             }
         }
 
-        if (KillAura.currentTarget != null && !(mc.currentScreen instanceof GuiChat)) {
-            animationEntityPlayerMap.putIfAbsent((EntityPlayer) KillAura.currentTarget, new DecelerateAnimation(175, 1));
-            animationEntityPlayerMap.get(KillAura.currentTarget).setDirection(Direction.FORWARDS);
-        }
+        if (KillAura.currentTarget instanceof EntityPlayer) {
+            if (KillAura.currentTarget != null && !(mc.currentScreen instanceof GuiChat)) {
+                animationEntityPlayerMap.putIfAbsent((EntityPlayer) KillAura.currentTarget, new DecelerateAnimation(175, 1));
+                animationEntityPlayerMap.get(KillAura.currentTarget).setDirection(Direction.FORWARDS);
+            }
 
-        if (aura.isEnabled() && KillAura.currentTarget == null && !(mc.currentScreen instanceof GuiChat)) {
-            Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<EntityPlayer, DecelerateAnimation> entry = iterator.next();
-                DecelerateAnimation animation = entry.getValue();
+            if (aura.isEnabled() && KillAura.currentTarget == null && !(mc.currentScreen instanceof GuiChat)) {
+                Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<EntityPlayer, DecelerateAnimation> entry = iterator.next();
+                    DecelerateAnimation animation = entry.getValue();
 
-                animation.setDirection(Direction.BACKWARDS);
-                if (animation.finished(Direction.BACKWARDS)) {
-                    iterator.remove();
+                    animation.setDirection(Direction.BACKWARDS);
+                    if (animation.finished(Direction.BACKWARDS)) {
+                        iterator.remove();
+                    }
                 }
             }
         }
+
         if (mc.currentScreen instanceof GuiChat) {
             animationEntityPlayerMap.putIfAbsent(mc.thePlayer, new DecelerateAnimation(175, 1));
             animationEntityPlayerMap.get(mc.thePlayer).setDirection(Direction.FORWARDS);

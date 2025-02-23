@@ -10,7 +10,6 @@ import wtf.demise.features.values.impl.SliderValue;
 
 @ModuleInfo(name = "FastBreak", category = ModuleCategory.Player)
 public class FastBreak extends Module {
-
     private final BoolValue legit = new BoolValue("Legit", true, this);
     private final SliderValue speed = new SliderValue("Speed", 0.5f, 0, 0.9f, 0.1f, this, () -> !legit.get());
 

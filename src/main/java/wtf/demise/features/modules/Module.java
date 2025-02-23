@@ -18,7 +18,6 @@ import wtf.demise.utils.packet.PacketUtils;
 import java.util.*;
 
 public abstract class Module implements InstanceAccess {
-
     private final ModuleInfo moduleInfo;
     @Getter
     private final String name;

@@ -84,6 +84,7 @@ public class ModuleManager {
                 AutoMeow.class,
                 MurderMystery.class,
                 InventorySync.class,
+                ChatBypass.class,
 
                 // Movement
                 Freeze.class,
@@ -99,6 +100,7 @@ public class ModuleManager {
                 Fly.class,
                 Scaffold.class,
                 Phase.class,
+                Sneak.class,
 
                 // Player
                 AntiFireball.class,

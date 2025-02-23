@@ -17,8 +17,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MovementUtils;
 
 @ModuleInfo(name = "FreeCam", category = ModuleCategory.Visual)
-public final class FreeCam extends Module {
-
+public class FreeCam extends Module {
     private final BoolValue fly = new BoolValue("Fly", true, this);
     private final SliderValue flySpeed = new SliderValue("Fly Speed", 1, 0.1f, 9.5f, 0.1f, this, fly::get);
     private final BoolValue noClip = new BoolValue("No clip", true, this, fly::get);
@@ -47,7 +46,7 @@ public final class FreeCam extends Module {
             if (MovementUtils.isMoving()) {
                 MovementUtils.strafe(flySpeed.get());
             } else {
-                MovementUtils.stop();
+                MovementUtils.stopXZ();
             }
         }
     }
