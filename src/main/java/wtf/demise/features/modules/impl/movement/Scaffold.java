@@ -213,22 +213,22 @@ public class Scaffold extends Module {
             }
             break;
             case "Reverse": {
-                rotation = new float[]{(float) (MovementUtils.getRawDirection() + 180), getYawBasedPitch(data.blockPos, data.facing, MovementUtils.getRawDirection() + 180, previousRotation[1], 50, RotationUtils.getRotations(getVec3(data))[1])};
+                rotation = new float[]{(float) (MovementUtils.getYawFromKeybind() + 180), getYawBasedPitch(data.blockPos, data.facing, MovementUtils.getYawFromKeybind() + 180, previousRotation[1], 50, RotationUtils.getRotations(getVec3(data))[1])};
             }
             break;
             case "Hypixel": {
                 rotation = RotationUtils.getRotations(getVec3(data));
                 if (MovementUtils.isMovingStraight()) {
-                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getRawDirection() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getRawDirection() + 102))) {
-                        rotation[0] = MovementUtils.getRawDirection() + 91;
+                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() + 102))) {
+                        rotation[0] = MovementUtils.getYawFromKeybind() + 91;
                     } else {
-                        rotation[0] = MovementUtils.getRawDirection() - 91;
+                        rotation[0] = MovementUtils.getYawFromKeybind() - 91;
                     }
                 } else {
-                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getRawDirection() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getRawDirection() + 102))) {
-                        rotation[0] = MovementUtils.getRawDirection() + 139;
+                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() + 102))) {
+                        rotation[0] = MovementUtils.getYawFromKeybind() + 139;
                     } else {
-                        rotation[0] = MovementUtils.getRawDirection() - 139;
+                        rotation[0] = MovementUtils.getYawFromKeybind() - 139;
                     }
                 }
             }
@@ -236,10 +236,10 @@ public class Scaffold extends Module {
             case "Hypixel 2": {
                 rotation = RotationUtils.getRotations(getVec3(data));
 
-                if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getRawDirection() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getRawDirection() + 102))) {
-                    rotation[0] = MovementUtils.getRawDirection() + 139;
+                if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() + 102))) {
+                    rotation[0] = MovementUtils.getYawFromKeybind() + 139;
                 } else {
-                    rotation[0] = MovementUtils.getRawDirection() - 139;
+                    rotation[0] = MovementUtils.getYawFromKeybind() - 139;
                 }
             }
             break;

@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundCategory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjglx.Sys;
 import org.lwjglx.opengl.Display;
 import wtf.demise.events.EventManager;
 import wtf.demise.features.command.CommandManager;

@@ -33,9 +33,9 @@ import static net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RE
 
 @ModuleInfo(name = "NoSlow", category = ModuleCategory.Movement)
 public class NoSlow extends Module {
-
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "GrimAC", "Intave", "Old Intave", "Watchdog", "NCP", "Prediction"}, "Vanilla", this);
     public final SliderValue speed = new SliderValue("Speed", 1, 0, 1, 0.1f, this);
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "GrimAC", "Intave", "Old Intave", "Watchdog", "NCP"}, "Vanilla", this);
+    private final SliderValue amount = new SliderValue("Amount", 2, 2, 5, 1, this, () -> mode.is("Prediction"));
     private final BoolValue sprint = new BoolValue("Sprint", true, this);
     private final BoolValue sword = new BoolValue("Sword", true, this);
     private final BoolValue consumable = new BoolValue("Consumable", true, this);
@@ -143,7 +143,7 @@ public class NoSlow extends Module {
     public void onPacket(PacketEvent event) {
         if (!check()) return;
 
-        final Packet packet = event.getPacket();
+        final Packet<?> packet = event.getPacket();
         switch (mode.get()) {
             case "NCP": {
                 ncpShouldWork = !(packet instanceof C07PacketPlayerDigging);
@@ -255,18 +255,28 @@ public class NoSlow extends Module {
     }
 
     @EventTarget
-    public void onSlowDown(SlowDownEvent event) {
+    public void onSlowDown(SlowDownEvent e) {
         if (!check()) return;
 
-        if (mode.is("GrimAC") && isUsingConsumable()) {
-            event.setForward(foodSpeed);
-            event.setStrafe(foodSpeed);
-            return;
+        switch (mode.get()) {
+            case "GrimAC":
+                if (isUsingConsumable()) {
+                    e.setForward(foodSpeed);
+                    e.setStrafe(foodSpeed);
+                    return;
+                }
+                break;
+            case "Prediction":
+                if (mc.thePlayer.onGroundTicks % amount.get() != 0 && mc.thePlayer.isUsingItem()) {
+                    e.setCancelled(mc.thePlayer.onGround);
+                    return;
+                }
+                break;
         }
 
-        event.setSprinting(sprint.get());
+        e.setSprinting(sprint.get());
 
-        event.setForward(speed.get());
-        event.setStrafe(speed.get());
+        e.setForward(speed.get());
+        e.setStrafe(speed.get());
     }
 }

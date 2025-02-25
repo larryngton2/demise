@@ -31,6 +31,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
+import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
@@ -111,14 +112,16 @@ public class KillAura extends Module {
     private final SliderValue dotScale = new SliderValue("Target scale", 0.04f, 0.01f, 1, 0.01f, this, targetOnPlayer::get);
 
     // targetS
-    private final BoolValue players = new BoolValue("Players", true, this);
-    private final BoolValue nonPlayers = new BoolValue("Non players", true, this);
-    private final BoolValue teams = new BoolValue("Teams", true, this);
-    private final BoolValue botCheck = new BoolValue("Bot check", false, this);
-    private final BoolValue invisibles = new BoolValue("Invisibles", false, this);
-    private final BoolValue dead = new BoolValue("Dead", false, this);
+    private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
+            new BoolValue("Players", true),
+            new BoolValue("Non players", true),
+            new BoolValue("Teams", true),
+            new BoolValue("Bots", false),
+            new BoolValue("Invisibles", false),
+            new BoolValue("Dead", false)
+    ), this);
 
-    public final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
+    private final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
     private final Queue<Vec3> positionHistory = new LinkedList<>();
     private final TimerUtils lastTargetTime = new TimerUtils();
     private final TimerUtils lastSwitchTime = new TimerUtils();
@@ -130,11 +133,10 @@ public class KillAura extends Module {
     private boolean blink = false;
     private int blockTicks = 0;
     public Vec3 currentVec;
-    double lastPitchOffset;
+    private double lastPitchOffset;
     private boolean pause;
-    public Vec3 targetVec;
-    double lastYawOffset;
-    public Vec3 prevVec;
+    private Vec3 targetVec;
+    private double lastYawOffset;
 
     @Override
     public void onEnable() {
@@ -270,29 +272,22 @@ public class KillAura extends Module {
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity != mc.thePlayer) {
-                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
-                    if (!nonPlayers.get())
-                        continue;
+                if (!(entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager || entity instanceof EntityPlayer)) {
+                    continue;
                 }
 
-                if (entity.isInvisible() && !invisibles.get())
-                    continue;
+                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
+                    if (!allowedTargets.isEnabled("Non players")) continue;
+                }
 
-                if (entity.isDead && !dead.get())
-                    continue;
+                if (entity.isInvisible() && !allowedTargets.isEnabled("Invisibles")) continue;
+                if (entity.isDead && !allowedTargets.isEnabled("Dead")) continue;
 
                 if (entity instanceof EntityPlayer) {
-                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) {
-                        continue;
-                    }
-
-                    if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
-                        continue;
-                    }
-
-                    if (PlayerUtils.isInTeam(entity) && teams.get()) {
-                        continue;
-                    }
+                    if (!allowedTargets.isEnabled("Players")) continue;
+                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
+                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity)) continue;
+                    if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
                 }
 
                 double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
@@ -321,29 +316,22 @@ public class KillAura extends Module {
             double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
 
             if (entity != mc.thePlayer && distanceToEntity <= searchRange.get()) {
-                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
-                    if (!nonPlayers.get())
-                        continue;
+                if (!(entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager || entity instanceof EntityPlayer)) {
+                    continue;
                 }
 
-                if (entity.isInvisible() && !invisibles.get())
-                    continue;
+                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
+                    if (!allowedTargets.isEnabled("Non players")) continue;
+                }
 
-                if (entity.isDead && !dead.get())
-                    continue;
+                if (entity.isInvisible() && !allowedTargets.isEnabled("Invisibles")) continue;
+                if (entity.isDead && !allowedTargets.isEnabled("Dead")) continue;
 
                 if (entity instanceof EntityPlayer) {
-                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) {
-                        continue;
-                    }
-
-                    if (botCheck.get() && getModule(AntiBot.class).isBot((EntityPlayer) entity)) {
-                        continue;
-                    }
-
-                    if (PlayerUtils.isInTeam(entity) && teams.get()) {
-                        continue;
-                    }
+                    if (!allowedTargets.isEnabled("Players")) continue;
+                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
+                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity)) continue;
+                    if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
                 }
 
                 switch (targetPriority.get()) {
@@ -663,7 +651,6 @@ public class KillAura extends Module {
     }
 
     public float[] calcToEntity(EntityLivingBase entity) {
-        prevVec = currentVec;
         float yaw;
         float pitch;
 

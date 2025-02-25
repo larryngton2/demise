@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
+import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.ModeValue;
@@ -65,7 +66,7 @@ public class TargetHUDWidget extends Widget {
     public float getTHUDWidth(Entity entity) {
         return switch (setting.targetHudMode.get()) {
             case "Moon" -> 35 + Fonts.interSemiBold.get(18).getStringWidth(entity.getName()) + 33;
-            case "Demise" -> 110;
+            case "Demise" -> 120;
             default -> 0;
         };
     }
@@ -152,12 +153,20 @@ class TargetHUD implements InstanceAccess {
                     RoundedUtils.drawRound(x + 38.5f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
                     String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
                     double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
-                    String diff = initialDiff >= 0 ? "+" + initialDiff : String.valueOf(initialDiff);
+                    String diff;
 
-                    RoundedUtils.drawRound(x + 38.5f, y + 28, target.healthAnimation.getOutput(), 4.5f, 2, new Color(setting.color(0)));
+                    if (initialDiff > 0) {
+                        diff = "+" + initialDiff;
+                    } else if (initialDiff < 0) {
+                        diff = String.valueOf(initialDiff);
+                    } else {
+                        diff = "±" + initialDiff;
+                    }
+
+                    RoundedUtils.drawRound(x + 38.5f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
                     RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
                     Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 37, y + 17, -1);
-                    Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 105.5 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, -1);
+                    Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, -1);
                     Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
                 } else {
                     RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.color()));

@@ -38,52 +38,19 @@ public class Notification implements InstanceAccess {
     }
 
     public double getWidth() {
-        double width = 0;
-        switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
-            case "Default":
-                width = Fonts.interMedium.get(15).getStringWidth(getDescription()) + 5;
-                break;
-            case "Test":
-                width = Math.max(Fonts.interSemiBold.get(15).getStringWidth(getTitle()), Fonts.interSemiBold.get(15).getStringWidth(getDescription())) + 5;
-                break;
-            case "Test2":
-                width = Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 10;
-                break;
-            case "Exhi":
-                width = Math.max(100.0f, Math.max(Fonts.interRegular.get(18).getStringWidth(getTitle()) + 2, Fonts.interRegular.get(14).getStringWidth(getDescription())) + 24.0f);
-                break;
-            case "Type 2":
-                width = Math.max(100.0f, Math.max(Fonts.interRegular.get(18).getStringWidth(getTitle()), Fonts.interRegular.get(14).getStringWidth(getDescription())) + 70);
-                break;
-            case "Type 3":
-                width = Math.max(Fonts.interRegular.get(22).getStringWidth(getTitle()), Fonts.interRegular.get(20).getStringWidth(getDescription())) + 50;
-                break;
-        }
-        return width;
+        return switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
+            case "Default" ->
+                    Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 8;
+            case "Exhi" ->
+                    Math.max(100.0f, Math.max(Fonts.interRegular.get(18).getStringWidth(getTitle()) + 2, Fonts.interRegular.get(14).getStringWidth(getDescription())) + 24.0f);
+            default -> 0;
+        };
     }
 
     public double getHeight() {
-        double height = 0;
-        switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
-            case "Default":
-                height = 16;
-                break;
-            case "Test":
-                height = Fonts.interRegular.get(15).getHeight() * 2 + 2;
-                break;
-            case "Test2":
-                height = 33;
-                break;
-            case "Exhi":
-                height = 26;
-                break;
-            case "Type 2":
-                height = 30;
-                break;
-            case "Type 3":
-                height = 35;
-                break;
-        }
-        return height;
+        return switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
+            case "Default", "Exhi" -> 26;
+            default -> 0;
+        };
     }
 }

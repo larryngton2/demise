@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,8 +15,6 @@ import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
@@ -39,13 +36,9 @@ import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.player.MovementUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
-import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static wtf.demise.gui.click.neverlose.NeverLose.*;
@@ -78,10 +71,10 @@ public class Interface extends Module {
     public final ModeValue outline = new ModeValue("Outline", new String[]{"Right", "Left", "None"}, "None", this, () -> elements.isEnabled("Module List"));
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
-    public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Default", "Nursultan", "Exhi", "Sexy", "Type 1", "NeverLose", "Mod"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
+    public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Exhi", "Sexy"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
     public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Moon", "Demise"}, "Demise", this, () -> elements.isEnabled("Target HUD"));
     public final BoolValue targetHudParticle = new BoolValue("TargetHUD Particle", true, this, () -> elements.isEnabled("Target HUD"));
-    public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Test", "Type 2", "Type 3", "Test2", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
+    public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
     public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
     public final BoolValue centerNotif = new BoolValue("Center Notification", true, this, () -> notificationMode.is("Exhi"));
     public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo", "NeverLose"}, "Fade", this);
@@ -98,8 +91,6 @@ public class Interface extends Module {
 
     private final DecimalFormat bpsFormat = new DecimalFormat("0.00");
     private final DecimalFormat xyzFormat = new DecimalFormat("0");
-    private final DecimalFormat healthFormat = new DecimalFormat("0.#", new DecimalFormatSymbols(Locale.ENGLISH));
-    private final DateFormat dateFormat = new SimpleDateFormat("hh:mm");
     public final Map<EntityPlayer, DecelerateAnimation> animationEntityPlayerMap = new HashMap<>();
     public int lost = 0, killed = 0, won = 0;
     public int prevMatchKilled = 0, matchKilled = 0, match;
@@ -121,37 +112,33 @@ public class Interface extends Module {
         }
 
         if (infoMode.canDisplay()) {
-            switch (infoMode.get()) {
-                case "Exhi":
-                    float textY = (event.getScaledResolution().getScaledHeight() - 9) + (mc.currentScreen instanceof GuiChat ? -14.0f : -3.0f);
-                    mc.fontRendererObj.drawStringWithShadow("XYZ: " + EnumChatFormatting.WHITE +
-                                    xyzFormat.format(mc.thePlayer.posX) + " " +
-                                    xyzFormat.format(mc.thePlayer.posY) + " " +
-                                    xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET + "BPS: " + EnumChatFormatting.WHITE + this.bpsFormat.format(MovementUtils.getBPS())
-                            , 2, textY, color(0));
-                    break;
+            if (infoMode.get().equals("Exhi")) {
+                float textY = (event.getScaledResolution().getScaledHeight() - 9) + (mc.currentScreen instanceof GuiChat ? -14.0f : -3.0f);
+                mc.fontRendererObj.drawStringWithShadow("XYZ: " + EnumChatFormatting.WHITE +
+                                xyzFormat.format(mc.thePlayer.posX) + " " +
+                                xyzFormat.format(mc.thePlayer.posY) + " " +
+                                xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET + "BPS: " + EnumChatFormatting.WHITE + this.bpsFormat.format(MovementUtils.getBPS())
+                        , 2, textY, color(0));
             }
         }
 
         if (armorMode.canDisplay()) {
-            switch (armorMode.get()) {
-                case "Default":
-                    ArrayList<ItemStack> stuff = new ArrayList<>();
-                    boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
-                    int split = -3;
-                    for (int index = 3; index >= 0; --index) {
-                        ItemStack armor = mc.thePlayer.inventory.armorInventory[index];
-                        if (armor == null) continue;
-                        stuff.add(armor);
-                    }
-                    if (mc.thePlayer.getCurrentEquippedItem() != null) {
-                        stuff.add(mc.thePlayer.getCurrentEquippedItem());
-                    }
-                    for (ItemStack everything : stuff) {
-                        split += 16;
-                        RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 65 : 55) + (mc.thePlayer.capabilities.isCreativeMode ? 14 : 0), 1, true, 0.5f);
-                    }
-                    break;
+            if (armorMode.get().equals("Default")) {
+                ArrayList<ItemStack> stuff = new ArrayList<>();
+                boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
+                int split = -3;
+                for (int index = 3; index >= 0; --index) {
+                    ItemStack armor = mc.thePlayer.inventory.armorInventory[index];
+                    if (armor == null) continue;
+                    stuff.add(armor);
+                }
+                if (mc.thePlayer.getCurrentEquippedItem() != null) {
+                    stuff.add(mc.thePlayer.getCurrentEquippedItem());
+                }
+                for (ItemStack everything : stuff) {
+                    split += 16;
+                    RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 65 : 55) + (mc.thePlayer.capabilities.isCreativeMode ? 14 : 0), 1, true, 0.5f);
+                }
             }
         }
 
@@ -164,6 +151,7 @@ public class Interface extends Module {
                 double bb = cFont.get() ? getFr().getStringWidth(m2.getName() + m2.getTag()) : mc.fontRendererObj.getStringWidth(m2.getName() + m2.getTag());
                 return Double.compare(bb, ab);
             };
+
             ArrayList<Module> enabledMods = new ArrayList<>(INSTANCE.getModuleManager().getModules());
 
             enabledMods.sort(sort);
@@ -237,102 +225,21 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Potion HUD") && potionHudMode.is("Mod")) {
-            GL11.glPushMatrix();
-            GL11.glTranslatef(25, event.getScaledResolution().getScaledHeight() / 2f, 0F);
-            float yPos = 0F;
-            float width = 0F;
-            for (final PotionEffect effect : mc.thePlayer.getActivePotionEffects()) {
-                final Potion potion = Potion.potionTypes[effect.getPotionID()];
-                final String number = intToRomanByGreedy(effect.getAmplifier());
-                final String name = I18n.format(potion.getName()) + " " + number;
-                final float stringWidth = mc.fontRendererObj.getStringWidth(name)
-                        + mc.fontRendererObj.getStringWidth("§7" + Potion.getDurationString(effect));
-
-                if (width < stringWidth)
-                    width = stringWidth;
-                final float finalY = yPos;
-                mc.fontRendererObj.drawString(name, 2f, finalY - 7f, potion.getLiquidColor(), true);
-                mc.fontRendererObj.drawStringWithShadow("§7" + Potion.getDurationString(effect), 2f, finalY + 4, -1);
-                if (potion.hasStatusIcon()) {
-                    GL11.glPushMatrix();
-                    final boolean is2949 = GL11.glIsEnabled(2929);
-                    final boolean is3042 = GL11.glIsEnabled(3042);
-                    if (is2949)
-                        GL11.glDisable(2929);
-                    if (!is3042)
-                        GL11.glEnable(3042);
-                    GL11.glDepthMask(false);
-                    OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-                    GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                    final int statusIconIndex = potion.getStatusIconIndex();
-                    mc.getTextureManager().bindTexture(new ResourceLocation("textures/gui/container/inventory.png"));
-                    drawTexturedModalRect(-20F, finalY - 5, statusIconIndex % 8 * 18, 198 + statusIconIndex / 8 * 18, 18, 18);
-                    GL11.glDepthMask(true);
-                    if (!is3042)
-                        GL11.glDisable(3042);
-                    if (is2949)
-                        GL11.glEnable(2929);
-                    GL11.glPopMatrix();
-                }
-
-                yPos += mc.fontRendererObj.FONT_HEIGHT + 15;
-            }
-            GL11.glPopMatrix();
-        }
-
         if (elements.isEnabled("Session Info") && sessionInfoMode.is("Exhi")) {
             mc.fontRendererObj.drawStringWithShadow(RenderUtils.sessionTime(), event.getScaledResolution().getScaledWidth() / 2.0f - mc.fontRendererObj.getStringWidth(RenderUtils.sessionTime()) / 2.0f, BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? 47 : 30.0f, -1);
+        }
+
+        if (elements.isEnabled("Notification")) {
+            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc),false);
         }
     }
 
     @EventTarget
     public void onShader2D(Shader2DEvent event) {
-        switch (watemarkMode.get()) {
-            case "Text":
+        if (watemarkMode.get().equals("Text")) {
+            if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
                 Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
-                break;
-            case "Styles":
-                String dateString = dateFormat.format(new Date());
-
-                String name = " | " + Demise.INSTANCE.getVersion() +
-                        EnumChatFormatting.GRAY + " | " + EnumChatFormatting.WHITE + dateString +
-                        EnumChatFormatting.GRAY + " | " + EnumChatFormatting.WHITE + mc.thePlayer.getName() +
-                        EnumChatFormatting.GRAY + " | " + EnumChatFormatting.WHITE + mc.getCurrentServerData().serverIP;
-
-                int x = 7;
-                int y = 7;
-                int width = Fonts.interBold.get(17).getStringWidth("ML") + Fonts.interRegular.get(17).getStringWidth(name) + 5;
-                int height = Fonts.interRegular.get(17).getHeight() + 3;
-
-                RoundedUtils.drawRound(x, y, width, height, 4, new Color(color()));
-                break;
-            case "NeverLose":
-                //title
-                FontRenderer title = Fonts.interBold.get(20);
-
-                //info
-                FontRenderer info = Fonts.interRegular.get(16);
-                String userIcon = "W ";
-                String fpsIcon = "X ";
-                String timeIcon = "V ";
-                float userIconX = 3 + title.getStringWidth(clientName.getText()) + 9 + 7;
-                float fpsIconX = Fonts.nursultan.get(20).getStringWidth(userIcon) + userIconX + info.getStringWidth(mc.thePlayer.getName()) + Fonts.nursultan.get(20).getStringWidth(fpsIcon) - 10;
-                String times = dateFormat.format(new Date());
-
-                int bgY = 5;
-
-                RoundedUtils.drawRound(3 + title.getStringWidth(clientName.getText()) + 14, bgY,
-                        Fonts.nursultan.get(20).getStringWidth(userIcon) +
-                                info.getStringWidth(mc.thePlayer.getName()) +
-                                Fonts.nursultan.get(20).getStringWidth(fpsIcon) +
-                                info.getStringWidth(String.valueOf(Minecraft.getDebugFPS())) +
-                                Fonts.nursultan.get(20).getStringWidth(timeIcon) +
-                                info.getStringWidth(times)
-                                + 27
-                        , Fonts.interRegular.get(20).getHeight() + 2, 4, NeverLose.bgColor);
-                RoundedUtils.drawRound(3, bgY, title.getStringWidth(clientName.getText()) + 10, Fonts.interRegular.get(20).getHeight() + 2, 4, NeverLose.bgColor);
-
+            }
         }
 
         if (elements.isEnabled("Module List")) {
@@ -358,7 +265,6 @@ public class Interface extends Module {
 
                 x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
 
-
                 final float leftSide = x - 2f;
                 final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
 
@@ -366,9 +272,9 @@ public class Interface extends Module {
                     if (event.getShaderType() == Shader2DEvent.ShaderType.BLUR || event.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
                         RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, color(count));
                     }
+
                     if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
                         RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
-
                     }
                 }
 
@@ -394,7 +300,10 @@ public class Interface extends Module {
                 y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
                 count -= 2;
             }
+        }
 
+        if (elements.isEnabled("Notification")) {
+            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc),false);
         }
     }
 
@@ -402,8 +311,9 @@ public class Interface extends Module {
     public void onTick(TickEvent event) {
         mainColor.setRainbow(color.is("Rainbow"));
         KillAura aura = getModule(KillAura.class);
+
         if (aura.isEnabled()) {
-            animationEntityPlayerMap.entrySet().removeIf(entry -> entry.getKey().isDead || KillAura.currentTarget != entry.getKey());
+            animationEntityPlayerMap.entrySet().removeIf(entry -> KillAura.currentTarget != null && KillAura.currentTarget != entry.getKey());
         }
 
         if (!aura.isEnabled() && !(mc.currentScreen instanceof GuiChat)) {
@@ -420,26 +330,26 @@ public class Interface extends Module {
         }
 
         if (KillAura.currentTarget instanceof EntityPlayer) {
-            if (KillAura.currentTarget != null && !(mc.currentScreen instanceof GuiChat)) {
+            if (!(mc.currentScreen instanceof GuiChat)) {
                 animationEntityPlayerMap.putIfAbsent((EntityPlayer) KillAura.currentTarget, new DecelerateAnimation(175, 1));
                 animationEntityPlayerMap.get(KillAura.currentTarget).setDirection(Direction.FORWARDS);
             }
+        }
 
-            if (aura.isEnabled() && KillAura.currentTarget == null && !(mc.currentScreen instanceof GuiChat)) {
-                Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<EntityPlayer, DecelerateAnimation> entry = iterator.next();
-                    DecelerateAnimation animation = entry.getValue();
+        if (aura.isEnabled() && KillAura.currentTarget == null && !(mc.currentScreen instanceof GuiChat)) {
+            Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<EntityPlayer, DecelerateAnimation> entry = iterator.next();
+                DecelerateAnimation animation = entry.getValue();
 
-                    animation.setDirection(Direction.BACKWARDS);
-                    if (animation.finished(Direction.BACKWARDS)) {
-                        iterator.remove();
-                    }
+                animation.setDirection(Direction.BACKWARDS);
+                if (animation.finished(Direction.BACKWARDS)) {
+                    iterator.remove();
                 }
             }
         }
 
-        if (mc.currentScreen instanceof GuiChat) {
+        if (mc.currentScreen instanceof GuiChat && KillAura.currentTarget == null) {
             animationEntityPlayerMap.putIfAbsent(mc.thePlayer, new DecelerateAnimation(175, 1));
             animationEntityPlayerMap.get(mc.thePlayer).setDirection(Direction.FORWARDS);
         }
@@ -482,21 +392,6 @@ public class Interface extends Module {
                 ++this.lost;
             }
         }
-    }
-
-    private String intToRomanByGreedy(int num) {
-        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-        String[] symbols = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
-        StringBuilder stringBuilder = new StringBuilder();
-        int i = 0;
-        while (i < values.length && num >= 0) {
-            while (values[i] <= num) {
-                num -= values[i];
-                stringBuilder.append(symbols[i]);
-            }
-            i++;
-        }
-        return stringBuilder.toString();
     }
 
     public FontRenderer getFr() {

@@ -1,6 +1,8 @@
 package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.client.settings.KeyBinding;
+import org.lwjgl.glfw.GLFW;
+import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MotionEvent;
@@ -13,11 +15,14 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.RotationUtils;
 
 @ModuleInfo(name = "Speed", category = ModuleCategory.Movement)
 public class Speed extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave"}, "Strafe Hop", this);
+    private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));
     private final BoolValue air = new BoolValue("Air", true, this, () -> mode.is("Strafe Hop"));
@@ -67,6 +72,22 @@ public class Speed extends Module {
             MovementUtils.strafe(minSpeed.get());
         }
 
+        switch (yawOffsetMode.get()) {
+            case "Ground":
+                if (mc.thePlayer.onGround) {
+                    RotationUtils.setRotation(new float[]{MovementUtils.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.SILENT, 180, 180);
+                }
+                break;
+            case "Air":
+                if (!mc.thePlayer.onGround) {
+                    RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, MovementCorrection.SILENT, 180, 180);
+                }
+                break;
+            case "Constant":
+                RotationUtils.setRotation(new float[]{MovementUtils.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.SILENT, 180, 180);
+                break;
+        }
+
         switch (mode.get()) {
             case "NCP":
                 if (ncpMode.is("On tick 4")) {
@@ -97,8 +118,6 @@ public class Speed extends Module {
                 break;
             case "Intave":
                 if (mc.thePlayer.onGround) {
-                    MovementUtils.strafe(MovementUtils.getSpeed(), 0.27);
-
                     mc.thePlayer.jump();
                 }
 
@@ -186,9 +205,7 @@ public class Speed extends Module {
                 }
                 break;
             case "Legit":
-                if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
-                    mc.gameSettings.keyBindJump.setPressed(true);
-                }
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), mc.thePlayer.onGround && MovementUtils.isMoving());
                 break;
         }
     }

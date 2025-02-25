@@ -22,10 +22,9 @@ import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.gui.notification.NotificationType;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -98,19 +97,12 @@ public class MurderMystery extends Module {
                     for (Item item : knownSwordItems) {
                         if (player.getHeldItem().getItem() == item) {
                             if (player != mc.thePlayer) {
-                                DebugUtils.sendMessage(player.getName() + " is the murderer!");
+                                Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "MurderMystery", player.getName() + " is the murderer!", 3);
                                 if (announceMurderer.get()) {
                                     mc.thePlayer.sendChatMessage(player.getName() + " is the murderer");
                                 }
                             } else {
-                                List<EntityPlayer> players = new ArrayList<>(mc.theWorld.playerEntities);
-                                players.remove(mc.thePlayer);
-                                EntityPlayer randomPlayer = players.get(rand.nextInt(players.size()));
-
-                                DebugUtils.sendMessage("You are the murderer!");
-                                if (announceMurderer.get()) {
-                                    mc.thePlayer.sendChatMessage(randomPlayer + " is the murderer");
-                                }
+                                Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "MurderMystery", "You are the murderer!", 3);
                             }
 
                             this.murderer = player;
@@ -125,9 +117,9 @@ public class MurderMystery extends Module {
                 if (player.getHeldItem() != null) {
                     if (player.getHeldItem().getItem() instanceof ItemBow) {
                         if (player != mc.thePlayer) {
-                            DebugUtils.sendMessage(player.getName() + " is the detective!");
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "MurderMystery", player.getName() + " is the detective!", 3);
                         } else {
-                            DebugUtils.sendMessage("You are the detective!");
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "MurderMystery", "You are the detective!", 3);
                         }
 
                         detective = player;

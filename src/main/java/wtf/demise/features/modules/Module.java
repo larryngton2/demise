@@ -13,6 +13,7 @@ import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Translate;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.packet.PacketUtils;
 
 import java.util.*;
@@ -167,8 +168,9 @@ public abstract class Module implements InstanceAccess {
         Demise.INSTANCE.getEventManager().register(this);
         try {
             onEnable();
-            Demise.INSTANCE.getNotificationManager().post(NotificationType.OKAY, "Module", getName() + EnumChatFormatting.GREEN + " enabled");
-            playClickSound(1.0F);
+            Demise.INSTANCE.getNotificationManager().post(NotificationType.OKAY, "Module", "Enabled " + getName());
+            //playClickSound(1.0F);
+            SoundUtil.toggleSound(true);
         } catch (Exception e) {
             handleException(e);
         }
@@ -181,8 +183,9 @@ public abstract class Module implements InstanceAccess {
         Demise.INSTANCE.getEventManager().unregister(this);
         try {
             onDisable();
-            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Module", getName() + EnumChatFormatting.RED + " disabled");
-            playClickSound(0.8F);
+            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Module", "Disabled " + getName());
+           //playClickSound(0.8F);
+            SoundUtil.toggleSound(false);
         } catch (Exception e) {
             handleException(e);
         }

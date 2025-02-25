@@ -54,7 +54,7 @@ public class AutoClicker extends Module {
                 if (breakBlocks.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
                     return;
 
-                if (mc.gameSettings.keyBindAttack.isKeyDown() && isLeftReady()) {
+                if (mc.gameSettings.keyBindAttack.isKeyDown() && isLeftReady() && !mc.thePlayer.isUsingItem()) {
                     mc.clickMouse();
                     leftTimer.reset();
                 }

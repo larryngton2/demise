@@ -292,10 +292,6 @@ public class GuiIngame extends Gui {
         Demise.INSTANCE.getModuleManager().getModule(Shaders.class).renderShaders();
         Demise.INSTANCE.getEventManager().call(new Render2DEvent(partialTicks, scaledresolution));
 
-        if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Interface.class).elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(scaledresolution, false);
-        }
-
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableLighting();
         GlStateManager.enableAlpha();

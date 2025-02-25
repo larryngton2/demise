@@ -10,7 +10,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.utils.math.MathUtils;
 
 @ModuleInfo(name = "ChatBypass", category = ModuleCategory.Misc)
-public final class ChatBypass extends Module {
+public class ChatBypass extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Hypixel"}, "Normal", this);
 
     private final char[] chars = new char[]{

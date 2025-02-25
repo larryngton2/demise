@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
@@ -12,9 +11,7 @@ import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.Translate;
-import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
-import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -58,61 +55,28 @@ public class NotificationManager implements InstanceAccess {
             }
 
             if (!animation.finished(Direction.BACKWARDS)) {
-                float x = 0;
-                float y = 0;
-                float yVal;
+                float x;
+                float y;
                 float actualOffset = 0;
                 switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
                     case "Default":
-                        actualOffset = 3;
+                        Interface anInterface = INSTANCE.getModuleManager().getModule(Interface.class);
 
-                        x = (sr.getScaledWidth() - ((sr.getScaledWidth() / 2f + width / 2f)));
-                        y = sr.getScaledHeight() / 2f - height / 2f + 55 + yOffset;
+                        x = (float) (sr.getScaledWidth() - (width + 5) * animation.getOutput());
+                        y = sr.getScaledHeight() - 5 - height - yOffset;
 
-                        yVal = (y + height) - height;
                         if (!shader) {
-                            RoundedUtils.drawRound(x, yVal, width + 2, height, 4, ColorUtils.applyOpacity(new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true), (float) notification.getAnimation().getOutput()));
-
-                            Fonts.interMedium.get(15).drawCenteredStringNoFormat(notification.getDescription(), x + width / 2f,
-                                    yVal + Fonts.interMedium.get(15).getMiddleOfBox(height) + 2, ColorUtils.applyOpacity(-1, (float) notification.getAnimation().getOutput()));
-                        } else {
-                            RoundedUtils.drawRound(x, yVal, width + 2, height, 4, ColorUtils.applyOpacity(new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true), (float) notification.getAnimation().getOutput()));
-                        }
-                        yOffset += (height + actualOffset) * (float) notification.getAnimation().getOutput();
-                        break;
-                    case "Test":
-
-                        notification.getAnimation().setDuration(200);
-                        actualOffset = 3;
-
-                        x = sr.getScaledWidth() - (width + 5);
-
-                        float heightVal = (float) (height * notification.getAnimation().getOutput());
-                        yVal = (y + height) - heightVal;
-                        if (!shader) {
-                            RoundedUtils.drawRound(x, yVal, width, heightVal, 4, ColorUtils.applyOpacity(new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true), (float) notification.getAnimation().getOutput()));
-                            Fonts.interSemiBold.get(15).drawCenteredStringNoFormat(notification.getTitle(), x + width / 2f, yVal + 2, ColorUtils.applyOpacity(Color.WHITE.getRGB(), (float) notification.getAnimation().getOutput()));
-                            Fonts.interSemiBold.get(15).drawCenteredStringNoFormat(notification.getDescription(), x + width / 2f, yVal + 2 + Fonts.interSemiBold.get(15).getHeight(), ColorUtils.applyOpacity(Color.WHITE.getRGB(), (float) notification.getAnimation().getOutput()));
-                        } else {
-                            RoundedUtils.drawRound(x, yVal, width, heightVal, 4, ColorUtils.applyOpacity(new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true), (float) notification.getAnimation().getOutput()));
-                        }
-                        yOffset += (height + actualOffset) * (float) notification.getAnimation().getOutput();
-                        break;
-                    case "Test2":
-                        if (!shader) {
-                            notification.getAnimation().setDuration(350);
+                            notification.getAnimation().setDuration(150);
                             actualOffset = 10;
 
-                            x = (float) (sr.getScaledWidth() - (width + 5) * animation.getOutput());
-                            y = sr.getScaledHeight() - 43 - height - yOffset;
-
-                            RenderUtils.drawRect(x, y, width, height, INSTANCE.getModuleManager().getModule(Interface.class).bgColor());
-                            Fonts.interSemiBold.get(17).drawStringNoFormat(notification.getTitle(), x + 7, y + 7, new Color(255, 255, 255, 255).getRGB());
-                            Fonts.interRegular.get(17).drawStringNoFormat(notification.getDescription(), x + 7, y + 18f, new Color(255, 255, 255, 120).getRGB());
+                            RenderUtils.drawRect(x, y, width, height, anInterface.bgColor());
+                            Fonts.interSemiBold.get(17).drawStringWithShadow(notification.getTitle(), x + 3, y + 5, new Color(255, 255, 255, 255).getRGB());
+                            Fonts.interRegular.get(17).drawStringWithShadow(notification.getDescription(), x + 3, y + 15, new Color(anInterface.color()).brighter().getRGB());
                             RenderUtils.drawRect(x, y + height - 1, width * Math.min((notification.getTimerUtils().getTime() / notification.getTime()), 1), 1, INSTANCE.getModuleManager().getModule(Interface.class).color());
                         } else {
-                            RenderUtils.drawRect(x, y, width, height, INSTANCE.getModuleManager().getModule(Interface.class).bgColor());
+                            RenderUtils.drawRect(x, y, width, height, anInterface.bgColor());
                         }
+
                         yOffset += (height + actualOffset) * (float) notification.getAnimation().getOutput();
                         break;
                     case "Exhi":
@@ -144,58 +108,6 @@ public class NotificationManager implements InstanceAccess {
                         if (!middlePos) {
                             yOffset -= height;
                         }
-                        break;
-
-                    case "Type 2":
-
-                        notification.getAnimation().setDuration(200);
-                        actualOffset = 3;
-
-                        x = sr.getScaledWidth() - (width + 5);
-                        y = sr.getScaledHeight() - 43 - height - yOffset;
-
-                        GlStateManager.pushMatrix();
-                        GlStateManager.translate(x + width / 2F, y + height / 2F, 0);
-                        GlStateManager.scale(animation.getOutput(), animation.getOutput(), animation.getOutput());
-                        GlStateManager.translate(-(x + width / 2F), -(y + height / 2F), 0);
-
-                        RoundedUtils.drawRound(x, y, width, height, 4, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
-                        if (!shader) {
-                            RenderUtils.drawCircle(x + 16f, y + 15f, 0, 360, 13f, .1f, true, -1);
-                            RenderUtils.drawGradientCircle(x + 16f, y + 15f, 0, 360, 13f, INSTANCE.getModuleManager().getModule(Interface.class).color(0), INSTANCE.getModuleManager().getModule(Interface.class).color(90));
-                            if (notification.getNotificationType() == NotificationType.INFO) {
-                                Fonts.noti.get(42).drawStringNoFormat("B", x + 11F, y + 8F, 0);
-                            } else if (notification.getNotificationType() == NotificationType.NOTIFY) {
-                                Fonts.noti.get(42).drawStringNoFormat("A", x + 14F, y + 8F, 0);
-                            } else if (notification.getNotificationType() == NotificationType.WARNING) {
-                                Fonts.noti2.get(42).drawStringNoFormat("L", x + 9F, y + 10F, 0);
-                            } else {
-                                Fonts.noti2.get(42).drawStringNoFormat("M", x + 8F, y + 10F, 0);
-                            }
-                            Fonts.interMedium.get(20).drawStringNoFormat(notification.getTitle(), x + 34F, y + 4F, -1);
-                            Fonts.interMedium.get(17).drawStringNoFormat(notification.getDescription(), x + 34F, y + 17F, -1);
-                        }
-
-                        yOffset += (height + actualOffset);
-
-                        GlStateManager.popMatrix();
-                        break;
-                    case "Type 3":
-                        animation.setDuration(250);
-                        actualOffset = 8;
-
-                        x = sr.getScaledWidth() - (width + 5) * (float) animation.getOutput();
-                        y = sr.getScaledHeight() - (yOffset + 18 + height);
-
-                        RoundedUtils.drawRound(x, y, width, height, 4f, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(0), true));
-                        RoundedUtils.drawRound(x + 3, y + 5, 25, 25, 4f, new Color(INSTANCE.getModuleManager().getModule(Interface.class).color(0), true));
-                        if (!shader) {
-                            Fonts.interRegular.get(22).drawStringWithShadow(notification.getTitle(), x + 32, y + 6, -1);
-                            Fonts.interRegular.get(20).drawStringWithShadow(notification.getDescription(), x + 32, y + 20, -1);
-                            Fonts.noti2.get(50).drawStringNoFormat("k", x + 9.5f, y + 10, new Color(INSTANCE.getModuleManager().getModule(Interface.class).color(0), true).darker().darker().darker().getRGB());
-                        }
-
-                        yOffset += (float) ((height + actualOffset) * animation.getOutput());
                         break;
                 }
             }

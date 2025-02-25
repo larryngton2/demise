@@ -11,7 +11,6 @@ import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
 
 import java.util.Arrays;
 
@@ -547,5 +546,33 @@ public class MovementUtils implements InstanceAccess {
         mc.thePlayer.rotationYawHead = e.getYaw();
         float f = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYawHead - mc.thePlayer.renderYawOffset);
         mc.thePlayer.renderYawOffset += f * 0.3F;
+    }
+
+    private static float yaw = 0;
+
+    public static float getDirFromKeybind() {
+        if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindLeft.isKeyDown()) {
+            yaw = 45f;
+        } else if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindRight.isKeyDown()) {
+            yaw = -45f;
+        } else if (mc.gameSettings.keyBindBack.isKeyDown() && mc.gameSettings.keyBindLeft.isKeyDown()) {
+            yaw = 135f;
+        } else if (mc.gameSettings.keyBindBack.isKeyDown() && mc.gameSettings.keyBindRight.isKeyDown()) {
+            yaw = -135f;
+        } else if (mc.gameSettings.keyBindBack.isKeyDown()) {
+            yaw = 180f;
+        } else if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+            yaw = 90f;
+        } else if (mc.gameSettings.keyBindRight.isKeyDown()) {
+            yaw = -90f;
+        } else if (mc.gameSettings.keyBindForward.isKeyDown()) {
+            yaw = 0f;
+        }
+
+        return yaw;
+    }
+
+    public static float getYawFromKeybind() {
+        return mc.thePlayer.rotationYaw - getDirFromKeybind();
     }
 }

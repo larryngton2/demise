@@ -1180,8 +1180,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             }
         }
 
-        Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
-
         this.frameFinish();
         this.waitForServerThread();
         MemoryMonitor.update();

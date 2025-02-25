@@ -32,17 +32,20 @@ public class Shaders extends Module {
         if (!this.isEnabled()) return;
 
         if (this.blur.get()) {
+            RenderUtils.resetColor();
             Blur.startBlur();
             INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.BLUR));
             Blur.endBlur(blurRadius.get(), (int) blurCompression.get());
+            RenderUtils.resetColor();
         }
 
         if (bloom.get()) {
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(false);
+            RenderUtils.resetColor();
             INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.GLOW));
-            stuffToBlur();
+            RenderUtils.resetColor();
             stencilFramebuffer.unbindFramebuffer();
 
             Bloom.renderBlur(stencilFramebuffer.framebufferTexture, (int) glowRadius.get(), (int) glowOffset.get());
@@ -52,9 +55,10 @@ public class Shaders extends Module {
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
+            RenderUtils.resetColor();
             INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.SHADOW));
-            stuffToBlur();
             stencilFramebuffer.unbindFramebuffer();
+            RenderUtils.resetColor();
 
             Shadow.renderBloom(stencilFramebuffer.framebufferTexture, (int) shadowRadius.get(), (int) shadowOffset.get());
         }
@@ -67,7 +71,6 @@ public class Shaders extends Module {
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(false);
             INSTANCE.getEventManager().call(new Shader3DEvent(Shader3DEvent.ShaderType.GLOW));
-            stuffToBlur();
             stencilFramebuffer.unbindFramebuffer();
 
             Bloom.renderBlur(stencilFramebuffer.framebufferTexture, (int) glowRadius.get(), (int) glowOffset.get());
@@ -84,16 +87,9 @@ public class Shaders extends Module {
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
             INSTANCE.getEventManager().call(new Shader3DEvent(Shader3DEvent.ShaderType.SHADOW));
-            stuffToBlur();
             stencilFramebuffer.unbindFramebuffer();
 
             Shadow.renderBloom(stencilFramebuffer.framebufferTexture, (int) shadowRadius.get(), (int) shadowOffset.get());
-        }
-    }
-
-    public void stuffToBlur() {
-        if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Interface.class).elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
         }
     }
 }
