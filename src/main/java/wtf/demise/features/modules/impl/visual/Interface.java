@@ -33,7 +33,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -117,7 +117,7 @@ public class Interface extends Module {
                 mc.fontRendererObj.drawStringWithShadow("XYZ: " + EnumChatFormatting.WHITE +
                                 xyzFormat.format(mc.thePlayer.posX) + " " +
                                 xyzFormat.format(mc.thePlayer.posY) + " " +
-                                xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET + "BPS: " + EnumChatFormatting.WHITE + this.bpsFormat.format(MovementUtils.getBPS())
+                                xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET + "BPS: " + EnumChatFormatting.WHITE + this.bpsFormat.format(MoveUtil.getBPS())
                         , 2, textY, color(0));
             }
         }

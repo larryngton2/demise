@@ -159,7 +159,7 @@ public class RotationUtils implements InstanceAccess {
              * Calculating movement fix
              */
             final float yaw = currentRotation[0];
-            MovementUtils.fixMovement(event, yaw);
+            MoveUtil.fixMovement(event, yaw);
         }
     }
 

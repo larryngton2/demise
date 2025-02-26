@@ -10,7 +10,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "MoreKB", category = ModuleCategory.Combat)
 public class MoreKB extends Module {
@@ -29,7 +29,7 @@ public class MoreKB extends Module {
     @EventTarget
     public void onUpdate(UpdateEvent event) {
         setTag(mode.get());
-        if (target != null && MovementUtils.isMoving()) {
+        if (target != null && MoveUtil.isMoving()) {
             if ((onlyGround.get() && mc.thePlayer.onGround || !onlyGround.get())) {
                 switch (mode.get()) {
                     case "Legit Fast":

@@ -7,7 +7,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "Sprint", category = ModuleCategory.Movement)
 public class Sprint extends Module {
@@ -22,7 +22,7 @@ public class Sprint extends Module {
         }
 
         if (omni.get()) {
-            mc.thePlayer.omniSprint = MovementUtils.isMoving();
+            mc.thePlayer.omniSprint = MoveUtil.isMoving();
         }
     }
 

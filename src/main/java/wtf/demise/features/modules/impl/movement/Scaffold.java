@@ -27,7 +27,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MovementCorrection;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -213,22 +213,22 @@ public class Scaffold extends Module {
             }
             break;
             case "Reverse": {
-                rotation = new float[]{(float) (MovementUtils.getYawFromKeybind() + 180), getYawBasedPitch(data.blockPos, data.facing, MovementUtils.getYawFromKeybind() + 180, previousRotation[1], 50, RotationUtils.getRotations(getVec3(data))[1])};
+                rotation = new float[]{(float) (MoveUtil.getYawFromKeybind() + 180), getYawBasedPitch(data.blockPos, data.facing, MoveUtil.getYawFromKeybind() + 180, previousRotation[1], 50, RotationUtils.getRotations(getVec3(data))[1])};
             }
             break;
             case "Hypixel": {
                 rotation = RotationUtils.getRotations(getVec3(data));
-                if (MovementUtils.isMovingStraight()) {
-                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() + 102))) {
-                        rotation[0] = MovementUtils.getYawFromKeybind() + 91;
+                if (MoveUtil.isMovingStraight()) {
+                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MoveUtil.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MoveUtil.getYawFromKeybind() + 102))) {
+                        rotation[0] = MoveUtil.getYawFromKeybind() + 91;
                     } else {
-                        rotation[0] = MovementUtils.getYawFromKeybind() - 91;
+                        rotation[0] = MoveUtil.getYawFromKeybind() - 91;
                     }
                 } else {
-                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() + 102))) {
-                        rotation[0] = MovementUtils.getYawFromKeybind() + 139;
+                    if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MoveUtil.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MoveUtil.getYawFromKeybind() + 102))) {
+                        rotation[0] = MoveUtil.getYawFromKeybind() + 139;
                     } else {
-                        rotation[0] = MovementUtils.getYawFromKeybind() - 139;
+                        rotation[0] = MoveUtil.getYawFromKeybind() - 139;
                     }
                 }
             }
@@ -236,10 +236,10 @@ public class Scaffold extends Module {
             case "Hypixel 2": {
                 rotation = RotationUtils.getRotations(getVec3(data));
 
-                if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MovementUtils.getYawFromKeybind() + 102))) {
-                    rotation[0] = MovementUtils.getYawFromKeybind() + 139;
+                if (Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MoveUtil.getYawFromKeybind() - 102)) < Math.abs(MathHelper.wrapAngleTo180_double(RotationUtils.getRotations(getVec3(data))[0] - MoveUtil.getYawFromKeybind() + 102))) {
+                    rotation[0] = MoveUtil.getYawFromKeybind() + 139;
                 } else {
-                    rotation[0] = MovementUtils.getYawFromKeybind() - 139;
+                    rotation[0] = MoveUtil.getYawFromKeybind() - 139;
                 }
             }
             break;
@@ -283,7 +283,7 @@ public class Scaffold extends Module {
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 
-        if (addons.isEnabled("AD Strafe") && MovementUtils.isMoving() && MovementUtils.isMovingStraight() && mc.currentScreen == null && !Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCodeDefault()) && mc.thePlayer.onGround) {
+        if (addons.isEnabled("AD Strafe") && MoveUtil.isMoving() && MoveUtil.isMovingStraight() && mc.currentScreen == null && !Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCodeDefault()) && mc.thePlayer.onGround) {
             final BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ);
             if (mc.thePlayer.getHorizontalFacing(mc.thePlayer.rotationYaw + 180) == EnumFacing.EAST) {
                 if (b.getZ() + 0.5 > mc.thePlayer.posZ) {
@@ -352,13 +352,13 @@ public class Scaffold extends Module {
                     mc.thePlayer.motionY += 0.057f;
 
                     if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && !(getModule(Scaffold.class).isEnabled() && mc.gameSettings.keyBindJump.isKeyDown()) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 >= 2) {
-                        MovementUtils.strafe(0.48);
+                        MoveUtil.strafe(0.48);
                     } else if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 >= 2) {
-                        MovementUtils.strafe(0.4);
+                        MoveUtil.strafe(0.4);
                     } else if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 == 1) {
-                        MovementUtils.strafe(0.405);
+                        MoveUtil.strafe(0.405);
                     } else {
-                        MovementUtils.strafe(0.33);
+                        MoveUtil.strafe(0.33);
                     }
                 }
 
@@ -374,7 +374,7 @@ public class Scaffold extends Module {
 
         if (mc.thePlayer.onGround) {
             if ((addons.isEnabled("Auto Jump") || mode.is("Telly")) && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
-                if (MovementUtils.isMoving()) {
+                if (MoveUtil.isMoving()) {
                     mc.thePlayer.jump();
                 }
             }
@@ -399,7 +399,7 @@ public class Scaffold extends Module {
 
         if (towerMove.canDisplay()) {
             if (towerMove.get().equals("Vanilla")) {
-                if (MovementUtils.isMoving() && MovementUtils.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
+                if (MoveUtil.isMoving() && MoveUtil.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
                     if (towerMoving()) {
                         mc.thePlayer.motionY = 0.42f;
                     }
@@ -421,7 +421,7 @@ public class Scaffold extends Module {
             if (tower.get().equals("Watchdog")) {
                 if (!mc.thePlayer.isPotionActive(Potion.jump) && placed) {
                     if (towering()) {
-                        MovementUtils.stopXZ();
+                        MoveUtil.stopXZ();
                         int valY = (int) Math.round((event.y % 1) * 10000);
                         if (valY == 0) {
                             mc.thePlayer.motionY = 0.42F;
@@ -438,15 +438,15 @@ public class Scaffold extends Module {
 
         if (towerMove.canDisplay()) {
             if (towerMove.get().equals("Watchdog")) {
-                if (MovementUtils.isMoving() && MovementUtils.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
+                if (MoveUtil.isMoving() && MoveUtil.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
                     if (towerMoving()) {
                         int valY = (int) Math.round((event.y % 1) * 10000);
                         if (valY == 0) {
                             mc.thePlayer.motionY = 0.42F;
-                            MovementUtils.strafe((float) 0.26 + MovementUtils.getSpeedEffect() * 0.03);
+                            MoveUtil.strafe((float) 0.26 + MoveUtil.getSpeedEffect() * 0.03);
                         } else if (valY > 4000 && valY < 4300) {
                             mc.thePlayer.motionY = 0.33;
-                            MovementUtils.strafe((float) 0.26 + MovementUtils.getSpeedEffect() * 0.03);
+                            MoveUtil.strafe((float) 0.26 + MoveUtil.getSpeedEffect() * 0.03);
                         } else if (valY > 7000) {
                             mc.thePlayer.motionY = 1 - mc.thePlayer.posY % 1;
                         }
@@ -469,11 +469,11 @@ public class Scaffold extends Module {
     }
 
     public boolean towering() {
-        return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && !isEnabled(Speed.class) && !MovementUtils.isMoving();
+        return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && !isEnabled(Speed.class) && !MoveUtil.isMoving();
     }
 
     public boolean towerMoving() {
-        return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && !isEnabled(Speed.class) && MovementUtils.isMoving();
+        return Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && !isEnabled(Speed.class) && MoveUtil.isMoving();
     }
 
     public int getBlockSlot() {

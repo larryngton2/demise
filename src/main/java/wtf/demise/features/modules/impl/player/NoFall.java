@@ -2,9 +2,7 @@ package wtf.demise.features.modules.impl.player;
 
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.Module;
@@ -14,7 +12,7 @@ import wtf.demise.features.modules.impl.movement.Scaffold;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "NoFall", category = ModuleCategory.Player)
@@ -57,7 +55,7 @@ public class NoFall extends Module {
         else {
             fallDistance += (float) Math.max(mc.thePlayer.lastTickPosY - event.getY(), 0);
 
-            fallDistance -= MovementUtils.predictedMotionY(mc.thePlayer.motionY, 1);
+            fallDistance -= MoveUtil.predictedMotionY(mc.thePlayer.motionY, 1);
         }
 
         if (mc.thePlayer.capabilities.allowFlying) return;

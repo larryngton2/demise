@@ -1,9 +1,7 @@
 package net.minecraft.client.renderer;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonSyntaxException;
-import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
@@ -83,6 +81,7 @@ import wtf.demise.features.modules.impl.visual.Atmosphere;
 import wtf.demise.features.modules.impl.visual.Camera;
 import wtf.demise.features.modules.impl.visual.FreeLook;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
+import wtf.demise.utils.player.ViewBobbingEvent;
 import wtf.demise.utils.render.shader.impl.Sky;
 
 import java.io.IOException;
@@ -741,7 +740,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
         this.hurtCameraEffect(partialTicks);
 
-        if (this.mc.gameSettings.viewBobbing) {
+        ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(0);
+        if (this.mc.gameSettings.viewBobbing && !viewBobbingEvent.isCancelled()) {
             this.setupViewBobbing(partialTicks);
         }
 
@@ -820,7 +820,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 GlStateManager.pushMatrix();
                 this.hurtCameraEffect(p_renderHand_1_);
 
-                if (this.mc.gameSettings.viewBobbing) {
+                ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(1);
+                if (this.mc.gameSettings.viewBobbing && !viewBobbingEvent.isCancelled()) {
                     this.setupViewBobbing(p_renderHand_1_);
                 }
 
@@ -853,7 +854,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 this.hurtCameraEffect(p_renderHand_1_);
             }
 
-            if (this.mc.gameSettings.viewBobbing) {
+            final ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(2);
+            if (this.mc.gameSettings.viewBobbing && !viewBobbingEvent.isCancelled()) {
                 this.setupViewBobbing(p_renderHand_1_);
             }
         }

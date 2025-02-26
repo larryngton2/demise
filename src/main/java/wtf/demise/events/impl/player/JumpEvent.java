@@ -11,4 +11,5 @@ import wtf.demise.events.impl.CancellableEvent;
 public class JumpEvent extends CancellableEvent {
     private float motionY;
     private float yaw;
+    private float jumpoff;
 }

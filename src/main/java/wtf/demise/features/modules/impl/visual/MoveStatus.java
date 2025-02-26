@@ -10,7 +10,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "MoveStatus", category = ModuleCategory.Visual)
 public class MoveStatus extends Module {
@@ -20,7 +20,7 @@ public class MoveStatus extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        String stateKey = (MovementUtils.isMoving() ? "M" : "S") + (mc.thePlayer.isSprinting() ? "P" : "") + (mc.thePlayer.isSneaking() ? "N" : "");
+        String stateKey = (MoveUtil.isMoving() ? "M" : "S") + (mc.thePlayer.isSprinting() ? "P" : "") + (mc.thePlayer.isSneaking() ? "N" : "");
 
         status = switch (stateKey) {
             case "SN", "MN", "MPN" -> "Sneak";

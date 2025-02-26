@@ -20,7 +20,6 @@ import java.util.List;
 
 @ModuleInfo(name = "Particles", category = ModuleCategory.Visual)
 public class Particles extends Module {
-
     private final SliderValue amount = new SliderValue("Amount", 10, 1, 20, 1, this);
     private final BoolValue physics = new BoolValue("Physics", true, this);
     private final SliderValue simulationSpeed = new SliderValue("Simulation speed", 0.25f, 0.01f, 1, 0.01f, this);
@@ -31,8 +30,7 @@ public class Particles extends Module {
 
     @EventTarget
     public void onAttackEvent(final AttackEvent event) {
-        if (event.getTargetEntity() instanceof EntityLivingBase)
-            target = (EntityLivingBase) event.getTargetEntity();
+        if (event.getTargetEntity() instanceof EntityLivingBase) target = (EntityLivingBase) event.getTargetEntity();
     }
 
     @EventTarget

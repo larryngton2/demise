@@ -7,7 +7,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "Strafe", category = ModuleCategory.Movement)
 public class Strafe extends Module {
@@ -19,7 +19,7 @@ public class Strafe extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
-        if (mc.thePlayer.onGround && ground.get()) MovementUtils.strafe(groundSpeed.get());
-        if (!mc.thePlayer.onGround && air.get()) MovementUtils.strafe(airSpeed.get());
+        if (mc.thePlayer.onGround && ground.get()) MoveUtil.strafe(groundSpeed.get());
+        if (!mc.thePlayer.onGround && air.get()) MoveUtil.strafe(airSpeed.get());
     }
 }

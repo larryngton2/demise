@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 import static java.lang.Math.toRadians;
 
-public class MovementUtils implements InstanceAccess {
+public class MoveUtil implements InstanceAccess {
     public static final double WALK_SPEED = 0.221;
     public static final double BUNNY_SLOPE = 0.66;
     public static final double MOD_SPRINTING = 1.3F;
@@ -393,8 +393,8 @@ public class MovementUtils implements InstanceAccess {
     }
 
     public static void moveFlying(double increase) {
-        if (!MovementUtils.isMoving()) return;
-        final double yaw = MovementUtils.getDirection();
+        if (!MoveUtil.isMoving()) return;
+        final double yaw = MoveUtil.getDirection();
         mc.thePlayer.motionX += -MathHelper.sin((float) yaw) * increase;
         mc.thePlayer.motionZ += MathHelper.cos((float) yaw) * increase;
     }
@@ -506,31 +506,31 @@ public class MovementUtils implements InstanceAccess {
     }
 
     public static void smoothStrafe(MotionEvent e) {
-        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(MovementUtils.getDirection()) - lastYaw);
+        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection()) - lastYaw);
         double maxAngle = 20;
         double angle = lastYaw + (deltaYaw > 0 ? maxAngle : -maxAngle);
 
-        if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(MovementUtils.getDirection());
+        if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(MoveUtil.getDirection());
 
         mc.thePlayer.setSprinting(true);
 
-        if (mc.thePlayer.onGround && MovementUtils.isMoving()) {
+        if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
             mc.thePlayer.jump();
             mc.thePlayer.motionY -= 0.02;
 
             double groundSpeed = 0.47;
 
-            angle = lastYaw = (float) Math.toDegrees(MovementUtils.getDirection());
+            angle = lastYaw = (float) Math.toDegrees(MoveUtil.getDirection());
 
-            MovementUtils.strafe(groundSpeed, Math.toRadians(angle));
+            MoveUtil.strafe(groundSpeed, Math.toRadians(angle));
         }
 
-        if (MovementUtils.isMoving()) {
+        if (MoveUtil.isMoving()) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), false);
-            MovementUtils.strafe(MovementUtils.getSpeed(), Math.toRadians(angle));
+            MoveUtil.strafe(MoveUtil.getSpeed(), Math.toRadians(angle));
 
-            if (MovementUtils.getSpeed() < 0.2) {
-                MovementUtils.strafe(Math.max(0.05, MovementUtils.getSpeed() * 1.1));
+            if (MoveUtil.getSpeed() < 0.2) {
+                MoveUtil.strafe(Math.max(0.05, MoveUtil.getSpeed() * 1.1));
             }
         } else {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), (

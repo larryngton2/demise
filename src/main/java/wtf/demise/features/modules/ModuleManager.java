@@ -36,7 +36,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Getter
 public class ModuleManager {
-
     private final List<Module> modules = new CopyOnWriteArrayList<>();
 
     /**
@@ -101,6 +100,7 @@ public class ModuleManager {
                 Scaffold.class,
                 Phase.class,
                 Sneak.class,
+                MotionModifier.class,
 
                 // Player
                 AntiFireball.class,
@@ -136,7 +136,8 @@ public class ModuleManager {
                 MoveStatus.class,
                 ItemPhysics.class,
                 ItemESP.class,
-                FreeCam.class
+                FreeCam.class,
+                ViewBobbing.class
         );
 
         // Sort modules by name for better organization

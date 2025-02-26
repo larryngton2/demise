@@ -1100,78 +1100,6 @@ public class RenderUtils implements InstanceAccess {
         GL11.glColor3d(255, 255, 255);
     }
 
-    public static void renderBreadCrumbs(final List<Vec3> vec3s) {
-        GlStateManager.disableDepth();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        int i = 0;
-        try {
-            for (final Vec3 v : vec3s) {
-
-                i++;
-
-                boolean draw = true;
-
-                final double x = v.xCoord - (mc.getRenderManager()).renderPosX;
-                final double y = v.yCoord - (mc.getRenderManager()).renderPosY;
-                final double z = v.zCoord - (mc.getRenderManager()).renderPosZ;
-
-                final double distanceFromPlayer = mc.thePlayer.getDistance(v.xCoord, v.yCoord - 1, v.zCoord);
-                int quality = (int) (distanceFromPlayer * 4 + 10);
-
-                if (quality > 350)
-                    quality = 350;
-
-                if (i % 10 != 0 && distanceFromPlayer > 25) {
-                    draw = false;
-                }
-
-                if (i % 3 == 0 && distanceFromPlayer > 15) {
-                    draw = false;
-                }
-
-                if (draw) {
-
-                    GL11.glPushMatrix();
-                    GL11.glTranslated(x, y, z);
-
-                    final float scale = 0.04f;
-                    GL11.glScalef(-scale, -scale, -scale);
-
-                    GL11.glRotated(-(mc.getRenderManager()).playerViewY, 0.0D, 1.0D, 0.0D);
-                    GL11.glRotated((mc.getRenderManager()).playerViewX, 1.0D, 0.0D, 0.0D);
-
-                    final Color c = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(0));
-
-                    drawFilledCircleNoGL(0, 0, 0.7, c.hashCode(), quality);
-
-                    if (distanceFromPlayer < 4)
-                        drawFilledCircleNoGL(0, 0, 1.4, new Color(c.getRed(), c.getGreen(), c.getBlue(), 50).hashCode(), quality);
-
-                    if (distanceFromPlayer < 20)
-                        drawFilledCircleNoGL(0, 0, 2.3, new Color(c.getRed(), c.getGreen(), c.getBlue(), 30).hashCode(), quality);
-
-                    GL11.glScalef(0.8f, 0.8f, 0.8f);
-
-                    GL11.glPopMatrix();
-
-                }
-
-            }
-        } catch (final ConcurrentModificationException ignored) {
-        }
-
-        GL11.glDisable(GL11.GL_LINE_SMOOTH);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
-        GlStateManager.enableDepth();
-
-        GL11.glColor3d(255, 255, 255);
-    }
-
     public static void drawFilledCircleNoGL(final int x, final int y, final double r, final int c, final int quality) {
         final float f = ((c >> 24) & 0xff) / 255F;
         final float f1 = ((c >> 16) & 0xff) / 255F;
@@ -1232,7 +1160,7 @@ public class RenderUtils implements InstanceAccess {
                     GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0D, 1.0D, 0.0D);
                     GL11.glRotated(mc.getRenderManager().playerViewX, mc.gameSettings.thirdPersonView == 2 ? -1.0D : 1.0D, 0.0D, 0.0D);
 
-                    final Color c = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(0));
+                    final Color c = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(i));
 
                     drawFilledCircleNoGL(0, -3, 0.7, c.hashCode(), quality);
 

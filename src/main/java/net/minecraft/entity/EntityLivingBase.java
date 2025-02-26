@@ -36,11 +36,10 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveMathEvent;
-import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.modules.impl.visual.Animations;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.animations.ContinualAnimation;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.RotationUtils;
 
 import java.util.*;
@@ -1082,10 +1081,10 @@ public abstract class EntityLivingBase extends Entity {
     }
 
     protected void jump() {
-        final JumpEvent jumpEvent = new JumpEvent(this.getJumpUpwardsMotion(), this.rotationYaw);
+        final JumpEvent jumpEvent = new JumpEvent(this.getJumpUpwardsMotion(), this.rotationYaw, 0.2f);
         Demise.INSTANCE.getEventManager().call(jumpEvent);
-        if (jumpEvent.isCancelled())
-            return;
+
+        if (jumpEvent.isCancelled()) return;
 
         this.motionY = jumpEvent.getMotionY();
 
@@ -1098,11 +1097,11 @@ public abstract class EntityLivingBase extends Entity {
 
             final Minecraft mc = Minecraft.getMinecraft();
             if (mc.thePlayer.omniSprint) {
-                f = MovementUtils.getRawDirection() * 0.017453292F;
+                f = MoveUtil.getRawDirection() * 0.017453292F;
             }
 
-            this.motionX -= MathHelper.sin(f) * 0.2F;
-            this.motionZ += MathHelper.cos(f) * 0.2F;
+            this.motionX -= MathHelper.sin(f) * jumpEvent.getJumpoff();
+            this.motionZ += MathHelper.cos(f) * jumpEvent.getJumpoff();
         }
 
         this.isAirBorne = true;
@@ -1505,8 +1504,7 @@ public abstract class EntityLivingBase extends Entity {
         }));
 
         if (!list.isEmpty()) {
-            for (int i = 0; i < list.size(); ++i) {
-                Entity entity = list.get(i);
+            for (Entity entity : list) {
                 this.collideWithEntity(entity);
             }
         }

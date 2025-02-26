@@ -14,7 +14,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "FreeCam", category = ModuleCategory.Visual)
 public class FreeCam extends Module {
@@ -43,10 +43,10 @@ public class FreeCam extends Module {
         if (fly.get()) {
             mc.thePlayer.motionY = mc.gameSettings.keyBindJump.isKeyDown() ? flySpeed.get() : mc.gameSettings.keyBindSneak.isKeyDown() ? -flySpeed.get() : 0;
 
-            if (MovementUtils.isMoving()) {
-                MovementUtils.strafe(flySpeed.get());
+            if (MoveUtil.isMoving()) {
+                MoveUtil.strafe(flySpeed.get());
             } else {
-                MovementUtils.stopXZ();
+                MoveUtil.stopXZ();
             }
         }
     }
@@ -105,6 +105,6 @@ public class FreeCam extends Module {
         }
         mc.thePlayer.noClip = false;
         mc.thePlayer.motionY = 0;
-        MovementUtils.strafe(0);
+        MoveUtil.strafe(0);
     }
 }

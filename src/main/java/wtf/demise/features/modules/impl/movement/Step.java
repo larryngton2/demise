@@ -13,7 +13,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "Step", category = ModuleCategory.Movement)
@@ -41,7 +41,7 @@ public class Step extends Module {
                 mc.timer.timerSpeed = timer.get();
                 stepped = true;
                 for (double motion : MOTION) {
-                    MovementUtils.strafe();
+                    MoveUtil.strafe();
                     sendPacketNoEvent(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + motion, mc.thePlayer.posZ, false));
                 }
                 mc.thePlayer.stepHeight = 0.6f;

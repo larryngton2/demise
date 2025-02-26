@@ -49,8 +49,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class KillAura extends Module {
 
     // reach
-    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
-    private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
+    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.01f, this);
+    private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.01f, this);
 
     // attack
     private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
@@ -67,16 +67,15 @@ public class KillAura extends Module {
 
     // autoBlock
     private final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
-    private final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
+    private final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.01f, this, autoBlock::get);
     private final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink"}, "Vanilla", this, autoBlock::get);
     private final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
 
     // rotation
-    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "None"}, "Silent", this);
+    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "None"}, "Silent", this);
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue xzTrim = new SliderValue("XZ trim", 0, 0, 0.5f, 0.01f, this);
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Sigmoid"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -89,7 +88,7 @@ public class KillAura extends Module {
     private final BoolValue delayed = new BoolValue("Delayed target pos", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
     private final BoolValue smartDelay = new BoolValue("Smart delay", true, this, () -> delayed.get() && delayed.canDisplay());
-    private final BoolValue predict = new BoolValue("Custom rotation prediction", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final BoolValue predict = new BoolValue("Rotation prediction", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 0, 3, 1, this, () -> predict.get() && predict.canDisplay());
     private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay() && predictTicks.get() != 0);
 
@@ -201,8 +200,17 @@ public class KillAura extends Module {
                 setBlocking(false);
             }
 
-            if (Objects.equals(rotationMode.get(), "Silent") && PlayerUtils.getDistanceToEntityBox(currentTarget) <= searchRange.get()) {
-                setRotationToTarget(currentTarget);
+            if (PlayerUtils.getDistanceToEntityBox(currentTarget) <= searchRange.get()) {
+                switch (rotationMode.get()) {
+                    case "Silent":
+                        setRotationToTarget(currentTarget);
+                        break;
+                    case "Snap":
+                        if (isAttackReady()) {
+                            setRotationToTarget(currentTarget);
+                        }
+                        break;
+                }
             }
         } else {
             predictProcesses.clear();
@@ -286,7 +294,8 @@ public class KillAura extends Module {
                 if (entity instanceof EntityPlayer) {
                     if (!allowedTargets.isEnabled("Players")) continue;
                     if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
-                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity)) continue;
+                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity))
+                        continue;
                     if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
                 }
 
@@ -330,7 +339,8 @@ public class KillAura extends Module {
                 if (entity instanceof EntityPlayer) {
                     if (!allowedTargets.isEnabled("Players")) continue;
                     if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
-                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity)) continue;
+                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity))
+                        continue;
                     if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
                 }
 
@@ -464,7 +474,7 @@ public class KillAura extends Module {
     private void handleAutoBlock() {
         boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
 
-        if (rayCastFailed && unBlockOnRayCastFail.get()) {
+        if (rayCastFailed && unBlockOnRayCastFail.get() && rayCast.get()) {
             if (isBlocking) {
                 setBlocking(false);
             }
@@ -655,6 +665,7 @@ public class KillAura extends Module {
         float pitch;
 
         Vec3 playerPos;
+
         if (predict.get() && !predictProcesses.isEmpty()) {
             PlayerUtils.PredictProcess predictedProcess = predictProcesses.get(predictProcesses.size() - 1);
             playerPos = new Vec3(predictedProcess.position.xCoord, predictedProcess.position.yCoord + mc.thePlayer.getEyeHeight(), predictedProcess.position.zCoord);
@@ -663,7 +674,9 @@ public class KillAura extends Module {
         }
 
         Vec3 entityPos = entity.getPositionVector();
-        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().contract(xzTrim.get(), yTrim.get(), xzTrim.get());
+
+        double yTrim = this.yTrim.get() + (mc.thePlayer.onGround ? 0 : 0.1);
+        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().contract(0, yTrim, 0);
 
         switch (aimPos.get()) {
             case "Head":
@@ -756,8 +769,8 @@ public class KillAura extends Module {
                 double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
                 double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
 
-                double iyawFactor = dynamicCheck ? initialYawFactor + MovementUtils.getSpeed() * 6.5 : initialYawFactor;
-                double ipitchFactor = dynamicCheck ? initialPitchFactor + MovementUtils.getSpeed() : initialPitchFactor;
+                double iyawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 6.5 : initialYawFactor;
+                double ipitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
 
                 double iyawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * iyawFactor;
                 double ipitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * ipitchFactor;
@@ -811,7 +824,7 @@ public class KillAura extends Module {
 
         simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
 
-        for (int i = 0; i < (predict.get() ? predictTicks.get() : 1); i++) {
+        for (int i = 0; i < predictTicks.get(); i++) {
             simulatedPlayer.tick();
             predictProcesses.add(
                     new PlayerUtils.PredictProcess(

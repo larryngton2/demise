@@ -23,7 +23,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 import java.util.Objects;
 
@@ -98,7 +98,7 @@ public class LongJump extends Module {
             currentTimer = 0;
             pauseTimes = 0;
             activeTicks = 0;
-            MovementUtils.stop();
+            MoveUtil.stop();
         }
     }
 
@@ -117,8 +117,8 @@ public class LongJump extends Module {
                 }
                 if (mPacket) {
                     mc.timer.timerSpeed = oMatrixTimer.get();
-                    mc.thePlayer.motionX = 1.97 * -Math.sin(MovementUtils.getDirection());
-                    mc.thePlayer.motionZ = 1.97 * Math.cos(MovementUtils.getDirection());
+                    mc.thePlayer.motionX = 1.97 * -Math.sin(MoveUtil.getDirection());
+                    mc.thePlayer.motionZ = 1.97 * Math.cos(MoveUtil.getDirection());
                     mc.thePlayer.motionY = 0.42;
                     matrixTimer++;
 
@@ -135,11 +135,11 @@ public class LongJump extends Module {
                 activeTicks++;
 
                 if (activeTicks <= 10) {
-                    MovementUtils.stop();
+                    MoveUtil.stop();
                 } else {
                     if (!jumped) {
                         if (mc.thePlayer.onGround) {
-                            MovementUtils.stop();
+                            MoveUtil.stop();
                             mc.thePlayer.jump();
                         }
 
@@ -149,18 +149,18 @@ public class LongJump extends Module {
 
                         switch (pauseTimes) {
                             case 0:
-                                mc.thePlayer.motionX = 1.9 * -Math.sin(MovementUtils.getDirection());
-                                mc.thePlayer.motionZ = 1.9 * Math.cos(MovementUtils.getDirection());
+                                mc.thePlayer.motionX = 1.9 * -Math.sin(MoveUtil.getDirection());
+                                mc.thePlayer.motionZ = 1.9 * Math.cos(MoveUtil.getDirection());
                                 maxTimer = 10;
                                 break;
                             case 1:
-                                mc.thePlayer.motionX = 1.285 * -Math.sin(MovementUtils.getDirection());
-                                mc.thePlayer.motionZ = 1.285 * Math.cos(MovementUtils.getDirection());
+                                mc.thePlayer.motionX = 1.285 * -Math.sin(MoveUtil.getDirection());
+                                mc.thePlayer.motionZ = 1.285 * Math.cos(MoveUtil.getDirection());
                                 maxTimer = 15;
                                 break;
                             case 2:
-                                mc.thePlayer.motionX = 1.1625 * -Math.sin(MovementUtils.getDirection());
-                                mc.thePlayer.motionZ = 1.1625 * Math.cos(MovementUtils.getDirection());
+                                mc.thePlayer.motionX = 1.1625 * -Math.sin(MoveUtil.getDirection());
+                                mc.thePlayer.motionZ = 1.1625 * Math.cos(MoveUtil.getDirection());
                                 maxTimer = 5;
                                 break;
                         }
@@ -169,7 +169,7 @@ public class LongJump extends Module {
                         currentTimer++;
 
                         if (Range.between(4, maxTimer).contains(currentTimer)) {
-                            MovementUtils.stop();
+                            MoveUtil.stop();
                         } else if (currentTimer > maxTimer) {
                             pauseTimes++;
                             currentTimer = 0;
@@ -178,7 +178,7 @@ public class LongJump extends Module {
                     }
 
                     if (pauseTimes >= 3) {
-                        MovementUtils.stop();
+                        MoveUtil.stop();
                         toggle();
                     }
                 }
@@ -212,18 +212,18 @@ public class LongJump extends Module {
 
                             if (ticksSinceVelocity == 28) {
                                 if (boost.get()) {
-                                    MovementUtils.strafe(0.42);
+                                    MoveUtil.strafe(0.42);
                                 }
                                 mc.thePlayer.motionY = 0.16f;
                             }
                             if (ticksSinceVelocity >= 35 && ticksSinceVelocity <= 50) {
-                                MovementUtils.strafe();
+                                MoveUtil.strafe();
                                 mc.thePlayer.posY = mc.thePlayer.posY + .029f;
 
                             }
 
                             if (ticksSinceVelocity >= 3 && ticksSinceVelocity <= 50) {
-                                MovementUtils.strafe();
+                                MoveUtil.strafe();
                             }
                             break;
                         case "Chef":
@@ -268,7 +268,7 @@ public class LongJump extends Module {
                     if (setSpeed) {
 
                         stopModules = true;
-                        MovementUtils.strafe(1.768f);
+                        MoveUtil.strafe(1.768f);
                         ticks++;
                     }
                     if (initTicks < 3) {
@@ -283,7 +283,7 @@ public class LongJump extends Module {
                         }
                         stopModules = true;
                         ticks++;
-                        MovementUtils.strafe(1.768f);
+                        MoveUtil.strafe(1.768f);
                     }
                 }
 

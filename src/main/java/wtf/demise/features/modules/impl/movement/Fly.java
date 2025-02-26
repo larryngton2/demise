@@ -1,7 +1,5 @@
 package wtf.demise.features.modules.impl.movement;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import wtf.demise.events.annotations.EventTarget;
@@ -14,7 +12,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PacketUtils;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "Fly", category = ModuleCategory.Movement)
 public class Fly extends Module {
@@ -64,7 +62,7 @@ public class Fly extends Module {
                     mc.thePlayer.motionY = -downSpeed.get();
                 }
 
-                MovementUtils.strafe(moveSpeed.get());
+                MoveUtil.strafe(moveSpeed.get());
 
                 break;
             case "Miniblox":
@@ -95,7 +93,7 @@ public class Fly extends Module {
                             mc.thePlayer.motionY = 0.0D;
                         }
 
-                        MovementUtils.setSpeed(moveSpeed.get());
+                        MoveUtil.setSpeed(moveSpeed.get());
                     }
 
                 if (!stop.get()) {
@@ -115,7 +113,7 @@ public class Fly extends Module {
                         mc.thePlayer.motionY = 0.0D;
                     }
 
-                    MovementUtils.setSpeed(moveSpeed.get());
+                    MoveUtil.setSpeed(moveSpeed.get());
                 }
 
                 if (slow.get())
@@ -136,7 +134,7 @@ public class Fly extends Module {
                             mc.thePlayer.motionY = 0.0D;
                         }
 
-                        MovementUtils.setSpeed(moveSpeed.get() / slowAmount.get());
+                        MoveUtil.setSpeed(moveSpeed.get() / slowAmount.get());
                     }
                 break;
         }

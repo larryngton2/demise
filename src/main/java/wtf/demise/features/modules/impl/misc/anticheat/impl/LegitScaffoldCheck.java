@@ -5,7 +5,7 @@ import net.minecraft.item.ItemBlock;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.impl.misc.anticheat.Check;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 public class LegitScaffoldCheck extends Check {
     private final TimerUtils timer = new TimerUtils();
@@ -32,10 +32,10 @@ public class LegitScaffoldCheck extends Check {
         }
         if (player.rotationPitch > 75 && player.rotationPitch < 90 && player.isSwingInProgress) {
             if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemBlock) {
-                if (MovementUtils.getSpeed(player) >= 0.10 && player.onGround && sneakFlag > 5) {
+                if (MoveUtil.getSpeed(player) >= 0.10 && player.onGround && sneakFlag > 5) {
                     flag(player, "Sneak too fast");
                 }
-                if (MovementUtils.getSpeed(player) >= 0.21 && !player.onGround && sneakFlag > 5) {
+                if (MoveUtil.getSpeed(player) >= 0.21 && !player.onGround && sneakFlag > 5) {
                     flag(player, "Sneak too fast");
                 }
             }

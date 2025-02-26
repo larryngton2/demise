@@ -1,16 +1,18 @@
 package wtf.demise.features.modules.impl.combat;
 
 import de.florianmichael.viamcp.fixes.AttackOrder;
+import net.minecraft.block.BlockAir;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import net.minecraft.network.play.server.S32PacketConfirmTransaction;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.BlockAABBEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
@@ -26,22 +28,24 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.Objects;
 
 @ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
 public class Velocity extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "JumpReset", "Legit packet", "GrimC07", "Intave"}, "Normal", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "JumpReset", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
     private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Reduce", "Test"}, "Reduce", this, () -> mode.is("Intave"));
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
-    private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
+    private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
     private final SliderValue rHurtTime = new SliderValue("HurtTime", 9, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Reduce")));
     private final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && intaveMode.is("Reduce")));
     private final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && intaveMode.is("Reduce")));
-    private final BoolValue debug = new BoolValue("Debug", false, this, () -> Objects.equals(mode.get(), "Intave test"));
+    private final BoolValue debug = new BoolValue("Debug", false, this, () -> Objects.equals(mode.get(), "Intave") && intaveMode.is("Test"));
     private final SliderValue packets = new SliderValue("Packets", 5, 1, 20, 1, this, () -> Objects.equals(mode.get(), "Legit packet"));
+    private final SliderValue ticks = new SliderValue("Ticks", 0, 0, 6, 1, this);
     private final BoolValue onSwing = new BoolValue("On swing", false, this);
 
     private double iFactor = 0.0;
@@ -118,10 +122,39 @@ public class Velocity extends Module {
                         velocity = false;
                     }
                     break;
+                case "ReStrafe":
+                    if (mc.thePlayer.hurtTime == 9 - ticks.get()) {
+                        if (MoveUtil.isMoving()) {
+                            MoveUtil.strafe();
+                        } else {
+                            mc.thePlayer.motionZ *= -1;
+                            mc.thePlayer.motionX *= -1;
+                        }
+
+                        if (vertical.get() != 100.0D) {
+                            mc.thePlayer.motionY *= vertical.get() / 100.0D;
+                        }
+                    }
+                    break;
             }
         }
 
         this.setTag(mode.get());
+    }
+
+    @EventTarget
+    public void onBlockAABB(BlockAABBEvent e) {
+        if (onSwing.get() && !mc.thePlayer.isSwingInProgress) return;
+
+        if (mode.is("Karhu")) {
+            if (e.getBlock() instanceof BlockAir && mc.thePlayer.hurtTime >= 1) {
+                final double x = e.getBlockPos().getX(), y = e.getBlockPos().getY(), z = e.getBlockPos().getZ();
+
+                if (y == Math.floor(mc.thePlayer.posY) + 1) {
+                    e.setBoundingBox(AxisAlignedBB.fromBounds(0, 0, 0, 1, 0, 1).offset(x, y, z));
+                }
+            }
+        }
     }
 
     @EventTarget

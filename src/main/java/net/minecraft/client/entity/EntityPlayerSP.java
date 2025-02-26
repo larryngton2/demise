@@ -35,7 +35,7 @@ import wtf.demise.events.impl.player.SlowDownEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.RotationUtils;
 
 public class EntityPlayerSP extends AbstractClientPlayer {
@@ -575,7 +575,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             if (!slowDownEvent.isSprinting())
                 this.setSprinting(false);
             if (slowDownEvent.isSprinting())
-                this.setSprinting(MovementUtils.canSprint(true));
+                this.setSprinting(MoveUtil.canSprint(true));
 
             this.sprintToggleTimer = 0;
         }

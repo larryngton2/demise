@@ -12,7 +12,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.utils.packet.PacketUtils;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 import java.util.Objects;
 
@@ -45,7 +45,7 @@ public class Criticals extends Module {
                 if (mc.thePlayer.onGround) {
                     Speed speed = Demise.INSTANCE.getModuleManager().getModule(Speed.class);
                     if (speed.isEnabled()) {
-                        if (!MovementUtils.isMoving()) {
+                        if (!MoveUtil.isMoving()) {
                             mc.thePlayer.jump();
                         }
                     } else {
@@ -71,7 +71,7 @@ public class Criticals extends Module {
                 if (mc.thePlayer.onGround) {
                     Speed speed = Demise.INSTANCE.getModuleManager().getModule(Speed.class);
                     if (speed.isEnabled()) {
-                        if (!MovementUtils.isMoving()) {
+                        if (!MoveUtil.isMoving()) {
                             mc.thePlayer.jump();
                         }
                     } else {

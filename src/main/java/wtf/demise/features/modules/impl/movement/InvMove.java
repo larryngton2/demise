@@ -14,7 +14,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.utils.player.MovementUtils;
+import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "InvMove", category = ModuleCategory.Movement)
 public class InvMove extends Module {
@@ -53,10 +53,10 @@ public class InvMove extends Module {
             }
 
             if (wdChest.get() && mc.currentScreen instanceof GuiChest)
-                MovementUtils.stopXZ();
+                MoveUtil.stopXZ();
 
             if (wdInv.get() && mc.currentScreen instanceof GuiInventory)
-                MovementUtils.stopXZ();
+                MoveUtil.stopXZ();
 
         }
     }
