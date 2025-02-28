@@ -84,9 +84,7 @@ public class Scaffold extends Module {
     private List<Vec3> placePossibilities = new ArrayList<>();
     private EnumFacingOffset enumFacing;
     private BlockPos blockFace;
-    private int slowTicks;
     private int oldSlot;
-
 
     private float targetYaw, targetPitch, yaw;
     public static float pitch;
@@ -108,15 +106,15 @@ public class Scaffold extends Module {
         } else {
             shouldEnableSpeed = false;
         }
-        slowTicks = 0;
-        slot = mc.thePlayer.inventory.currentItem;
+
+        slot = oldSlot = mc.thePlayer.inventory.currentItem;
 
         if (rotations.is("Pitch Abuse")) {
             targetYaw = mc.thePlayer.rotationYaw;
             targetPitch = 94;
         } else {
-            targetYaw = mc.thePlayer.rotationYaw - 180;
-            targetPitch = 90;
+            targetYaw = MoveUtil.getYawFromKeybind() - 180;
+            targetPitch = 80;
         }
 
         startY = mc.thePlayer.posY;
@@ -419,7 +417,7 @@ public class Scaffold extends Module {
                 }
 
                 case "Normal":
-                    targetYaw = (float) (mc.thePlayer.rotationYaw + 180 - Math.random() * 10);
+                    targetYaw = (float) (MoveUtil.getYawFromKeybind() + 180 - Math.random() * 10);
                     targetPitch = (float) (80 + Math.random() / 100f);
                     break;
 
@@ -427,7 +425,7 @@ public class Scaffold extends Module {
                     targetYaw = rotationss[0];
                     targetPitch = rotationss[1];
                     if (ticksOnAir <= placeDelay.get()) {
-                        targetYaw = (float) (mc.thePlayer.rotationYaw + Math.random());
+                        targetYaw = (float) (MoveUtil.getYawFromKeybind() + Math.random());
                         targetPitch = mc.thePlayer.rotationPitch;
                     }
                     break;
@@ -435,7 +433,7 @@ public class Scaffold extends Module {
                 case "Pitch Abuse":
                     boolean found = false;
 
-                    boolean strict = rayCast.is("Strict");
+                    boolean strict = !rayCast.is("None");
 
                     for (float yaw = mc.thePlayer.rotationYaw; yaw <= mc.thePlayer.rotationYaw + 360 && !found; yaw += 5) {
                         for (float pitch = 120; pitch < 180 && !found; pitch += 1) {
@@ -459,7 +457,7 @@ public class Scaffold extends Module {
                     break;
 
                 case "Reverse":
-                    targetYaw = mc.thePlayer.rotationYaw + 180;
+                    targetYaw = MoveUtil.getYawFromKeybind() + 180;
                     targetPitch = 80;
                     break;
             }
@@ -470,7 +468,9 @@ public class Scaffold extends Module {
 
         if (!rotations.is("Pitch Abuse")) targetPitch = MathHelper.clamp_float(targetPitch, -90, 90);
 
-        RotationUtils.setRotation(new float[]{targetYaw, targetPitch}, movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, rotationSpeed.get(), rotationSpeed.get());
+        float[] finalRot = new float[]{targetYaw, targetPitch};
+
+        RotationUtils.setRotation(finalRot, movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, rotationSpeed.get(), rotationSpeed.get());
     }
 
     public static double getRandomHypixelValues() {
@@ -493,7 +493,6 @@ public class Scaffold extends Module {
         boolean switchedSlot = false;
         if (slot != blockSlot) {
             slot = blockSlot;
-            oldSlot = mc.thePlayer.inventory.currentItem;
             SpoofSlotUtils.startSpoofing(mc.thePlayer.inventory.currentItem);
             mc.thePlayer.inventory.currentItem = slot;
             switchedSlot = true;
@@ -515,10 +514,10 @@ public class Scaffold extends Module {
         boolean normalCheck = movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && movingObjectPosition.getBlockPos().equals(blockFace);
 
         if (!switchedSlot && ticksOnAir > placeDelay.get() + (randomisePlaceDelay.get() && !mc.gameSettings.keyBindJump.isKeyDown() ? Math.random() * 3 : 0)) {
-            if (rayCast.is("Strict") && !strictCheck) return;
+            if (rayCast.is("Legit") && !strictCheck) return;
             if (rayCast.is("Normal") && !normalCheck) return;
 
-            if (!BlockUtil.lookingAtBlock(blockFace, yaw, pitch, enumFacing.getEnumFacing(), rayCast.is("Strict"))) {
+            if (!BlockUtil.lookingAtBlock(blockFace, yaw, pitch, enumFacing.getEnumFacing(), !rayCast.is("None"))) {
                 hitVec.yCoord = Math.random() + blockFace.getY();
                 hitVec.zCoord = Math.random() + blockFace.getZ();
                 hitVec.xCoord = Math.random() + blockFace.getX();
@@ -536,7 +535,6 @@ public class Scaffold extends Module {
                 else PacketUtils.sendPacket(new C0APacketAnimation());
             }
 
-            slowTicks = 3;
             blocksPlaced++;
         } else if (dragClick.get() && Math.random() > 0.5)
             PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(item));
