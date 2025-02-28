@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
-import wtf.demise.features.modules.impl.movement.Scaffold;
+import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
@@ -29,7 +29,7 @@ public class ScaffoldCounter implements InstanceAccess {
             case "normal": {
                 anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
                 if (!scaffold.isEnabled() && anim.isDone()) return;
-                int slot = scaffold.getBlockSlot();
+                int slot = scaffold.slot;
                 ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
                 int count = slot == -1 ? 0 : scaffold.getBlockCount();
                 String countStr = String.valueOf(count);
@@ -98,8 +98,8 @@ public class ScaffoldCounter implements InstanceAccess {
         switch (scaffold.counter.get().toLowerCase()) {
             case "normal": {
                 anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                //if (!scaffold.isEnabled() && anim.isDone()) return;
-                int slot = scaffold.getBlockSlot();
+                if (!scaffold.isEnabled() && anim.isDone()) return;
+                int slot = scaffold.slot;
                 ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
                 int count = slot == -1 ? 0 : scaffold.getBlockCount();
                 String countStr = String.valueOf(count);

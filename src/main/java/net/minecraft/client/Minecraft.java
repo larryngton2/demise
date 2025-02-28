@@ -775,6 +775,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         long i = System.nanoTime();
         this.mcProfiler.startSection("root");
 
+        Demise.INSTANCE.getEventManager().call(new GameEvent());
+
         if (Display.isCreated() && Display.isCloseRequested()) {
             this.shutdown();
         }
@@ -800,8 +802,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.mcProfiler.startSection("tick");
 
         TickBase tickBase = Demise.INSTANCE.getModuleManager().getModule(TickBase.class);
-
-        Demise.INSTANCE.getEventManager().call(new GameEvent());
 
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
             if (tickBase.handleTick()) {

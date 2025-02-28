@@ -35,8 +35,11 @@ import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.EnumFacingOffset;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 

@@ -21,7 +21,6 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.movement.Scaffold;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -81,7 +80,7 @@ public class BedNuker extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
-        if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).data == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
+        if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && getModule(Scaffold.class).targetBlock == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
             reset(true);
             return;
         }

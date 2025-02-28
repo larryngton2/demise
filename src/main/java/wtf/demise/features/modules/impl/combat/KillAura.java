@@ -13,6 +13,7 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -55,7 +56,7 @@ public class KillAura extends Module {
     // attack
     private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
     private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
-    private final BoolValue noSwing = new BoolValue("No swing", false, this, () -> Objects.equals(clickMode.get(), "Packet"));
+    private final ModeValue swingMode = new ModeValue("Swing mode", new String[]{"Normal", "Client", "Server"}, "Normal", this, () -> clickMode.is("Packet"));
     private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
     private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
     private final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
@@ -63,7 +64,7 @@ public class KillAura extends Module {
     private final SliderValue clicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
     private final BoolValue rayCast = new BoolValue("RayCast", false, this);
     private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
-    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, failSwing::get);
+    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
 
     // autoBlock
     private final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
@@ -451,8 +452,13 @@ public class KillAura extends Module {
         if (failSwing.get() && failSwing.canDisplay()) {
             switch (clickMode.get()) {
                 case "Packet":
-                    if (!noSwing.get()) {
-                        AttackOrder.sendConditionalSwing(movingObjectPosition);
+                    switch (swingMode.get()) {
+                        case "Normal", "Client":
+                            AttackOrder.sendConditionalSwing(movingObjectPosition);
+                            break;
+                        case "Server":
+                            sendPacketNoEvent(new C0APacketAnimation());
+                            break;
                     }
                     break;
                 case "Legit":
@@ -538,14 +544,24 @@ public class KillAura extends Module {
                         case "Packet":
                             if (clickMode.get().equals("Packet")) {
                                 if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                                    if (!noSwing.get()) {
-                                        mc.thePlayer.swingItem();
+                                    switch (swingMode.get()) {
+                                        case "Normal", "Client":
+                                            mc.thePlayer.swingItem();
+                                            break;
+                                        case "Server":
+                                            sendPacketNoEvent(new C0APacketAnimation());
+                                            break;
                                     }
                                     PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
                                 } else {
                                     PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
-                                    if (!noSwing.get()) {
-                                        mc.thePlayer.swingItem();
+                                    switch (swingMode.get()) {
+                                        case "Normal", "Client":
+                                            mc.thePlayer.swingItem();
+                                            break;
+                                        case "Server":
+                                            sendPacketNoEvent(new C0APacketAnimation());
+                                            break;
                                     }
                                 }
                             }
@@ -564,14 +580,24 @@ public class KillAura extends Module {
                         break;
                     case "Packet":
                         if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                            if (!noSwing.get()) {
-                                mc.thePlayer.swingItem();
+                            switch (swingMode.get()) {
+                                case "Normal", "Client":
+                                    mc.thePlayer.swingItem();
+                                    break;
+                                case "Server":
+                                    sendPacketNoEvent(new C0APacketAnimation());
+                                    break;
                             }
                             PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
                         } else {
                             PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
-                            if (!noSwing.get()) {
-                                mc.thePlayer.swingItem();
+                            switch (swingMode.get()) {
+                                case "Normal", "Client":
+                                    mc.thePlayer.swingItem();
+                                    break;
+                                case "Server":
+                                    sendPacketNoEvent(new C0APacketAnimation());
+                                    break;
                             }
                         }
                         break;
@@ -614,6 +640,14 @@ public class KillAura extends Module {
             PingSpoofComponent.blink();
         } else {
             PingSpoofComponent.dispatch();
+        }
+
+        if (e.getState() == PacketEvent.State.OUTGOING) {
+            if (swingMode.is("Client")) {
+                if (e.getPacket() instanceof C0APacketAnimation) {
+                    e.setCancelled(true);
+                }
+            }
         }
     }
 

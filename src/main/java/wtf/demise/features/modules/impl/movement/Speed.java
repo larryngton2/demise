@@ -132,9 +132,6 @@ public class Speed extends Module {
 
                 if (mc.thePlayer.hurtTime == 0) {
                     switch (mc.thePlayer.offGroundTicks) {
-                        case 4:
-                            MoveUtil.strafe();
-                            break;
                         case 10:
                             MoveUtil.strafe();
                             mc.thePlayer.motionY -= 0.44;

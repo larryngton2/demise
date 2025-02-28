@@ -97,7 +97,6 @@ public class ModuleManager {
                 Step.class,
                 Strafe.class,
                 Fly.class,
-                Scaffold.class,
                 Phase.class,
                 Sneak.class,
                 MotionModifier.class,
@@ -113,6 +112,7 @@ public class ModuleManager {
                 NoRot.class,
                 FastUse.class,
                 FastBreak.class,
+                Scaffold.class,
 
                 // Visual
                 Atmosphere.class,
