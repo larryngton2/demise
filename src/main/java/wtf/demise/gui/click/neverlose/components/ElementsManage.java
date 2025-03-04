@@ -40,8 +40,8 @@ public class ElementsManage extends Component {
         posX = INSTANCE.getNeverLose().espPreviewComponent.getPosX();
         posY = INSTANCE.getNeverLose().espPreviewComponent.getPosY();
         //anim
-        hover.setDirection(MouseUtils.isHovered2(posX + INSTANCE.getNeverLose().getWidth() + 70, posY + INSTANCE.getNeverLose().getHeight() - 27.5f, 85, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover2.setDirection(MouseUtils.isHovered2(posX + INSTANCE.getNeverLose().getWidth() + 195.5f, (float) (posY + INSTANCE.getNeverLose().getHeight() - 183.5f * open.getOutput()), 10, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered(posX + INSTANCE.getNeverLose().getWidth() + 70, posY + INSTANCE.getNeverLose().getHeight() - 27.5f, 85, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover2.setDirection(MouseUtils.isHovered(posX + INSTANCE.getNeverLose().getWidth() + 195.5f, (float) (posY + INSTANCE.getNeverLose().getHeight() - 183.5f * open.getOutput()), 10, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         open.setDirection(opened ? Direction.FORWARDS : Direction.BACKWARDS);
         //render
         if (open.getOutput() < 0.1) {
@@ -85,9 +85,9 @@ public class ElementsManage extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(posX + INSTANCE.getNeverLose().getWidth() + 70, posY + INSTANCE.getNeverLose().getHeight() - 27.5f, 85, 10, mouseX, mouseY)) {
+        if (MouseUtils.isHovered(posX + INSTANCE.getNeverLose().getWidth() + 70, posY + INSTANCE.getNeverLose().getHeight() - 27.5f, 85, 10, mouseX, mouseY)) {
             opened = true;
-        } else if (MouseUtils.isHovered2(posX + INSTANCE.getNeverLose().getWidth() + 195.5f, (float) (posY + INSTANCE.getNeverLose().getHeight() - 183.5f * open.getOutput()), 10, 10, mouseX, mouseY)) {
+        } else if (MouseUtils.isHovered(posX + INSTANCE.getNeverLose().getWidth() + 195.5f, (float) (posY + INSTANCE.getNeverLose().getHeight() - 183.5f * open.getOutput()), 10, 10, mouseX, mouseY)) {
             opened = false;
         }
         if (opened) {
@@ -99,7 +99,7 @@ public class ElementsManage extends Component {
                         yOffset += 14;
                         xOffset = 0;
                     }
-                    if (MouseUtils.isHovered2(posX + INSTANCE.getNeverLose().getWidth() + 20 + xOffset, (float) (posY + INSTANCE.getNeverLose().getHeight() - 184 * open.getOutput()) + yOffset, currentWidth, 12, mouseX, mouseY)) {
+                    if (MouseUtils.isHovered(posX + INSTANCE.getNeverLose().getWidth() + 20 + xOffset, (float) (posY + INSTANCE.getNeverLose().getHeight() - 184 * open.getOutput()) + yOffset, currentWidth, 12, mouseX, mouseY)) {
                         boolValue.set(!boolValue.get());
                     }
                     //RoundedUtils.drawRoundOutline(posX + INSTANCE.getNeverLose().getWidth() + 20 + xOffset, (float) (posY + INSTANCE.getNeverLose().getHeight() - 184 * open.getOutput()) + yOffset,currentWidth,12,2,0.1f,bgColor,new Color(0x00BBFF).darker().darker().darker().darker().darker());

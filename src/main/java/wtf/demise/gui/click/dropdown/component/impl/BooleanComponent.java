@@ -35,7 +35,7 @@ public class BooleanComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + getWidth() - 17.5f, getY() + 2.5f, 12.5f, 5, mouseX, mouseY) && mouseButton == 0)
+        if (MouseUtils.isHovered(getX() + getWidth() - 17.5f, getY() + 2.5f, 12.5f, 5, mouseX, mouseY) && mouseButton == 0)
             this.setting.set(!this.setting.get());
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }

@@ -76,7 +76,7 @@ public abstract class Widget implements InstanceAccess {
     }
 
     public final void onChatGUI(int mouseX, int mouseY, boolean drag) {
-        boolean hovering = MouseUtils.isHovered2(renderX, renderY, width, height, mouseX, mouseY);
+        boolean hovering = MouseUtils.isHovered(renderX, renderY, width, height, mouseX, mouseY);
 
         if (dragging) {
             RoundedUtils.drawRoundOutline(renderX, renderY, width, height, 2f, 0.05f, new Color(0, 0, 0, 0), Color.WHITE);

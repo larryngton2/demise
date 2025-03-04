@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
-import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.Demise;
 import wtf.demise.gui.button.MenuButton;
 import wtf.demise.gui.font.Fonts;
@@ -18,8 +17,8 @@ public class GuiMainMenu extends GuiScreen {
             new MenuButton("Singleplayer"),
             new MenuButton("Multiplayer"),
             new MenuButton("Alt Manager"),
-            new MenuButton("Options"),
-            new MenuButton("Shutdown"));
+            new MenuButton("Options")
+    );
 
     @Override
     public void initGui() {
@@ -30,13 +29,13 @@ public class GuiMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
 
-        float buttonWidth = 140;
+        float buttonWidth = 130;
         float buttonHeight = 25;
 
         int count = 20;
 
         Fonts.interBold.get(35).drawCenteredStringWithShadow(Demise.INSTANCE.getClientName(), (width / 2f - buttonWidth / 2f) + buttonWidth / 2, (height / 2f) + count - (buttons.size() * buttonHeight) / 2f, -1);
-        Fonts.interMedium.get(14).drawStringWithShadow("Welcome back, " + EnumChatFormatting.AQUA + Demise.INSTANCE.getDiscordRP().getName(), width - (2 + Fonts.interMedium.get(14).getStringWidth("Welcome back, " + Demise.INSTANCE.getDiscordRP().getName())), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
+        //Fonts.interMedium.get(14).drawStringWithShadow("Welcome back, " + EnumChatFormatting.AQUA + Demise.INSTANCE.getDiscordRP().getName(), width - (2 + Fonts.interMedium.get(14).getStringWidth("Welcome back, " + Demise.INSTANCE.getDiscordRP().getName())), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
 
         for (MenuButton button : buttons) {
             button.x = width / 2f - buttonWidth / 2f;
@@ -49,11 +48,11 @@ public class GuiMainMenu extends GuiScreen {
                     case "Multiplayer" -> mc.displayGuiScreen(new GuiMultiplayer(this));
                     case "Alt Manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
                     case "Options" -> mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
-                    case "Shutdown" -> mc.shutdown();
                 }
             };
+
             button.drawScreen(mouseX, mouseY);
-            count += (int) (buttonHeight + 3);
+            count += (int) (buttonHeight + 4);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

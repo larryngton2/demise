@@ -45,7 +45,7 @@ public class Velocity extends Module {
     private final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && intaveMode.is("Reduce")));
     private final BoolValue debug = new BoolValue("Debug", false, this, () -> Objects.equals(mode.get(), "Intave") && intaveMode.is("Test"));
     private final SliderValue packets = new SliderValue("Packets", 5, 1, 20, 1, this, () -> Objects.equals(mode.get(), "Legit packet"));
-    private final SliderValue ticks = new SliderValue("Ticks", 0, 0, 6, 1, this);
+    private final SliderValue ticks = new SliderValue("Ticks", 0, 0, 6, 1, this, () -> mode.is("ReStrafe"));
     private final BoolValue onSwing = new BoolValue("On swing", false, this);
 
     private double iFactor = 0.0;

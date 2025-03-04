@@ -150,7 +150,7 @@ public class NeverLose extends GuiScreen {
         Fonts.interSemiBold.get(14).drawString("Visuals", posX + 14, posY + 212, Color.GRAY.getRGB());
         Fonts.interSemiBold.get(14).drawString("Presets", posX + 14, posY + 249, Color.GRAY.getRGB());
         //search
-        hover.setDirection(MouseUtils.isHovered2(posX + width - 20, posY + 18, 10, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered(posX + width - 20, posY + 18, 10, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         if (!panels.get(8).isSelected()) {
             if (!panels.get(7).isSelected()) {
                 Fonts.neverlose.get(20).drawString("j", posX + width - 20, posY + 21, ColorUtils.interpolateColor2(new Color(textRGB), new Color(textRGB).darker().darker(), (float) hover.getOutput()));
@@ -201,7 +201,7 @@ public class NeverLose extends GuiScreen {
                     break;
                 }
             }
-            if (MouseUtils.isHovered2(posX, posY, 136, 42, mouseX, mouseY)) {
+            if (MouseUtils.isHovered(posX, posY, 136, 42, mouseX, mouseY)) {
                 dragging = true;
                 dragX = posX - mouseX;
                 dragY = posY - mouseY;
@@ -210,7 +210,7 @@ public class NeverLose extends GuiScreen {
         Panel selected = getSelected();
         if (selected != null) {
             espPreviewComponent.mouseClicked(mouseX, mouseY, mouseButton);
-            if (!selected.getCategory().getName().equals("Search") && !selected.getCategory().getName().equals("Configs") && !MouseUtils.isHovered2(getPosX() + 140, getPosY() + 49, 380, 368, mouseX, mouseY))
+            if (!selected.getCategory().getName().equals("Search") && !selected.getCategory().getName().equals("Configs") && !MouseUtils.isHovered(getPosX() + 140, getPosY() + 49, 380, 368, mouseX, mouseY))
                 return;
             selected.mouseClicked(mouseX, mouseY, mouseButton);
         }
@@ -218,7 +218,7 @@ public class NeverLose extends GuiScreen {
     }
 
     private boolean handleSearchPanel(Panel panel, int mouseX, int mouseY) {
-        if (panel.getCategory() == ModuleCategory.Search && !panels.get(8).isSelected() && MouseUtils.isHovered2(posX + width - 20, posY + 18, 10, 10, mouseX, mouseY)) {
+        if (panel.getCategory() == ModuleCategory.Search && !panels.get(8).isSelected() && MouseUtils.isHovered(posX + width - 20, posY + 18, 10, 10, mouseX, mouseY)) {
             if (!panel.isSelected()) {
                 for (Panel p : panels) {
                     p.setSelected(false);
@@ -236,7 +236,7 @@ public class NeverLose extends GuiScreen {
     }
 
     private boolean handleCategoryPanel(Panel panel, int mouseX, int mouseY) {
-        if (panel.getCategory() != ModuleCategory.Search && MouseUtils.isHovered2(posX + 8, panel.getCategory().ordinal() >= 7 ? posY + 92 + panel.getCategory().ordinal() * 24 : panel.getCategory().ordinal() >= 6 ? posY + 78 + panel.getCategory().ordinal() * 24 : panel.getCategory().ordinal() >= 2 ? posY + 65 + panel.getCategory().ordinal() * 24
+        if (panel.getCategory() != ModuleCategory.Search && MouseUtils.isHovered(posX + 8, panel.getCategory().ordinal() >= 7 ? posY + 92 + panel.getCategory().ordinal() * 24 : panel.getCategory().ordinal() >= 6 ? posY + 78 + panel.getCategory().ordinal() * 24 : panel.getCategory().ordinal() >= 2 ? posY + 65 + panel.getCategory().ordinal() * 24
                 : posY + 52 + panel.getCategory().ordinal() * 24, 120, 19, mouseX, mouseY)) {
             for (Panel p : panels) {
                 p.setSelected(false);

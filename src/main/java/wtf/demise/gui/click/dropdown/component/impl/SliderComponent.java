@@ -46,7 +46,7 @@ public class SliderComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (mouseButton == 0 && MouseUtils.isHovered2(getX() + 2, getY() + Fonts.interRegular.get(15).getHeight() + 2, getWidth(), 2, mouseX, mouseY))
+        if (mouseButton == 0 && MouseUtils.isHovered(getX() + 2, getY() + Fonts.interRegular.get(15).getHeight() + 2, getWidth(), 2, mouseX, mouseY))
             dragging = true;
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }

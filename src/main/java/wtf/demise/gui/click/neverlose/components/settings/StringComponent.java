@@ -50,7 +50,7 @@ public class StringComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + 94, getY() + 13, 80, 16, mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered(getX() + 94, getY() + 13, 80, 16, mouseX, mouseY) && mouseButton == 0) {
             inputting = !inputting;
         } else {
             inputting = false;

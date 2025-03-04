@@ -29,7 +29,7 @@ public class BooleanComponent extends Component {
     @Override
     public void drawScreen(int mouseX, int mouseY) {
         enabled.setDirection(setting.get() ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover.setDirection(MouseUtils.isHovered2(getX() + 154, getY() + 16, 20, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered(getX() + 154, getY() + 16, 20, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         RoundedUtils.drawRound(getX() + 4, getY() + 10, 172, .5f, 4, lineColor2);
 
         Fonts.interSemiBold.get(17).drawString(setting.getName(), getX() + 6, getY() + 20, ColorUtils.interpolateColor2(Color.WHITE.darker().darker(), Color.WHITE, (float) enabled.getOutput()));
@@ -42,7 +42,7 @@ public class BooleanComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + 154, getY() + 16, 20, 10, mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered(getX() + 154, getY() + 16, 20, 10, mouseX, mouseY) && mouseButton == 0) {
             setting.toggle();
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);

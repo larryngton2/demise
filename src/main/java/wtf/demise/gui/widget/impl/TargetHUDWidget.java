@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
-import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.ModeValue;
@@ -36,10 +35,10 @@ public class TargetHUDWidget extends Widget {
         int count = 0;
         float lastTargetWidth = 0;
         for (EntityPlayer target : setting.animationEntityPlayerMap.keySet()) {
+            if (count > 1) continue;
             this.height = getTHUDHeight();
             float currentTargetWidth = getTHUDWidth(target);
             this.width = currentTargetWidth;
-            if (count > 9) continue;
             TargetHUD targetHUD = new TargetHUD((float) (renderX + ((count % 3) * (lastTargetWidth + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), (float) (this.renderY + ((count / 3) * (this.height + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), target, setting.animationEntityPlayerMap.get(target), false, setting.targetHudMode);
             targetHUD.render();
             lastTargetWidth = currentTargetWidth;
@@ -52,10 +51,10 @@ public class TargetHUDWidget extends Widget {
         int count = 0;
         float lastTargetWidth = 0;
         for (EntityPlayer target : setting.animationEntityPlayerMap.keySet()) {
+            if (count > 1) continue;
             this.height = getTHUDHeight();
             float currentTargetWidth = getTHUDWidth(target);
             this.width = currentTargetWidth;
-            if (count > 9) continue;
             TargetHUD targetHUD = new TargetHUD((float) (renderX + ((count % 3) * (lastTargetWidth + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), (float) (this.renderY + ((count / 3) * (this.height + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), target, setting.animationEntityPlayerMap.get(target), true, setting.targetHudMode);
             targetHUD.render();
             lastTargetWidth = currentTargetWidth;

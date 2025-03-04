@@ -10,7 +10,6 @@ public enum Direction {
         } else return Direction.FORWARDS;
     }
 
-
     public boolean forwards() {
         return this == Direction.FORWARDS;
     }

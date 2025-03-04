@@ -3,10 +3,12 @@ package wtf.demise.utils.player;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
+import org.lwjglx.util.vector.Vector2f;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
@@ -15,6 +17,7 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 
 import java.util.Objects;
 
@@ -96,7 +99,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float steepness, float midpoint) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float midpoint) {
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -105,8 +108,8 @@ public class RotationUtils implements InstanceAccess {
                 case Lerp:
                     RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
                     break;
-                case Sigmoid:
-                    RotationUtils.currentRotation = smoothSigmoid(serverRotation, rotation, hSpeed, vSpeed, steepness, midpoint);
+                case Bezier:
+                    RotationUtils.currentRotation = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint);
                     break;
             }
         } else {
@@ -119,9 +122,9 @@ public class RotationUtils implements InstanceAccess {
                     mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
                     mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
                     break;
-                case Sigmoid:
-                    mc.thePlayer.rotationYaw = smoothSigmoid(serverRotation, rotation, hSpeed, vSpeed, steepness, midpoint)[0];
-                    mc.thePlayer.rotationPitch = smoothSigmoid(serverRotation, rotation, hSpeed, vSpeed, steepness, midpoint)[1];
+                case Bezier:
+                    mc.thePlayer.rotationYaw = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint)[0];
+                    mc.thePlayer.rotationPitch = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint)[1];
                     break;
             }
         }
@@ -254,32 +257,34 @@ public class RotationUtils implements InstanceAccess {
         return applyGCDFix(currentRotation, finalTargetRotation);
     }
 
-    public static float[] smoothCorrelation(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float correlationThreshold) {
+    public static float[] smoothBezier(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float midpoint) {
         float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
         float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
         double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
 
-        float correlation = calculateCorrelation(currentRotation, targetRotation);
-
-        float smoothingFactor = (correlation > correlationThreshold) ? correlation : 0.1f;
-
-        float straightLineYaw = (float) (Math.abs(yawDifference / rotationDifference) * hSpeed * smoothingFactor);
-        float straightLinePitch = (float) (Math.abs(pitchDifference / rotationDifference) * vSpeed * smoothingFactor);
+        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * hSpeed);
+        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * vSpeed);
 
         float[] finalTargetRotation = new float[]{
                 currentRotation[0] + Math.max(-straightLineYaw, Math.min(straightLineYaw, yawDifference)),
                 currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
         };
 
-        return applyGCDFix(currentRotation, finalTargetRotation);
-    }
+        float yawDirection = yawDifference / (float) rotationDifference;
+        float pitchDirection = pitchDifference / (float) rotationDifference;
 
-    private static float calculateCorrelation(float[] currentRotation, float[] targetRotation) {
-        float yawCorrelation = 1 - abs(getAngleDifference(targetRotation[0], currentRotation[0])) / 180.0f;
-        float pitchCorrelation = 1 - abs(getAngleDifference(targetRotation[1], currentRotation[1])) / 180.0f;
+        float controlYaw = currentRotation[0] + yawDirection * midpoint * (float) rotationDifference;
+        float controlPitch = currentRotation[1] + pitchDirection * midpoint * (float) rotationDifference;
 
-        return (yawCorrelation + pitchCorrelation) / 2.0f;
+        float[] t = new float[]{hSpeed / 180, vSpeed / 180};
+
+        float finalYaw = (1 - t[0]) * (1 - t[0]) * currentRotation[0] + 2 * (1 - t[0]) * t[0] * controlYaw + t[0] * t[0] * finalTargetRotation[0];
+        float finalPitch = (1 - t[1]) * (1 - t[1]) * currentRotation[1] + 2 * (1 - t[1]) * t[1] * controlPitch + t[1] * t[1] * finalTargetRotation[1];
+
+        float[] finalRotation = new float[]{finalYaw, finalPitch};
+
+        return applyGCDFix(currentRotation, finalRotation);
     }
 
     public static float[] smoothLerp(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
@@ -292,34 +297,6 @@ public class RotationUtils implements InstanceAccess {
         float[] finalTargetRotation = new float[]{newYaw, newPitch};
 
         return applyGCDFix(currentRotation, finalTargetRotation);
-    }
-
-    public static float[] smoothSigmoid(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float steepness, float midpoint) {
-        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
-
-        double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
-
-        float factorH = computeSigmoidFactor(rotationDifference, hSpeed, steepness, midpoint);
-        float factorV = computeSigmoidFactor(rotationDifference, vSpeed, steepness, midpoint);
-
-        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * factorH);
-        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * factorV);
-
-        float[] finalTargetRotation = new float[]{
-                currentRotation[0] + Math.max(-straightLineYaw, Math.min(straightLineYaw, yawDifference)),
-                currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
-        };
-
-        return applyGCDFix(currentRotation, finalTargetRotation);
-    }
-
-    private static float computeSigmoidFactor(double rotationDifference, float speed, float steepness, float midpoint) {
-        float scaledDifference = (float) (rotationDifference / 120f);
-        double sigmoid = 1 / (1 + Math.exp(-steepness * (scaledDifference - midpoint)));
-        double interpolatedSpeed = sigmoid * speed;
-
-        return (float) Math.max(0, Math.min(interpolatedSpeed, 180f));
     }
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
@@ -501,7 +478,7 @@ public class RotationUtils implements InstanceAccess {
         return MathHelper.wrapAngleTo180_float(a - b);
     }
 
-    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize,float gravity,float velocity) {
+    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize, float gravity, float velocity) {
         EntityPlayerSP player = mc.thePlayer;
 
         double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (player.posX + (predict ? player.posX - player.prevPosX : 0.0));
@@ -525,6 +502,6 @@ public class RotationUtils implements InstanceAccess {
         float gravity = 0.03f;
         float velocity = 0;
 
-        return faceTrajectory(target,predict,predictSize,gravity,velocity);
+        return faceTrajectory(target, predict, predictSize, gravity, velocity);
     }
 }

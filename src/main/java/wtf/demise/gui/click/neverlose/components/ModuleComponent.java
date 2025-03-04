@@ -67,7 +67,7 @@ public class ModuleComponent extends Component {
         RoundedUtils.drawRoundOutline(getX(), y + 10, getWidth() / 2, getHeight(), 4, 0.1f, bgColor4, outlineColor);
         //enable
         enabled.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover.setDirection(MouseUtils.isHovered2(getX() + 154, y + 16, 20, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered(getX() + 154, y + 16, 20, 10, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         Fonts.interSemiBold.get(18).drawString("Enabled", getX() + 6, y + 18, textRGB);
         RoundedUtils.drawRound(getX() + 154, y + 16, 20, 10, 4, new Color(ColorUtils.interpolateColor2(new Color(ColorUtils.interpolateColor2(boolBgColor, boolBgColor2, (float) enabled.getOutput())),
                 new Color(ColorUtils.interpolateColor2(boolBgColor, boolBgColor2, (float) enabled.getOutput())).brighter().brighter(), (float) hover.getOutput())));
@@ -88,7 +88,7 @@ public class ModuleComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + 154, getY() + scroll + 22, 20, 10, mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered(getX() + 154, getY() + scroll + 22, 20, 10, mouseX, mouseY) && mouseButton == 0) {
             module.toggle();
         }
         for (Component component : components) {

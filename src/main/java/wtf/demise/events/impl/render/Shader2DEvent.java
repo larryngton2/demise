@@ -7,7 +7,6 @@ import wtf.demise.events.impl.Event;
 @Getter
 @Setter
 public class Shader2DEvent implements Event {
-
     private ShaderType shaderType;
 
     public Shader2DEvent(ShaderType shaderType) {

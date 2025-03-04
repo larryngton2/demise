@@ -26,6 +26,7 @@ public class FakeLag extends Module {
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
+    private final BoolValue teamCheck = new BoolValue("Team check", false, this);
 
     private boolean blinking = false, picked = false;
     private final TimerUtils delay = new TimerUtils();
@@ -42,7 +43,7 @@ public class FakeLag extends Module {
     public void onUpdate(UpdateEvent e) {
         this.setTag(delayMin.get() + " - " + delayMax.get());
 
-        target = PlayerUtils.getTarget(maxRange.get() + 1);
+        target = PlayerUtils.getTarget(maxRange.get() + 1, teamCheck.get());
 
         double ms = MathUtils.randomizeDouble(delayMin.get(), delayMax.get());
 
@@ -66,11 +67,11 @@ public class FakeLag extends Module {
                 BlinkComponent.blinking = true;
                 ever.reset();
             } else {
-                BlinkComponent.dispatch();
+                BlinkComponent.dispatch(true);
                 picked = false;
             }
         } else {
-            BlinkComponent.dispatch();
+            BlinkComponent.dispatch(true);
             picked = false;
             if (delay.hasTimeElapsed(ms) && blinking) {
                 blinking = false;

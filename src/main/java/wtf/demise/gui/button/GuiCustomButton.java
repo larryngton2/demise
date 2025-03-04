@@ -56,7 +56,7 @@ public class GuiCustomButton extends GuiButton {
     @Override
     public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 
-        boolean hovered = MouseUtils.isHovered2(xPosition, yPosition, width, height, mouseX, mouseY);
+        boolean hovered = MouseUtils.isHovered(xPosition, yPosition, width, height, mouseX, mouseY);
         hoverAnimation.setDirection(hovered ? Direction.FORWARDS : Direction.BACKWARDS);
         Color rectColor = new Color(0, 0, 0, 128);
         RoundedUtils.drawRound(xPosition, yPosition, width, height, radius, rectColor);

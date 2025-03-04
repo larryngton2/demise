@@ -57,7 +57,7 @@ public class ModeComponent extends Component {
                 offset = 0;
                 heightoff += 8;
             }
-            if (MouseUtils.isHovered2(getX() + offset + 8, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff, Fonts.interRegular.get(13).getStringWidth(text), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
+            if (MouseUtils.isHovered(getX() + offset + 8, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff, Fonts.interRegular.get(13).getStringWidth(text), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
                 setting.set(text);
             }
             offset += off;

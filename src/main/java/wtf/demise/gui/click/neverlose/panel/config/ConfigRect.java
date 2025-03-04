@@ -39,7 +39,7 @@ public class ConfigRect extends Component {
         //coordinate
         float y = getPosY() + scroll;
         //anim
-        hover.setDirection(MouseUtils.isHovered2(getPosX() + 290, y + 20, 60, 18, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered(getPosX() + 290, y + 20, 60, 18, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         select.setDirection(selected ? Direction.FORWARDS : Direction.BACKWARDS);
         //render
         String name = config.getName().replace(".json", "") + (Demise.INSTANCE.getConfigManager().getCurrentConfig().equals(config.getName()) ? " (Current Config)" : "");
@@ -54,7 +54,7 @@ public class ConfigRect extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getPosX() + 290, getPosY() + scroll + 20, 60, 18, mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered(getPosX() + 290, getPosY() + scroll + 20, 60, 18, mouseX, mouseY) && mouseButton == 0) {
             config.saveConfig();
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -75,6 +75,6 @@ public class ConfigRect extends Component {
     }
 
     public boolean isHovered(int mouseX, int mouseY) {
-        return MouseUtils.isHovered2(getPosX(), getPosY() + scroll + 10, 358, getHeight(), mouseX, mouseY);
+        return MouseUtils.isHovered(getPosX(), getPosY() + scroll + 10, 358, getHeight(), mouseX, mouseY);
     }
 }

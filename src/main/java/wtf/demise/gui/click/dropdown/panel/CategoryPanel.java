@@ -72,7 +72,7 @@ public class CategoryPanel implements IComponent {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(x, y - 2, width, 19, mouseX, mouseY)) {
+        if (MouseUtils.isHovered(x, y - 2, width, 19, mouseX, mouseY)) {
             switch (mouseButton) {
                 case 0 -> {
                     dragging = true;
@@ -82,7 +82,7 @@ public class CategoryPanel implements IComponent {
                 case 1 -> opened = !opened;
             }
         }
-        if (opened && !MouseUtils.isHovered2(x, y - 2, width, 19, mouseX, mouseY)) {
+        if (opened && !MouseUtils.isHovered(x, y - 2, width, 19, mouseX, mouseY)) {
             moduleComponents.forEach(component -> component.mouseClicked(mouseX, mouseY, mouseButton));
         }
         IComponent.super.mouseClicked(mouseX, mouseY, mouseButton);

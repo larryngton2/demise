@@ -36,8 +36,8 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PacketUtils;
-import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -50,8 +50,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class KillAura extends Module {
 
     // reach
-    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.01f, this);
-    private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.01f, this);
+    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
+    private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
 
     // attack
     private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
@@ -68,7 +68,7 @@ public class KillAura extends Module {
 
     // autoBlock
     private final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
-    private final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.01f, this, autoBlock::get);
+    private final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
     private final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink"}, "Vanilla", this, autoBlock::get);
     private final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
 
@@ -81,20 +81,21 @@ public class KillAura extends Module {
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue steepness = new SliderValue("Steepness", 10, 0, 20, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Sigmoid"));
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Sigmoid"));
+    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier"));
     private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
     private final BoolValue delayed = new BoolValue("Delayed target pos", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
-    private final BoolValue smartDelay = new BoolValue("Smart delay", true, this, () -> delayed.get() && delayed.canDisplay());
+    private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
+    private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
     private final BoolValue predict = new BoolValue("Rotation prediction", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 0, 3, 1, this, () -> predict.get() && predict.canDisplay());
     private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay() && predictTicks.get() != 0);
 
     // offset
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue iHurtTime = new SliderValue("Intave hurtTime", 5, 1, 10, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Intave"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
@@ -130,12 +131,11 @@ public class KillAura extends Module {
     private Vec3 positionOnPlayer, lastPositionOnPlayer;
     public static Entity currentTarget = null;
     public static boolean isBlocking = false;
-    private boolean blink = false;
     private int blockTicks = 0;
+    private Vec3 targetVec;
     public Vec3 currentVec;
     private double lastPitchOffset;
     private boolean pause;
-    private Vec3 targetVec;
     private double lastYawOffset;
 
     @Override
@@ -149,7 +149,6 @@ public class KillAura extends Module {
         if (isBlocking) {
             setBlocking(false);
         }
-        blink = false;
         currentTarget = null;
         targets.clear();
         predictProcesses.clear();
@@ -266,11 +265,11 @@ public class KillAura extends Module {
                         SmoothMode.Lerp
                 );
                 break;
-            case Sigmoid:
+            case Bezier:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
                         MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
                         MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                        SmoothMode.Sigmoid, steepness.get(), midpoint.get()
+                        SmoothMode.Bezier, midpoint.get()
                 );
                 break;
         }
@@ -636,14 +635,8 @@ public class KillAura extends Module {
 
     @EventTarget
     public void onSendPacket(PacketEvent e) {
-        if (blink) {
-            PingSpoofComponent.blink();
-        } else {
-            PingSpoofComponent.dispatch();
-        }
-
         if (e.getState() == PacketEvent.State.OUTGOING) {
-            if (swingMode.is("Client")) {
+            if (swingMode.is("Client") && clickMode.is("Packet")) {
                 if (e.getPacket() instanceof C0APacketAnimation) {
                     e.setCancelled(true);
                 }
@@ -679,12 +672,12 @@ public class KillAura extends Module {
 
         switch (blockTicks) {
             case 1:
-                blink = true;
+                BlinkComponent.blinking = true;
                 setBlocking(false);
                 break;
             case 2:
                 setBlocking(true);
-                blink = false;
+                BlinkComponent.dispatch(true);
                 break;
         }
     }
@@ -751,14 +744,18 @@ public class KillAura extends Module {
         }
 
         if (delayed.get()) {
-            if ((smartDelay.get() && entity.hurtTime > 5) || !smartDelay.get()) {
-                positionHistory.add(targetVec);
+            positionHistory.add(targetVec);
 
-                while (positionHistory.size() > delayedTicks.get()) {
-                    positionHistory.poll();
-                }
+            while (positionHistory.size() > delayedTicks.get()) {
+                positionHistory.poll();
+            }
 
-                if (positionHistory.size() >= delayedTicks.get()) {
+            if (positionHistory.size() < delayedTicks.get()) {
+                currentVec = targetVec;
+            }
+
+            if (positionHistory.size() >= delayedTicks.get()) {
+                if ((delayOnHurtTime.get() && entity.hurtTime >= hurtTime.get()) || !delayOnHurtTime.get()) {
                     currentVec = positionHistory.poll();
                 } else {
                     currentVec = targetVec;
@@ -798,12 +795,12 @@ public class KillAura extends Module {
                 }
                 break;
             case "Intave":
-                boolean dynamicCheck = entity.hurtTime >= 7;
+                boolean dynamicCheck = entity.hurtTime > iHurtTime.get();
 
                 double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
                 double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
 
-                double iyawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 6.5 : initialYawFactor;
+                double iyawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
                 double ipitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
 
                 double iyawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * iyawFactor;

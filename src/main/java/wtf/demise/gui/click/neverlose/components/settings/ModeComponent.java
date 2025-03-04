@@ -94,12 +94,12 @@ public class ModeComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouse) {
-        if (MouseUtils.isHovered2(getX() + 94, getY() + 14, 80f, 20, mouseX, mouseY) && mouse == 1) {
+        if (MouseUtils.isHovered(getX() + 94, getY() + 14, 80f, 20, mouseX, mouseY) && mouse == 1) {
             opened = !opened;
         }
         if (opened) {
             for (String str : setting.getModes()) {
-                if (MouseUtils.isHovered2(getX() + 98, ((getY() + 15 + Arrays.asList(setting.getModes()).indexOf(str) * 20) - getHalfTotalHeight()) + getScroll(), 52, 12, mouseX, mouseY) && mouse == 0) {
+                if (MouseUtils.isHovered(getX() + 98, ((getY() + 15 + Arrays.asList(setting.getModes()).indexOf(str) * 20) - getHalfTotalHeight()) + getScroll(), 52, 12, mouseX, mouseY) && mouse == 0) {
                     setting.set(str);
                 }
             }
@@ -113,7 +113,7 @@ public class ModeComponent extends Component {
         float y = (getY() + 12 - halfTotalHeight / 2f) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - halfTotalHeight);
         float visibleHeight = getVisibleHeight();
 
-        if (MouseUtils.isHovered2(getX() + 94,
+        if (MouseUtils.isHovered(getX() + 94,
                 y,
                 80f,
                 visibleHeight, mx, my)) {
@@ -142,7 +142,7 @@ public class ModeComponent extends Component {
 
     @Override
     public boolean isHovered(float mouseX, float mouseY) {
-        return opened && MouseUtils.isHovered2(getX() + 94,
+        return opened && MouseUtils.isHovered(getX() + 94,
                 (getY() + 12 - getHalfTotalHeight()) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - getHalfTotalHeight()),
                 80f,
                 (float) ((getY() + 12 - getSize() * 20 * open.getOutput() / 2f < INSTANCE.getNeverLose().getPosY() + 49 ? MathHelper.clamp_double(getY() + 12 - getHalfTotalHeight() - INSTANCE.getNeverLose().getPosY() + 49, 0, 999) : 122) * open.getOutput()), (int) mouseX, (int) mouseY);

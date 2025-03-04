@@ -96,18 +96,18 @@ public class ColorPickerComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(getX() + 157, getY() + 15f, 14, 14, mouseX, mouseY) && mouseButton == 1) {
+        if (MouseUtils.isHovered(getX() + 157, getY() + 15f, 14, 14, mouseX, mouseY) && mouseButton == 1) {
             opened = !opened;
         }
         if (opened) {
             if (mouseButton == 0) {
-                if (MouseUtils.isHovered2(getX() + 78, getY() + 34, 8, 78, mouseX, mouseY)) {
+                if (MouseUtils.isHovered(getX() + 78, getY() + 34, 8, 78, mouseX, mouseY)) {
                     pickingHue = true;
                 }
-                if (MouseUtils.isHovered2(getX() + 90, getY() + 34, 80, 80, mouseX, mouseY)) {
+                if (MouseUtils.isHovered(getX() + 90, getY() + 34, 80, 80, mouseX, mouseY)) {
                     picking = true;
                 }
-                if (MouseUtils.isHovered2(getX() + 65, getY() + 34, 8, 78, mouseX, mouseY)) {
+                if (MouseUtils.isHovered(getX() + 65, getY() + 34, 8, 78, mouseX, mouseY)) {
                     pickingAlpha = true;
                 }
             }

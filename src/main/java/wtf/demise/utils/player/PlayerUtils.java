@@ -174,14 +174,14 @@ public class PlayerUtils implements InstanceAccess {
         return !mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isEmpty();
     }
 
-    public static EntityPlayer getTarget(double distance) {
+    public static EntityPlayer getTarget(double distance, boolean teamCheck) {
         EntityPlayer target = null;
         if (mc.theWorld == null) {
             return null;
         }
 
         for (EntityPlayer entity : mc.theWorld.playerEntities) {
-            if (isInTeam(entity))
+            if (teamCheck && isInTeam(entity))
                 continue;
 
             if (Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).bots.contains(entity))
@@ -193,6 +193,11 @@ public class PlayerUtils implements InstanceAccess {
                 distance = tempDistance;
             }
         }
+
+        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isEnabled() && KillAura.currentTarget != null) {
+            return (EntityPlayer) KillAura.currentTarget;
+        }
+
         return target;
     }
 

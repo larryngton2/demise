@@ -12,7 +12,6 @@ import wtf.demise.features.command.CommandManager;
 import wtf.demise.features.config.ConfigManager;
 import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
-import wtf.demise.features.modules.impl.visual.ScaffoldCounter;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
 import wtf.demise.gui.click.dropdown.DropdownGUI;
 import wtf.demise.gui.click.neverlose.NeverLose;
@@ -134,7 +133,6 @@ public class Demise {
     }
 
     private void registerEventHandlers() {
-        eventManager.register(new ScaffoldCounter());
         eventManager.register(new RotationUtils());
         eventManager.register(new FallDistanceComponent());
         eventManager.register(new BadPacketsComponent());

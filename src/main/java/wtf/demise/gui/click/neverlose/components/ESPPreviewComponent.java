@@ -69,7 +69,7 @@ public class ESPPreviewComponent extends Component implements InstanceAccess {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(posX + INSTANCE.getNeverLose().getWidth() + 12, posY + 10, 200, INSTANCE.getNeverLose().getHeight() - (INSTANCE.getNeverLose().getHeight() - 20), mouseX, mouseY) && mouseButton == 0 && !elementsManage.opened) {
+        if (MouseUtils.isHovered(posX + INSTANCE.getNeverLose().getWidth() + 12, posY + 10, 200, INSTANCE.getNeverLose().getHeight() - (INSTANCE.getNeverLose().getHeight() - 20), mouseX, mouseY) && mouseButton == 0 && !elementsManage.opened) {
             dragging = true;
             dragX = posX - mouseX;
             dragY = posY - mouseY;

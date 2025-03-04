@@ -357,11 +357,12 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             double reach = 3.0D;
             float expand = 0;
 
-            MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand);
+            MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand, blockReachDistance);
             Demise.INSTANCE.getEventManager().call(mouseOverEvent);
 
             reach = mouseOverEvent.getRange();
             expand = mouseOverEvent.getExpand();
+            blockReachDistance = mouseOverEvent.getBlockRange();
 
             if (mouseOverEvent.getMovingObjectPosition() != null) {
                 this.mc.objectMouseOver = mouseOverEvent.getMovingObjectPosition();
@@ -740,7 +741,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
         this.hurtCameraEffect(partialTicks);
 
-        ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(0);
+        ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(ViewBobbingEvent.State.CameraTransform);
         if (this.mc.gameSettings.viewBobbing && !viewBobbingEvent.isCancelled()) {
             this.setupViewBobbing(partialTicks);
         }
@@ -764,26 +765,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         this.orientCamera(partialTicks);
 
         if (this.debugView) {
-            switch (this.debugViewDirection) {
-                case 0:
-                    GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                    break;
-
-                case 1:
-                    GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                    break;
-
-                case 2:
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                    break;
-
-                case 3:
-                    GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-                    break;
-
-                case 4:
-                    GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
-            }
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
         }
     }
 
@@ -820,7 +802,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 GlStateManager.pushMatrix();
                 this.hurtCameraEffect(p_renderHand_1_);
 
-                ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(1);
+                ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(ViewBobbingEvent.State.Hand1);
                 if (this.mc.gameSettings.viewBobbing && !viewBobbingEvent.isCancelled()) {
                     this.setupViewBobbing(p_renderHand_1_);
                 }
@@ -854,7 +836,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 this.hurtCameraEffect(p_renderHand_1_);
             }
 
-            final ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(2);
+            final ViewBobbingEvent viewBobbingEvent = new ViewBobbingEvent(ViewBobbingEvent.State.Hand2);
             if (this.mc.gameSettings.viewBobbing && !viewBobbingEvent.isCancelled()) {
                 this.setupViewBobbing(p_renderHand_1_);
             }

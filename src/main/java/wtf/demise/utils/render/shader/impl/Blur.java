@@ -16,7 +16,6 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL20.glUniform1fv;
 
 public class Blur implements InstanceAccess {
-
     private static final ShaderUtils gaussianBlur = new ShaderUtils("gaussianBlur");
     private static Framebuffer framebuffer = new Framebuffer(1, 1, false);
 

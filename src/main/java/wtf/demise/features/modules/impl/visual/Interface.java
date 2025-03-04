@@ -30,7 +30,6 @@ import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.player.MoveUtil;
@@ -52,7 +51,6 @@ public class Interface extends Module {
             new BoolValue("Module List", true),
             new BoolValue("Armor", true),
             new BoolValue("Info", true),
-            new BoolValue("Health", false),
             new BoolValue("Potion HUD", true),
             new BoolValue("Target HUD", true),
             new BoolValue("Notification", false),
@@ -63,12 +61,11 @@ public class Interface extends Module {
     public final ModeValue fontMode = new ModeValue("C Fonts Mode", new String[]{"Bold", "Semi Bold", "Regular", "Tahoma"}, "Regular", this, () -> cFont.canDisplay() && cFont.get());
     public final SliderValue fontSize = new SliderValue("Font Size", 17, 10, 25, this, cFont::get);
     public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi"}, "Text", this, () -> elements.isEnabled("Watermark"));
-    public final ModeValue arrayPosition = new ModeValue("Position", new String[]{"Right", "Left"}, "Right", this, () -> elements.isEnabled("Module List"));
     public final SliderValue x = new SliderValue("Module List X", -5, -50, 50, this, () -> elements.isEnabled("Module List"));
     public final SliderValue y = new SliderValue("Module List Y", 5, -50, 50, this, () -> elements.isEnabled("Module List"));
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
-    public final ModeValue outline = new ModeValue("Outline", new String[]{"Right", "Left", "None"}, "None", this, () -> elements.isEnabled("Module List"));
+    public final BoolValue outline = new BoolValue("Outline", false, this, () -> elements.isEnabled("Module List"));
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
     public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Exhi", "Sexy"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
@@ -142,58 +139,6 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Module List")) {
-            int count = 1;
-            int screenWidth = event.getScaledResolution().getScaledWidth();
-            float y = this.y.get();
-            Comparator<Module> sort = (m1, m2) -> {
-                double ab = cFont.get() ? getFr().getStringWidth(m1.getName() + m1.getTag()) : mc.fontRendererObj.getStringWidth(m1.getName() + m1.getTag());
-                double bb = cFont.get() ? getFr().getStringWidth(m2.getName() + m2.getTag()) : mc.fontRendererObj.getStringWidth(m2.getName() + m2.getTag());
-                return Double.compare(bb, ab);
-            };
-
-            ArrayList<Module> enabledMods = new ArrayList<>(INSTANCE.getModuleManager().getModules());
-
-            enabledMods.sort(sort);
-            for (Module module : enabledMods) {
-                if (module.isHidden() || module.getCategory() == ModuleCategory.Visual)
-                    continue;
-                Animation moduleAnimation = module.getAnimation();
-                moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
-                float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
-                float x = (arrayPosition.is("Right") ? screenWidth - moduleWidth - 1.0f : 2) + this.x.get();
-                float alphaAnimation = 1.0f;
-
-                x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
-
-
-                final float leftSide = x - 2f;
-                final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-
-                if (background.get()) {
-                    RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
-                }
-
-                if (outline.is("Left")) {
-                    RenderUtils.drawRect(leftSide - 1, y, 1, bottom, color(count));
-                }
-
-                if (outline.is("Right")) {
-                    RenderUtils.drawRect(x + moduleWidth, y, 1, bottom, color(count));
-                }
-
-                if (cFont.get()) {
-                    getFr().drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), (int) alphaAnimation * 255));
-                } else {
-                    mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), (int) alphaAnimation * 255));
-                }
-
-                y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
-                count -= 2;
-            }
-        }
-
         if (elements.isEnabled("Potion HUD") && potionHudMode.is("Exhi")) {
             ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
             potions.sort(Comparator.comparingDouble(effect -> -mc.fontRendererObj.getStringWidth(I18n.format(Potion.potionTypes[effect.getPotionID()].getName()))));
@@ -239,66 +184,6 @@ public class Interface extends Module {
         if (watemarkMode.get().equals("Text")) {
             if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
                 Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
-            }
-        }
-
-        if (elements.isEnabled("Module List")) {
-            int count = 1;
-            int screenWidth = new ScaledResolution(mc).getScaledWidth();
-            float y = this.y.get();
-            Comparator<Module> sort = (m1, m2) -> {
-                double ab = cFont.get() ? getFr().getStringWidth(m1.getName() + m1.getTag()) : mc.fontRendererObj.getStringWidth(m1.getName() + m1.getTag());
-                double bb = cFont.get() ? getFr().getStringWidth(m2.getName() + m2.getTag()) : mc.fontRendererObj.getStringWidth(m2.getName() + m2.getTag());
-                return Double.compare(bb, ab);
-            };
-            ArrayList<Module> enabledMods = new ArrayList<>(INSTANCE.getModuleManager().getModules());
-
-            enabledMods.sort(sort);
-            for (Module module : enabledMods) {
-                if (module.isHidden() || module.getCategory() == ModuleCategory.Visual)
-                    continue;
-                Animation moduleAnimation = module.getAnimation();
-                moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
-                float moduleWidth = cFont.get() ? getFr().getStringWidth(module.getName() + module.getTag()) : mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
-                float x = (arrayPosition.is("Right") ? screenWidth - moduleWidth - 1.0f : 2) + this.x.get();
-
-                x += (float) Math.abs((moduleAnimation.getOutput() - 1.0) * (2.0 + moduleWidth));
-
-                final float leftSide = x - 2f;
-                final float bottom = (cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get();
-
-                if (background.get()) {
-                    if (event.getShaderType() == Shader2DEvent.ShaderType.BLUR || event.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
-                        RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, color(count));
-                    }
-
-                    if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                        RenderUtils.drawRect(leftSide, y, moduleWidth + 3, bottom, bgColor(count));
-                    }
-                }
-
-                if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                    if (outline.is("Left")) {
-                        RenderUtils.drawRect(leftSide - 1, y, 1, bottom, color(count));
-                    }
-
-                    if (outline.is("Right")) {
-                        RenderUtils.drawRect(x + moduleWidth, y, 1, bottom, color(count));
-                    }
-
-                }
-
-                if (event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                    if (cFont.get()) {
-                        getFr().drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), 255));
-                    } else {
-                        mc.fontRendererObj.drawStringWithShadow(module.getName() + module.getTag(), x - 1, y + 2f, ColorUtils.swapAlpha(color(count), 255));
-                    }
-                }
-
-                y += (float) (moduleAnimation.getOutput() * ((cFont.get() ? getFr().getHeight() : mc.fontRendererObj.FONT_HEIGHT) + textHeight.get()));
-                count -= 2;
             }
         }
 
@@ -395,7 +280,6 @@ public class Interface extends Module {
     }
 
     public FontRenderer getFr() {
-
         return switch (fontMode.get()) {
             case "Bold" -> Fonts.interBold.get(fontSize.get());
             case "Semi Bold" -> Fonts.interSemiBold.get(fontSize.get());

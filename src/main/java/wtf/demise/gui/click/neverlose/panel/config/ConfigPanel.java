@@ -59,8 +59,8 @@ public class ConfigPanel extends Panel {
         posY = INSTANCE.getNeverLose().getPosY();
         //select anim
         animation.setDirection(selected ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover.setDirection(MouseUtils.isHovered2(posX + 148, posY + 14, 70, 22, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
-        hover2.setDirection(MouseUtils.isHovered2(posX + 228, posY + 14, 70, 22, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover.setDirection(MouseUtils.isHovered(posX + 148, posY + 14, 70, 22, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
+        hover2.setDirection(MouseUtils.isHovered(posX + 228, posY + 14, 70, 22, mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
         input.setDirection(inputting ? Direction.FORWARDS : Direction.BACKWARDS);
         //render
         if (isSelected()) {
@@ -105,15 +105,15 @@ public class ConfigPanel extends Panel {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         //handle mouseClick
-        if (MouseUtils.isHovered2(posX + 308, posY + 14, 120, 22, mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered(posX + 308, posY + 14, 120, 22, mouseX, mouseY) && mouseButton == 0) {
             inputting = !inputting;
         } else {
             inputting = false;
         }
-        if (MouseUtils.isHovered2(posX + 148, posY + 14, 70, 22, mouseX, mouseY)) {
+        if (MouseUtils.isHovered(posX + 148, posY + 14, 70, 22, mouseX, mouseY)) {
             refresh();
         }
-        if (MouseUtils.isHovered2(posX + 228, posY + 14, 70, 22, mouseX, mouseY)) {
+        if (MouseUtils.isHovered(posX + 228, posY + 14, 70, 22, mouseX, mouseY)) {
             Demise.INSTANCE.getConfigManager().saveConfig(new Config(text + ".json"));
             refresh();
         }
@@ -171,7 +171,7 @@ public class ConfigPanel extends Panel {
 
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
-        if (MouseUtils.isHovered2(posX + 148, posY + 80, 360, 338, mx, my)) {
+        if (MouseUtils.isHovered(posX + 148, posY + 80, 360, 338, mx, my)) {
             rawScroll += (float) Mouse.getDWheel() * 20;
         }
         rawScroll = Math.max(Math.min(0, rawScroll), -maxScroll);

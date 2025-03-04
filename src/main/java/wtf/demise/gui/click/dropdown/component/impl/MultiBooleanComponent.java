@@ -60,7 +60,7 @@ public class MultiBooleanComponent extends Component {
                 offset = 8;
                 heightoff += Fonts.interRegular.get(13).getHeight() + 2;
             }
-            if (MouseUtils.isHovered2(getX() + offset, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff, Fonts.interRegular.get(13).getStringWidth(boolValue.getName()), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
+            if (MouseUtils.isHovered(getX() + offset, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff, Fonts.interRegular.get(13).getStringWidth(boolValue.getName()), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
                 boolValue.set(!boolValue.get());
             }
             offset += off;

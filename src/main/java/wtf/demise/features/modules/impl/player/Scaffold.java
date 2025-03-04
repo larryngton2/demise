@@ -13,6 +13,7 @@ import org.lwjglx.input.Keyboard;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
+import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.Module;
@@ -64,10 +65,8 @@ public class Scaffold extends Module {
     private final BoolValue eaglePacket = new BoolValue("Packet Eagle", false, this, eagle::get);
 
     private final BoolValue telly = new BoolValue("Telly", false, this);
-    private final ModeValue tellyMode = new ModeValue("Telly mode", new String[]{"Legit", "Teleport", "Custom"}, "Legit", this, telly::get);
-    private final SliderValue teleportOhMyGod = new SliderValue("Teleport Height", 0.42f, 0.01f, 5, 0.01f, this, () -> telly.get() && tellyMode.is("Teleport"));
-    private final SliderValue tellyVerticalAmount = new SliderValue("Custom vertical amount", 0.42f, 0.01f, 1, 0.01f, this, () -> telly.get() && tellyMode.is("Custom"));
-    private final SliderValue tellyHorizontalAmount = new SliderValue("Custom horizontal amount", 0.35f, 0, 4, 0.01f, this, () -> telly.get() && tellyMode.is("Custom"));
+    private final ModeValue tellyMode = new ModeValue("Telly mode", new String[]{"Jump", "Rotate"}, "Jump", this, telly::get);
+    private final SliderValue straightTicks = new SliderValue("Straight ticks", 1, 1, 5, 1, this, telly::get);
 
     public final ModeValue counter = new ModeValue("Counter", new String[]{"Normal", "Exhibition", "Simple", "None"}, "None", this);
     private final ModeValue placeTiming = new ModeValue("Place timing", new String[]{"Legit", "Post"}, "Legit", this);
@@ -301,36 +300,6 @@ public class Scaffold extends Module {
                     break;
             }
         }
-
-        final double baseSpeed = getBaseSpeed();
-        final double speedMultiplier = this.speedMultiplier.get();
-        if (Math.abs(speedMultiplier - 1.0) > 1E-4 && mc.thePlayer.onGround && !(mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() > 2 - 1) && baseSpeed != 0) {
-            MoveUtil.strafe(baseSpeed * speedMultiplier);
-        }
-    }
-
-    public double getBaseSpeed() {
-        if (mc.gameSettings.keyBindSprint.isKeyDown()) {
-            if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && !ignoreSpeed.get()) {
-                if (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 == 1) {
-                    return 0.18386012061481244;
-                } else {
-                    return 0.21450346015841276;
-                }
-            } else {
-                return 0.15321676228437875;
-            }
-        } else {
-            if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && !ignoreSpeed.get()) {
-                if (mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 == 1) {
-                    return 0.14143085686761;
-                } else {
-                    return 0.16500264553372018;
-                }
-            } else {
-                return 0.11785905094607611;
-            }
-        }
     }
 
     @EventTarget
@@ -361,27 +330,27 @@ public class Scaffold extends Module {
                 event.setStrafe(-1.0f);
             }
         }
+
         if (telly.get() && MoveUtil.isMoving() && mc.thePlayer.onGround) {
             switch (tellyMode.get()) {
-                case "Legit":
+                case "Jump", "Rotate":
                     event.setJumping(true);
-                    break;
-                case "Custom":
-                    mc.thePlayer.motionY = tellyVerticalAmount.get();
-                    MoveUtil.strafe(tellyHorizontalAmount.get());
-                case "Teleport":
-                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + teleportOhMyGod.get(), mc.thePlayer.posZ);
                     break;
             }
         }
 
-        if (!eaglePacket.get()) {
+        if (eagle.get()) {
+            if (eaglePacket.get()) return;
+
             event.setSneaking(shiftPressed);
         }
     }
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
+        mc.thePlayer.motionX *= speedMultiplier.get();
+        mc.thePlayer.motionZ *= speedMultiplier.get();
+
         final float[] rotationss = BlockUtil.getDirectionToBlock(blockFace.getX(), blockFace.getY(), blockFace.getZ(), enumFacing.getEnumFacing());
 
         if ((ticksOnAir > placeDelay.get() && updateOnBlockPlace.get()) || !updateOnBlockPlace.get() || rotations.is("Snap") || rotations.is("None")) {
@@ -470,6 +439,8 @@ public class Scaffold extends Module {
 
         float[] finalRot = new float[]{targetYaw, targetPitch};
 
+        if (telly.get() && tellyMode.is("Rotate") && mc.thePlayer.offGroundTicks < straightTicks.get()) return;
+
         RotationUtils.setRotation(finalRot, movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, rotationSpeed.get(), rotationSpeed.get());
     }
 
@@ -538,6 +509,11 @@ public class Scaffold extends Module {
             blocksPlaced++;
         } else if (dragClick.get() && Math.random() > 0.5)
             PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(item));
+    }
+
+    @EventTarget
+    public void onMouseOver(MouseOverEvent e) {
+        e.setBlockRange(range.get());
     }
 
     @EventTarget

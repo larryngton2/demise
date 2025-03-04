@@ -64,11 +64,11 @@ public final class GuiAddAlt extends GuiScreen {
         this.groupAltInfo = new GuiGroupAltLogin(this, title);
 
         List<GuiButton> buttonList = this.buttonList;
-        buttonList.add(new GuiCustomButton(addAltButtonName, 0, width / 2 - 100, height + 72 + 12, 15, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton("Back", 1, width / 2 - 100, height + 72 + 12 + 24, 15, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton("Import alt", 2, width / 2 - 100, height + 72 + 12 + -24, 15, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton(generateButtonName, 3, width / 2 - 100, height + 72 + 12 + -48, 15, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton("Microsoft", 4, width / 2 - 100, height + 72 + 12 + -72, 15, Fonts.interSemiBold.get(20)));
+        buttonList.add(new GuiCustomButton(addAltButtonName, 0, width / 2 - 100, height + 72 + 12, 7, Fonts.interSemiBold.get(20)));
+        buttonList.add(new GuiCustomButton("Back", 1, width / 2 - 100, height + 72 + 12 + 24, 7, Fonts.interSemiBold.get(20)));
+        buttonList.add(new GuiCustomButton("Import alt", 2, width / 2 - 100, height + 72 + 12 + -24, 7, Fonts.interSemiBold.get(20)));
+        buttonList.add(new GuiCustomButton(generateButtonName, 3, width / 2 - 100, height + 72 + 12 + -48, 7, Fonts.interSemiBold.get(20)));
+        buttonList.add(new GuiCustomButton("Microsoft", 4, width / 2 - 100, height + 72 + 12 + -72, 7, Fonts.interSemiBold.get(20)));
 
         this.usernameField = new TokenField(0, mc.fontRendererObj, width / 2 - 100, 60, 200, 20, "Alt Email:");
         this.passwordField = new PasswordTextField(1, mc.fontRendererObj, width / 2 - 100, 100, 200, 20, "Password:");

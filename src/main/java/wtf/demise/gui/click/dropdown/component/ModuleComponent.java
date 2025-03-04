@@ -121,6 +121,6 @@ public class ModuleComponent implements IComponent {
     }
 
     public boolean isHovered(int mouseX, int mouseY) {
-        return MouseUtils.isHovered2(x + 2, y, width - 2, 17, mouseX, mouseY);
+        return MouseUtils.isHovered(x + 2, y, width - 2, 17, mouseX, mouseY);
     }
 }

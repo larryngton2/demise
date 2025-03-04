@@ -1,15 +1,14 @@
-package wtf.demise.features.modules.impl.visual;
+package wtf.demise.gui.widget.impl;
 
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.opengl.GL11;
-import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.player.Scaffold;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.InstanceAccess;
+import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
@@ -19,11 +18,17 @@ import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 
-public class ScaffoldCounter implements InstanceAccess {
+public class ScaffoldCounterWidget extends Widget {
+    public ScaffoldCounterWidget() {
+        super("Scaffold Counter");
+        this.x = 0.4f;
+        this.y = 0.7f;
+    }
+
     private final Animation anim = new DecelerateAnimation(175, 1);
 
-    @EventTarget
-    public void drawCounter(Render2DEvent event) {
+    @Override
+    public void render() {
         Scaffold scaffold = INSTANCE.getModuleManager().getModule(Scaffold.class);
         switch (scaffold.counter.get().toLowerCase()) {
             case "normal": {
@@ -33,8 +38,6 @@ public class ScaffoldCounter implements InstanceAccess {
                 ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
                 int count = slot == -1 ? 0 : scaffold.getBlockCount();
                 String countStr = String.valueOf(count);
-                ScaledResolution sr = new ScaledResolution(mc);
-                float x, y;
                 float output = (float) anim.getOutput();
                 float blockWH = heldItem != null ? 15 : -2;
                 int spacing = 3;
@@ -42,19 +45,19 @@ public class ScaffoldCounter implements InstanceAccess {
                 float textWidth = Fonts.interBold.get(18).getStringWidth(text);
 
                 float totalWidth = ((textWidth + blockWH + spacing) + 6) * output;
-                x = sr.getScaledWidth() / 2f - (totalWidth / 2f);
-                y = sr.getScaledHeight() - (sr.getScaledHeight() / 2f - 20);
+                this.width = totalWidth;
                 float height = 20;
+                this.height = height;
                 GL11.glPushMatrix();
-                RenderUtils.scissor(x - 1.5, y - 1.5, totalWidth + 3, height + 3);
+                RenderUtils.scissor(renderX - 1.5, renderY - 1.5, totalWidth + 3, height + 3);
                 GL11.glEnable(GL11.GL_SCISSOR_TEST);
-                RoundedUtils.drawRound(x, y, totalWidth, height, 5, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
+                RoundedUtils.drawRound(renderX, renderY, totalWidth, height, 5, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
 
-                Fonts.interBold.get(18).drawString(text, x + 3 + blockWH + spacing, y + height / 2F - Fonts.interBold.get(18).getHeight() / 2F + 2.5f, -1);
+                Fonts.interBold.get(18).drawString(text, renderX + 3 + blockWH + spacing, renderY + height / 2F - Fonts.interBold.get(18).getHeight() / 2F + 2.5f, -1);
 
                 if (heldItem != null) {
                     RenderHelper.enableGUIStandardItemLighting();
-                    mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) x + 3, (int) (y + 10 - (blockWH / 2)));
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) renderX + 3, (int) (renderY + 10 - (blockWH / 2)));
                     RenderHelper.disableStandardItemLighting();
                 }
                 GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -92,36 +95,37 @@ public class ScaffoldCounter implements InstanceAccess {
         }
     }
 
-    @EventTarget
-    public void drawShader2D(Shader2DEvent event) {
+    @Override
+    public void onShader(Shader2DEvent event) {
         Scaffold scaffold = INSTANCE.getModuleManager().getModule(Scaffold.class);
-        switch (scaffold.counter.get().toLowerCase()) {
-            case "normal": {
-                anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
-                if (!scaffold.isEnabled() && anim.isDone()) return;
-                int slot = scaffold.slot;
-                ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
-                int count = slot == -1 ? 0 : scaffold.getBlockCount();
-                String countStr = String.valueOf(count);
-                ScaledResolution sr = new ScaledResolution(mc);
-                float x, y;
-                float output = (float) anim.getOutput();
-                float blockWH = heldItem != null ? 15 : -2;
-                int spacing = 3;
-                String text = "§l" + countStr + "§r block" + (count != 1 ? "s" : "");
-                float textWidth = Fonts.interBold.get(18).getStringWidth(text);
-                float totalWidth = ((textWidth + blockWH + spacing) + 6) * output;
-                x = sr.getScaledWidth() / 2f - (totalWidth / 2f);
-                y = sr.getScaledHeight() - (sr.getScaledHeight() / 2f - 20);
-                float height = 20;
-                GL11.glPushMatrix();
-                RenderUtils.scissor(x - 1.5, y - 1.5, totalWidth + 3, height + 3);
-                GL11.glEnable(GL11.GL_SCISSOR_TEST);
-                RoundedUtils.drawRound(x, y, totalWidth, height, 5, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
-                GL11.glDisable(GL11.GL_SCISSOR_TEST);
-                GL11.glPopMatrix();
-                break;
-            }
+
+        if (scaffold.counter.get().equalsIgnoreCase("normal")) {
+            anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
+            if (!scaffold.isEnabled() && anim.isDone()) return;
+            int slot = scaffold.slot;
+            ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
+            int count = slot == -1 ? 0 : scaffold.getBlockCount();
+            String countStr = String.valueOf(count);
+            float output = (float) anim.getOutput();
+            float blockWH = heldItem != null ? 15 : -2;
+            int spacing = 3;
+            String text = "§l" + countStr + "§r block" + (count != 1 ? "s" : "");
+            float textWidth = Fonts.interBold.get(18).getStringWidth(text);
+            float totalWidth = ((textWidth + blockWH + spacing) + 6) * output;
+            float height = 20;
+            GL11.glPushMatrix();
+            RenderUtils.scissor(renderX - 1.5, renderY - 1.5, totalWidth + 3, height + 3);
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            RoundedUtils.drawRound(renderX, renderY, totalWidth, height, 5, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            GL11.glPopMatrix();
         }
+    }
+
+    @Override
+    public boolean shouldRender() {
+        Scaffold scaffold = INSTANCE.getModuleManager().getModule(Scaffold.class);
+
+        return !scaffold.counter.is("None");
     }
 }

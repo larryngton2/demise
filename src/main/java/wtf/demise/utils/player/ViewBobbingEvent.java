@@ -9,5 +9,11 @@ import wtf.demise.events.impl.CancellableEvent;
 @Setter
 @AllArgsConstructor
 public final class ViewBobbingEvent extends CancellableEvent {
-    private int time;
+    private State state;
+
+    public enum State {
+        CameraTransform,
+        Hand1,
+        Hand2
+    }
 }

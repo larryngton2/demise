@@ -17,6 +17,7 @@ import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
 import wtf.demise.features.modules.impl.exploit.*;
 import wtf.demise.features.modules.impl.legit.AutoClicker;
+import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.legit.LegitScaffold;
 import wtf.demise.features.modules.impl.legit.NoHitDelay;
 import wtf.demise.features.modules.impl.misc.*;
@@ -47,7 +48,6 @@ public class ModuleManager {
                 // Combat
                 AntiBot.class,
                 AutoWeapon.class,
-                BackTrack.class,
                 KeepSprint.class,
                 KillAura.class,
                 Reach.class,
@@ -63,6 +63,7 @@ public class ModuleManager {
                 AutoClicker.class,
                 NoHitDelay.class,
                 LegitScaffold.class,
+                BackTrack.class,
 
                 // Exploit
                 Blink.class,
@@ -84,6 +85,7 @@ public class ModuleManager {
                 MurderMystery.class,
                 InventorySync.class,
                 ChatBypass.class,
+                AutoQueue.class,
 
                 // Movement
                 Freeze.class,
@@ -100,6 +102,7 @@ public class ModuleManager {
                 Phase.class,
                 Sneak.class,
                 MotionModifier.class,
+                AutoWalk.class,
 
                 // Player
                 AntiFireball.class,
@@ -137,7 +140,8 @@ public class ModuleManager {
                 ItemPhysics.class,
                 ItemESP.class,
                 FreeCam.class,
-                ViewBobbing.class
+                ViewBobbing.class,
+                BreakProgress.class
         );
 
         // Sort modules by name for better organization

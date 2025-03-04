@@ -13,6 +13,7 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -37,7 +38,7 @@ public class TickBase extends Module {
     public final SliderValue maxTick = new SliderValue("Max Ticks", 4, 1, 20, this);
     public final BoolValue displayPredictPos = new BoolValue("Dislay Predict Pos", false, this);
     public final BoolValue check = new BoolValue("Check", false, this);
-    public final BoolValue workWithBackTrack = new BoolValue("Work With Back Track", false, this);
+    private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
     public TimerUtils timer = new TimerUtils();
     public int skippedTick = 0;
     private long shifted, previousTime;
@@ -54,11 +55,8 @@ public class TickBase extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
-        if (workWithBackTrack.get()) {
-            target = getModule(BackTrack.class).target;
-        } else {
-            target = PlayerUtils.getTarget(maxActiveRange.get() * 3);
-        }
+        target = PlayerUtils.getTarget(maxActiveRange.get() * 3, teamCheck.get());
+
     }
 
     @EventTarget
@@ -145,9 +143,6 @@ public class TickBase extends Module {
     }
 
     public boolean shouldStart() {
-        Vec3 targetPos = target.getPositionVector();
-        if (workWithBackTrack.get())
-            targetPos = getModule(BackTrack.class).realPosition;
         return predictProcesses.get((int) (maxTick.get() - 1)).position.distanceTo(target.getPositionVector()) <
                 mc.thePlayer.getPositionVector().distanceTo(target.getPositionVector()) &&
                 MathUtils.inBetween(minActiveRange.get(), maxActiveRange.get(), predictProcesses.get((int) (maxTick.get() - 1)).position.distanceTo(target.getPositionVector())) &&

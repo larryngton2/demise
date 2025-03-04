@@ -8,19 +8,14 @@ import wtf.demise.events.impl.Event;
 @Getter
 @Setter
 public class MouseOverEvent implements Event {
-
-    public MouseOverEvent(double range, float expand) {
+    public MouseOverEvent(double range, float expand, double blockRange) {
         this.range = range;
         this.expand = expand;
-    }
-
-    public MouseOverEvent(double range) {
-        this.range = range;
-        this.expand = 1f;
+        this.blockRange = blockRange;
     }
 
     private double range;
     private float expand;
     private MovingObjectPosition movingObjectPosition;
-
+    private double blockRange;
 }

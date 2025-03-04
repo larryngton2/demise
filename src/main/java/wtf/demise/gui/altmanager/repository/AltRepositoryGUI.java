@@ -66,7 +66,6 @@ import static net.minecraft.util.EnumChatFormatting.GREEN;
 import static net.minecraft.util.EnumChatFormatting.RED;
 
 public class AltRepositoryGUI extends GuiScreen {
-
     static final int PLAYER_BOX_WIDTH = 320;
     static final int PLAYER_BOX_HEIGHT = 36;
     static final float PLAYER_BOX_SPACE = 3F;

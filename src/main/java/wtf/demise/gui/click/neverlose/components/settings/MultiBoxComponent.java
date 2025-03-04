@@ -102,12 +102,12 @@ public class MultiBoxComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouse) {
-        if (MouseUtils.isHovered2(getX() + 94, getY() + 14, 80f, 20, mouseX, mouseY) && mouse == 1) {
+        if (MouseUtils.isHovered(getX() + 94, getY() + 14, 80f, 20, mouseX, mouseY) && mouse == 1) {
             opened = !opened;
         }
         if (opened) {
             for (BoolValue boolValue : setting.getValues()) {
-                if (MouseUtils.isHovered2(getX() + 98, (float) ((getY() + 15 + setting.getValues().indexOf(boolValue) * 20) - ((Math.min(4, (setting.getValues().size() - 1)) * 20) * open.getOutput()) / 2f) + getScroll(), 72, 12, mouseX, mouseY) && mouse == 0) {
+                if (MouseUtils.isHovered(getX() + 98, (float) ((getY() + 15 + setting.getValues().indexOf(boolValue) * 20) - ((Math.min(4, (setting.getValues().size() - 1)) * 20) * open.getOutput()) / 2f) + getScroll(), 72, 12, mouseX, mouseY) && mouse == 0) {
                     boolValue.set(!boolValue.get());
                 }
             }
@@ -117,7 +117,7 @@ public class MultiBoxComponent extends Component {
 
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
-        if (MouseUtils.isHovered2(getX() + 94,
+        if (MouseUtils.isHovered(getX() + 94,
                 (getY() + 12 - getHalfTotalHeight()) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - getHalfTotalHeight()),
                 80f,
                 (float) (((((getY() + 12 - (getSize() * 20 * open.getOutput()) / 2f) < INSTANCE.getNeverLose().getPosY() + 49) ? MathHelper.clamp_float((getY() + 12 - getHalfTotalHeight()) - INSTANCE.getNeverLose().getPosY() + 49, 0, 999) : 122)) * open.getOutput()), mx, my)) {
@@ -134,7 +134,7 @@ public class MultiBoxComponent extends Component {
 
     @Override
     public boolean isHovered(float mouseX, float mouseY) {
-        return opened && MouseUtils.isHovered2(getX() + 94,
+        return opened && MouseUtils.isHovered(getX() + 94,
                 (getY() + 12 - getHalfTotalHeight()) < INSTANCE.getNeverLose().getPosY() + 49 ? INSTANCE.getNeverLose().getPosY() + 49 : (getY() + 12 - getHalfTotalHeight()),
                 80f,
                 (float) (((((getY() + 12 - (getSize() * 20 * open.getOutput()) / 2f) < INSTANCE.getNeverLose().getPosY() + 49) ? MathHelper.clamp_float((getY() + 12 - getHalfTotalHeight()) - INSTANCE.getNeverLose().getPosY() + 49, 0, 999) : 122)) * open.getOutput()), (int) mouseX, (int) mouseY);

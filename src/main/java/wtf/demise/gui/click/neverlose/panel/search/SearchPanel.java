@@ -119,7 +119,7 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered2(posX + 140, posY + 12, 340, 22, mouseX, mouseY) && mouseButton == 0) {
+        if (MouseUtils.isHovered(posX + 140, posY + 12, 340, 22, mouseX, mouseY) && mouseButton == 0) {
             inputting = !inputting;
         } else {
             inputting = false;
@@ -171,7 +171,7 @@ public class SearchPanel extends Panel implements IComponent, InstanceAccess {
 
     public void onScroll(int ms, int mx, int my) {
         scroll = (float) (rawScroll - scrollAnimation.getOutput());
-        if (MouseUtils.isHovered2(getPosX() + 140, getPosY() + 49, 380, 368, mx, my) && moduleComponents.stream().noneMatch(moduleComponent -> moduleComponent.getComponents().stream().anyMatch(component -> component.isHovered(mx, my)))) {
+        if (MouseUtils.isHovered(getPosX() + 140, getPosY() + 49, 380, 368, mx, my) && moduleComponents.stream().noneMatch(moduleComponent -> moduleComponent.getComponents().stream().anyMatch(component -> component.isHovered(mx, my)))) {
             rawScroll += (float) Mouse.getDWheel() * 20;
         }
         rawScroll = Math.max(Math.min(0, rawScroll), -maxScroll);
