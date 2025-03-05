@@ -21,14 +21,36 @@ public class BlockUtil {
             Blocks.dropper, Blocks.tnt, Blocks.standing_banner, Blocks.wall_banner, Blocks.redstone_torch);
 
     public static float[] getDirectionToBlock(final double x, final double y, final double z, final EnumFacing enumfacing) {
-        final EntityEgg var4 = new EntityEgg(mc.theWorld);
-        var4.posX = x + 0.5D;
-        var4.posY = y + 0.5D;
-        var4.posZ = z + 0.5D;
-        var4.posX += (double) enumfacing.getDirectionVec().getX() * 0.5D;
-        var4.posY += (double) enumfacing.getDirectionVec().getY() * 0.5D;
-        var4.posZ += (double) enumfacing.getDirectionVec().getZ() * 0.5D;
-        return getRotations(var4.posX, var4.posY, var4.posZ);
+        final EntityPlayerSP player = mc.thePlayer;
+        double closestX = x + 0.5D;
+        double closestY = y + 0.5D;
+        double closestZ = z + 0.5D;
+
+        // Calculate the closest point on the block's surface
+        if (player.posX < x) {
+            closestX = x;
+        } else if (player.posX > x + 1) {
+            closestX = x + 1;
+        }
+
+        if (player.posY < y) {
+            closestY = y;
+        } else if (player.posY > y + 1) {
+            closestY = y + 1;
+        }
+
+        if (player.posZ < z) {
+            closestZ = z;
+        } else if (player.posZ > z + 1) {
+            closestZ = z + 1;
+        }
+
+        // Adjust for the block's facing direction
+        closestX += (double) enumfacing.getDirectionVec().getX() * 0.5D;
+        closestY += (double) enumfacing.getDirectionVec().getY() * 0.5D;
+        closestZ += (double) enumfacing.getDirectionVec().getZ() * 0.5D;
+
+        return getRotations(closestX, closestY, closestZ);
     }
 
     public static float[] getRotations(final double posX, final double posY, final double posZ) {

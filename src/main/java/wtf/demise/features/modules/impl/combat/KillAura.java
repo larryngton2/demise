@@ -82,6 +82,8 @@ public class KillAura extends Module {
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier"));
+    private final BoolValue slowDistance = new BoolValue("Slow distance", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue slowDistanceRange = new SliderValue("Slow distance range", 1, 0, 8, 0.1f, this, () -> slowDistance.get() && slowDistance.canDisplay());
     private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
@@ -250,25 +252,37 @@ public class KillAura extends Module {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
         MovementCorrection correction = movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF;
 
+        boolean slowCheck = mc.thePlayer.getDistanceToEntity(target) < slowDistanceRange.get();
+
+        float hSpeed = MathUtils.randomizeFloat(
+                slowCheck ? yawRotationSpeedMin.get() / 2 : yawRotationSpeedMin.get(),
+                slowCheck ? yawRotationSpeedMax.get() / 2 : yawRotationSpeedMax.get()
+        );
+
+        float vSpeed = MathUtils.randomizeFloat(
+                slowCheck ? pitchRotationSpeedMin.get() / 2 : pitchRotationSpeedMin.get(),
+                slowCheck ? pitchRotationSpeedMax.get() / 2 : pitchRotationSpeedMax.get()
+        );
+
         switch (mode) {
             case Linear:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        hSpeed,
+                        vSpeed,
                         SmoothMode.Linear
                 );
                 break;
             case Lerp:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        hSpeed,
+                        vSpeed,
                         SmoothMode.Lerp
                 );
                 break;
             case Bezier:
                 RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                        MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
+                        hSpeed,
+                        vSpeed,
                         SmoothMode.Bezier, midpoint.get()
                 );
                 break;

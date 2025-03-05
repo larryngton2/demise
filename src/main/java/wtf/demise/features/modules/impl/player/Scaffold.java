@@ -7,7 +7,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.*;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.Demise;
@@ -39,10 +38,10 @@ import static wtf.demise.utils.player.PlayerUtils.getBlock;
 
 @ModuleInfo(name = "Scaffold", category = ModuleCategory.Player)
 public class Scaffold extends Module {
-    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"None", "Normal", "Reverse", "Predicted", "Rounded", "Snap", "Pitch Abuse"}, "Normal", this);
+    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"None", "Normal", "Reverse", "Predicted", "Rounded", "GodBridge", "Snap", "Pitch Abuse"}, "Normal", this);
     private final BoolValue updateOnBlockPlace = new BoolValue("Update on Place", true, this, () -> !rotations.is("None"));
     private final BoolValue randomiseRotationSpeedOnEnable = new BoolValue("Randomise rotation speed on enable", false, this, () -> !rotations.is("None"));
-    private final SliderValue rotationSpeed = new SliderValue("Rotation Speed", 55, 55, 180, 1, this, () -> !rotations.is("None"));
+    private final SliderValue rotationSpeed = new SliderValue("Rotation Speed", 55, 1, 180, 1, this, () -> !rotations.is("None"));
     private final SliderValue randomisation = new SliderValue("Randomisation", 1, 0, 6, 0.1f, this, () -> !rotations.is("None"));
 
     private final ModeValue tower = new ModeValue("Tower", new String[]{"None", "Vanilla", "Slow", "Verus", "NCP"}, "None", this);
@@ -74,7 +73,6 @@ public class Scaffold extends Module {
     private final BoolValue swing = new BoolValue("Swing", true, this);
     private final BoolValue disableOnWorldChange = new BoolValue("Disable on World Change", false, this);
     private final BoolValue disableSpeed = new BoolValue("Disable Speed", false, this);
-    private final BoolValue ignoreSpeed = new BoolValue("Ignore speed", false, this);
     private final BoolValue dragClick = new BoolValue("Drag click", false, this);
     private final BoolValue jitter = new BoolValue("Jitter", false, this);
     private final SliderValue expand = new SliderValue("Expand", 0, 0, 5, 0.1f, this);
@@ -84,6 +82,7 @@ public class Scaffold extends Module {
     private EnumFacingOffset enumFacing;
     private BlockPos blockFace;
     private int oldSlot;
+    private boolean isOnRightSide;
 
     private float targetYaw, targetPitch, yaw;
     public static float pitch;
@@ -144,7 +143,7 @@ public class Scaffold extends Module {
         if (shouldEnableSpeed) {
             if (!this.getModule(Speed.class).isEnabled()) {
                 this.getModule(Speed.class).setEnabled(true);
-                Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Scaffold", "Enabled Speed since it was previously enabled");
+                Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Scaffold", "Enabled Speed since it was previously enabled");
             }
         }
 
@@ -157,6 +156,8 @@ public class Scaffold extends Module {
             sneaking = false;
             PacketUtils.sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SNEAKING));
         }
+
+        mc.thePlayer.omniSprint = false;
     }
 
     @EventTarget
@@ -170,14 +171,13 @@ public class Scaffold extends Module {
 
         double forward = 0, posX = 0, posZ = 0;
 
-        float direction = (float) MoveUtil.getYawFromKeybind();
+        float direction = (float) MoveUtil.getDirection();
         posX = -MathHelper.sin(direction) * forward + mc.thePlayer.posX;
         posZ = MathHelper.cos(direction) * forward + mc.thePlayer.posZ;
 
         for (forward = 0; forward <= expand.get() && !(getBlock(posX, mc.thePlayer.posY - 1, posZ) instanceof BlockAir); forward += 0.1) {
             forward = expand.get();
-
-            direction = MoveUtil.getYawFromKeybind();
+            direction = (float) MoveUtil.getDirection();
             posX = -MathHelper.sin(direction) * forward + mc.thePlayer.posX;
             posZ = MathHelper.cos(direction) * forward + mc.thePlayer.posZ;
         }
@@ -187,7 +187,6 @@ public class Scaffold extends Module {
             posX = -MathHelper.sin(direction) * forward + mc.thePlayer.posX;
             posZ = MathHelper.cos(direction) * forward + mc.thePlayer.posZ;
         }
-
 
         if (getBlock(posX, mc.thePlayer.posY - 1, posZ) instanceof BlockAir) ticksOnAir++;
         else ticksOnAir = 0;
@@ -300,6 +299,8 @@ public class Scaffold extends Module {
                     break;
             }
         }
+
+        mc.thePlayer.omniSprint = movementFix.get() && sprint.get();
     }
 
     @EventTarget
@@ -351,37 +352,44 @@ public class Scaffold extends Module {
         mc.thePlayer.motionX *= speedMultiplier.get();
         mc.thePlayer.motionZ *= speedMultiplier.get();
 
-        final float[] rotationss = BlockUtil.getDirectionToBlock(blockFace.getX(), blockFace.getY(), blockFace.getZ(), enumFacing.getEnumFacing());
+        final float[] rotation = BlockUtil.getDirectionToBlock(blockFace.getX(), blockFace.getY(), blockFace.getZ(), enumFacing.getEnumFacing());
 
         if ((ticksOnAir > placeDelay.get() && updateOnBlockPlace.get()) || !updateOnBlockPlace.get() || rotations.is("Snap") || rotations.is("None")) {
             switch (rotations.get()) {
                 case "Predicted":
-                    targetYaw = rotationss[0];
-                    targetPitch = rotationss[1];
+                    targetYaw = rotation[0];
+                    targetPitch = rotation[1];
                     break;
 
                 case "Rounded": {
-                    float yaw = 0;
+                    float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
 
-                    switch (enumFacing.getEnumFacing()) {
-                        case SOUTH: {
-                            yaw = 180;
-                            break;
-                        }
+                    targetYaw = Math.round(movingYaw / 45) * 45;
+                    targetPitch = MoveUtil.isMoving() ? 80 : 90;
+                    break;
+                }
 
-                        case EAST: {
-                            yaw = 90;
-                            break;
-                        }
+                case "GodBridge": {
+                    float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
 
-                        case WEST: {
-                            yaw = -90;
-                            break;
+                    if (mc.thePlayer.onGround) {
+                        isOnRightSide = Math.floor(mc.thePlayer.posX + Math.cos(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posX) ||
+                                Math.floor(mc.thePlayer.posZ + Math.sin(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posZ);
+
+                        BlockPos posInDirection = mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(movingYaw), 1);
+
+                        boolean isLeaningOffBlock = mc.theWorld.getBlockState(mc.thePlayer.getPosition().down()) instanceof BlockAir;
+                        boolean nextBlockIsAir = mc.theWorld.getBlockState(posInDirection.down()).getBlock() instanceof BlockAir;
+
+                        if (isLeaningOffBlock && nextBlockIsAir) {
+                            isOnRightSide = !isOnRightSide;
                         }
                     }
 
-                    targetYaw = yaw;
-                    targetPitch = 80;
+                    float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
+
+                    targetYaw = Math.round(yaw / 45) * 45;
+                    targetPitch = MoveUtil.isMoving() ? 75.6f : 90;
                     break;
                 }
 
@@ -391,8 +399,8 @@ public class Scaffold extends Module {
                     break;
 
                 case "Snap":
-                    targetYaw = rotationss[0];
-                    targetPitch = rotationss[1];
+                    targetYaw = rotation[0];
+                    targetPitch = rotation[1];
                     if (ticksOnAir <= placeDelay.get()) {
                         targetYaw = (float) (MoveUtil.getYawFromKeybind() + Math.random());
                         targetPitch = mc.thePlayer.rotationPitch;
@@ -435,7 +443,7 @@ public class Scaffold extends Module {
         targetPitch += (float) (this.randomisation.get() * (Math.random() - 0.5) * 3);
         targetYaw += (float) (this.randomisation.get() * (Math.random() - 0.5) * 3);
 
-        if (!rotations.is("Pitch Abuse")) targetPitch = MathHelper.clamp_float(targetPitch, -90, 90);
+        if (!rotations.is("Pitch Abuse")) targetPitch = MathHelper.clamp_float(targetPitch, -89.9f, 89.9f);
 
         float[] finalRot = new float[]{targetYaw, targetPitch};
 
@@ -464,6 +472,7 @@ public class Scaffold extends Module {
         boolean switchedSlot = false;
         if (slot != blockSlot) {
             slot = blockSlot;
+            oldSlot = mc.thePlayer.inventory.currentItem;
             SpoofSlotUtils.startSpoofing(mc.thePlayer.inventory.currentItem);
             mc.thePlayer.inventory.currentItem = slot;
             switchedSlot = true;
@@ -472,17 +481,17 @@ public class Scaffold extends Module {
         if (placePossibilities.isEmpty() || targetBlock == null || enumFacing == null || blockFace == null || slot < 0 || slot > 9)
             return;
 
-        final MovingObjectPosition movingObjectPosition = mc.objectMouseOver;
-        if (movingObjectPosition == null) return;
+        final MovingObjectPosition mov = mc.objectMouseOver;
+        if (mov == null) return;
 
         final boolean sameY = (this.sameY.get() || (this.getModule(Speed.class).isEnabled() && !mc.gameSettings.keyBindJump.isKeyDown())) && MoveUtil.isMoving();
         if (((int) startY - 1 != (int) targetBlock.yCoord && sameY)) return;
 
-        final Vec3 hitVec = movingObjectPosition.hitVec;
+        final Vec3 hitVec = mov.hitVec;
         final ItemStack item = mc.thePlayer.inventoryContainer.getSlot(slot + 36).getStack();
 
-        boolean strictCheck = movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && movingObjectPosition.getBlockPos().equals(blockFace) && movingObjectPosition.sideHit == enumFacing.getEnumFacing();
-        boolean normalCheck = movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && movingObjectPosition.getBlockPos().equals(blockFace);
+        boolean strictCheck = mov.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && mov.getBlockPos().equals(blockFace) && mov.sideHit == enumFacing.getEnumFacing();
+        boolean normalCheck = mov.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && mov.getBlockPos().equals(blockFace);
 
         if (!switchedSlot && ticksOnAir > placeDelay.get() + (randomisePlaceDelay.get() && !mc.gameSettings.keyBindJump.isKeyDown() ? Math.random() * 3 : 0)) {
             if (rayCast.is("Legit") && !strictCheck) return;
@@ -493,6 +502,7 @@ public class Scaffold extends Module {
                 hitVec.zCoord = Math.random() + blockFace.getZ();
                 hitVec.xCoord = Math.random() + blockFace.getX();
             }
+
 
             if (ViaLoadingBase.getInstance().getTargetVersion().getVersion() > 47) {
                 if (swing.get()) mc.thePlayer.swingItem();

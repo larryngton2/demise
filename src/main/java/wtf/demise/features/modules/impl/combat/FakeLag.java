@@ -33,6 +33,7 @@ public class FakeLag extends Module {
     private final TimerUtils ever = new TimerUtils();
     private double x, y, z;
     public EntityPlayer target;
+    private int ms;
 
     @Override
     public void onEnable() {
@@ -41,13 +42,13 @@ public class FakeLag extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        this.setTag(delayMin.get() + " - " + delayMax.get());
+        this.setTag(ms + " ms");
 
         target = PlayerUtils.getTarget(maxRange.get() + 1, teamCheck.get());
 
-        double ms = MathUtils.randomizeDouble(delayMin.get(), delayMax.get());
-
         if (target != null && MathUtils.inBetween(minRange.get(), maxRange.get(), PlayerUtils.getDistanceToEntityBox(target)) && mc.thePlayer.canEntityBeSeen(target)) {
+            ms = (int) MathUtils.randomizeDouble(delayMin.get(), delayMax.get());
+
             if (ever.hasTimeElapsed(recoilTime.get())) {
                 blinking = true;
             }

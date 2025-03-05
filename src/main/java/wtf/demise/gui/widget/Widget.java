@@ -79,7 +79,7 @@ public abstract class Widget implements InstanceAccess {
         boolean hovering = MouseUtils.isHovered(renderX, renderY, width, height, mouseX, mouseY);
 
         if (dragging) {
-            RoundedUtils.drawRoundOutline(renderX, renderY, width, height, 2f, 0.05f, new Color(0, 0, 0, 0), Color.WHITE);
+            RoundedUtils.drawRoundOutline(renderX - 1, renderY - 1, width + 2, height + 2, 8, 0.05f, new Color(0, 0, 0, 0), Color.WHITE);
         }
 
         if (hovering && Mouse.isButtonDown(0) && !dragging && drag) {
@@ -100,7 +100,6 @@ public abstract class Widget implements InstanceAccess {
             dragX = mouseX;
             dragY = mouseY;
         }
-
     }
 
     public abstract boolean shouldRender();

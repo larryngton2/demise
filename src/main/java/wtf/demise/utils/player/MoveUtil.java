@@ -227,7 +227,7 @@ public class MoveUtil implements InstanceAccess {
     }
 
     public static boolean isMovingStraight() {
-        float direction = getRawDirection() + 180;
+        float direction = getYawFromKeybind() + 180;
         float movingYaw = Math.round(direction / 45) * 45;
         return movingYaw % 90 == 0f;
     }

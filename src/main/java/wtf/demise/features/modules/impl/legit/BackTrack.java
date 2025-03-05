@@ -37,7 +37,6 @@ public class BackTrack extends Module {
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
     private final ModeValue esp = new ModeValue("Mode", new String[]{"Off", "Box"}, "Box", this);
     private final ColorValue color = new ColorValue("Color", new Color(0, 0, 0, 100), this, () -> esp.is("Box"));
-    private final BoolValue outline = new BoolValue("Outline", false, this, () -> esp.is("Box"));
 
     private EntityPlayer target;
     private Vec3 realPosition = new Vec3(0, 0, 0);
@@ -123,7 +122,7 @@ public class BackTrack extends Module {
 
         boolean on = realDistance > clientDistance && realDistance > minRange.get() && realDistance < maxRange.get() && (releaseOnVelocity.get() && mc.thePlayer.hurtTime < 5 || !releaseOnVelocity.get());
 
-        if (target != null && on) {
+        if (target != null) {
             switch (esp.get()) {
                 case "Box":
                     double x = realPosition.xCoord - mc.getRenderManager().viewerPosX;
@@ -136,7 +135,10 @@ public class BackTrack extends Module {
 
                     AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
                     AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + animatedX.getOutput(), box.minY - mc.thePlayer.posY + animatedY.getOutput(), box.minZ - mc.thePlayer.posZ + animatedZ.getOutput(), box.maxX - mc.thePlayer.posX + animatedX.getOutput(), box.maxY - mc.thePlayer.posY + animatedY.getOutput(), box.maxZ - mc.thePlayer.posZ + animatedZ.getOutput());
-                    RenderUtils.drawAxisAlignedBB(axis, outline.get(), color.get().getRGB());
+
+                    if (on) {
+                        RenderUtils.drawAxisAlignedBB(axis, true, color.get().getRGB());
+                    }
                     break;
             }
         }

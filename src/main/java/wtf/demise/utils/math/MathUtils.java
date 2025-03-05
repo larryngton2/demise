@@ -100,6 +100,10 @@ public class MathUtils {
         return Math.random() * (max - min) + min;
     }
 
+    public static float randomizeFloat(float min, float max) {
+        return (float) (Math.random() * (max - min) + min);
+    }
+
     public static boolean inBetween(double min, double max, double value) {
         return value >= min && value <= max;
     }

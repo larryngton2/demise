@@ -1,13 +1,3 @@
-/*
- * Demise Hacked Client
- *
- * A free and open-source hacked client for Minecraft.
- * Developed using Minecraft's resources.
- *
- * Repository: https://github.com/randomguy3725/Demise
- *
- * Author(s): [Randumbguy & opZywl & lucas]
- */
 package wtf.demise.features.modules;
 
 import lombok.Getter;
@@ -32,7 +22,7 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Manages all modules within the Demise client.
+ * Manages all modules within the client.
  * Responsible for initializing, registering, and handling modules.
  */
 @Getter
@@ -58,6 +48,7 @@ public class ModuleManager {
                 FakeLag.class,
                 MoreKB.class,
                 HitBox.class,
+                AutoRod.class,
 
                 // Legit
                 AutoClicker.class,

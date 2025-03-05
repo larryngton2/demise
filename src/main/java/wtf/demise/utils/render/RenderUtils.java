@@ -379,8 +379,8 @@ public class RenderUtils implements InstanceAccess {
         drawAxisAlignedBB(axisAlignedBB, shade, outline, color);
     }
 
-    public static void drawAxisAlignedBB(AxisAlignedBB axisAlignedBB, boolean outline, int color) {
-        drawAxisAlignedBB(axisAlignedBB, outline, true, color);
+    public static void drawAxisAlignedBB(AxisAlignedBB axisAlignedBB, boolean filled, int color) {
+        drawAxisAlignedBB(axisAlignedBB, filled, true, color);
     }
 
     public static void drawAxisAlignedBB(AxisAlignedBB axisAlignedBB, boolean filled, boolean outline, int color) {
