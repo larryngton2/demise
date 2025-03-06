@@ -76,14 +76,16 @@ public class KillAura extends Module {
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "None"}, "Silent", this);
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "test"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier"));
-    private final BoolValue slowDistance = new BoolValue("Slow distance", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue slowDistanceRange = new SliderValue("Slow distance range", 1, 0, 8, 0.1f, this, () -> slowDistance.get() && slowDistance.canDisplay());
+    private final BoolValue slowDown = new BoolValue("Slow down", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final SliderValue slowDownDivision = new SliderValue("Speed division", 2, 1, 10, 0.1f, this, () -> slowDown.get() && slowDown.canDisplay());
+    private final SliderValue slowHurtTime = new SliderValue("Slow hurtTime", 7, 0, 10, 1, this, () -> slowDown.get() && slowDown.canDisplay());
+    private final SliderValue slowDistanceRange = new SliderValue("Slow distance range", 1, 0, 8, 0.1f, this, () -> slowDown.get() && slowDown.canDisplay());
     private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
@@ -105,7 +107,7 @@ public class KillAura extends Module {
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
 
     // target
-    private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch", "Multi"}, "Single", this);
+    private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch"}, "Single", this);
     private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health", "HurtTime"}, "Distance", this, () -> targetMode.is("Single"));
     private final SliderValue targetSwitchDelay = new SliderValue("Target Switch Delay (ms)", 500, 50, 1000, 50, this, () -> targetMode.is("Switch"));
 
@@ -131,7 +133,7 @@ public class KillAura extends Module {
     public List<EntityLivingBase> targets = new ArrayList<>();
     private final TimerUtils pauseTimer = new TimerUtils();
     private Vec3 positionOnPlayer, lastPositionOnPlayer;
-    public static Entity currentTarget = null;
+    public static EntityLivingBase currentTarget;
     public static boolean isBlocking = false;
     private int blockTicks = 0;
     private Vec3 targetVec;
@@ -172,16 +174,6 @@ public class KillAura extends Module {
             case "Switch":
                 if (lastSwitchTime.hasTimeElapsed(targetSwitchDelay.get())) {
                     currentTarget = findNextTarget();
-                }
-                break;
-            case "Multi":
-                currentTarget = findNextTarget();
-
-                targets.clear();
-                for (Entity target : mc.theWorld.loadedEntityList) {
-                    if (target instanceof EntityLivingBase target2 && PlayerUtils.getDistanceToEntityBox(target) <= searchRange.get() && target != mc.thePlayer) {
-                        targets.add(target2);
-                    }
                 }
                 break;
         }
@@ -248,43 +240,31 @@ public class KillAura extends Module {
         }
     }
 
-    private void setRotationToTarget(Entity target) {
+    private void setRotationToTarget(EntityLivingBase target) {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
         MovementCorrection correction = movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF;
 
-        boolean slowCheck = mc.thePlayer.getDistanceToEntity(target) < slowDistanceRange.get();
+        boolean slowCheck = slowDown.get() && mc.thePlayer.getDistanceToEntity(target) < slowDistanceRange.get() && currentTarget.hurtTime > slowHurtTime.get();
 
         float hSpeed = MathUtils.randomizeFloat(
-                slowCheck ? yawRotationSpeedMin.get() / 2 : yawRotationSpeedMin.get(),
-                slowCheck ? yawRotationSpeedMax.get() / 2 : yawRotationSpeedMax.get()
+                slowCheck ? yawRotationSpeedMin.get() / slowDownDivision.get() : yawRotationSpeedMin.get(),
+                slowCheck ? yawRotationSpeedMax.get() / slowDownDivision.get() : yawRotationSpeedMax.get()
         );
 
         float vSpeed = MathUtils.randomizeFloat(
-                slowCheck ? pitchRotationSpeedMin.get() / 2 : pitchRotationSpeedMin.get(),
-                slowCheck ? pitchRotationSpeedMax.get() / 2 : pitchRotationSpeedMax.get()
+                slowCheck ? pitchRotationSpeedMin.get() / slowDownDivision.get() : pitchRotationSpeedMin.get(),
+                slowCheck ? pitchRotationSpeedMax.get() / slowDownDivision.get() : pitchRotationSpeedMax.get()
         );
 
         switch (mode) {
             case Linear:
-                RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        hSpeed,
-                        vSpeed,
-                        SmoothMode.Linear
-                );
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed, vSpeed, SmoothMode.Linear);
                 break;
             case Lerp:
-                RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        hSpeed,
-                        vSpeed,
-                        SmoothMode.Lerp
-                );
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed, vSpeed, SmoothMode.Lerp);
                 break;
             case Bezier:
-                RotationUtils.setRotation(calcToEntity((EntityLivingBase) target), correction,
-                        hSpeed,
-                        vSpeed,
-                        SmoothMode.Bezier, midpoint.get()
-                );
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed, vSpeed, SmoothMode.Bezier, midpoint.get());
                 break;
         }
     }
@@ -404,13 +384,7 @@ public class KillAura extends Module {
             }
 
             if (targetESP.get()) {
-                if (targetMode.is("Multi")) {
-                    for (EntityLivingBase target : targets) {
-                        drawCircle(target);
-                    }
-                } else {
-                    drawCircle(currentTarget);
-                }
+                drawCircle(currentTarget);
             }
         }
 
@@ -514,13 +488,13 @@ public class KillAura extends Module {
                     setBlocking(true);
                     break;
                 case "Release":
-                    releaseAb((EntityLivingBase) currentTarget);
+                    releaseAb(currentTarget);
                     break;
                 case "VanillaForce":
                     vanillaReblockAb(currentTarget);
                     break;
                 case "Smart":
-                    smartAb((EntityLivingBase) currentTarget);
+                    smartAb(currentTarget);
                     break;
                 case "Blink":
                     blinkAb(currentTarget);
@@ -532,11 +506,7 @@ public class KillAura extends Module {
     }
 
     private boolean shouldClick() {
-        if (currentTarget instanceof EntityLivingBase target) {
-            return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY >= 0 || target.hurtTime <= 5;
-        } else {
-            return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY >= 0;
-        }
+        return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY >= 0 || currentTarget.hurtTime <= 5;
     }
 
     private boolean canAutoBlock() {
@@ -550,74 +520,37 @@ public class KillAura extends Module {
             attackCount = (int) clicks.get() + 1;
         }
 
-        if (targetMode.is("Multi")) {
-            for (EntityLivingBase target : targets) {
-                for (int i = 0; i < attackCount; i++) {
-                    switch (clickMode.get()) {
-                        case "Packet":
-                            if (clickMode.get().equals("Packet")) {
-                                if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                                    switch (swingMode.get()) {
-                                        case "Normal", "Client":
-                                            mc.thePlayer.swingItem();
-                                            break;
-                                        case "Server":
-                                            sendPacketNoEvent(new C0APacketAnimation());
-                                            break;
-                                    }
-                                    PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
-                                } else {
-                                    PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
-                                    switch (swingMode.get()) {
-                                        case "Normal", "Client":
-                                            mc.thePlayer.swingItem();
-                                            break;
-                                        case "Server":
-                                            sendPacketNoEvent(new C0APacketAnimation());
-                                            break;
-                                    }
-                                }
-                            }
-                            break;
-                        case "PlayerController":
-                            AttackOrder.sendFixedAttack(mc.thePlayer, target);
-                            break;
-                    }
-                }
-            }
-        } else {
-            for (int i = 0; i < attackCount; i++) {
-                switch (clickMode.get()) {
-                    case "Legit":
-                        KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
-                        break;
-                    case "Packet":
-                        if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                            switch (swingMode.get()) {
-                                case "Normal", "Client":
-                                    mc.thePlayer.swingItem();
-                                    break;
-                                case "Server":
-                                    sendPacketNoEvent(new C0APacketAnimation());
-                                    break;
-                            }
-                            PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
-                        } else {
-                            PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
-                            switch (swingMode.get()) {
-                                case "Normal", "Client":
-                                    mc.thePlayer.swingItem();
-                                    break;
-                                case "Server":
-                                    sendPacketNoEvent(new C0APacketAnimation());
-                                    break;
-                            }
+        for (int i = 0; i < attackCount; i++) {
+            switch (clickMode.get()) {
+                case "Legit":
+                    KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
+                    break;
+                case "Packet":
+                    if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
+                        switch (swingMode.get()) {
+                            case "Normal", "Client":
+                                mc.thePlayer.swingItem();
+                                break;
+                            case "Server":
+                                sendPacketNoEvent(new C0APacketAnimation());
+                                break;
                         }
-                        break;
-                    case "PlayerController":
-                        AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
-                        break;
-                }
+                        PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
+                    } else {
+                        PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
+                        switch (swingMode.get()) {
+                            case "Normal", "Client":
+                                mc.thePlayer.swingItem();
+                                break;
+                            case "Server":
+                                sendPacketNoEvent(new C0APacketAnimation());
+                                break;
+                        }
+                    }
+                    break;
+                case "PlayerController":
+                    AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                    break;
             }
         }
     }
