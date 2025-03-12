@@ -26,6 +26,7 @@ public class FakeLag extends Module {
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
+    private final BoolValue onlyOnGround = new BoolValue("Only onGround", false, this);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
 
     private boolean blinking = false, picked = false;
@@ -40,11 +41,33 @@ public class FakeLag extends Module {
         blinking = false;
     }
 
+    @Override
+    public void onDisable() {
+        if (blinking) {
+            BlinkComponent.dispatch(true);
+        }
+
+        picked = false;
+        target = null;
+    }
+
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         this.setTag(ms + " ms");
 
         target = PlayerUtils.getTarget(maxRange.get() + 1, teamCheck.get());
+
+        if (ms == 0) ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
+
+        if (onlyOnGround.get() && !mc.thePlayer.onGround) {
+            if (blinking) {
+                BlinkComponent.dispatch(true);
+                blinking = false;
+            }
+
+            if (picked) picked = false;
+            return;
+        }
 
         if (target != null && MathUtils.inBetween(minRange.get(), maxRange.get(), PlayerUtils.getDistanceToEntityBox(target)) && mc.thePlayer.canEntityBeSeen(target)) {
             ms = (int) MathUtils.randomizeDouble(delayMin.get(), delayMax.get());
@@ -82,7 +105,7 @@ public class FakeLag extends Module {
     }
 
     @EventTarget
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(Render3DEvent e) {
         if (realPos.get() && blinking && mc.gameSettings.thirdPersonView != 0) {
             double x = this.x - mc.getRenderManager().viewerPosX;
             double y = this.y - mc.getRenderManager().viewerPosY;

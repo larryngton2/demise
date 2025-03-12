@@ -34,7 +34,7 @@ public class ScaffoldCounterWidget extends Widget {
             case "normal": {
                 anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
                 if (!scaffold.isEnabled() && anim.isDone()) return;
-                int slot = scaffold.slot;
+                int slot = scaffold.getBlockSlot();
                 ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
                 int count = slot == -1 ? 0 : scaffold.getBlockCount();
                 String countStr = String.valueOf(count);
@@ -102,7 +102,7 @@ public class ScaffoldCounterWidget extends Widget {
         if (scaffold.counter.get().equalsIgnoreCase("normal")) {
             anim.setDirection(scaffold.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
             if (!scaffold.isEnabled() && anim.isDone()) return;
-            int slot = scaffold.slot;
+            int slot = scaffold.getBlockSlot();
             ItemStack heldItem = slot == -1 ? null : mc.thePlayer.inventory.mainInventory[slot];
             int count = slot == -1 ? 0 : scaffold.getBlockCount();
             String countStr = String.valueOf(count);

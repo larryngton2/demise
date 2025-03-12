@@ -80,7 +80,7 @@ public class BedNuker extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
-        if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && getModule(Scaffold.class).targetBlock == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
+        if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && getModule(Scaffold.class).data == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
             reset(true);
             return;
         }

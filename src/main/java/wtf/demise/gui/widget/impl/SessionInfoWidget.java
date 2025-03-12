@@ -39,19 +39,20 @@ public class SessionInfoWidget extends Widget {
 
     @Override
     public void render() {
-
         String srv;
         if (mc.isSingleplayer()) {
             srv = "Singleplayer";
-        } else
-            srv = mc.getCurrentServerData().serverIP.toLowerCase().contains("ccc.blocksmc.com") ? "blocksmc.com" : mc.getCurrentServerData().serverIP;
+        } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
+            srv = "liquidproxy.net";
+        } else {
+            srv = mc.getCurrentServerData().serverIP;
+        }
 
         switch (setting.sessionInfoMode.get()) {
             case "Default":
                 this.width = 150;
                 this.height = 100;
                 RoundedUtils.drawRound(renderX, renderY, width, height, 10, new Color(setting.bgColor(), true));
-
 
                 Fonts.interRegular.get(14).drawStringWithShadow("Session Time: " + RenderUtils.sessionTime(), renderX + 7.5f, renderY + 10, -1);
                 Fonts.interRegular.get(14).drawStringWithShadow("User: " + mc.thePlayer.getName(), renderX + 7.5f, renderY + 10 + Fonts.interRegular.get(13).getHeight(), -1);

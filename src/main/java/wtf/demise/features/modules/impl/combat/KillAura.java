@@ -13,11 +13,10 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import org.apache.commons.lang3.Range;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
@@ -69,23 +68,21 @@ public class KillAura extends Module {
     // autoBlock
     private final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
     private final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
-    private final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink"}, "Vanilla", this, autoBlock::get);
+    private final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
     private final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "None"}, "Silent", this);
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "test"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier"));
     private final BoolValue slowDown = new BoolValue("Slow down", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue slowDownDivision = new SliderValue("Speed division", 2, 1, 10, 0.1f, this, () -> slowDown.get() && slowDown.canDisplay());
-    private final SliderValue slowHurtTime = new SliderValue("Slow hurtTime", 7, 0, 10, 1, this, () -> slowDown.get() && slowDown.canDisplay());
-    private final SliderValue slowDistanceRange = new SliderValue("Slow distance range", 1, 0, 8, 0.1f, this, () -> slowDown.get() && slowDown.canDisplay());
+    private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
     private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
@@ -152,6 +149,7 @@ public class KillAura extends Module {
     public void onDisable() {
         if (isBlocking) {
             setBlocking(false);
+            BlinkComponent.dispatch(true);
         }
         currentTarget = null;
         targets.clear();
@@ -212,6 +210,7 @@ public class KillAura extends Module {
 
             if (isBlocking) {
                 setBlocking(false);
+                BlinkComponent.dispatch(true);
             }
         }
 
@@ -244,16 +243,18 @@ public class KillAura extends Module {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
         MovementCorrection correction = movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF;
 
-        boolean slowCheck = slowDown.get() && mc.thePlayer.getDistanceToEntity(target) < slowDistanceRange.get() && currentTarget.hurtTime > slowHurtTime.get();
+        float hurtTime = target.hurtTime - hurtTimeSubtraction.get();
+
+        if (hurtTime < 1) hurtTime = 1;
 
         float hSpeed = MathUtils.randomizeFloat(
-                slowCheck ? yawRotationSpeedMin.get() / slowDownDivision.get() : yawRotationSpeedMin.get(),
-                slowCheck ? yawRotationSpeedMax.get() / slowDownDivision.get() : yawRotationSpeedMax.get()
+                slowDown.get() ? yawRotationSpeedMin.get() / hurtTime : yawRotationSpeedMin.get(),
+                slowDown.get() ? yawRotationSpeedMax.get() / hurtTime : yawRotationSpeedMax.get()
         );
 
         float vSpeed = MathUtils.randomizeFloat(
-                slowCheck ? pitchRotationSpeedMin.get() / slowDownDivision.get() : pitchRotationSpeedMin.get(),
-                slowCheck ? pitchRotationSpeedMax.get() / slowDownDivision.get() : pitchRotationSpeedMax.get()
+                slowDown.get() ? pitchRotationSpeedMin.get() / hurtTime : pitchRotationSpeedMin.get(),
+                slowDown.get() ? pitchRotationSpeedMax.get() / hurtTime : pitchRotationSpeedMax.get()
         );
 
         switch (mode) {
@@ -400,9 +401,6 @@ public class KillAura extends Module {
 
     private void sendAttack() {
         if (!isWithinAttackRange()) {
-            if (isBlocking) {
-                setBlocking(false);
-            }
             return;
         }
 
@@ -481,7 +479,7 @@ public class KillAura extends Module {
                         setBlocking(false);
                     }
                     break;
-                case "Fake":
+                case "Fake", "NCP":
                     isBlocking = true;
                     break;
                 case "Vanilla":
@@ -547,11 +545,20 @@ public class KillAura extends Module {
                                 break;
                         }
                     }
+
+                    Demise.INSTANCE.getEventManager().call(new AttackEvent(currentTarget));
                     break;
                 case "PlayerController":
                     AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
                     break;
             }
+        }
+    }
+
+    @EventTarget
+    public void onAttack(AttackEvent e) {
+        if (canAutoBlock() && autoBlockMode.is("NCP")) {
+            setBlocking(true);
         }
     }
 
@@ -630,7 +637,16 @@ public class KillAura extends Module {
     }
 
     private void setBlocking(boolean state) {
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), state);
+        if (!autoBlockMode.is("NCP")) {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), state);
+        } else {
+            if (state) {
+                sendPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, null, 0.0f, 0.0f, 0.0f));
+            } else {
+                sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            }
+        }
+
         isBlocking = state;
     }
 
@@ -795,7 +811,7 @@ public class KillAura extends Module {
     }
 
     @EventTarget
-    public void onMove(MoveEvent event) {
+    public void onMove(MoveEvent e) {
         predictProcesses.clear();
 
         SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput);

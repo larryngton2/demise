@@ -27,6 +27,7 @@ public class RotationUtils implements InstanceAccess {
     private static boolean enabled;
     public static float cachedHSpeed;
     public static float cachedVSpeed;
+    public static float cachedMidpoint;
     public static SmoothMode smoothMode = SmoothMode.Linear;
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
 
@@ -129,6 +130,7 @@ public class RotationUtils implements InstanceAccess {
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
+        cachedMidpoint = midpoint;
         RotationUtils.smoothMode = smoothMode;
 
         enabled = true;
@@ -146,28 +148,37 @@ public class RotationUtils implements InstanceAccess {
             }
 
             if (distanceToPlayerRotation > 0) {
-                RotationUtils.currentRotation = smoothMode == SmoothMode.Linear ? smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed) : smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                RotationUtils.currentRotation =
+                        switch (smoothMode) {
+                            case Linear ->
+                                    smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                            case Lerp ->
+                                    smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                            case Bezier ->
+                                    smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
+                        };
             }
         }
+
         enabled = false;
     }
 
     @EventTarget
-    private void onMove(MoveInputEvent event) {
+    private void onMove(MoveInputEvent e) {
         if (currentCorrection == MovementCorrection.SILENT) {
             /*
              * Calculating movement fix
              */
             final float yaw = currentRotation[0];
-            MoveUtil.fixMovement(event, yaw);
+            MoveUtil.fixMovement(e, yaw);
         }
     }
 
     @EventTarget
-    private void onStrafe(StrafeEvent event) {
+    private void onStrafe(StrafeEvent e) {
         if (shouldRotate()) {
-            if (currentCorrection == MovementCorrection.STRICT || currentCorrection == MovementCorrection.SILENT) {
-                event.setYaw(currentRotation[0]);
+            if (currentCorrection != MovementCorrection.OFF) {
+                e.setYaw(currentRotation[0]);
             }
         }
     }
@@ -182,14 +193,13 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
-    public void onPacket(final PacketEvent event) {
-        final Packet<?> packet = event.getPacket();
+    @EventPriority(-100)
+    public void onPacket(final PacketEvent e) {
+        final Packet<?> packet = e.getPacket();
 
-        if (!(packet instanceof C03PacketPlayer packetPlayer))
-            return;
+        if (!(packet instanceof C03PacketPlayer packetPlayer)) return;
 
-        if (!packetPlayer.rotating)
-            return;
+        if (!packetPlayer.rotating) return;
 
         if (shouldRotate()) {
             packetPlayer.yaw = currentRotation[0];
@@ -200,7 +210,7 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
-    public void onWorld(WorldChangeEvent event) {
+    public void onWorld(WorldChangeEvent e) {
         resetRotation();
     }
 
@@ -217,9 +227,18 @@ public class RotationUtils implements InstanceAccess {
                 }
 
                 if (distanceToPlayerRotation > 0) {
-                    RotationUtils.currentRotation = smoothMode == SmoothMode.Linear ? smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed) : smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                    RotationUtils.currentRotation =
+                            switch (smoothMode) {
+                                case Linear ->
+                                        smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                                case Lerp ->
+                                        smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                                case Bezier ->
+                                        smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
+                            };
                 }
             }
+
             enabled = false;
         }
     }
@@ -330,6 +349,15 @@ public class RotationUtils implements InstanceAccess {
 
     public static double distanceFromYaw(final Entity entity) {
         return abs(MathHelper.wrapAngleTo180_double(i(entity.posX, entity.posZ) - mc.thePlayer.rotationYaw));
+    }
+
+    public static double getRotationDifference(float[] e) {
+        return getRotationDifference(serverRotation, e);
+    }
+
+    public static double getRotationDifference(Vec3 e) {
+        float[] entityRotation = getRotations(e.xCoord, e.yCoord, e.zCoord);
+        return getRotationDifference(entityRotation);
     }
 
     public static float getRotationDifference(final Entity entity) {

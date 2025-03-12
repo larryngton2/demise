@@ -22,7 +22,7 @@ public class NoFallCheck extends Check {
             fall = true;
         }
         if (fall && player.fallDistance == 0 && player.hurtTime == 0 && !player.isInWater()) {
-            flag(player, "Not taking any damage");
+            flag(player, "Not taking any fall damage");
             fall = false;
         }
     }

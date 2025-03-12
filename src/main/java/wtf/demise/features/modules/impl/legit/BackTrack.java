@@ -64,6 +64,8 @@ public class BackTrack extends Module {
 
             target = PlayerUtils.getTarget(9, teamCheck.get());
 
+            if (ping == 0) ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
+
             if (target == null)
                 return;
 

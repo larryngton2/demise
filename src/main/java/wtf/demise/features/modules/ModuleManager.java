@@ -75,7 +75,6 @@ public class ModuleManager {
                 AutoMeow.class,
                 MurderMystery.class,
                 InventorySync.class,
-                ChatBypass.class,
                 AutoQueue.class,
 
                 // Movement
