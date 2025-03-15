@@ -32,14 +32,11 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.*;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
-import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.misc.EnumFacingOffset;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -144,7 +141,16 @@ public class PlayerUtils implements InstanceAccess {
     }
 
     public static double getDistanceToEntityBox(Entity entity) {
-        Vec3 eyes = mc.thePlayer.getPositionEyes(1f);
+        Vec3 eyes = mc.thePlayer.getPositionEyes(1);
+        Vec3 pos = RotationUtils.getBestHitVec(entity);
+        double xDist = Math.abs(pos.xCoord - eyes.xCoord);
+        double yDist = Math.abs(pos.yCoord - eyes.yCoord);
+        double zDist = Math.abs(pos.zCoord - eyes.zCoord);
+        return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2) + Math.pow(zDist, 2));
+    }
+
+    public static double getCustomDistanceToEntityBox(Vec3 playerPos, Entity entity) {
+        Vec3 eyes = new Vec3(playerPos.xCoord, playerPos.yCoord + mc.thePlayer.getEyeHeight(), playerPos.zCoord);
         Vec3 pos = RotationUtils.getBestHitVec(entity);
         double xDist = Math.abs(pos.xCoord - eyes.xCoord);
         double yDist = Math.abs(pos.yCoord - eyes.yCoord);

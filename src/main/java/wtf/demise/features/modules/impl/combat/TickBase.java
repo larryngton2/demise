@@ -2,50 +2,41 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Vec3;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TimerManipulationEvent;
-import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
 import wtf.demise.utils.render.RenderUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @ModuleInfo(name = "TickBase", category = ModuleCategory.Combat)
 public class TickBase extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
-    public final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
-    public final SliderValue minActiveRange = new SliderValue("Min Active Range", 3f, 0.1f, 7f, 0.1f, this);
-    public final SliderValue maxActiveRange = new SliderValue("Max Active Range", 7f, 0.1f, 7f, 0.1f, this);
-    public final SliderValue maxTick = new SliderValue("Max Ticks", 4, 1, 20, this);
-    public final BoolValue displayPredictPos = new BoolValue("Dislay Predict Pos", false, this);
-    public final BoolValue check = new BoolValue("Check", false, this);
+    private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
+    private final SliderValue attackRange = new SliderValue("Attack range", 3f, 0.1f, 7f, 0.1f, this);
+    private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 7f, 0.1f, this);
+    private final SliderValue maxTick = new SliderValue("Max Ticks", 4, 1, 20, this);
+    private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
+    private final BoolValue displayPredictPos = new BoolValue("Dislay Predict Pos", false, this);
+    private final BoolValue check = new BoolValue("Check", false, this);
     private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
-    public TimerUtils timer = new TimerUtils();
-    public int skippedTick = 0;
+    private final TimerUtils timer = new TimerUtils();
     private long shifted, previousTime;
-    public boolean working;
-    private boolean firstAnimation = true;
-    public final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
-    public EntityPlayer target;
+    private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
+    private EntityPlayer target;
 
     @Override
     public void onEnable() {
@@ -54,88 +45,55 @@ public class TickBase extends Module {
     }
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
-        target = PlayerUtils.getTarget(maxActiveRange.get() * 3, teamCheck.get());
-
+    public void onUpdate(UpdateEvent e) {
+        target = PlayerUtils.getTarget(searchRange.get() * 3, teamCheck.get());
     }
 
     @EventTarget
-    public void onMotion(MotionEvent event) {
-        setTag(mode.get());
-        if (mode.is("Future")) {
-            if (event.getState() == MotionEvent.State.PRE)
-                return;
-
-            if (target == null || predictProcesses.isEmpty() || shouldStop()) {
-                return;
-            }
-
-            if (timer.hasTimeElapsed(delay.get())) {
-                if (shouldStart()) {
-                    firstAnimation = false;
-                    while (skippedTick <= maxTick.get() && !shouldStop()) {
-                        ++skippedTick;
-                        try {
-                            mc.runTick();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    timer.reset();
-                }
-            }
-            working = false;
+    public void onTimerManipulation(TimerManipulationEvent e) {
+        if (target == null || selfPrediction.isEmpty() || shouldStop()) {
+            return;
         }
-    }
 
-    @EventTarget
-    public void onTimerManipulation(TimerManipulationEvent event) {
-        if (mode.is("Past")) {
-
-            if (target == null || predictProcesses.isEmpty() || shouldStop()) {
-                return;
-            }
-
-            if (shouldStart() && timer.hasTimeElapsed(delay.get())) {
-                shifted += event.getTime() - previousTime;
-            }
-
-            if (shifted >= maxTick.get() * (1000 / 20f)) {
-                shifted = 0;
-                timer.reset();
-            }
-
-            previousTime = event.getTime();
-            event.setTime(event.getTime() - shifted);
+        if (shouldStart() && timer.hasTimeElapsed(delay.get())) {
+            shifted += e.getTime() - previousTime;
         }
+
+        if (shifted >= maxTick.get() * (1000 / 20f)) {
+            shifted = 0;
+            timer.reset();
+        }
+
+        previousTime = e.getTime();
+        e.setTime(e.getTime() - shifted);
     }
 
     @EventTarget
-    public void onMove(MoveEvent event) {
+    public void onMove(MoveEvent e) {
+        selfPrediction.clear();
 
-        predictProcesses.clear();
+        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
 
-        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput);
+        simulatedSelf.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
 
-        simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
-
-        for (int i = 0; i < (skippedTick != 0 ? skippedTick : maxTick.get()); i++) {
-            simulatedPlayer.tick();
-            predictProcesses.add(new PlayerUtils.PredictProcess(
-                    simulatedPlayer.getPos(),
-                    simulatedPlayer.fallDistance,
-                    simulatedPlayer.onGround,
-                    simulatedPlayer.isCollidedHorizontally
-            ));
+        for (int i = 0; i < maxTick.get(); i++) {
+            simulatedSelf.tick();
+            selfPrediction.add(new PlayerUtils.PredictProcess(
+                            simulatedSelf.getPos(),
+                            simulatedSelf.fallDistance,
+                            simulatedSelf.onGround,
+                            simulatedSelf.isCollidedHorizontally
+                    )
+            );
         }
     }
 
     @EventTarget
     public void onRender3D(Render3DEvent e) {
         if (displayPredictPos.get() && mc.gameSettings.thirdPersonView != 0) {
-            double x = predictProcesses.get(predictProcesses.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
-            double y = predictProcesses.get(predictProcesses.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
-            double z = predictProcesses.get(predictProcesses.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
+            double x = selfPrediction.get(selfPrediction.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
+            double y = selfPrediction.get(selfPrediction.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
+            double z = selfPrediction.get(selfPrediction.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
             AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
             AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
             RenderUtils.drawAxisAlignedBB(axis, false, true, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
@@ -143,38 +101,17 @@ public class TickBase extends Module {
     }
 
     public boolean shouldStart() {
-        return predictProcesses.get((int) (maxTick.get() - 1)).position.distanceTo(target.getPositionVector()) <
-                mc.thePlayer.getPositionVector().distanceTo(target.getPositionVector()) &&
-                MathUtils.inBetween(minActiveRange.get(), maxActiveRange.get(), predictProcesses.get((int) (maxTick.get() - 1)).position.distanceTo(target.getPositionVector())) &&
+        double predictedDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.get((int) maxTick.get() - 1).position, target);
+
+        return predictedDistance < PlayerUtils.getDistanceToEntityBox(target) &&
+                predictedDistance <= attackRange.get() && predictedDistance <= searchRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&
                 target.canEntityBeSeen(mc.thePlayer) &&
                 (RotationUtils.getRotationDifference(mc.thePlayer, target) <= 90 && check.get() || !check.get()) &&
-                !predictProcesses.get((int) (maxTick.get() - 1)).isCollidedHorizontally;
+                !selfPrediction.get((int) (maxTick.get() - 1)).isCollidedHorizontally;
     }
 
     public boolean shouldStop() {
-        return mc.thePlayer.hurtTime != 0;
-    }
-
-    public boolean handleTick() {
-        if (mode.is("Future")) {
-            if (working || skippedTick < 0) return true;
-            if (isEnabled() && skippedTick > 0) {
-                --skippedTick;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean freezeAnim() {
-        if (skippedTick != 0) {
-            if (!firstAnimation) {
-                firstAnimation = true;
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return mc.thePlayer.hurtTime > hurtTimeToStop.get();
     }
 }

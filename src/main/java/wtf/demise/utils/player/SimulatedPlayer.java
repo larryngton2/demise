@@ -33,7 +33,7 @@ import wtf.demise.utils.InstanceAccess;
 import java.util.List;
 
 public class SimulatedPlayer implements InstanceAccess {
-    private final EntityPlayerSP player;
+    public final EntityPlayerSP player;
     public AxisAlignedBB box;
     public final MovementInput movementInput;
     private int jumpTicks;
@@ -129,7 +129,7 @@ public class SimulatedPlayer implements InstanceAccess {
 
     private static final float SPEED_IN_AIR = 0.02F;
 
-    public static SimulatedPlayer fromClientPlayer(MovementInput input) {
+    public static SimulatedPlayer fromClientPlayer(MovementInput input, float motionMulti) {
         EntityPlayerSP player = mc.thePlayer;
 
         PlayerCapabilities capabilities = createCapabilitiesCopy(player);
@@ -145,9 +145,9 @@ public class SimulatedPlayer implements InstanceAccess {
                 player.getEntityBoundingBox(),
                 movementInput,
                 player.jumpTicks,
-                player.motionZ * 1.5,
-                player.motionY * 1.5,
-                player.motionX * 1.5,
+                player.motionZ * motionMulti,
+                player.motionY * motionMulti,
+                player.motionX * motionMulti,
                 player.isInWater(),
                 player.onGround,
                 player.isAirBorne,

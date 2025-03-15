@@ -9,6 +9,7 @@ import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -19,7 +20,7 @@ import wtf.demise.utils.player.RotationUtils;
 
 @ModuleInfo(name = "Speed", category = ModuleCategory.Movement)
 public class Speed extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan"}, "Strafe Hop", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC"}, "Strafe Hop", this);
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));
@@ -89,29 +90,49 @@ public class Speed extends Module {
         switch (mode.get()) {
             case "NCP":
                 if (ncpMode.is("On tick 4")) {
-                    switch (mc.thePlayer.offGroundTicks) {
-                        case 4:
-                            mc.thePlayer.motionY = -0.09800000190734863;
-                            break;
-
-                        case 6:
-                            if (MoveUtil.isMoving()) MoveUtil.strafe();
-                            break;
+                    if (mc.thePlayer.offGroundTicks == 4 && mc.thePlayer.posY % 1.0 == 0.16610926093821377) {
+                        mc.thePlayer.motionY = -0.09800000190734863;
                     }
 
-                    if (mc.thePlayer.hurtTime >= 1 && mc.thePlayer.motionY > 0) {
-                        mc.thePlayer.motionY -= 0.15;
+                    if (mc.thePlayer.offGroundTicks >= 6) {
+                        MoveUtil.strafe();
                     }
 
                     if (mc.thePlayer.onGround) {
                         mc.thePlayer.jump();
 
-                        if (MoveUtil.getSpeed() < 0.281) {
-                            MoveUtil.strafe(0.281);
-                        } else {
-                            MoveUtil.strafe();
-                        }
+                        MoveUtil.strafe(Math.max(0.281, MoveUtil.getSpeed()));
                     }
+
+                    if (MoveUtil.getSpeedEffect() > 0 && mc.thePlayer.offGroundTicks == 3) {
+                        mc.thePlayer.motionX *= 1.2;
+                        mc.thePlayer.motionZ *= 1.2;
+                    }
+                }
+                break;
+            case "BMC":
+                if (mc.thePlayer.offGroundTicks == 4 && mc.thePlayer.posY % 1.0 == 0.16610926093821377) {
+                    if (MoveUtil.getSpeedEffect() == 0) {
+                        mc.thePlayer.motionX *= 0.93;
+                        mc.thePlayer.motionZ *= 0.93;
+                    }
+
+                    if (!getModule(Scaffold.class).isEnabled()) {
+                        mc.thePlayer.motionY = -0.09800000190734863;
+                    }
+                }
+
+                if (!mc.thePlayer.onGround) {
+                    MoveUtil.strafe();
+                } else {
+                    mc.thePlayer.jump();
+                }
+
+                MoveUtil.strafe(Math.max(0.23, MoveUtil.getSpeed()));
+
+                if (MoveUtil.getSpeedEffect() > 0 && mc.thePlayer.offGroundTicks == 3) {
+                    mc.thePlayer.motionX *= 1.15;
+                    mc.thePlayer.motionZ *= 1.15;
                 }
                 break;
             case "Intave":

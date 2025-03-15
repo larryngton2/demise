@@ -7,18 +7,20 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
+import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
@@ -27,16 +29,13 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
-import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.MovementCorrection;
-import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
-@ModuleInfo(name = "Scaffold", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Scaffold", category = ModuleCategory.Player)
 public class Scaffold extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly"}, "Normal", this);
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));
@@ -64,9 +63,10 @@ public class Scaffold extends Module {
     ), this);
     private final SliderValue blocksToSneak = new SliderValue("Blocks To Sneak", 7, 1, 8, this, () -> addons.isEnabled("Sneak"));
     private final SliderValue sneakDistance = new SliderValue("Sneak Distance", 0, 0, 0.5f, 0.01f, this, () -> addons.isEnabled("Sneak"));
-    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog"}, "Jump", this, () -> !mode.is("Telly"));
-    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "Low"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown"}, "Jump", this, () -> !mode.is("Telly"));
     public final ModeValue counter = new ModeValue("Counter", new String[]{"None", "Simple", "Normal", "Exhibition"}, "Normal", this);
+    private final SliderValue pullDownMotion = new SliderValue("PullDown motion", 0.95f, 0.5f, 1, 0.01f, this, () -> towerMove.is("PullDown"));
 
     private float[] previousRotation;
     private BlockPos previousBlock;
@@ -80,6 +80,7 @@ public class Scaffold extends Module {
     public PlaceData data;
     private float hypixelRandomYaw;
     private boolean isOnRightSide;
+    private float targetYaw, targetPitch;
 
     float yaw, pitch;
     private HoverState hoverState = HoverState.DONE;
@@ -356,32 +357,6 @@ public class Scaffold extends Module {
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 
-        if (towerMove.is("Low")) {
-            if (towerMoving()) {
-                if (mc.thePlayer.offGroundTicks == 1) {
-                    mc.thePlayer.motionY += 0.057f;
-
-                    if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && !(getModule(Scaffold.class).isEnabled() && mc.gameSettings.keyBindJump.isKeyDown()) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 >= 2) {
-                        MoveUtil.strafe(0.48);
-                    } else if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 >= 2) {
-                        MoveUtil.strafe(0.4);
-                    } else if (mc.thePlayer.isPotionActive(Potion.moveSpeed) && mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 == 1) {
-                        MoveUtil.strafe(0.405);
-                    } else {
-                        MoveUtil.strafe(0.33);
-                    }
-                }
-
-                if (mc.thePlayer.offGroundTicks == 3) {
-                    mc.thePlayer.motionY -= 0.1309f;
-                }
-
-                if (mc.thePlayer.offGroundTicks == 4) {
-                    mc.thePlayer.motionY -= 0.2;
-                }
-            }
-        }
-
         if (mc.thePlayer.onGround) {
             if ((addons.isEnabled("Auto Jump") || mode.is("Telly")) && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
                 if (MoveUtil.isMoving()) {
@@ -419,8 +394,7 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onMotion(MotionEvent event) {
-
+    public void onPreMotion(MotionEvent event) {
         if (event.isPost())
             return;
 
@@ -460,6 +434,25 @@ public class Scaffold extends Module {
                         } else if (valY > 7000) {
                             mc.thePlayer.motionY = 1 - mc.thePlayer.posY % 1;
                         }
+                    }
+                }
+            }
+        }
+
+        if ((towerMove.canDisplay() && towerMoving() && towerMove.is("PullDown")) || (tower.canDisplay() && towering() && tower.is("PullDown"))) {
+            if (mc.thePlayer.onGround) mc.thePlayer.motionY = 0.42F;
+            mc.thePlayer.motionX *= pullDownMotion.get();
+            mc.thePlayer.motionZ *= pullDownMotion.get();
+        }
+    }
+
+    @EventTarget
+    public void onPacket(PacketEvent e) {
+        if (e.getState() == PacketEvent.State.OUTGOING) {
+            if ((towerMove.canDisplay() && towerMoving() && towerMove.is("PullDown")) || (tower.canDisplay() && towering() && tower.is("PullDown"))) {
+                if (mc.thePlayer.motionY > -0.0784000015258789 && e.getPacket() instanceof C08PacketPlayerBlockPlacement wrapper) {
+                    if (wrapper.getPosition().equals(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1.4, mc.thePlayer.posZ))) {
+                        mc.thePlayer.motionY = -0.0784000015258789;
                     }
                 }
             }

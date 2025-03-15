@@ -4,11 +4,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -19,7 +19,6 @@ import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SmoothMode;
-import wtf.demise.utils.render.RenderUtils;
 
 @ModuleInfo(name = "AutoRod", category = ModuleCategory.Combat)
 public class AutoRod extends Module {

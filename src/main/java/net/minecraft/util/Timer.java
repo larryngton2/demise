@@ -32,6 +32,7 @@ public class Timer {
     public void updateTimer() {
         TimerManipulationEvent timerManipulationEvent = new TimerManipulationEvent(Minecraft.getSystemTime());
         Demise.INSTANCE.getEventManager().call(timerManipulationEvent);
+
         long i = timerManipulationEvent.getTime();
         this.field_194148_c = (float) (i - this.lastSyncSysClock) / this.field_194149_e * this.timerSpeed;
         this.lastSyncSysClock = i;

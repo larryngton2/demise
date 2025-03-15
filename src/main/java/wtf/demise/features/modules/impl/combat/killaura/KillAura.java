@@ -1,10 +1,6 @@
-package wtf.demise.features.modules.impl.combat;
+package wtf.demise.features.modules.impl.combat.killaura;
 
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import de.florianmichael.vialoadingbase.ViaLoadingBase;
-import de.florianmichael.viamcp.fixes.AttackOrder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
@@ -12,12 +8,8 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.*;
-import org.apache.commons.lang3.Range;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -28,6 +20,10 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.combat.AntiBot;
+import wtf.demise.features.modules.impl.combat.HitBox;
+import wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler;
+import wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -36,40 +32,41 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
+import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
+import static wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler.setBlocking;
 
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
 
     // reach
-    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
+    public final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
 
     // attack
-    private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
-    private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
-    private final ModeValue swingMode = new ModeValue("Swing mode", new String[]{"Normal", "Client", "Server"}, "Normal", this, () -> clickMode.is("Packet"));
-    private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
-    private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
-    private final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
-    private final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
-    private final SliderValue clicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
-    private final BoolValue rayCast = new BoolValue("RayCast", false, this);
-    private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
+    public final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
+    public final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
+    public final ModeValue swingMode = new ModeValue("Swing mode", new String[]{"Normal", "Client", "Server"}, "Normal", this, () -> clickMode.is("Packet"));
+    public final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
+    public final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
+    public final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
+    public final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
+    public final SliderValue clicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
+    public final BoolValue rayCast = new BoolValue("RayCast", false, this);
+    public final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
     private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
 
     // autoBlock
-    private final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
-    private final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
-    private final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
-    private final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
+    public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
+    public final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
+    public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
+    public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "None"}, "Silent", this);
@@ -91,8 +88,9 @@ public class KillAura extends Module {
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
     private final BoolValue predict = new BoolValue("Rotation prediction", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 0, 3, 1, this, () -> predict.get() && predict.canDisplay());
-    private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay() && predictTicks.get() != 0);
+    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
+    private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
+    private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay());
 
     // offset
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -125,14 +123,12 @@ public class KillAura extends Module {
 
     private final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
     private final Queue<Vec3> positionHistory = new LinkedList<>();
-    private final TimerUtils lastTargetTime = new TimerUtils();
     private final TimerUtils lastSwitchTime = new TimerUtils();
     public List<EntityLivingBase> targets = new ArrayList<>();
     private final TimerUtils pauseTimer = new TimerUtils();
     private Vec3 positionOnPlayer, lastPositionOnPlayer;
     public static EntityLivingBase currentTarget;
     public static boolean isBlocking = false;
-    private int blockTicks = 0;
     private Vec3 targetVec;
     public Vec3 currentVec;
     private double lastPitchOffset;
@@ -179,30 +175,30 @@ public class KillAura extends Module {
         if (currentTarget != null) {
             lastSwitchTime.reset();
 
-            if (isTargetInvalid()) {
+            if (!isTargetInvalid()) {
+                double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
+
+                if (!ClickHandler.isWithinAttackRange() && isBlocking) {
+                    setBlocking(false);
+                }
+
+                if (distance <= searchRange.get()) {
+                    switch (rotationMode.get()) {
+                        case "Silent":
+                            setRotationToTarget(currentTarget);
+                            break;
+                        case "Snap":
+                            if (ClickHandler.isAttackReady()) {
+                                setRotationToTarget(currentTarget);
+                            }
+                            break;
+                    }
+                }
+            } else {
                 if (isBlocking) {
                     setBlocking(false);
                 }
                 currentTarget = null;
-            } else {
-                handleAutoBlock();
-            }
-
-            if (!isWithinAttackRange() && isBlocking) {
-                setBlocking(false);
-            }
-
-            if (PlayerUtils.getDistanceToEntityBox(currentTarget) <= searchRange.get()) {
-                switch (rotationMode.get()) {
-                    case "Silent":
-                        setRotationToTarget(currentTarget);
-                        break;
-                    case "Snap":
-                        if (isAttackReady()) {
-                            setRotationToTarget(currentTarget);
-                        }
-                        break;
-                }
             }
         } else {
             predictProcesses.clear();
@@ -227,15 +223,22 @@ public class KillAura extends Module {
     }
 
     @EventTarget
-    public void onPlayerTick(PlayerTickEvent e) {
-        if (e.state == PlayerTickEvent.State.PRE && currentTarget != null) {
+    public void onPlayerTickEvent(PlayerTickEvent e) {
+        if (mc.thePlayer == null || mc.theWorld == null) {
+            return;
+        }
+
+        if (e.getState() == PlayerTickEvent.State.PRE && currentTarget != null && !isTargetInvalid()) {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
-            if (Range.between(attackRange.get(), swingRange.get()).contains((float) distance) && failSwing.get() && isAttackReady()) {
-                handleFailSwing(mc.objectMouseOver);
+            AutoBlockHandler.preAttack();
+            if (!ClickHandler.isWithinAttackRange() && distance < swingRange.get() && ClickHandler.isAttackReady() && failSwing.get()) {
+                ClickHandler.handleFailSwing();
+                lastTargetTime.reset();
             }
 
-            sendAttack();
+            ClickHandler.sendAttack();
+            AutoBlockHandler.postAttack();
         }
     }
 
@@ -399,166 +402,14 @@ public class KillAura extends Module {
         }
     }
 
-    private void sendAttack() {
-        if (!isWithinAttackRange()) {
-            return;
-        }
-
-        if (!isAttackReady()) {
-            return;
-        }
-
-        boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
-
-        if (rayCast.get() && rayCastFailed) {
-            handleFailSwing(mc.objectMouseOver);
-        } else {
-            attack();
-        }
-
-        lastTargetTime.reset();
-    }
-
-    private boolean isWithinAttackRange() {
-        return PlayerUtils.getDistanceToEntityBox(currentTarget) <= attackRange.get();
-    }
-
-    private boolean isAttackReady() {
-        boolean check = lastTargetTime.hasTimeElapsed(1000 / (ThreadLocalRandom.current().nextInt((int) minCPS.get(), (int) maxCPS.get() + 1) * 1.5));
-
-        if (smartClicking.get() && check) {
-            return shouldClick();
-        } else {
-            return check;
-        }
-    }
-
-    private void handleFailSwing(MovingObjectPosition movingObjectPosition) {
-        if (failSwing.get() && failSwing.canDisplay()) {
-            switch (clickMode.get()) {
-                case "Packet":
-                    switch (swingMode.get()) {
-                        case "Normal", "Client":
-                            AttackOrder.sendConditionalSwing(movingObjectPosition);
-                            break;
-                        case "Server":
-                            sendPacketNoEvent(new C0APacketAnimation());
-                            break;
-                    }
-                    break;
-                case "Legit":
-                    KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
-                    break;
-                case "PlayerController":
-                    AttackOrder.sendConditionalSwing(movingObjectPosition);
-                    break;
-            }
-        }
-
-        lastTargetTime.reset();
-    }
-
     private boolean isTargetInvalid() {
         return currentTarget.isDead || PlayerUtils.getDistanceToEntityBox(currentTarget) > searchRange.get() || currentTarget.getEntityWorld() != mc.thePlayer.getEntityWorld();
     }
 
-    private void handleAutoBlock() {
-        boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
-
-        if (rayCastFailed && unBlockOnRayCastFail.get() && rayCast.get()) {
-            if (isBlocking) {
-                setBlocking(false);
-            }
-            return;
-        }
-
-        if (canAutoBlock()) {
-            switch (autoBlockMode.get()) {
-                case "None":
-                    if (isBlocking) {
-                        setBlocking(false);
-                    }
-                    break;
-                case "Fake", "NCP":
-                    isBlocking = true;
-                    break;
-                case "Vanilla":
-                    setBlocking(true);
-                    break;
-                case "Release":
-                    releaseAb(currentTarget);
-                    break;
-                case "VanillaForce":
-                    vanillaReblockAb(currentTarget);
-                    break;
-                case "Smart":
-                    smartAb(currentTarget);
-                    break;
-                case "Blink":
-                    blinkAb(currentTarget);
-                    break;
-            }
-        } else if (isBlocking) {
-            setBlocking(false);
-        }
-    }
-
-    private boolean shouldClick() {
-        return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY >= 0 || currentTarget.hurtTime <= 5;
-    }
-
-    private boolean canAutoBlock() {
-        return isHoldingSword() && autoBlock.get() && PlayerUtils.getDistanceToEntityBox(currentTarget) <= autoBlockRange.get();
-    }
-
-    private void attack() {
-        int attackCount = 1;
-
-        if (extraClicks.get() && rand.nextInt(100) <= eChance.get()) {
-            attackCount = (int) clicks.get() + 1;
-        }
-
-        for (int i = 0; i < attackCount; i++) {
-            switch (clickMode.get()) {
-                case "Legit":
-                    KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
-                    break;
-                case "Packet":
-                    if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                        switch (swingMode.get()) {
-                            case "Normal", "Client":
-                                mc.thePlayer.swingItem();
-                                break;
-                            case "Server":
-                                sendPacketNoEvent(new C0APacketAnimation());
-                                break;
-                        }
-                        PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
-                    } else {
-                        PacketUtils.sendPacket(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
-                        switch (swingMode.get()) {
-                            case "Normal", "Client":
-                                mc.thePlayer.swingItem();
-                                break;
-                            case "Server":
-                                sendPacketNoEvent(new C0APacketAnimation());
-                                break;
-                        }
-                    }
-
-                    Demise.INSTANCE.getEventManager().call(new AttackEvent(currentTarget));
-                    break;
-                case "PlayerController":
-                    AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
-                    break;
-            }
-        }
-    }
-
     @EventTarget
     public void onAttack(AttackEvent e) {
-        if (canAutoBlock() && autoBlockMode.is("NCP")) {
-            setBlocking(true);
+        if (AutoBlockHandler.canAutoBlock()) {
+            AutoBlockHandler.onAttack();
         }
     }
 
@@ -600,54 +451,6 @@ public class KillAura extends Module {
 
     public boolean isHoldingSword() {
         return mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
-    }
-
-    private void releaseAb(EntityLivingBase e) {
-        setBlocking(e.hurtTime >= 5 || isWithinAttackRange());
-    }
-
-    private void vanillaReblockAb(Entity e) {
-        setBlocking(true);
-        if (!mc.gameSettings.keyBindUseItem.isKeyDown() || !mc.thePlayer.isBlocking()) {
-            setBlocking(true);
-        }
-    }
-
-    private void smartAb(EntityLivingBase e) {
-        setBlocking(((mc.thePlayer.hurtTime <= 5 && mc.thePlayer.hurtTime != 0) && mc.thePlayer.motionY >= 0) || e.hurtTime > 5);
-    }
-
-    private void blinkAb(Entity e) {
-        if (blockTicks >= 3) {
-            blockTicks = 0;
-        } else {
-            blockTicks++;
-        }
-
-        switch (blockTicks) {
-            case 1:
-                BlinkComponent.blinking = true;
-                setBlocking(false);
-                break;
-            case 2:
-                setBlocking(true);
-                BlinkComponent.dispatch(true);
-                break;
-        }
-    }
-
-    private void setBlocking(boolean state) {
-        if (!autoBlockMode.is("NCP")) {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), state);
-        } else {
-            if (state) {
-                sendPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, null, 0.0f, 0.0f, 0.0f));
-            } else {
-                sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-            }
-        }
-
-        isBlocking = state;
     }
 
     public float[] calcToEntity(EntityLivingBase entity) {
@@ -814,7 +617,7 @@ public class KillAura extends Module {
     public void onMove(MoveEvent e) {
         predictProcesses.clear();
 
-        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput);
+        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, simulatedMotionMulti.get());
 
         simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
 

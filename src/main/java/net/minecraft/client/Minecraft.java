@@ -105,6 +105,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
+import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.math.TimerUtils;
@@ -801,13 +802,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
 
-        TickBase tickBase = Demise.INSTANCE.getModuleManager().getModule(TickBase.class);
-
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
-            if (tickBase.handleTick()) {
-                continue;
-            }
-
             this.runTick();
         }
 
@@ -830,7 +825,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         this.mcProfiler.endSection();
 
-        if (!this.skipRenderWorld && !tickBase.freezeAnim()) {
+        if (!this.skipRenderWorld) {
             this.mcProfiler.endStartSection("gameRenderer");
             this.entityRenderer.updateCameraAndRender(this.timer.renderPartialTicks, i);
             this.mcProfiler.endSection();

@@ -5,6 +5,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
+import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.modules.impl.exploit.*;
 import wtf.demise.features.modules.impl.legit.AutoClicker;
 import wtf.demise.features.modules.impl.legit.BackTrack;

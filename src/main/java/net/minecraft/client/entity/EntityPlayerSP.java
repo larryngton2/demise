@@ -510,6 +510,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     public void onLivingUpdate() {
         UpdateEvent updateEvent = new UpdateEvent();
         Demise.INSTANCE.getEventManager().call(updateEvent);
+
         if (this.sprintingTicksLeft > 0) {
             --this.sprintingTicksLeft;
 

@@ -25,7 +25,7 @@ import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.font.FontRenderer;
