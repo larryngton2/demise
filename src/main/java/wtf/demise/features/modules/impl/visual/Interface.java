@@ -85,6 +85,7 @@ public class Interface extends Module {
     public final BoolValue hideScoreboard = new BoolValue("Hide Scoreboard", false, this);
     public final BoolValue hideScoreRed = new BoolValue("Hide Scoreboard Red Points", true, this, () -> !hideScoreboard.get());
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
+    public final BoolValue healthFix = new BoolValue("Health fix", true, this);
 
     private final DecimalFormat bpsFormat = new DecimalFormat("0.00");
     private final DecimalFormat xyzFormat = new DecimalFormat("0");

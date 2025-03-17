@@ -45,11 +45,7 @@ import net.minecraft.util.*;
 import net.minecraft.world.*;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
-import wtf.demise.features.modules.impl.combat.KeepSprint;
-import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.utils.player.RotationUtils;
-import wtf.demise.utils.waveycapes.config.Config;
-import wtf.demise.utils.waveycapes.sim.StickSimulation;
 
 import java.util.Collection;
 import java.util.List;
@@ -94,7 +90,6 @@ public abstract class EntityPlayer extends EntityLivingBase {
     public final GameProfile gameProfile;
     private boolean hasReducedDebug = false;
     public EntityFishHook fishEntity;
-    public final StickSimulation stickSimulation = new StickSimulation();
 
     public EntityPlayer(World worldIn, GameProfile gameProfileIn) {
         super(worldIn);
@@ -160,10 +155,6 @@ public abstract class EntityPlayer extends EntityLivingBase {
     }
 
     public void onUpdate() {
-        Options cape = Demise.INSTANCE.getModuleManager().getModule(Options.class);
-        if (cape.wavey.get()) {
-            simulate(this);
-        }
         this.noClip = this.isSpectator();
 
         if (this.isSpectator()) {
@@ -1752,44 +1743,5 @@ public abstract class EntityPlayer extends EntityLivingBase {
         TOO_FAR_AWAY,
         OTHER_PROBLEM,
         NOT_SAFE
-    }
-
-    public void updateSimulation(EntityPlayer abstractClientPlayer, int partCount) {
-        boolean dirty = false;
-        if (stickSimulation.points.size() != partCount) {
-            stickSimulation.points.clear();
-            stickSimulation.sticks.clear();
-            for (int i = 0; i < partCount; i++) {
-                StickSimulation.Point point = new StickSimulation.Point();
-                point.position.y = -i;
-                point.locked = i == 0;
-                stickSimulation.points.add(point);
-                if (i > 0) {
-                    stickSimulation.sticks.add(new StickSimulation.Stick(stickSimulation.points.get(i - 1), point, 1f));
-                }
-            }
-            dirty = true;
-        }
-        if (dirty) {
-            for (int i = 0; i < 10; i++)
-                simulate(abstractClientPlayer);
-        }
-    }
-
-    public void simulate(EntityPlayer abstractClientPlayer) {
-        if (stickSimulation.points.isEmpty()) {
-            return;
-        }
-        stickSimulation.points.get(0).prevPosition.copy(stickSimulation.points.get(0).position);
-        double d = abstractClientPlayer.chasingPosX - abstractClientPlayer.posX;
-        double m = abstractClientPlayer.chasingPosZ - abstractClientPlayer.posZ;
-        float n = abstractClientPlayer.prevRenderYawOffset + abstractClientPlayer.renderYawOffset - abstractClientPlayer.prevRenderYawOffset;
-        double o = MathHelper.sin(n * 0.017453292F);
-        double p = -MathHelper.cos(n * 0.017453292F);
-        float heightMul = Config.heightMultiplier;
-        double fallHack = MathHelper.clamp_double((stickSimulation.points.get(0).position.y - (abstractClientPlayer.posY * heightMul)), 0d, 1d);
-        stickSimulation.points.get(0).position.x += (d * o + m * p) + fallHack;
-        stickSimulation.points.get(0).position.y = (float) (abstractClientPlayer.posY * heightMul + (abstractClientPlayer.isSneaking() ? -4 : 0));
-        stickSimulation.simulate();
     }
 }

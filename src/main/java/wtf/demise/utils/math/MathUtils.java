@@ -33,11 +33,11 @@ public class MathUtils {
         return old + (now - old) * partialTicks;
     }
 
-    public static Vec3 interpolate(Vec3 end, Vec3 start, float multiple) {
+    public static Vec3 interpolate(Vec3 old, Vec3 now, float multiple) {
         return new Vec3(
-                (float) interpolate(end.xCoord, start.xCoord, multiple),
-                (float) interpolate(end.yCoord, start.yCoord, multiple),
-                (float) interpolate(end.zCoord, start.zCoord, multiple));
+                (float) interpolate(old.xCoord, now.xCoord, multiple),
+                (float) interpolate(old.yCoord, now.yCoord, multiple),
+                (float) interpolate(old.zCoord, now.zCoord, multiple));
     }
 
     public static double interpolate(double old, double now) {

@@ -72,7 +72,6 @@ public class ModuleManager {
                 // Misc
                 Twerk.class,
                 AntiCheat.class,
-                Options.class,
                 AutoMeow.class,
                 MurderMystery.class,
                 InventorySync.class,
@@ -132,7 +131,9 @@ public class ModuleManager {
                 ItemESP.class,
                 FreeCam.class,
                 ViewBobbing.class,
-                BreakProgress.class
+                BreakProgress.class,
+                Dot.class,
+                Cape.class
         );
 
         // Sort modules by name for better organization

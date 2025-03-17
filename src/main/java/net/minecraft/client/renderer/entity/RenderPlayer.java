@@ -14,7 +14,6 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Camera;
-import wtf.demise.utils.waveycapes.renderlayers.CustomCapeRenderLayer;
 
 public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
     private final boolean smallArms;
@@ -32,8 +31,6 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
         this.addLayer(new LayerDeadmau5Head(this));
         this.addLayer(new LayerCape(this));
         this.addLayer(new LayerCustomHead(this.getMainModel().bipedHead));
-
-        this.addLayer(new CustomCapeRenderLayer(this, getMainModel()));
     }
 
     public ModelPlayer getMainModel() {

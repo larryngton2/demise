@@ -10,6 +10,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
@@ -22,13 +23,11 @@ import static wtf.demise.utils.packet.PacketUtils.sendPacketNoEvent;
 public class ClickHandler implements InstanceAccess {
     private static final KillAura killAura = Demise.INSTANCE.getModuleManager().getModule(KillAura.class);
     public static final TimerUtils lastTargetTime = new TimerUtils();
+    public static final TimerUtils lastClickUpdate = new TimerUtils();
+    private static double currentCPS;
 
     public static void sendAttack() {
         if (!isWithinAttackRange()) {
-            return;
-        }
-
-        if (!isAttackReady()) {
             return;
         }
 
@@ -39,8 +38,6 @@ public class ClickHandler implements InstanceAccess {
         } else {
             attack();
         }
-
-        lastTargetTime.reset();
     }
 
     public static boolean isWithinAttackRange() {
@@ -48,7 +45,12 @@ public class ClickHandler implements InstanceAccess {
     }
 
     public static boolean isAttackReady() {
-        boolean check = lastTargetTime.hasTimeElapsed(1000 / (ThreadLocalRandom.current().nextInt((int) killAura.minCPS.get(), (int) killAura.maxCPS.get() + 1) * 1.5));
+        double meanCPS = (killAura.minCPS.get() + killAura.maxCPS.get()) / 2.0;
+        double stdDevCPS = (killAura.maxCPS.get() - killAura.minCPS.get()) / 4.0;
+
+        currentCPS = MathUtils.interpolate(currentCPS, ThreadLocalRandom.current().nextGaussian(meanCPS, stdDevCPS));
+
+        boolean check = lastTargetTime.hasTimeElapsed(1000 / currentCPS);
 
         if (killAura.smartClicking.get() && check) {
             return shouldClick();
@@ -90,7 +92,7 @@ public class ClickHandler implements InstanceAccess {
         int attackCount = 1;
 
         if (killAura.extraClicks.get() && killAura.rand.nextInt(100) <= killAura.eChance.get()) {
-            attackCount = (int) killAura.clicks.get() + 1;
+            attackCount = (int) killAura.eClicks.get() + 1;
         }
 
         for (int i = 0; i < attackCount; i++) {

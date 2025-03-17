@@ -10,8 +10,8 @@ import net.minecraft.world.World;
 
 import java.io.IOException;
 
+@Getter
 public class C02PacketUseEntity implements Packet<INetHandlerPlayServer> {
-    @Getter
     private int entityId;
     private C02PacketUseEntity.Action action;
     private Vec3 hitVec;
@@ -55,14 +55,6 @@ public class C02PacketUseEntity implements Packet<INetHandlerPlayServer> {
 
     public Entity getEntityFromWorld(World worldIn) {
         return worldIn.getEntityByID(this.entityId);
-    }
-
-    public C02PacketUseEntity.Action getAction() {
-        return this.action;
-    }
-
-    public Vec3 getHitVec() {
-        return this.hitVec;
     }
 
     public enum Action {

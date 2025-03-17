@@ -13,7 +13,7 @@ public class InventorySync extends Module {
     public short action;
 
     @EventTarget
-    public void onReceivePacket(PacketEvent e) {
+    public void onSendPacket(PacketEvent e) {
         if (e.getState() != PacketEvent.State.INCOMING) {
             return;
         }

@@ -47,6 +47,8 @@ public class TickBase extends Module {
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         target = PlayerUtils.getTarget(searchRange.get() * 3, teamCheck.get());
+
+        this.setTag(String.valueOf(maxTick.get()));
     }
 
     @EventTarget

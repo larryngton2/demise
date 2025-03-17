@@ -16,6 +16,8 @@ import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @ModuleInfo(name = "BreakProgress", category = ModuleCategory.Visual)
 public class BreakProgress extends Module {
@@ -29,7 +31,7 @@ public class BreakProgress extends Module {
         float x, y;
         float output = (float) anim.getOutput();
         int spacing = 3;
-        String text = Math.floor(mc.playerController.curBlockDamageMP * 100) + "%";
+        String text = BigDecimal.valueOf(mc.playerController.curBlockDamageMP * 100).setScale(1, RoundingMode.FLOOR) + "%";
         float textWidth = Fonts.interBold.get(18).getStringWidth(text);
 
         float totalWidth = ((textWidth + spacing) + 6) * output;
@@ -55,7 +57,7 @@ public class BreakProgress extends Module {
         float x, y;
         float output = (float) anim.getOutput();
         int spacing = 3;
-        String text = Math.floor(mc.playerController.curBlockDamageMP * 100) + "%";
+        String text = BigDecimal.valueOf(mc.playerController.curBlockDamageMP * 100).setScale(1, RoundingMode.FLOOR) + "%";
         float textWidth = Fonts.interBold.get(18).getStringWidth(text);
 
         float totalWidth = ((textWidth + spacing) + 6) * output;

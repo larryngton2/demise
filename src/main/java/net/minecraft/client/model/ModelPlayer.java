@@ -4,7 +4,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.misc.Options;
 import wtf.demise.features.modules.impl.visual.ESP;
 
 public class ModelPlayer extends ModelBiped {
@@ -101,10 +100,6 @@ public class ModelPlayer extends ModelBiped {
     }
 
     public void renderCape(float p_178728_1_) {
-        Options cape = Demise.INSTANCE.getModuleManager().getModule(Options.class);
-        if (cape.wavey.get())
-            return;
-
         this.bipedCape.render(p_178728_1_);
     }
 

@@ -13,6 +13,7 @@ import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
@@ -57,7 +58,7 @@ public class KillAura extends Module {
     public final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
     public final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
     public final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
-    public final SliderValue clicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
+    public final SliderValue eClicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
     public final BoolValue rayCast = new BoolValue("RayCast", false, this);
     public final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
     private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
@@ -65,7 +66,7 @@ public class KillAura extends Module {
     // autoBlock
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
     public final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
-    public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Smart", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
+    public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
 
     // rotation
@@ -93,7 +94,7 @@ public class KillAura extends Module {
     private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay());
 
     // offset
-    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave", "test"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue iHurtTime = new SliderValue("Intave hurtTime", 5, 1, 10, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Intave"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
@@ -108,8 +109,6 @@ public class KillAura extends Module {
 
     // visual
     private final BoolValue targetESP = new BoolValue("Target ESP", false, this);
-    private final BoolValue targetOnPlayer = new BoolValue("Target on player", false, this);
-    private final SliderValue dotScale = new SliderValue("Target scale", 0.04f, 0.01f, 1, 0.01f, this, targetOnPlayer::get);
 
     // targetS
     private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
@@ -126,7 +125,7 @@ public class KillAura extends Module {
     private final TimerUtils lastSwitchTime = new TimerUtils();
     public List<EntityLivingBase> targets = new ArrayList<>();
     private final TimerUtils pauseTimer = new TimerUtils();
-    private Vec3 positionOnPlayer, lastPositionOnPlayer;
+    private int clicks;
     public static EntityLivingBase currentTarget;
     public static boolean isBlocking = false;
     private Vec3 targetVec;
@@ -137,7 +136,6 @@ public class KillAura extends Module {
 
     @Override
     public void onEnable() {
-        lastTargetTime.reset();
         lastSwitchTime.reset();
     }
 
@@ -145,12 +143,17 @@ public class KillAura extends Module {
     public void onDisable() {
         if (isBlocking) {
             setBlocking(false);
+        }
+
+        if (BlinkComponent.blinking) {
             BlinkComponent.dispatch(true);
         }
+
         currentTarget = null;
         targets.clear();
         predictProcesses.clear();
         positionHistory.clear();
+        clicks = 0;
     }
 
     @EventTarget
@@ -195,9 +198,6 @@ public class KillAura extends Module {
                     }
                 }
             } else {
-                if (isBlocking) {
-                    setBlocking(false);
-                }
                 currentTarget = null;
             }
         } else {
@@ -206,8 +206,13 @@ public class KillAura extends Module {
 
             if (isBlocking) {
                 setBlocking(false);
+            }
+
+            if (BlinkComponent.blinking) {
                 BlinkComponent.dispatch(true);
             }
+
+            clicks = 0;
         }
 
         if (Objects.equals(clickMode.get(), "Packet")) {
@@ -223,6 +228,18 @@ public class KillAura extends Module {
     }
 
     @EventTarget
+    public void onGameUpdate(GameEvent e) {
+        if (mc.thePlayer == null || mc.theWorld == null) {
+            return;
+        }
+
+        if (ClickHandler.isAttackReady() && currentTarget != null && !isTargetInvalid()) {
+            clicks++;
+            lastTargetTime.reset();
+        }
+    }
+
+    @EventTarget
     public void onPlayerTickEvent(PlayerTickEvent e) {
         if (mc.thePlayer == null || mc.theWorld == null) {
             return;
@@ -231,14 +248,18 @@ public class KillAura extends Module {
         if (e.getState() == PlayerTickEvent.State.PRE && currentTarget != null && !isTargetInvalid()) {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
-            AutoBlockHandler.preAttack();
-            if (!ClickHandler.isWithinAttackRange() && distance < swingRange.get() && ClickHandler.isAttackReady() && failSwing.get()) {
-                ClickHandler.handleFailSwing();
-                lastTargetTime.reset();
-            }
+            for (int i = 0; i < clicks; i++) {
+                AutoBlockHandler.preAttack();
 
-            ClickHandler.sendAttack();
-            AutoBlockHandler.postAttack();
+                if (!ClickHandler.isWithinAttackRange() && distance < swingRange.get() && failSwing.get()) {
+                    ClickHandler.handleFailSwing();
+                }
+
+                ClickHandler.sendAttack();
+                AutoBlockHandler.postAttack();
+
+                clicks--;
+            }
         }
     }
 
@@ -378,18 +399,8 @@ public class KillAura extends Module {
             return;
         }
 
-        if (currentTarget != null) {
-            if (positionOnPlayer != null && lastPositionOnPlayer != null && targetOnPlayer.get()) {
-                Vec3 interpolatedPosition = new Vec3(
-                        (positionOnPlayer.xCoord - lastPositionOnPlayer.xCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.xCoord,
-                        (positionOnPlayer.yCoord - lastPositionOnPlayer.yCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.yCoord,
-                        (positionOnPlayer.zCoord - lastPositionOnPlayer.zCoord) * mc.timer.renderPartialTicks + lastPositionOnPlayer.zCoord);
-                RenderUtils.renderBreadCrumb(interpolatedPosition, dotScale.get());
-            }
-
-            if (targetESP.get()) {
-                drawCircle(currentTarget);
-            }
+        if (currentTarget != null && targetESP.get()) {
+            drawCircle(currentTarget);
         }
 
         if (predict.get() && mc.gameSettings.thirdPersonView != 0 && renderPredictPos.get()) {
@@ -419,22 +430,6 @@ public class KillAura extends Module {
 
         if (!getModule(HitBox.class).isEnabled()) {
             e.setExpand(-0.1f);
-        }
-    }
-
-    @EventTarget
-    public void onPreMotion(MotionEvent e) {
-        if (e.isPre()) {
-            MovingObjectPosition movingObjectPosition = PlayerUtils.getMouseOver(RotationUtils.serverRotation[0], RotationUtils.serverRotation[1], (float) (attackRange.get() + 0.4));
-
-            if (movingObjectPosition == null) {
-                return;
-            }
-
-            final Vec3 rayCast = Objects.requireNonNull(movingObjectPosition).hitVec;
-            if (rayCast == null) return;
-            lastPositionOnPlayer = positionOnPlayer;
-            positionOnPlayer = rayCast;
         }
     }
 
@@ -542,7 +537,7 @@ public class KillAura extends Module {
         pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
 
         switch (offsetMode.get()) {
-            case "Gaussian":
+            case "Gaussian": {
                 double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
                 double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
 
@@ -559,28 +554,29 @@ public class KillAura extends Module {
                     yaw += (float) lastYawOffset;
                     pitch += (float) lastPitchOffset;
                 }
-                break;
-            case "Intave":
+            }
+            break;
+            case "Intave": {
                 boolean dynamicCheck = entity.hurtTime > iHurtTime.get();
 
                 double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
                 double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
 
-                double iyawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
-                double ipitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
+                double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
+                double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
 
-                double iyawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * iyawFactor;
-                double ipitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * ipitchFactor;
+                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
+                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
 
                 float targetYaw = yaw;
                 float targetPitch = pitch;
 
                 if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
-                    targetYaw += (float) iyawOffset;
-                    targetPitch += (float) ipitchOffset;
+                    targetYaw += (float) yawOffset;
+                    targetPitch += (float) pitchOffset;
 
-                    lastYawOffset = iyawOffset;
-                    lastPitchOffset = ipitchOffset;
+                    lastYawOffset = yawOffset;
+                    lastPitchOffset = pitchOffset;
                 } else {
                     targetYaw += (float) lastYawOffset;
                     targetPitch += (float) lastPitchOffset;
@@ -591,6 +587,23 @@ public class KillAura extends Module {
 
                 yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
                 pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
+            }
+            break;
+            case "test":
+                double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6) * 15;
+                double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4) * 10;
+
+                double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
+                double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
+
+                float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
+                float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
+
+                yaw += smoothedYaw;
+                pitch += smoothedPitch;
+
+                lastYawOffset = smoothedYaw;
+                lastPitchOffset = smoothedPitch;
                 break;
         }
 

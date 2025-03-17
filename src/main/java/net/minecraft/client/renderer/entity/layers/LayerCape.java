@@ -9,7 +9,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.misc.Options;
+import wtf.demise.features.modules.impl.visual.Cape;
 import wtf.demise.features.modules.impl.visual.Interface;
 
 import java.util.Iterator;
@@ -22,20 +22,38 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
     }
 
     public void doRenderLayer(AbstractClientPlayer entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale) {
-        if (!entitylivingbaseIn.isInvisible() && (entitylivingbaseIn.hasPlayerInfo() && entitylivingbaseIn.isWearing(EnumPlayerModelParts.CAPE) && entitylivingbaseIn.getLocationCape() != null || entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Options.class).cape.get())) {
+        if (!entitylivingbaseIn.isInvisible() && (entitylivingbaseIn.hasPlayerInfo() && entitylivingbaseIn.isWearing(EnumPlayerModelParts.CAPE) && entitylivingbaseIn.getLocationCape() != null || entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled())) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Options.class).cape.get()) {
-                this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/cape.png"));
+            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled()) {
+                switch (Demise.INSTANCE.getModuleManager().getModule(Cape.class).mode.get()) {
+                    case "Normal" ->
+                            this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/cape.png"));
+                    case "Rise" -> {
+                        switch (Demise.INSTANCE.getModuleManager().getModule(Cape.class).riseMode.get()) {
+                            case "Normal" ->
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCape.png"));
+                            case "Red" ->
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeRed.png"));
+                            case "Green" ->
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeGreen.png"));
+                            case "Blue" ->
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeBlue.png"));
+                            case "Dogshit" ->
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeGato.png"));
+                        }
+                    }
+                }
             } else {
                 this.playerRenderer.bindTexture(entitylivingbaseIn.getLocationCape());
             }
+
             GlStateManager.pushMatrix();
             GlStateManager.translate(0.0F, 0.0F, 0.125F);
             double d0 = entitylivingbaseIn.prevChasingPosX + (entitylivingbaseIn.chasingPosX - entitylivingbaseIn.prevChasingPosX) * (double) partialTicks - (entitylivingbaseIn.prevPosX + (entitylivingbaseIn.posX - entitylivingbaseIn.prevPosX) * (double) partialTicks);
             double d1 = entitylivingbaseIn.prevChasingPosY + (entitylivingbaseIn.chasingPosY - entitylivingbaseIn.prevChasingPosY) * (double) partialTicks - (entitylivingbaseIn.prevPosY + (entitylivingbaseIn.posY - entitylivingbaseIn.prevPosY) * (double) partialTicks);
             double d2 = entitylivingbaseIn.prevChasingPosZ + (entitylivingbaseIn.chasingPosZ - entitylivingbaseIn.prevChasingPosZ) * (double) partialTicks - (entitylivingbaseIn.prevPosZ + (entitylivingbaseIn.posZ - entitylivingbaseIn.prevPosZ) * (double) partialTicks);
-            float f = entitylivingbaseIn.prevRenderYawOffset + (entitylivingbaseIn.renderYawOffset - entitylivingbaseIn.prevRenderYawOffset) * partialTicks;
+            float f = entitylivingbaseIn.prevRotationYaw + (entitylivingbaseIn.rotationYaw - entitylivingbaseIn.prevRotationYaw) * partialTicks;
             double d3 = MathHelper.sin(f * (float) Math.PI / 180.0F);
             double d4 = -MathHelper.cos(f * (float) Math.PI / 180.0F);
             float f1 = (float) d1 * 10.0F;
@@ -69,7 +87,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
             this.playerRenderer.getMainModel().renderCape(0.0625F);
 
-            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Options.class).cape.get()) {
+            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Cape.class).mode.is("Normal")) {
                 this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/overlay.png"));
                 int rgb = Demise.INSTANCE.getModuleManager().getModule(Interface.class).color();
                 float alpha = 0.3F;
@@ -79,7 +97,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                 GL11.glColor4f(red, green, blue, alpha);
                 this.playerRenderer.getMainModel().renderCape(0.0625F);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                if (Demise.INSTANCE.getModuleManager().getModule(Options.class).enchanted.get()) {
+                if (Demise.INSTANCE.getModuleManager().getModule(Cape.class).enchanted.get()) {
                     for (Iterator<LayerRenderer<AbstractClientPlayer>> var32 = this.playerRenderer.getLayerRenderers().iterator(); var32.hasNext(); GlStateManager.resetColor()) {
                         LayerRenderer var31 = var32.next();
                         if (var31 instanceof LayerArmorBase) {

@@ -32,8 +32,7 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @ModuleInfo(name = "Scaffold", category = ModuleCategory.Player)
 public class Scaffold extends Module {
@@ -63,24 +62,22 @@ public class Scaffold extends Module {
     ), this);
     private final SliderValue blocksToSneak = new SliderValue("Blocks To Sneak", 7, 1, 8, this, () -> addons.isEnabled("Sneak"));
     private final SliderValue sneakDistance = new SliderValue("Sneak Distance", 0, 0, 0.5f, 0.01f, this, () -> addons.isEnabled("Sneak"));
-    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown"}, "Jump", this, () -> !mode.is("Telly"));
-    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
     public final ModeValue counter = new ModeValue("Counter", new String[]{"None", "Simple", "Normal", "Exhibition"}, "Normal", this);
     private final SliderValue pullDownMotion = new SliderValue("PullDown motion", 0.95f, 0.5f, 1, 0.01f, this, () -> towerMove.is("PullDown"));
 
-    private float[] previousRotation;
     private BlockPos previousBlock;
-    private BlockPos targetBlock;
+    public BlockPos targetBlock;
     private double onGroundY;
     private int oloSlot = -1;
     private int blocksPlaced;
     private boolean placing;
     private int tellyTicks;
-    private boolean placed;
+    public boolean placed;
     public PlaceData data;
     private float hypixelRandomYaw;
     private boolean isOnRightSide;
-    private float targetYaw, targetPitch;
 
     float yaw, pitch;
     private HoverState hoverState = HoverState.DONE;
@@ -110,7 +107,6 @@ public class Scaffold extends Module {
 
         oloSlot = mc.thePlayer.inventory.currentItem;
         onGroundY = mc.thePlayer.getEntityBoundingBox().minY;
-        previousRotation = new float[]{mc.thePlayer.rotationYaw + 180, 82};
     }
 
     @Override
@@ -118,7 +114,6 @@ public class Scaffold extends Module {
         mc.thePlayer.inventory.currentItem = oloSlot;
         SpoofSlotUtils.stopSpoofing();
 
-        previousRotation = null;
         blocksPlaced = 0;
         placing = false;
         tellyTicks = 0;
@@ -264,8 +259,6 @@ public class Scaffold extends Module {
             rotation = RotationUtils.getRotations(getVec3(data));
         }
 
-        previousRotation = rotation;
-
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
             RotationUtils.setRotation(rotation, addons.isEnabled("Movement Fix") ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
 
@@ -290,7 +283,6 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onMovementInput(MoveInputEvent event) {
-
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 
@@ -322,7 +314,6 @@ public class Scaffold extends Module {
         }
 
         if (addons.isEnabled("Sneak")) {
-
             double dif = 0.5;
             BlockPos blockPos = new BlockPos(mc.thePlayer).down();
 
@@ -415,8 +406,19 @@ public class Scaffold extends Module {
                             mc.thePlayer.motionY = 1 - mc.thePlayer.posY % 1;
                         }
                     }
-
                 }
+            }
+
+            if (tower.is("NCP") && towering()) {
+                    sendPacketNoEvent(new C08PacketPlayerBlockPlacement(null));
+
+                    if (mc.thePlayer.posY % 1 <= 0.00153598) {
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, Math.floor(mc.thePlayer.posY), mc.thePlayer.posZ);
+                        mc.thePlayer.motionY = 0.42F;
+                    } else if (mc.thePlayer.posY % 1 < 0.1 && mc.thePlayer.offGroundTicks != 0) {
+                        mc.thePlayer.motionY = 0;
+                        mc.thePlayer.setPosition(mc.thePlayer.posX, Math.floor(mc.thePlayer.posY), mc.thePlayer.posZ);
+                    }
             }
         }
 
@@ -435,6 +437,18 @@ public class Scaffold extends Module {
                             mc.thePlayer.motionY = 1 - mc.thePlayer.posY % 1;
                         }
                     }
+                }
+            }
+
+            if (towerMove.is("NCP") && towerMoving()) {
+                sendPacketNoEvent(new C08PacketPlayerBlockPlacement(null));
+
+                if (mc.thePlayer.posY % 1 <= 0.00153598) {
+                    mc.thePlayer.setPosition(mc.thePlayer.posX, Math.floor(mc.thePlayer.posY), mc.thePlayer.posZ);
+                    mc.thePlayer.motionY = 0.42F;
+                } else if (mc.thePlayer.posY % 1 < 0.1 && mc.thePlayer.offGroundTicks != 0) {
+                    mc.thePlayer.motionY = 0;
+                    mc.thePlayer.setPosition(mc.thePlayer.posX, Math.floor(mc.thePlayer.posY), mc.thePlayer.posZ);
                 }
             }
         }
@@ -525,7 +539,6 @@ public class Scaffold extends Module {
     }
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
-
         placing = false;
         if (!addons.isEnabled("Ray Trace")) {
             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, facing, hitVec)) {
@@ -572,78 +585,51 @@ public class Scaffold extends Module {
 
     private PlaceData findBlock(BlockPos pos) {
         EnumFacing[] facings = {EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.UP};
-        BlockPos[] offsets = {new BlockPos(-1, 0, 0), new BlockPos(1, 0, 0), new BlockPos(0, 0, 1), new BlockPos(0, 0, -1), new BlockPos(0, -1, 0)};
+        BlockPos[] offsets = {
+                new BlockPos(-1, 0, 0), new BlockPos(1, 0, 0),
+                new BlockPos(0, 0, 1), new BlockPos(0, 0, -1),
+                new BlockPos(0, -1, 0)
+        };
 
         if (previousBlock != null && previousBlock.getY() > mc.thePlayer.posY) {
             previousBlock = null;
         }
-        for (int lastCheck = 0; lastCheck < 2; lastCheck++) {
-            for (int i = 0; i < offsets.length; i++) {
-                BlockPos newPos = pos.add(offsets[i]);
-                Block block = mc.theWorld.getBlockState(newPos).getBlock();
-                if (newPos.equals(previousBlock)) {
-                    return new PlaceData(facings[i], newPos);
-                }
-                if (lastCheck == 0) {
-                    continue;
-                }
-                if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
-                    return new PlaceData(facings[i], newPos);
+
+        PlaceData result = checkPositions(pos, offsets, facings);
+        if (result != null) {
+            return result;
+        }
+
+        for (BlockPos offset : offsets) {
+            result = checkPositions(pos.add(offset), offsets, facings);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        for (BlockPos offset1 : offsets) {
+            for (BlockPos offset2 : offsets) {
+                result = checkPositions(pos.add(offset1).add(offset2), offsets, facings);
+                if (result != null) {
+                    return result;
                 }
             }
         }
 
-        BlockPos[] additionalOffsets = {
-                pos.add(-1, 0, 0),
-                pos.add(1, 0, 0),
-                pos.add(0, 0, 1),
-                pos.add(0, 0, -1),
-                pos.add(0, -1, 0),
-        };
+        return null;
+    }
 
-        for (int lastCheck = 0; lastCheck < 2; lastCheck++) {
-            for (BlockPos additionalPos : additionalOffsets) {
-                for (int i = 0; i < offsets.length; i++) {
-                    BlockPos newPos = additionalPos.add(offsets[i]);
-                    Block block = mc.theWorld.getBlockState(newPos).getBlock();
-                    if (newPos.equals(previousBlock)) {
-                        return new PlaceData(facings[i], newPos);
-                    }
-                    if (lastCheck == 0) {
-                        continue;
-                    }
-                    if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
-                        return new PlaceData(facings[i], newPos);
-                    }
-                }
+    private PlaceData checkPositions(BlockPos basePos, BlockPos[] offsets, EnumFacing[] facings) {
+        for (int i = 0; i < offsets.length; i++) {
+            BlockPos newPos = basePos.add(offsets[i]);
+            Block block = mc.theWorld.getBlockState(newPos).getBlock();
+
+            if (newPos.equals(previousBlock)) {
+                return new PlaceData(facings[i], newPos);
             }
-        }
 
-        BlockPos[] additionalOffsets2 = {
-                new BlockPos(-1, 0, 0),
-                new BlockPos(1, 0, 0),
-                new BlockPos(0, 0, 1),
-                new BlockPos(0, 0, -1),
-                new BlockPos(0, -1, 0),
-        };
-
-        for (int lastCheck = 0; lastCheck < 2; lastCheck++) {
-            for (BlockPos additionalPos2 : additionalOffsets2) {
-                for (BlockPos additionalPos : additionalOffsets) {
-                    for (int i = 0; i < offsets.length; i++) {
-                        BlockPos newPos = additionalPos2.add(additionalPos.add(offsets[i]));
-                        Block block = mc.theWorld.getBlockState(newPos).getBlock();
-                        if (newPos.equals(previousBlock)) {
-                            return new PlaceData(facings[i], newPos);
-                        }
-                        if (lastCheck == 0) {
-                            continue;
-                        }
-                        if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
-                            return new PlaceData(facings[i], newPos);
-                        }
-                    }
-                }
+            if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
+                return new PlaceData(facings[i], newPos);
             }
         }
         return null;

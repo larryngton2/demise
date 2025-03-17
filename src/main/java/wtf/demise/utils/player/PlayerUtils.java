@@ -33,7 +33,7 @@ import net.minecraft.util.*;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
-import wtf.demise.features.modules.impl.misc.Options;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.InstanceAccess;
 
 import java.util.ArrayList;
@@ -437,7 +437,7 @@ public class PlayerUtils implements InstanceAccess {
     private static final String[] healthSubstrings = {"hp", "health", "lives", "❤"};
 
     public static Float getActualHealth(EntityLivingBase entity) {
-        if (Demise.INSTANCE.getModuleManager().getModule(Options.class).fixHealth.get()) {
+        if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).healthFix.get()) {
             Scoreboard scoreboard = entity.getEntityWorld().getScoreboard();
             ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(2);
 

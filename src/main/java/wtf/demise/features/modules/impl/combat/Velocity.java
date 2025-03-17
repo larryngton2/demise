@@ -53,7 +53,6 @@ public class Velocity extends Module {
     private boolean shouldReduce;
     private Entity currentTarget;
     private boolean velocity;
-    private boolean cancel;
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {

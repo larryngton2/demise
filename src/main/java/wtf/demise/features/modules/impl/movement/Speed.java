@@ -112,7 +112,7 @@ public class Speed extends Module {
                 break;
             case "BMC":
                 if (mc.thePlayer.offGroundTicks == 4 && mc.thePlayer.posY % 1.0 == 0.16610926093821377) {
-                    if (MoveUtil.getSpeedEffect() == 0) {
+                    if (MoveUtil.getSpeedEffect() == 0 || getModule(Scaffold.class).isEnabled()) {
                         mc.thePlayer.motionX *= 0.93;
                         mc.thePlayer.motionZ *= 0.93;
                     }
@@ -128,11 +128,23 @@ public class Speed extends Module {
                     mc.thePlayer.jump();
                 }
 
-                MoveUtil.strafe(Math.max(0.23, MoveUtil.getSpeed()));
+                switch (MoveUtil.getSpeedEffect()) {
+                    case 0 -> MoveUtil.strafe(Math.max(0.23, MoveUtil.getSpeed()));
+                    case 1 -> MoveUtil.strafe(Math.max(0.27, MoveUtil.getSpeed()));
+                    case 2 -> MoveUtil.strafe(Math.max(0.3, MoveUtil.getSpeed()));
+                }
 
                 if (MoveUtil.getSpeedEffect() > 0 && mc.thePlayer.offGroundTicks == 3) {
-                    mc.thePlayer.motionX *= 1.15;
-                    mc.thePlayer.motionZ *= 1.15;
+                    switch (MoveUtil.getSpeedEffect()) {
+                        case 1:
+                            mc.thePlayer.motionX *= 1.07;
+                            mc.thePlayer.motionZ *= 1.07;
+                            break;
+                        case 2:
+                            mc.thePlayer.motionX *= 1.15;
+                            mc.thePlayer.motionZ *= 1.15;
+                            break;
+                    }
                 }
                 break;
             case "Intave":
