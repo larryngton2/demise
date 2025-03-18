@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Cape;
 import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.utils.player.MoveUtil;
 
 import java.util.Iterator;
 
@@ -32,17 +33,19 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                     case "Rise" -> {
                         switch (Demise.INSTANCE.getModuleManager().getModule(Cape.class).riseMode.get()) {
                             case "Normal" ->
-                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCape.png"));
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/rise/RiseCape.png"));
                             case "Red" ->
-                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeRed.png"));
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/rise/RiseCapeRed.png"));
                             case "Green" ->
-                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeGreen.png"));
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/rise/RiseCapeGreen.png"));
                             case "Blue" ->
-                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeBlue.png"));
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/rise/RiseCapeBlue.png"));
                             case "Dogshit" ->
-                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/RiseCapeGato.png"));
+                                    this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/rise/RiseCapeGato.png"));
                         }
                     }
+                    case "Minecraft" ->
+                        this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/mc/" + Demise.INSTANCE.getModuleManager().getModule(Cape.class).mcMode.get() + ".png"));
                 }
             } else {
                 this.playerRenderer.bindTexture(entitylivingbaseIn.getLocationCape());
@@ -53,7 +56,15 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
             double d0 = entitylivingbaseIn.prevChasingPosX + (entitylivingbaseIn.chasingPosX - entitylivingbaseIn.prevChasingPosX) * (double) partialTicks - (entitylivingbaseIn.prevPosX + (entitylivingbaseIn.posX - entitylivingbaseIn.prevPosX) * (double) partialTicks);
             double d1 = entitylivingbaseIn.prevChasingPosY + (entitylivingbaseIn.chasingPosY - entitylivingbaseIn.prevChasingPosY) * (double) partialTicks - (entitylivingbaseIn.prevPosY + (entitylivingbaseIn.posY - entitylivingbaseIn.prevPosY) * (double) partialTicks);
             double d2 = entitylivingbaseIn.prevChasingPosZ + (entitylivingbaseIn.chasingPosZ - entitylivingbaseIn.prevChasingPosZ) * (double) partialTicks - (entitylivingbaseIn.prevPosZ + (entitylivingbaseIn.posZ - entitylivingbaseIn.prevPosZ) * (double) partialTicks);
-            float f = entitylivingbaseIn.prevRotationYaw + (entitylivingbaseIn.rotationYaw - entitylivingbaseIn.prevRotationYaw) * partialTicks;
+
+            float f;
+
+            if (Demise.INSTANCE.getModuleManager().getModule(Cape.class).alternativePhysics.get()) {
+                f = entitylivingbaseIn.prevRotationYaw + (entitylivingbaseIn.rotationYaw - entitylivingbaseIn.prevRotationYaw) * partialTicks;
+            } else {
+                f = entitylivingbaseIn.prevRenderYawOffset + (entitylivingbaseIn.renderYawOffset - entitylivingbaseIn.prevRenderYawOffset) * partialTicks;
+            }
+
             double d3 = MathHelper.sin(f * (float) Math.PI / 180.0F);
             double d4 = -MathHelper.cos(f * (float) Math.PI / 180.0F);
             float f1 = (float) d1 * 10.0F;

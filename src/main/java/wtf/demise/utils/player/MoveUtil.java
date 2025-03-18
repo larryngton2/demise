@@ -40,7 +40,7 @@ public class MoveUtil implements InstanceAccess {
     public static final double UNLOADED_CHUNK_MOTION = -0.09800000190735147;
     public static final double HEAD_HITTER_MOTION = -0.0784000015258789;
 
-    private static float lastYaw;
+    public static float lastYaw2;
 
     public static boolean isMoving() {
         return isMoving(mc.thePlayer);
@@ -506,41 +506,27 @@ public class MoveUtil implements InstanceAccess {
     }
 
     public static void smoothStrafe(MotionEvent e) {
-        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection()) - lastYaw);
+        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection()) - lastYaw2);
         double maxAngle = 20;
-        double angle = lastYaw + (deltaYaw > 0 ? maxAngle : -maxAngle);
+        double angle = lastYaw2 + (deltaYaw > 0 ? maxAngle : -maxAngle);
 
         if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(MoveUtil.getDirection());
 
-        mc.thePlayer.setSprinting(true);
-
         if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
             mc.thePlayer.jump();
-            mc.thePlayer.motionY -= 0.02;
 
             double groundSpeed = 0.47;
 
-            angle = lastYaw = (float) Math.toDegrees(MoveUtil.getDirection());
+            angle = lastYaw2 = (float) Math.toDegrees(MoveUtil.getDirection());
 
             MoveUtil.strafe(groundSpeed, Math.toRadians(angle));
         }
 
         if (MoveUtil.isMoving()) {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), false);
             MoveUtil.strafe(MoveUtil.getSpeed(), Math.toRadians(angle));
-
-            if (MoveUtil.getSpeed() < 0.2) {
-                MoveUtil.strafe(Math.max(0.05, MoveUtil.getSpeed() * 1.1));
-            }
-        } else {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), (
-                            Keyboard.isKeyDown(mc.gameSettings.keyBindJump.getKeyCode()) && mc.currentScreen == null
-                    )
-            );
         }
 
-        mc.thePlayer.jumpMovementFactor = 0.028f;
-        lastYaw = MathHelper.wrapAngleTo180_float((float) angle);
+        lastYaw2 = MathHelper.wrapAngleTo180_float((float) angle);
         e.setYaw((float) angle);
 
         mc.thePlayer.rotationYawHead = e.getYaw();
@@ -549,8 +535,10 @@ public class MoveUtil implements InstanceAccess {
     }
 
     private static float yaw = 0;
+    private static float lastYaw = 0;
 
     public static float getDirFromKeybind() {
+
         if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindLeft.isKeyDown()) {
             yaw = 45f;
         } else if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindRight.isKeyDown()) {
@@ -569,10 +557,15 @@ public class MoveUtil implements InstanceAccess {
             yaw = 0f;
         }
 
+        lastYaw = yaw;
         return yaw;
     }
 
     public static float getYawFromKeybind() {
         return mc.thePlayer.rotationYaw - getDirFromKeybind();
+    }
+
+    public static float getLastYawFromKeybind() {
+        return mc.thePlayer.rotationYaw - lastYaw;
     }
 }

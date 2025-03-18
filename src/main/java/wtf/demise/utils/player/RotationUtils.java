@@ -1,6 +1,7 @@
 package wtf.demise.utils.player;
 
 import com.google.common.base.Predicates;
+import com.sun.javafx.geom.Vec2f;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -427,7 +428,6 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static float[] getRotationToBlock(BlockPos blockPos, EnumFacing direction) {
-
         double centerX = blockPos.getX() + 0.5 + direction.getFrontOffsetX() * 0.5;
         double centerY = blockPos.getY() + 0.5 + direction.getFrontOffsetY() * 0.5;
         double centerZ = blockPos.getZ() + 0.5 + direction.getFrontOffsetZ() * 0.5;
