@@ -4,7 +4,10 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
+import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.features.values.impl.ModeValue;
+
+import java.awt.*;
 
 @ModuleInfo(name = "Cape", category = ModuleCategory.Visual)
 public class Cape extends Module {
@@ -47,4 +50,6 @@ public class Cape extends Module {
 
     public final BoolValue enchanted = new BoolValue("Enchanted", false, this, () -> mode.is("Normal"));
     public final BoolValue alternativePhysics = new BoolValue("Alternative physics", false, this);
+    public final BoolValue tint = new BoolValue("Tint", false, this);
+    public final ColorValue color = new ColorValue("Color", Color.white, this, tint::get);
 }

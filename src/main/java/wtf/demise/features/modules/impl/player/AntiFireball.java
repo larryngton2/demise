@@ -40,9 +40,9 @@ public class AntiFireball extends Module {
                     float[] finalRotation = RotationUtils.getAngles(entity);
 
                     if (customRotationSetting.get()) {
-                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
+                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.Silent : MovementCorrection.None, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
                     } else {
-                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF);
+                        RotationUtils.setRotation(finalRotation, moveFix.get() ? MovementCorrection.Silent : MovementCorrection.None);
                     }
 
                     AttackOrder.sendFixedAttack(mc.thePlayer, entity);

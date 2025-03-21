@@ -58,7 +58,7 @@ public class AutoRod extends Module {
                 float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.get(), 0.03f, 2f);
 
                 SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
-                MovementCorrection correction = movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF;
+                MovementCorrection correction = movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None;
 
                 switch (mode) {
                     case Linear:

@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Cape;
 import wtf.demise.features.modules.impl.visual.Interface;
-import wtf.demise.utils.player.MoveUtil;
 
 import java.util.Iterator;
 
@@ -24,7 +23,13 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
 
     public void doRenderLayer(AbstractClientPlayer entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale) {
         if (!entitylivingbaseIn.isInvisible() && (entitylivingbaseIn.hasPlayerInfo() && entitylivingbaseIn.isWearing(EnumPlayerModelParts.CAPE) && entitylivingbaseIn.getLocationCape() != null || entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled())) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            Cape cape = Demise.INSTANCE.getModuleManager().getModule(Cape.class);
+
+            if (cape.tint.get()) {
+                GlStateManager.color(cape.color.get().getRed() / 255f, cape.color.get().getGreen() / 255f, cape.color.get().getBlue() / 255f, cape.color.get().getAlpha() / 255f);
+            } else {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            }
 
             if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled()) {
                 switch (Demise.INSTANCE.getModuleManager().getModule(Cape.class).mode.get()) {

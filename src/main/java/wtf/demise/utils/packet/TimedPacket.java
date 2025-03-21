@@ -1,10 +1,11 @@
 package wtf.demise.utils.packet;
 
+import lombok.Getter;
 import net.minecraft.network.Packet;
 import wtf.demise.utils.math.TimerUtils;
 
+@Getter
 public class TimedPacket {
-
     private final Packet packet;
     private final TimerUtils time;
     private final long millis;
@@ -21,20 +22,7 @@ public class TimedPacket {
         this.time = null;
     }
 
-    public Packet getPacket() {
-        return packet;
-    }
-
     public TimerUtils getCold() {
         return getTime();
     }
-
-    public TimerUtils getTime() {
-        return time;
-    }
-
-    public long getMillis() {
-        return millis;
-    }
-
 }

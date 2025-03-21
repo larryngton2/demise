@@ -7,7 +7,6 @@ import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.utils.InstanceAccess;
 
 public class SpoofSlotUtils implements InstanceAccess {
-
     private static int spoofedSlot;
 
     @Getter

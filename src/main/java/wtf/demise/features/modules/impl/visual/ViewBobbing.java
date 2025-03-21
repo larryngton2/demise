@@ -6,7 +6,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
-import wtf.demise.utils.player.ViewBobbingEvent;
+import wtf.demise.events.impl.render.ViewBobbingEvent;
 
 @ModuleInfo(name = "ViewBobbing", category = ModuleCategory.Visual)
 public class ViewBobbing extends Module {

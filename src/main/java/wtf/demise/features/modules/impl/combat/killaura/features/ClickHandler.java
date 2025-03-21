@@ -14,6 +14,7 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.RotationUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -23,7 +24,6 @@ import static wtf.demise.utils.packet.PacketUtils.sendPacketNoEvent;
 public class ClickHandler implements InstanceAccess {
     private static final KillAura killAura = Demise.INSTANCE.getModuleManager().getModule(KillAura.class);
     public static final TimerUtils lastTargetTime = new TimerUtils();
-    public static final TimerUtils lastClickUpdate = new TimerUtils();
     private static double currentCPS;
 
     public static void sendAttack() {
@@ -31,13 +31,19 @@ public class ClickHandler implements InstanceAccess {
             return;
         }
 
-        boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
-
-        if (killAura.rayCast.get() && rayCastFailed) {
+        if (killAura.rayTrace.get() && rayTraceFailed()) {
             handleFailSwing();
         } else {
             attack();
         }
+    }
+
+    public static boolean rayTraceFailed() {
+        if (killAura.noPartialTicks.get()) {
+            mc.entityRenderer.getMouseOver(1);
+        }
+
+        return mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
     }
 
     public static boolean isWithinAttackRange() {

@@ -42,6 +42,7 @@ import java.util.List;
 
 import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
 import static wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler.setBlocking;
+import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.rayTraceFailed;
 
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
@@ -59,18 +60,19 @@ public class KillAura extends Module {
     public final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
     public final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
     public final SliderValue eClicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
-    public final BoolValue rayCast = new BoolValue("RayCast", false, this);
-    public final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayCast::get);
+    public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
+    public final BoolValue noPartialTicks = new BoolValue("No partial ticks", false, this, rayTrace::get);
+    public final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayTrace::get);
     private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
 
     // autoBlock
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
     public final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
     public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "VanillaForce", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
-    public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayCast.get());
+    public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
-    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "None"}, "Silent", this);
+    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "Derp", "None"}, "Silent", this);
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -81,7 +83,7 @@ public class KillAura extends Module {
     private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier"));
     private final BoolValue slowDown = new BoolValue("Slow down", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
-    private final BoolValue movementFix = new BoolValue("Movement fix", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get());
     private final BoolValue delayed = new BoolValue("Delayed target pos", false, this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -133,6 +135,8 @@ public class KillAura extends Module {
     private double lastPitchOffset;
     private boolean pause;
     private double lastYawOffset;
+    private float derpYaw;
+    private boolean rotate;
 
     @Override
     public void onEnable() {
@@ -191,9 +195,19 @@ public class KillAura extends Module {
                             setRotationToTarget(currentTarget);
                             break;
                         case "Snap":
-                            if (ClickHandler.isAttackReady()) {
+                            if (rotate) {
                                 setRotationToTarget(currentTarget);
+
+                                if ((rayTrace.get() && !rayTraceFailed()) || !rayTrace.get()) {
+                                    rotate = false;
+                                }
                             }
+                            break;
+                        case "Derp":
+                            MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
+                            derpYaw += MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()) / 6;
+
+                            RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, SmoothMode.Linear);
                             break;
                     }
                 }
@@ -248,6 +262,10 @@ public class KillAura extends Module {
         if (e.getState() == PlayerTickEvent.State.PRE && currentTarget != null && !isTargetInvalid()) {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
+            if (rayTrace.get() && rayTraceFailed() && rotationMode.is("Snap") && rotate) {
+                return;
+            }
+
             for (int i = 0; i < clicks; i++) {
                 AutoBlockHandler.preAttack();
 
@@ -258,6 +276,7 @@ public class KillAura extends Module {
                 ClickHandler.sendAttack();
                 AutoBlockHandler.postAttack();
 
+                rotate = true;
                 clicks--;
             }
         }
@@ -265,7 +284,7 @@ public class KillAura extends Module {
 
     private void setRotationToTarget(EntityLivingBase target) {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
-        MovementCorrection correction = movementFix.get() ? MovementCorrection.SILENT : MovementCorrection.OFF;
+        MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
 
         float hurtTime = target.hurtTime - hurtTimeSubtraction.get();
 

@@ -81,7 +81,7 @@ import wtf.demise.features.modules.impl.visual.Atmosphere;
 import wtf.demise.features.modules.impl.visual.Camera;
 import wtf.demise.features.modules.impl.visual.FreeLook;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
-import wtf.demise.utils.player.ViewBobbingEvent;
+import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.utils.render.shader.impl.Sky;
 
 import java.io.IOException;

@@ -8,7 +8,6 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import static net.minecraft.network.play.client.C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT;
 
 public final class BadPacketsComponent {
-
     private static boolean slot, attack, swing, block, inventory;
 
     public static boolean bad() {

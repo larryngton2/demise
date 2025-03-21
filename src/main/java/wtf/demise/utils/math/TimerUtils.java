@@ -1,7 +1,6 @@
 package wtf.demise.utils.math;
 
 public class TimerUtils {
-
     public long lastMS = System.currentTimeMillis();
 
     public void reset() {

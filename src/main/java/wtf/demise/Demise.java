@@ -24,7 +24,6 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BadPacketsComponent;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
-import wtf.demise.utils.player.FallDistanceComponent;
 import wtf.demise.utils.player.RotationUtils;
 
 import javax.imageio.ImageIO;
@@ -134,7 +133,6 @@ public class Demise {
 
     private void registerEventHandlers() {
         eventManager.register(new RotationUtils());
-        eventManager.register(new FallDistanceComponent());
         eventManager.register(new BadPacketsComponent());
         eventManager.register(new PingSpoofComponent());
         eventManager.register(new BlinkComponent());

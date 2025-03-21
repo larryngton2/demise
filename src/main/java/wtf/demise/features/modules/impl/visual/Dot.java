@@ -26,6 +26,8 @@ public class Dot extends Module {
             return;
         }
 
+        mc.entityRenderer.getMouseOver(1);
+
         if (notOnMiss.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
             pos = lastPos = null;
             return;

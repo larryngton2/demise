@@ -1,4 +1,4 @@
-package wtf.demise.utils.player;
+package wtf.demise.events.impl.render;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import wtf.demise.events.impl.CancellableEvent;
 @Getter
 @Setter
 @AllArgsConstructor
-public final class ViewBobbingEvent extends CancellableEvent {
+public class ViewBobbingEvent extends CancellableEvent {
     private State state;
 
     public enum State {

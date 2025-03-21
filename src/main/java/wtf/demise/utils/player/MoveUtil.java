@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
-import org.lwjglx.input.Keyboard;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
@@ -144,28 +143,6 @@ public class MoveUtil implements InstanceAccess {
         }
 
         return Math.toRadians(rotationYaw);
-    }
-
-    public static double getDirection() {
-        float rotationYaw = mc.thePlayer.rotationYaw;
-
-        if (mc.thePlayer.movementInput.moveForward < 0F)
-            rotationYaw += 180F;
-
-        float forward = 1F;
-
-        if (mc.thePlayer.movementInput.moveForward < 0F)
-            forward = -0.5F;
-        else if (mc.thePlayer.movementInput.moveForward > 0F)
-            forward = 0.5F;
-
-        if (mc.thePlayer.movementInput.moveStrafe > 0F)
-            rotationYaw -= 90F * forward;
-
-        if (mc.thePlayer.movementInput.moveStrafe < 0F)
-            rotationYaw += 90F * forward;
-
-        return toRadians(rotationYaw);
     }
 
     public static float getRawDirectionRotation(float yaw, float pStrafe, float pForward) {
@@ -394,7 +371,7 @@ public class MoveUtil implements InstanceAccess {
 
     public static void moveFlying(double increase) {
         if (!MoveUtil.isMoving()) return;
-        final double yaw = MoveUtil.getDirection();
+        final double yaw = getDirection();
         mc.thePlayer.motionX += -MathHelper.sin((float) yaw) * increase;
         mc.thePlayer.motionZ += MathHelper.cos((float) yaw) * increase;
     }
@@ -506,18 +483,18 @@ public class MoveUtil implements InstanceAccess {
     }
 
     public static void smoothStrafe(MotionEvent e) {
-        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection()) - lastYaw2);
+        double deltaYaw = MathHelper.wrapAngleTo180_double(Math.toDegrees(getDirection()) - lastYaw2);
         double maxAngle = 20;
         double angle = lastYaw2 + (deltaYaw > 0 ? maxAngle : -maxAngle);
 
-        if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(MoveUtil.getDirection());
+        if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(getDirection());
 
         if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
             mc.thePlayer.jump();
 
             double groundSpeed = 0.47;
 
-            angle = lastYaw2 = (float) Math.toDegrees(MoveUtil.getDirection());
+            angle = lastYaw2 = (float) Math.toDegrees(getDirection());
 
             MoveUtil.strafe(groundSpeed, Math.toRadians(angle));
         }
@@ -535,10 +512,8 @@ public class MoveUtil implements InstanceAccess {
     }
 
     private static float yaw = 0;
-    private static float lastYaw = 0;
 
     public static float getDirFromKeybind() {
-
         if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindLeft.isKeyDown()) {
             yaw = 45f;
         } else if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindRight.isKeyDown()) {
@@ -557,7 +532,6 @@ public class MoveUtil implements InstanceAccess {
             yaw = 0f;
         }
 
-        lastYaw = yaw;
         return yaw;
     }
 
@@ -565,7 +539,7 @@ public class MoveUtil implements InstanceAccess {
         return mc.thePlayer.rotationYaw - getDirFromKeybind();
     }
 
-    public static float getLastYawFromKeybind() {
-        return mc.thePlayer.rotationYaw - lastYaw;
+    public static float getDirection() {
+        return (float) toRadians(mc.thePlayer.rotationYaw - getDirFromKeybind());
     }
 }

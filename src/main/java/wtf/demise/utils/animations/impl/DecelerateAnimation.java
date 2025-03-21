@@ -4,7 +4,6 @@ import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 
 public class DecelerateAnimation extends Animation {
-
     public DecelerateAnimation(int ms, double endPoint) {
         super(ms, endPoint);
     }

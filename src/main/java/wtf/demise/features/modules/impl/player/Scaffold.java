@@ -28,6 +28,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
@@ -39,8 +40,7 @@ public class Scaffold extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly"}, "Normal", this);
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));
     private final SliderValue maxTellyTicks = new SliderValue("Max Telly Ticks", 4, 1, 5, this, () -> mode.is("Telly"));
-    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "Hypixel", "GodBridge"}, "Normal", this);
-    private final BoolValue updateOnPlace = new BoolValue("Only update on place", false, this);
+    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "Hypixel", "GodBridge", "Derp", "Reverse"}, "Normal", this);
     private final SliderValue minSearch = new SliderValue("Min search", 0.1f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final SliderValue maxSearch = new SliderValue("Max search", 0.9f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final SliderValue minYawRotSpeed = new SliderValue("Min Yaw Rotation Speed", 180, 0, 180, 1, this);
@@ -65,6 +65,7 @@ public class Scaffold extends Module {
     ), this);
     private final SliderValue blocksToSneak = new SliderValue("Blocks To Sneak", 7, 1, 8, this, () -> addons.isEnabled("Sneak"));
     private final SliderValue sneakDistance = new SliderValue("Sneak Distance", 0, 0, 0.5f, 0.01f, this, () -> addons.isEnabled("Sneak"));
+    private final BoolValue onlySneakOnGround = new BoolValue("Only sneak on ground", true, this, () -> addons.isEnabled("Sneak"));
     private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
     private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
     public final ModeValue counter = new ModeValue("Counter", new String[]{"None", "Simple", "Normal", "Exhibition"}, "Normal", this);
@@ -73,7 +74,7 @@ public class Scaffold extends Module {
     private BlockPos previousBlock;
     public BlockPos targetBlock;
     private double onGroundY;
-    private int oloSlot = -1;
+    private int oldSlot = -1;
     private int blocksPlaced;
     private boolean placing;
     private int tellyTicks;
@@ -108,13 +109,13 @@ public class Scaffold extends Module {
             hoverState = HoverState.DONE;
         }
 
-        oloSlot = mc.thePlayer.inventory.currentItem;
+        oldSlot = mc.thePlayer.inventory.currentItem;
         onGroundY = mc.thePlayer.getEntityBoundingBox().minY;
     }
 
     @Override
     public void onDisable() {
-        mc.thePlayer.inventory.currentItem = oloSlot;
+        mc.thePlayer.inventory.currentItem = oldSlot;
         SpoofSlotUtils.stopSpoofing();
 
         blocksPlaced = 0;
@@ -132,7 +133,7 @@ public class Scaffold extends Module {
         }
 
         mc.thePlayer.inventory.currentItem = getBlockSlot();
-        SpoofSlotUtils.startSpoofing(oloSlot);
+        SpoofSlotUtils.startSpoofing(oldSlot);
 
         data = null;
 
@@ -199,7 +200,9 @@ public class Scaffold extends Module {
                 break;
         }
 
-        if ((updateOnPlace.get() && placing) || !updateOnPlace.get()) {
+        mc.entityRenderer.getMouseOver(1);
+
+        if (!mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
             switch (rotations.get()) {
                 case "Normal": {
                     this.yaw = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[0];
@@ -259,8 +262,25 @@ public class Scaffold extends Module {
                     this.pitch = MoveUtil.isMoving() ? 75.6f : 90;
                 }
                 break;
+                case "Derp": {
+                    this.yaw += 30;
+                    this.pitch = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                }
+                break;
+                case "Reverse": {
+                    this.yaw = MoveUtil.getYawFromKeybind() - 180;
+                    this.pitch = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                }
+                break;
             }
         }
+
+        /*
+        if (!mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.BLOCK) && addons.isEnabled("Ray Trace")) {
+            this.yaw = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[0];
+            this.pitch = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[1];
+        }
+         */
 
         if (tower.canDisplay() && tower.is("Watchdog") && towering()) {
             yaw = RotationUtils.getRotations(getVec3(data))[0];
@@ -268,7 +288,7 @@ public class Scaffold extends Module {
         }
 
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            RotationUtils.setRotation(new float[]{yaw, pitch}, addons.isEnabled("Movement Fix") ? MovementCorrection.SILENT : MovementCorrection.OFF, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
+            RotationUtils.setRotation(new float[]{yaw, pitch}, addons.isEnabled("Movement Fix") ? MovementCorrection.Silent : MovementCorrection.None, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
 
             place(data.blockPos, data.facing, getVec3(data));
         }
@@ -276,7 +296,9 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onLookEvent(LookEvent event) {
-        event.rotation = new float[]{yaw, pitch};
+        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
+            event.rotation = new float[]{yaw, pitch};
+        }
     }
 
     @EventTarget
@@ -340,11 +362,15 @@ public class Scaffold extends Module {
                 }
             }
 
-            if (mc.thePlayer.onGround && (PlayerUtils.isReplaceable(blockPos) || dif < sneakDistance.get()) && blocksPlaced == blocksToSneak.get()) {
+            if (blocksPlaced > blocksToSneak.get()) {
+                blocksPlaced = 0;
+            }
+
+            if (onlySneakOnGround.get() && !mc.thePlayer.onGround) return;
+
+            if (PlayerUtils.isReplaceable(blockPos) || dif < sneakDistance.get() && blocksPlaced == blocksToSneak.get()) {
                 event.setSneaking(true);
             }
-            if (blocksPlaced > blocksToSneak.get())
-                blocksPlaced = 0;
         }
     }
 
@@ -364,7 +390,6 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onMove(MoveEvent event) {
-
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 

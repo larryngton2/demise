@@ -84,7 +84,7 @@ public class Stealer extends Module {
     public void rotate(BlockPos blockPos, EnumFacing enumFacing) {
         rotation = RotationUtils.getRotations(blockPos, enumFacing);
 
-        RotationUtils.setRotation(rotation, MovementCorrection.SILENT, 180, 180);
+        RotationUtils.setRotation(rotation, MovementCorrection.Silent, 180, 180);
     }
 
     @Override

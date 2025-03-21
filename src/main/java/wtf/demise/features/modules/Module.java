@@ -28,7 +28,6 @@ public abstract class Module implements InstanceAccess {
     @Setter
     private int keyBind;
     @Getter
-    @Setter
     private String tag = "";
     @Getter
     private final List<Value> values = new ArrayList<>();

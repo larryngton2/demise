@@ -29,7 +29,7 @@ import static java.lang.Math.hypot;
 
 public class RotationUtils implements InstanceAccess {
     public static float[] currentRotation = null, serverRotation = new float[]{}, previousRotation = null;
-    public static MovementCorrection currentCorrection = MovementCorrection.OFF;
+    public static MovementCorrection currentCorrection = MovementCorrection.None;
     private static boolean enabled;
     public static float cachedHSpeed;
     public static float cachedVSpeed;
@@ -42,7 +42,7 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation) {
-        setRotation(rotation, MovementCorrection.OFF);
+        setRotation(rotation, MovementCorrection.None);
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction) {
@@ -171,7 +171,7 @@ public class RotationUtils implements InstanceAccess {
 
     @EventTarget
     private void onMove(MoveInputEvent e) {
-        if (currentCorrection == MovementCorrection.SILENT) {
+        if (currentCorrection == MovementCorrection.Silent) {
             /*
              * Calculating movement fix
              */
@@ -183,7 +183,7 @@ public class RotationUtils implements InstanceAccess {
     @EventTarget
     private void onStrafe(StrafeEvent e) {
         if (shouldRotate()) {
-            if (currentCorrection != MovementCorrection.OFF) {
+            if (currentCorrection != MovementCorrection.None) {
                 e.setYaw(currentRotation[0]);
             }
         }
@@ -192,7 +192,7 @@ public class RotationUtils implements InstanceAccess {
     @EventTarget
     private void onJump(JumpEvent event) {
         if (shouldRotate()) {
-            if (currentCorrection != MovementCorrection.OFF) {
+            if (currentCorrection != MovementCorrection.None) {
                 event.setYaw(currentRotation[0]);
             }
         }
@@ -259,7 +259,7 @@ public class RotationUtils implements InstanceAccess {
     private static void resetRotation() {
         enabled = false;
         RotationUtils.currentRotation = null;
-        currentCorrection = MovementCorrection.OFF;
+        currentCorrection = MovementCorrection.None;
     }
 
     public static float[] smoothLinear(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {

@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 public final class Translate {
-
     private double x, y;
     private final long lastMS = System.currentTimeMillis();
 

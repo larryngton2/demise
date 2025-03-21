@@ -7,7 +7,6 @@ import java.util.LinkedList;
 
 @Getter
 public final class EvictingList<T> extends LinkedList<T> {
-
     private final int maxSize;
 
     public EvictingList(final int maxSize) {

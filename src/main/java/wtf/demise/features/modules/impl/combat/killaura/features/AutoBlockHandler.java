@@ -101,9 +101,7 @@ public class AutoBlockHandler implements InstanceAccess {
     }
 
     private static boolean extraCheck() {
-        boolean rayCastFailed = mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
-
-        return !rayCastFailed || !killAura.unBlockOnRayCastFail.get() || !killAura.rayCast.get();
+        return !ClickHandler.rayTraceFailed() || !killAura.unBlockOnRayCastFail.get() || !killAura.rayTrace.get();
     }
 
     private static void vanillaReblockAb(Entity e) {

@@ -14,7 +14,6 @@ import javax.script.ScriptException;
 import java.util.Arrays;
 
 public class NetworkAPI implements InstanceAccess {
-
     public final static Class<Packet<INetHandlerPlayServer>>[] serverbound = new Class[]{
             C00PacketKeepAlive.class,
             C01PacketChatMessage.class,

@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class BlinkComponent implements InstanceAccess {
-
     public static final ConcurrentLinkedQueue<Packet<?>> packets = new ConcurrentLinkedQueue<>();
     public static boolean blinking;
     public static ArrayList<Class<?>> exemptedPackets = new ArrayList<>();
