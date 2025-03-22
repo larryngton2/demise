@@ -3,6 +3,7 @@ package net.minecraft.client.gui;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import lombok.Getter;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -35,13 +36,21 @@ import net.minecraft.world.border.WorldBorder;
 import net.optifine.CustomColors;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Render2DEvent;
+import wtf.demise.features.modules.impl.visual.Hotbar;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.modules.impl.visual.Shaders;
+import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.RoundedUtils;
+import wtf.demise.utils.render.shader.impl.Blur;
+import wtf.demise.utils.render.shader.impl.Shadow;
 
 import java.awt.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,8 +61,9 @@ public class GuiIngame extends Gui {
     private static final ResourceLocation pumpkinBlurTexPath = new ResourceLocation("textures/misc/pumpkinblur.png");
     private final Random rand = new Random();
     private final Minecraft mc;
-    private final RenderItem itemRenderer;
+    private static RenderItem itemRenderer;
     private final GuiNewChat persistantChatGUI;
+    @Getter
     private int updateCounter;
     private String recordPlaying = "";
     private int recordPlayingUpFor;
@@ -62,6 +72,7 @@ public class GuiIngame extends Gui {
     private int remainingHighlightTicks;
     private ItemStack highlightingItemStack;
     private final GuiOverlayDebug overlayDebug;
+    @Getter
     private final GuiSpectator spectatorGui;
     private final GuiPlayerTabOverlay overlayPlayerList;
     private int titlesTimer;
@@ -74,10 +85,11 @@ public class GuiIngame extends Gui {
     public int lastPlayerHealth = 0;
     private long lastSystemTime = 0L;
     public long healthUpdateCounter = 0L;
+    private float x;
 
     public GuiIngame(Minecraft mcIn) {
         this.mc = mcIn;
-        this.itemRenderer = mcIn.getRenderItem();
+        itemRenderer = mcIn.getRenderItem();
         this.overlayDebug = new GuiOverlayDebug(mcIn);
         this.spectatorGui = new GuiSpectator(mcIn);
         this.persistantChatGUI = new GuiNewChat(mcIn);
@@ -299,28 +311,43 @@ public class GuiIngame extends Gui {
 
     protected void renderTooltip(ScaledResolution sr, float partialTicks) {
         if (this.mc.getRenderViewEntity() instanceof EntityPlayer entityplayer) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            this.mc.getTextureManager().bindTexture(widgetsTexPath);
-            int i = sr.getScaledWidth() / 2;
-            float f = this.zLevel;
-            this.zLevel = -90.0F;
-            this.drawTexturedModalRect(i - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
-            this.drawTexturedModalRect(i - 91 - 1 + SpoofSlotUtils.getSpoofedSlot() * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
-            this.zLevel = f;
-            GlStateManager.enableRescaleNormal();
-            GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            RenderHelper.enableGUIStandardItemLighting();
+            Hotbar hotbar = Demise.INSTANCE.getModuleManager().getModule(Hotbar.class);
+            hotbar.sr = sr;
 
-            for (int j = 0; j < 9; ++j) {
-                int k = sr.getScaledWidth() / 2 - 90 + j * 20 + 2;
-                int l = sr.getScaledHeight() - 16 - 3;
-                this.renderHotbarItem(j, k, l, partialTicks, entityplayer);
+            int i = sr.getScaledWidth() / 2;
+            this.mc.getTextureManager().bindTexture(widgetsTexPath);
+            float f = zLevel;
+
+            hotbar.f = f;
+
+            zLevel = -90.0F;
+
+            if (hotbar.smooth.get()) {
+                x = MathUtils.lerp(x, i - 91 - 1 + SpoofSlotUtils.getSpoofedSlot() * 20, 0.25f);
+            } else {
+                x = i - 91 - 1 + SpoofSlotUtils.getSpoofedSlot() * 20;
             }
 
-            RenderHelper.disableStandardItemLighting();
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.disableBlend();
+            if (!hotbar.custom.get()) {
+                drawTexturedModalRect(i - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
+                drawTexturedModalRect(x, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
+
+                zLevel = f;
+                GlStateManager.enableRescaleNormal();
+                GlStateManager.enableBlend();
+                GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+                RenderHelper.enableGUIStandardItemLighting();
+
+                for (int j = 0; j < 9; ++j) {
+                    int k = sr.getScaledWidth() / 2 - 90 + j * 20 + 2;
+                    int l = sr.getScaledHeight() - 16 - 3;
+                    renderHotbarItem(j, k, l, partialTicks, entityplayer);
+                }
+
+                RenderHelper.disableStandardItemLighting();
+                GlStateManager.disableRescaleNormal();
+                GlStateManager.disableBlend();
+            }
         }
     }
 
@@ -341,18 +368,22 @@ public class GuiIngame extends Gui {
     }
 
     public void renderExpBar(ScaledResolution scaledRes, int x) {
+        Hotbar hotbar = Demise.INSTANCE.getModuleManager().getModule(Hotbar.class);
+
         this.mc.mcProfiler.startSection("expBar");
         this.mc.getTextureManager().bindTexture(Gui.icons);
         int i = this.mc.thePlayer.xpBarCap();
 
-        if (i > 0) {
-            int j = 182;
-            int k = (int) (this.mc.thePlayer.experience * (float) (j + 1));
-            int l = scaledRes.getScaledHeight() - 32 + 3;
-            this.drawTexturedModalRect(x, l, 0, 64, j, 5);
+        if (!hotbar.custom.get()) {
+            if (i > 0) {
+                int j = 182;
+                int k = (int) (this.mc.thePlayer.experience * (float) (j + 1));
+                int l = scaledRes.getScaledHeight() - 32 + 3;
+                this.drawTexturedModalRect(x, l, 0, 64, j, 5);
 
-            if (k > 0) {
-                this.drawTexturedModalRect(x, l, 0, 69, k, 5);
+                if (k > 0) {
+                    this.drawTexturedModalRect(x, l, 0, 69, k, 5);
+                }
             }
         }
 
@@ -368,8 +399,15 @@ public class GuiIngame extends Gui {
 
             String s = "" + this.mc.thePlayer.experienceLevel;
             int l1 = (scaledRes.getScaledWidth() - this.getFontRenderer().getStringWidth(s)) / 2;
-            int i1 = scaledRes.getScaledHeight() - 31 - 4;
-            int j1 = 0;
+
+            int i1;
+
+            if (hotbar.custom.get()) {
+                i1 = scaledRes.getScaledHeight() - 38;
+            } else {
+                i1 = scaledRes.getScaledHeight() - 35;
+            }
+
             this.getFontRenderer().drawString(s, l1 + 1, i1, 0);
             this.getFontRenderer().drawString(s, l1 - 1, i1, 0);
             this.getFontRenderer().drawString(s, l1, i1 + 1, 0);
@@ -450,11 +488,9 @@ public class GuiIngame extends Gui {
         }
     }
 
-
     private static final Pattern LINK_PATTERN = Pattern.compile("(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[A-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&//=]*)");
 
     private void renderScoreboard(ScoreObjective objective, ScaledResolution scaledRes) {
-
         if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Interface.class).hideScoreboard.get())
             return;
 
@@ -495,23 +531,25 @@ public class GuiIngame extends Gui {
             int k = j1 - j * this.getFontRenderer().FONT_HEIGHT;
 
             int l = scaledRes.getScaledWidth() - k1 + 2;
-            drawRect(l1 - 2, k, l, k + this.getFontRenderer().FONT_HEIGHT, 1342177280);
+
+            //drawRect(l1 - 2, k, l, k + this.getFontRenderer().FONT_HEIGHT, 1342177280);
 
             final Matcher linkMatcher = LINK_PATTERN.matcher(s1);
             if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && linkMatcher.find()) {
                 s1 = "demise.wtf";
                 this.getFontRenderer().drawGradientWithShadow(s1, l1, k, (index) -> new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(index)));
             } else {
-                this.getFontRenderer().drawString(s1, l1, k, 553648127, true);
+                this.getFontRenderer().drawStringWithShadow(s1, l1, k, 553648127);
             }
+
             if (!(Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Interface.class).hideScoreRed.get()))
-                this.getFontRenderer().drawString(s2, l - this.getFontRenderer().getStringWidth(s2), k, 553648127);
+                this.getFontRenderer().drawStringWithShadow(s2, l - this.getFontRenderer().getStringWidth(s2), k, 553648127);
 
             if (j == collection.size()) {
+                //drawRect(l1 - 2, k - mc.fontRendererObj.FONT_HEIGHT - 1, l, k - 1, 1610612736);
+                //drawRect(l1 - 2, k - 1, l, k, 1342177280);
                 String s3 = objective.getDisplayName();
-                drawRect(l1 - 2, k - this.getFontRenderer().FONT_HEIGHT - 1, l, k - 1, 1610612736);
-                drawRect(l1 - 2, k - 1, l, k, 1342177280);
-                this.getFontRenderer().drawString(s3, l1 + i / 2 - this.getFontRenderer().getStringWidth(s3) / 2, k - this.getFontRenderer().FONT_HEIGHT, 553648127);
+                this.getFontRenderer().drawStringWithShadow(s3, l1 + i / 2 - this.getFontRenderer().getStringWidth(s3) / 2, k - this.getFontRenderer().FONT_HEIGHT, 553648127);
             }
         }
     }
@@ -871,7 +909,7 @@ public class GuiIngame extends Gui {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    private void renderHotbarItem(int index, int xPos, int yPos, float partialTicks, EntityPlayer player) {
+    public static void renderHotbarItem(int index, float xPos, float yPos, float partialTicks, EntityPlayer player) {
         ItemStack itemstack = player.inventory.mainInventory[index];
 
         if (itemstack != null) {
@@ -880,18 +918,18 @@ public class GuiIngame extends Gui {
             if (f > 0.0F) {
                 GlStateManager.pushMatrix();
                 float f1 = 1.0F + f / 5.0F;
-                GlStateManager.translate((float) (xPos + 8), (float) (yPos + 12), 0.0F);
+                GlStateManager.translate((xPos + 8), (yPos + 12), 0.0F);
                 GlStateManager.scale(1.0F / f1, (f1 + 1.0F) / 2.0F, 1.0F);
-                GlStateManager.translate((float) (-(xPos + 8)), (float) (-(yPos + 12)), 0.0F);
+                GlStateManager.translate((-(xPos + 8)), (-(yPos + 12)), 0.0F);
             }
 
-            this.itemRenderer.renderItemAndEffectIntoGUI(itemstack, xPos, yPos);
+            GuiIngame.itemRenderer.renderItemAndEffectIntoGUI(itemstack, xPos, yPos);
 
             if (f > 0.0F) {
                 GlStateManager.popMatrix();
             }
 
-            this.itemRenderer.renderItemOverlays(this.mc.fontRendererObj, itemstack, xPos, yPos);
+            GuiIngame.itemRenderer.renderItemOverlays(Minecraft.getMinecraft().fontRendererObj, itemstack, xPos, yPos);
         }
     }
 
@@ -975,16 +1013,8 @@ public class GuiIngame extends Gui {
         return this.persistantChatGUI;
     }
 
-    public int getUpdateCounter() {
-        return this.updateCounter;
-    }
-
     public FontRenderer getFontRenderer() {
         return this.mc.fontRendererObj;
-    }
-
-    public GuiSpectator getSpectatorGui() {
-        return this.spectatorGui;
     }
 
     public GuiPlayerTabOverlay getTabList() {

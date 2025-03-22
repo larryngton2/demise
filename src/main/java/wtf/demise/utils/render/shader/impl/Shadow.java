@@ -17,7 +17,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUniform1fv;
 
 public class Shadow implements InstanceAccess {
-
     public static ShaderUtils bloomShader = new ShaderUtils("shadow");
     public static Framebuffer bloomFramebuffer = new Framebuffer(1, 1, false);
     public static float prevRadius;
@@ -39,7 +38,6 @@ public class Shadow implements InstanceAccess {
         ShaderUtils.drawQuads();
         bloomShader.unload();
         bloomFramebuffer.unbindFramebuffer();
-
 
         mc.getFramebuffer().bindFramebuffer(true);
 

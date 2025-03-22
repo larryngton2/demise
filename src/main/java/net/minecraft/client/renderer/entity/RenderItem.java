@@ -355,7 +355,7 @@ public class RenderItem implements IResourceManagerReloadListener {
         return itemTranformVec.scale.x < 0.0F ^ itemTranformVec.scale.y < 0.0F ^ itemTranformVec.scale.z < 0.0F;
     }
 
-    public void renderItemIntoGUI(ItemStack stack, int x, int y) {
+    public void renderItemIntoGUI(ItemStack stack, float x, float y) {
         this.renderItemGui = true;
         IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
         GlStateManager.pushMatrix();
@@ -385,8 +385,8 @@ public class RenderItem implements IResourceManagerReloadListener {
         this.renderItemGui = false;
     }
 
-    private void setupGuiTransform(int xPosition, int yPosition, boolean isGui3d) {
-        GlStateManager.translate((float) xPosition, (float) yPosition, 100.0F + this.zLevel);
+    private void setupGuiTransform(float xPosition, float yPosition, boolean isGui3d) {
+        GlStateManager.translate(xPosition, yPosition, 100.0F + this.zLevel);
         GlStateManager.translate(8.0F, 8.0F, 0.0F);
         GlStateManager.scale(1.0F, 1.0F, -1.0F);
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
@@ -403,7 +403,7 @@ public class RenderItem implements IResourceManagerReloadListener {
         }
     }
 
-    public void renderItemAndEffectIntoGUI(final ItemStack stack, int xPosition, int yPosition) {
+    public void renderItemAndEffectIntoGUI(final ItemStack stack, float xPosition, float yPosition) {
         if (stack != null && stack.getItem() != null) {
             this.zLevel += 50.0F;
 
@@ -439,11 +439,11 @@ public class RenderItem implements IResourceManagerReloadListener {
         }
     }
 
-    public void renderItemOverlays(FontRenderer fr, ItemStack stack, int xPosition, int yPosition) {
+    public void renderItemOverlays(FontRenderer fr, ItemStack stack, float xPosition, float yPosition) {
         this.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, null);
     }
 
-    public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text) {
+    public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, float xPosition, float yPosition, String text) {
         if (stack != null) {
             if (stack.stackSize != 1 || text != null) {
                 String s = text == null ? String.valueOf(stack.stackSize) : text;
@@ -504,7 +504,7 @@ public class RenderItem implements IResourceManagerReloadListener {
         }
     }
 
-    private void draw(WorldRenderer renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+    private void draw(WorldRenderer renderer, float x, float y, int width, int height, int red, int green, int blue, int alpha) {
         renderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
         renderer.pos(x, y, 0.0D).color(red, green, blue, alpha).endVertex();
         renderer.pos(x, y + height, 0.0D).color(red, green, blue, alpha).endVertex();

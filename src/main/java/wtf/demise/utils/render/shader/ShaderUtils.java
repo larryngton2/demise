@@ -186,7 +186,7 @@ public class ShaderUtils implements InstanceAccess {
                     blr += texture2D(inTexture, gl_TexCoord[0].st - f * offset).a * (weights[int(abs(f))]);
                 }
             
-                gl_FragColor = vec4(0.0, 0.0, 0.0, blr);
+                gl_FragColor = vec4(0.0, 0.0, 0.0, blr * 1.3);
             }
             """;
 
@@ -200,7 +200,6 @@ public class ShaderUtils implements InstanceAccess {
             float roundedBoxSDF(vec2 centerPos, vec2 size, float radius) {
                 return length(max(abs(centerPos) -size, 0.)) - radius;
             }
-            
             
             void main() {
                 float distance = roundedBoxSDF((rectSize * .5) - (gl_TexCoord[0].st * rectSize), (rectSize * .5) - radius - 1., radius);

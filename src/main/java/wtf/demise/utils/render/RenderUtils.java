@@ -139,7 +139,6 @@ public class RenderUtils implements InstanceAccess {
                 (int) (width * scaleFactor), (int) (height * scaleFactor));
     }
 
-
     public static void drawImage(ResourceLocation image, float x, float y, int width, int height) {
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);

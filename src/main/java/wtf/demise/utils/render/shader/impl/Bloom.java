@@ -48,7 +48,6 @@ public class Bloom implements InstanceAccess {
         }
     }
 
-
     public static void renderBlur(int framebufferTexture, int iterations, int offset) {
         if (currentIterations != iterations || (framebuffer.framebufferWidth != mc.displayWidth || framebuffer.framebufferHeight != mc.displayHeight)) {
             initFramebuffers(iterations);

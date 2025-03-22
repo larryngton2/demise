@@ -39,10 +39,9 @@ public class ModuleListWidget extends Widget {
 
             RenderPosition position = calculateRenderPosition(module, width, middle);
 
-            renderShaderModule(module, position.x, position.y, offset, width, height,
-                    position.alphaAnimation, middle, lastWidth, i, enabledModules.size());
+            renderShaderModule(module, position.x, position.y, offset, width, height, position.alphaAnimation, middle, lastWidth, i, enabledModules.size());
 
-            if (!module.isHidden() && module.getCategory() != ModuleCategory.Visual) {
+            if (!module.isHidden() && ((setting.hideRender.get() && module.getCategory() != ModuleCategory.Visual) || !setting.hideRender.get())) {
                 offset = calculateNextOffset(module, height, offset);
             }
 
@@ -73,10 +72,9 @@ public class ModuleListWidget extends Widget {
             if (!module.isHidden() && module.getCategory() != ModuleCategory.Visual) {
                 offset = calculateNextOffset(module, height, offset);
             }
+
             lastWidth = width;
         }
-
-        //setting.scoreBoardHeight = (int) offset;
     }
 
     private List<Module> getEnabledModules() {
@@ -119,8 +117,7 @@ public class ModuleListWidget extends Widget {
         renderText(module, localX, localY, offset, width, alphaAnimation, middle,index);
     }
 
-    private void renderModule(Module module, float localX, float localY, float offset, int width, int height,
-                              float alphaAnimation, int middle, float lastWidth, int index, int totalModules) {
+    private void renderModule(Module module, float localX, float localY, float offset, int width, int height, float alphaAnimation, int middle, float lastWidth, int index, int totalModules) {
         if (setting.background.get()) {
             renderBackground(localX, localY, offset, width, height, middle,index);
         }
@@ -141,6 +138,7 @@ public class ModuleListWidget extends Widget {
                     width + 3, height + PADDING + setting.textHeight.get(), setting.bgColor(index));
         }
     }
+
     private void renderShaderBackground(float localX, float localY, float offset, int width, int height, int middle, int index) {
         if (localX < middle) {
             RenderUtils.drawRect(localX - PADDING, localY + offset, width + 3,
@@ -151,9 +149,7 @@ public class ModuleListWidget extends Widget {
         }
     }
 
-    private void renderLines(float localX, float localY, float offset, int width, int height,
-                             int middle, float lastWidth, int index, int totalModules) {
-        // Main line
+    private void renderLines(float localX, float localY, float offset, int width, int height, int middle, float lastWidth, int index, int totalModules) {
         if (localX < middle) {
             RenderUtils.drawRect(localX - PADDING, localY + offset, 1,
                     height + 3 + setting.textHeight.get(), setting.color(index));
@@ -167,9 +163,7 @@ public class ModuleListWidget extends Widget {
         }
     }
 
-    private void renderOutlines(float localX, float localY, float offset, int width, int height,
-                                int middle, float lastWidth, int index, int totalModules) {
-        // Side lines
+    private void renderOutlines(float localX, float localY, float offset, int width, int height, int middle, float lastWidth, int index, int totalModules) {
         if (localX < middle) {
             RenderUtils.drawRect(localX + width + 1, localY + offset + 1, 1,
                     height + PADDING + setting.textHeight.get(), setting.color(index));
@@ -178,17 +172,14 @@ public class ModuleListWidget extends Widget {
                     height + 3 + setting.textHeight.get(), setting.color(index));
         }
 
-        // Middle lines
         if (index > 0) {
             renderMiddleLines(localX, localY, offset, width, middle, lastWidth, index);
         }
 
-        // Top lines
         if (index == 0) {
             renderTopLines(localX, localY, width, middle);
         }
 
-        // Bottom lines
         if (index == totalModules - 1) {
             renderBottomLines(localX, localY, offset, width, height, middle,index);
         }

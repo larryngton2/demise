@@ -131,7 +131,7 @@ class TargetHUD implements InstanceAccess {
                     Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 40, y + 17, -1);
                     Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 40, y + 6, -1);
                 } else {
-                    RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.color()));
+                    RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.bgColor()));
                 }
 
                 if (setting.targetHudParticle.get()) {
@@ -142,14 +142,14 @@ class TargetHUD implements InstanceAccess {
 
             case "Demise": {
                 float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
-                float space = (width - 42) / 100;
+                float space = (width - 42.5f) / 100;
 
                 target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
 
                 if (!shader) {
-                    RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.bgColor(), true));
+                    RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
 
-                    RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 3, new Color(0, 0, 0, 150));
+                    RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
                     String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
                     double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
                     String diff;
@@ -162,13 +162,15 @@ class TargetHUD implements InstanceAccess {
                         diff = "±" + initialDiff;
                     }
 
-                    RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 3, new Color(setting.color(0)));
+                    RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
                     RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
                     Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
                     Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
                     Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
                 } else {
-                    RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.color()));
+                    // very hacky patch for shitty shadow rendering
+                    // Pontic Greek technologies™
+                    RoundedUtils.drawRound(x + 0.25f, y + 0.29f, width - 0.5f, height - 0.58f, 7, new Color(setting.bgColor()));
                 }
 
                 if (setting.targetHudParticle.get()) {

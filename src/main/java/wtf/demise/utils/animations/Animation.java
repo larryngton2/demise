@@ -5,7 +5,6 @@ import lombok.Setter;
 import wtf.demise.utils.math.TimerUtils;
 
 public abstract class Animation {
-
     public TimerUtils timerUtils = new TimerUtils();
     @Setter
     protected int duration;

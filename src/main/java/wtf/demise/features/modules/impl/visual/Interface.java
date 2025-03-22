@@ -66,6 +66,7 @@ public class Interface extends Module {
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue outline = new BoolValue("Outline", false, this, () -> elements.isEnabled("Module List"));
+    public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
     public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Exhi", "Sexy"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
@@ -135,7 +136,12 @@ public class Interface extends Module {
                 }
                 for (ItemStack everything : stuff) {
                     split += 16;
-                    RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 65 : 55) + (mc.thePlayer.capabilities.isCreativeMode ? 14 : 0), 1, true, 0.5f);
+
+                    if (getModule(Hotbar.class).isEnabled() && getModule(Hotbar.class).custom.get()) {
+                        RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
+                    } else {
+                        RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 14 : 0), 1, true, 0.5f);
+                    }
                 }
             }
         }
@@ -176,20 +182,20 @@ public class Interface extends Module {
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc),false);
+            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
         }
     }
 
     @EventTarget
     public void onShader2D(Shader2DEvent event) {
-        if (watemarkMode.get().equals("Text")) {
+        if (watemarkMode.get().equals("Text") && elements.isEnabled("Watermark")) {
             if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
                 Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
             }
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc),false);
+            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
         }
     }
 
@@ -247,8 +253,7 @@ public class Interface extends Module {
         matchKilled = 0;
         match += 1;
 
-        if (match > 6)
-            match = 6;
+        if (match > 6) match = 6;
     }
 
     @EventTarget

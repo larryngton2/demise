@@ -28,7 +28,7 @@ public class AutoTool extends Module {
     }
 
     @EventTarget
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent e) {
         if (mc.gameSettings.keyBindAttack.isKeyDown() && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && PlayerUtils.findTool(mc.objectMouseOver.getBlockPos()) != -1) {
             if (!this.wasDigging) {
                 this.oldSlot = mc.thePlayer.inventory.currentItem;

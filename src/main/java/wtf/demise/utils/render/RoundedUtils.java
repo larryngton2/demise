@@ -75,7 +75,6 @@ public class RoundedUtils implements InstanceAccess {
         GLUtils.endBlend();
     }
 
-
     public static void drawRoundOutline(float x, float y, float width, float height, float radius, float outlineThickness, Color color, Color outlineColor) {
         RenderUtils.resetColor();
         GLUtils.startBlend();
