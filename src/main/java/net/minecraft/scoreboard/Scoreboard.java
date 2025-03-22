@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -209,13 +210,16 @@ public class Scoreboard {
     }
 
     public void removeTeam(ScorePlayerTeam p_96511_1_) {
-        this.teams.remove(p_96511_1_.getRegisteredName());
+        try {
+            this.teams.remove(p_96511_1_.getRegisteredName());
 
-        for (String s : p_96511_1_.getMembershipCollection()) {
-            this.teamMemberships.remove(s);
+            for (String s : p_96511_1_.getMembershipCollection()) {
+                this.teamMemberships.remove(s);
+            }
+
+            this.func_96513_c(p_96511_1_);
+        } catch (RuntimeException ignored) {
         }
-
-        this.func_96513_c(p_96511_1_);
     }
 
     public boolean addPlayerToTeam(String player, String newTeam) {

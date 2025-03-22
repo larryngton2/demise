@@ -270,10 +270,13 @@ public class GuiIngame extends Gui {
         ScorePlayerTeam scoreplayerteam = scoreboard.getPlayersTeam(this.mc.thePlayer.getName());
 
         if (scoreplayerteam != null) {
-            int i1 = scoreplayerteam.getChatFormat().getColorIndex();
+            try {
+                int i1 = scoreplayerteam.getChatFormat().getColorIndex();
 
-            if (i1 >= 0) {
-                scoreobjective = scoreboard.getObjectiveInDisplaySlot(3 + i1);
+                if (i1 >= 0) {
+                    scoreobjective = scoreboard.getObjectiveInDisplaySlot(3 + i1);
+                }
+            } catch (RuntimeException ignored) {
             }
         }
 
