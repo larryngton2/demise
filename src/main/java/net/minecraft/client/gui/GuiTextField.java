@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.MathHelper;
 
+import java.awt.*;
+
 public class GuiTextField extends Gui {
     private final int id;
     public final FontRenderer fontRendererInstance;
@@ -385,15 +387,11 @@ public class GuiTextField extends Gui {
 
             if (flag1) {
                 if (flag2) {
-                    Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, -3092272);
+                    Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, new Color(-3092272).getRGB());
                 } else {
-                    this.fontRendererInstance.drawStringWithShadow("_", (float) k1, (float) i1, i);
+                    int l1 = l + this.fontRendererInstance.getStringWidth(s.substring(0, k));
+                    this.drawCursorVertical(k1, i1 - 1, l1 - 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT);
                 }
-            }
-
-            if (k != j) {
-                int l1 = l + this.fontRendererInstance.getStringWidth(s.substring(0, k));
-                this.drawCursorVertical(k1, i1 - 1, l1 - 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT);
             }
         }
     }

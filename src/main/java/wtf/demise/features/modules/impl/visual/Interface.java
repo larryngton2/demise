@@ -32,9 +32,11 @@ import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
+import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -60,12 +62,9 @@ public class Interface extends Module {
     public final BoolValue cFont = new BoolValue("C Fonts", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue fontMode = new ModeValue("C Fonts Mode", new String[]{"Bold", "Semi Bold", "Regular", "Tahoma"}, "Regular", this, () -> cFont.canDisplay() && cFont.get());
     public final SliderValue fontSize = new SliderValue("Font Size", 17, 10, 25, this, cFont::get);
-    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi"}, "Text", this, () -> elements.isEnabled("Watermark"));
-    public final SliderValue x = new SliderValue("Module List X", -5, -50, 50, this, () -> elements.isEnabled("Module List"));
-    public final SliderValue y = new SliderValue("Module List Y", 5, -50, 50, this, () -> elements.isEnabled("Module List"));
+    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi", "Modern"}, "Text", this, () -> elements.isEnabled("Watermark"));
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
-    public final BoolValue outline = new BoolValue("Outline", false, this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
@@ -83,8 +82,6 @@ public class Interface extends Module {
     public final ModeValue bgColor = new ModeValue("Background Color", new String[]{"Dark", "Synced", "Custom", "NeverLose"}, "Dark", this, background::get);
     private final ColorValue bgCustomColor = new ColorValue("Background Custom Color", new Color(0, 0, 0), this, () -> bgColor.canDisplay() && bgColor.is("Custom"));
     private final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
-    public final BoolValue hideScoreboard = new BoolValue("Hide Scoreboard", false, this);
-    public final BoolValue hideScoreRed = new BoolValue("Hide Scoreboard Red Points", true, this, () -> !hideScoreboard.get());
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
     public final BoolValue healthFix = new BoolValue("Health fix", true, this);
 
@@ -106,6 +103,28 @@ public class Interface extends Module {
                     String text = shouldChange ? "§r" + clientName.get() : clientName.get().charAt(0) + "§r§f" + clientName.get().substring(1) +
                             "§7[§f" + Minecraft.getDebugFPS() + " FPS§7]§r ";
                     mc.fontRendererObj.drawStringWithShadow(text, 2.0f, 2.0f, color());
+                    break;
+                case "Modern":
+                    String srv;
+                    if (mc.isSingleplayer()) {
+                        srv = "singleplayer";
+                    } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
+                        srv = "liquidproxy.net";
+                    } else {
+                        srv = mc.getCurrentServerData().serverIP;
+                    }
+
+                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
+                            " | " + Minecraft.getDebugFPS() + "fps" +
+                            " | " + srv;
+
+                    int x = 7;
+                    int y = 7;
+                    int width = Fonts.interSemiBold.get(17).getStringWidth("") + Fonts.interSemiBold.get(17).getStringWidth(name) + 5;
+                    int height = Fonts.interSemiBold.get(17).getHeight() + 3;
+
+                    RoundedUtils.drawRound(x, y, width, height, 4, new Color(getModule(Interface.class).bgColor(), true));
+                    Fonts.interSemiBold.get(17).drawStringWithShadow(name, Fonts.interBold.get(17).getStringWidth("") + x + 2, y + 4.5f, new Color(color(1)).getRGB());
                     break;
             }
         }
@@ -131,17 +150,15 @@ public class Interface extends Module {
                     if (armor == null) continue;
                     stuff.add(armor);
                 }
-                if (mc.thePlayer.getCurrentEquippedItem() != null) {
-                    stuff.add(mc.thePlayer.getCurrentEquippedItem());
+
+                if (SpoofSlotUtils.getSpoofedStack() != null) {
+                    stuff.add(SpoofSlotUtils.getSpoofedStack());
                 }
+
                 for (ItemStack everything : stuff) {
                     split += 16;
 
-                    if (getModule(Hotbar.class).isEnabled() && getModule(Hotbar.class).custom.get()) {
-                        RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
-                    } else {
-                        RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 14 : 0), 1, true, 0.5f);
-                    }
+                    RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
                 }
             }
         }
@@ -188,9 +205,34 @@ public class Interface extends Module {
 
     @EventTarget
     public void onShader2D(Shader2DEvent event) {
-        if (watemarkMode.get().equals("Text") && elements.isEnabled("Watermark")) {
-            if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
+        if (elements.isEnabled("Watermark")) {
+            switch (watemarkMode.get()) {
+                case "Text":
+                if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
+                    Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
+                }
+                break;
+                case "Modern":
+                    String srv;
+                    if (mc.isSingleplayer()) {
+                        srv = "singleplayer";
+                    } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
+                        srv = "liquidproxy.net";
+                    } else {
+                        srv = mc.getCurrentServerData().serverIP;
+                    }
+
+                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
+                            " | " + Minecraft.getDebugFPS() + "fps" +
+                            " | " + srv;
+
+                    int x = 7;
+                    int y = 7;
+                    int width = Fonts.interSemiBold.get(17).getStringWidth("") + Fonts.interSemiBold.get(17).getStringWidth(name) + 5;
+                    int height = Fonts.interSemiBold.get(17).getHeight() + 3;
+
+                    RoundedUtils.drawShaderRound(x, y, width, height, 4, Color.black);
+                    break;
             }
         }
 

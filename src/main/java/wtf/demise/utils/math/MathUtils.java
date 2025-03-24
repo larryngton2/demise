@@ -26,10 +26,7 @@ public class MathUtils {
         return (oldValue + (newValue - oldValue) * interpolationValue);
     }
 
-    public static float interpolate(float old,
-                                    float now,
-                                    float partialTicks) {
-
+    public static float interpolate(float old, float now, float partialTicks) {
         return old + (now - old) * partialTicks;
     }
 

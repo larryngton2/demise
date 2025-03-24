@@ -50,7 +50,7 @@ public class BreakProgress extends Module {
     }
 
     @EventTarget
-    public void drawShader2D(Shader2DEvent event) {
+    public void drawShader2D(Shader2DEvent e) {
         anim.setDirection(mc.playerController.curBlockDamageMP != 0 ? Direction.FORWARDS : Direction.BACKWARDS);
         if (mc.playerController.curBlockDamageMP == 0 && anim.isDone()) return;
         ScaledResolution sr = new ScaledResolution(mc);
@@ -67,7 +67,7 @@ public class BreakProgress extends Module {
         GL11.glPushMatrix();
         RenderUtils.scissor(x - 1.5, y - 1.5, totalWidth + 3, height + 3);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        RoundedUtils.drawRound(x, y, totalWidth, height, 5, Color.black);
+        RoundedUtils.drawShaderRound(x, y, totalWidth, height, 5, Color.black);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GL11.glPopMatrix();
     }

@@ -10,11 +10,9 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.RotationUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -39,9 +37,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     public static boolean rayTraceFailed() {
-        if (killAura.noPartialTicks.get()) {
-            mc.entityRenderer.getMouseOver(1);
-        }
+        mc.entityRenderer.getMouseOver(1);
 
         return mc.objectMouseOver == null || mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
     }
@@ -54,7 +50,7 @@ public class ClickHandler implements InstanceAccess {
         double meanCPS = (killAura.minCPS.get() + killAura.maxCPS.get()) / 2.0;
         double stdDevCPS = (killAura.maxCPS.get() - killAura.minCPS.get()) / 4.0;
 
-        currentCPS = MathUtils.interpolate(currentCPS, ThreadLocalRandom.current().nextGaussian(meanCPS, stdDevCPS));
+        currentCPS = ThreadLocalRandom.current().nextGaussian(meanCPS, stdDevCPS);
 
         boolean check = lastTargetTime.hasTimeElapsed(1000 / currentCPS);
 

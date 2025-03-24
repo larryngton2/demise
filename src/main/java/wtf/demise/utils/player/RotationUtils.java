@@ -1,7 +1,6 @@
 package wtf.demise.utils.player;
 
 import com.google.common.base.Predicates;
-import com.sun.javafx.geom.Vec2f;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -249,6 +248,7 @@ public class RotationUtils implements InstanceAccess {
         }
     }
 
+    @EventPriority(Integer.MIN_VALUE)
     @EventTarget
     public void onLook(LookEvent event) {
         if (shouldRotate()) {
@@ -535,8 +535,8 @@ public class RotationUtils implements InstanceAccess {
         return faceTrajectory(target, predict, predictSize, gravity, velocity);
     }
 
-    public static boolean isLookingAtEntity(final float[] rotation,final double range) {
-        return isLookingAtEntity(rayCast(rotation,range,1).entityHit,rotation,range);
+    public static boolean isLookingAtEntity(final float[] rotation, final double range) {
+        return isLookingAtEntity(rayCast(rotation, range, 1).entityHit, rotation, range);
     }
 
     public static boolean isLookingAtEntity(Entity target, float[] rotations, final double range) {
@@ -554,11 +554,10 @@ public class RotationUtils implements InstanceAccess {
         MovingObjectPosition objectMouseOver = null;
         Entity entity = mc.getRenderViewEntity();
 
-        if (entity != null && mc.theWorld != null)
-        {
+        if (entity != null && mc.theWorld != null) {
             Entity pointedEntity = null;
             double d0 = mc.playerController.getBlockReachDistance();
-            objectMouseOver = entity.rayTraceCustom(d0, partialTicks,rots[0],rots[1]);
+            objectMouseOver = entity.rayTraceCustom(d0, partialTicks, rots[0], rots[1]);
             double d1 = d0;
             Vec3 vec3 = entity.getPositionEyes(partialTicks);
             boolean flag = false;
@@ -569,22 +568,18 @@ public class RotationUtils implements InstanceAccess {
 
             i = mouseOverEvent.getRange();
 
-            if (mc.playerController.extendedReach())
-            {
+            if (mc.playerController.extendedReach()) {
                 d0 = 6.0D;
                 d1 = 6.0D;
-            }
-            else if (d0 > (ViaLoadingBase.getInstance().getTargetVersion().getVersion() <= 47 ? 3.0D : 2.9D))
-            {
+            } else if (d0 > (ViaLoadingBase.getInstance().getTargetVersion().getVersion() <= 47 ? 3.0D : 2.9D)) {
                 flag = true;
             }
 
-            if (objectMouseOver != null)
-            {
+            if (objectMouseOver != null) {
                 d1 = objectMouseOver.hitVec.distanceTo(vec3);
             }
 
-            Vec3 vec31 = entity.getLookCustom(RotationUtils.serverRotation[0],RotationUtils.serverRotation[1]);
+            Vec3 vec31 = entity.getLookCustom(RotationUtils.serverRotation[0], RotationUtils.serverRotation[1]);
             Vec3 vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0);
             Vec3 vec33 = null;
             float f = 1.0F;
@@ -626,14 +621,12 @@ public class RotationUtils implements InstanceAccess {
                 }
             }
 
-            if (pointedEntity != null && flag && vec3.distanceTo(vec33) > (ViaLoadingBase.getInstance().getTargetVersion().getVersion() <= 47 ? i : i - 0.1f))
-            {
+            if (pointedEntity != null && flag && vec3.distanceTo(vec33) > (ViaLoadingBase.getInstance().getTargetVersion().getVersion() <= 47 ? i : i - 0.1f)) {
                 pointedEntity = null;
                 objectMouseOver = new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, vec33, null, new BlockPos(vec33));
             }
 
-            if (pointedEntity != null && (d2 < d1 || objectMouseOver == null))
-            {
+            if (pointedEntity != null && (d2 < d1 || objectMouseOver == null)) {
                 objectMouseOver = new MovingObjectPosition(pointedEntity, vec33);
             }
         }

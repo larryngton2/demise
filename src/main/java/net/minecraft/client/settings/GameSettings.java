@@ -113,7 +113,7 @@ public class GameSettings {
     public int streamChatEnabled = 0;
     public int streamChatUserFilter = 0;
     public int streamMicToggleBehavior = 0;
-    public boolean useNativeTransport = true;
+    public boolean useNativeTransport = false;
     public boolean entityShadows = true;
     public boolean realmsNotifications = true;
     public KeyBinding keyBindForward = new KeyBinding("key.forward", 17, "key.categories.movement");

@@ -74,7 +74,7 @@ public class NotificationManager implements InstanceAccess {
                             Fonts.interRegular.get(17).drawStringWithShadow(notification.getDescription(), x + 3, y + 15, new Color(anInterface.color()).brighter().getRGB());
                             RenderUtils.drawRect(x, y + height - 1, width * Math.min((notification.getTimerUtils().getTime() / notification.getTime()), 1), 1, INSTANCE.getModuleManager().getModule(Interface.class).color());
                         } else {
-                            RenderUtils.drawRect(x, y, width, height, anInterface.bgColor());
+                            RenderUtils.drawRect(x, y, width, height, Color.black.getRGB());
                         }
 
                         yOffset += (height + actualOffset) * (float) notification.getAnimation().getOutput();

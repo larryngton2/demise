@@ -480,12 +480,12 @@ public class RenderUtils implements InstanceAccess {
     }
 
     public static void drawRoundedRect(float x, float y, float width, float height, float radius, int color) {
-        float x1 = x + width, // @off
+        float x1 = x + width,
                 y1 = y + height;
         final float f = (color >> 24 & 0xFF) / 255.0F,
                 f1 = (color >> 16 & 0xFF) / 255.0F,
                 f2 = (color >> 8 & 0xFF) / 255.0F,
-                f3 = (color & 0xFF) / 255.0F; // @on
+                f3 = (color & 0xFF) / 255.0F;
         GL11.glPushAttrib(0);
         GL11.glScaled(0.5, 0.5, 0.5);
 

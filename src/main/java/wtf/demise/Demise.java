@@ -16,6 +16,7 @@ import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
 import wtf.demise.gui.click.dropdown.DropdownGUI;
 import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.click.skeet.SkeetUI;
+import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.gui.notification.NotificationManager;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.gui.widget.WidgetManager;
@@ -89,6 +90,11 @@ public class Demise {
         setupSystemTray();
         handleFastRender();
 
+        // linux multiplayer fix
+        if (!isWindows()) {
+            Minecraft.getMinecraft().gameSettings.useNativeTransport = false;
+        }
+
         loaded = true;
 
         dataFolder = Paths.get(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()).resolve(clientName);
@@ -137,6 +143,7 @@ public class Demise {
         eventManager.register(new PingSpoofComponent());
         eventManager.register(new BlinkComponent());
         eventManager.register(new SpoofSlotUtils());
+        eventManager.register(new CustomWidgets());
 
         LOGGER.info("Event handlers registered.");
     }

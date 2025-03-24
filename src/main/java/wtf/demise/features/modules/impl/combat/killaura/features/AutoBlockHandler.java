@@ -12,10 +12,7 @@ import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
-
-import java.util.Objects;
 
 import static wtf.demise.features.modules.impl.combat.killaura.KillAura.currentTarget;
 import static wtf.demise.features.modules.impl.combat.killaura.KillAura.isBlocking;

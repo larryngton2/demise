@@ -168,9 +168,7 @@ class TargetHUD implements InstanceAccess {
                     Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
                     Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
                 } else {
-                    // very hacky patch for shitty shadow rendering
-                    // Pontic Greek technologies™
-                    RoundedUtils.drawRound(x + 0.25f, y + 0.29f, width - 0.5f, height - 0.58f, 7, new Color(setting.bgColor()));
+                    RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
                 }
 
                 if (setting.targetHudParticle.get()) {

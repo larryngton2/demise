@@ -16,9 +16,12 @@ public class RoundedUtils implements InstanceAccess {
     private static final ShaderUtils roundedTexturedShader = new ShaderUtils("roundRectTexture");
     private static final ShaderUtils roundedGradientShader = new ShaderUtils("roundedRectGradient");
 
-
     public static void drawRound(float x, float y, float width, float height, float radius, Color color) {
         drawRound(x, y, width, height, radius, false, color);
+    }
+
+    public static void drawShaderRound(float x, float y, float width, float height, float radius, Color color) {
+        drawShaderRound(x, y, width, height, radius, false, color);
     }
 
     public static void drawGradientHorizontal(float x, float y, float width, float height, float radius, Color left, Color right) {
@@ -58,8 +61,28 @@ public class RoundedUtils implements InstanceAccess {
         GLUtils.endBlend();
     }
 
-
     public static void drawRound(float x, float y, float width, float height, float radius, boolean blur, Color color) {
+        RenderUtils.resetColor();
+        GLUtils.startBlend();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        RenderUtils.setAlphaLimit(0);
+        roundedShader.init();
+
+        setupRoundedRectUniforms(x, y, width, height, radius, roundedShader);
+        roundedShader.setUniformi("blur", blur ? 1 : 0);
+        roundedShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+
+        ShaderUtils.drawQuads(x - 1, y - 1, width + 2, height + 2);
+        roundedShader.unload();
+        GLUtils.endBlend();
+    }
+
+    public static void drawShaderRound(float x, float y, float width, float height, float radius, boolean blur, Color color) {
+        x += 0.25f;
+        y += 0.25f;
+        width -= 0.5f;
+        height -= 0.5f;
+
         RenderUtils.resetColor();
         GLUtils.startBlend();
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -88,12 +111,10 @@ public class RoundedUtils implements InstanceAccess {
         roundedOutlineShader.setUniformf("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         roundedOutlineShader.setUniformf("outlineColor", outlineColor.getRed() / 255f, outlineColor.getGreen() / 255f, outlineColor.getBlue() / 255f, outlineColor.getAlpha() / 255f);
 
-
         ShaderUtils.drawQuads(x - (2 + outlineThickness), y - (2 + outlineThickness), width + (4 + outlineThickness * 2), height + (4 + outlineThickness * 2));
         roundedOutlineShader.unload();
         GLUtils.endBlend();
     }
-
 
     public static void drawRoundTextured(float x, float y, float width, float height, float radius, float alpha) {
         RenderUtils.resetColor();

@@ -55,10 +55,12 @@ public abstract class Widget implements InstanceAccess {
         renderX = x * sr.getScaledWidth();
         renderY = y * sr.getScaledHeight();
 
-        if (renderX < 0f) x = 0f;
-        if (renderX > sr.getScaledWidth() - width) x = (sr.getScaledWidth() - width) / sr.getScaledWidth();
-        if (renderY < 0f) y = 0f;
-        if (renderY > sr.getScaledHeight() - height) y = (sr.getScaledHeight() - height) / sr.getScaledHeight();
+        if (dragging) {
+            if (renderX < 0f) x = 0f;
+            if (renderX > sr.getScaledWidth() - width) x = (sr.getScaledWidth() - width) / sr.getScaledWidth();
+            if (renderY < 0f) y = 0f;
+            if (renderY > sr.getScaledHeight() - height) y = (sr.getScaledHeight() - height) / sr.getScaledHeight();
+        }
 
         if (align == (WidgetAlign.LEFT | WidgetAlign.TOP)) return;
 

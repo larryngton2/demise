@@ -16,6 +16,7 @@ import wtf.demise.events.impl.misc.BlockAABBEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
+import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.Module;
@@ -76,11 +77,6 @@ public class Velocity extends Module {
                         }
                     }
                     break;
-                case "JumpReset":
-                    if (mc.thePlayer.onGround && mc.thePlayer.hurtTime > 5) {
-                        mc.thePlayer.jump();
-                    }
-                    break;
                 case "Intave":
                     if (mode.get().equals("Test")) {
                         if (mc.thePlayer.hurtTime < 5) {
@@ -139,6 +135,15 @@ public class Velocity extends Module {
         }
 
         this.setTag(mode.get());
+    }
+
+    @EventTarget
+    public void onMoveInput(MoveInputEvent e) {
+        if (mode.get().equals("JumpReset")) {
+            if (mc.thePlayer.onGround && mc.thePlayer.hurtTime > 5) {
+                e.setJumping(true);
+            }
+        }
     }
 
     @EventTarget

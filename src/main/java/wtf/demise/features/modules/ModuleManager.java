@@ -15,6 +15,7 @@ import wtf.demise.features.modules.impl.misc.*;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
+import wtf.demise.gui.ingame.CustomWidgets;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -133,8 +134,7 @@ public class ModuleManager {
                 ViewBobbing.class,
                 BreakProgress.class,
                 Dot.class,
-                Cape.class,
-                Hotbar.class
+                Cape.class
         );
 
         // Sort modules by name for better organization

@@ -110,20 +110,12 @@ public class ModuleListWidget extends Widget {
             renderShaderBackground(localX, localY, offset, width, height, middle,index);
         }
 
-        if (setting.outline.get()) {
-            renderLines(localX, localY, offset, width, height, middle, lastWidth, index, totalModules);
-        }
-
         renderText(module, localX, localY, offset, width, alphaAnimation, middle,index);
     }
 
     private void renderModule(Module module, float localX, float localY, float offset, int width, int height, float alphaAnimation, int middle, float lastWidth, int index, int totalModules) {
         if (setting.background.get()) {
             renderBackground(localX, localY, offset, width, height, middle,index);
-        }
-
-        if (setting.outline.get()) {
-            renderLines(localX, localY, offset, width, height, middle, lastWidth, index, totalModules);
         }
 
         renderText(module, localX, localY, offset, width, alphaAnimation, middle,index);
@@ -146,69 +138,6 @@ public class ModuleListWidget extends Widget {
         } else {
             RenderUtils.drawRect(localX + this.width - 4 - width, localY + offset + 1,
                     width + 3, height + PADDING + setting.textHeight.get(), setting.color(index));
-        }
-    }
-
-    private void renderLines(float localX, float localY, float offset, int width, int height, int middle, float lastWidth, int index, int totalModules) {
-        if (localX < middle) {
-            RenderUtils.drawRect(localX - PADDING, localY + offset, 1,
-                    height + 3 + setting.textHeight.get(), setting.color(index));
-        } else {
-            RenderUtils.drawRect(localX + this.width + PADDING - 3, localY + offset + 1, 1,
-                    height + PADDING + setting.textHeight.get(), setting.color(index));
-        }
-
-        if (setting.outline.get()) {
-            renderOutlines(localX, localY, offset, width, height, middle, lastWidth, index, totalModules);
-        }
-    }
-
-    private void renderOutlines(float localX, float localY, float offset, int width, int height, int middle, float lastWidth, int index, int totalModules) {
-        if (localX < middle) {
-            RenderUtils.drawRect(localX + width + 1, localY + offset + 1, 1,
-                    height + PADDING + setting.textHeight.get(), setting.color(index));
-        } else {
-            RenderUtils.drawRect(localX + this.width - width - PADDING - 3, localY + offset, 1,
-                    height + 3 + setting.textHeight.get(), setting.color(index));
-        }
-
-        if (index > 0) {
-            renderMiddleLines(localX, localY, offset, width, middle, lastWidth, index);
-        }
-
-        if (index == 0) {
-            renderTopLines(localX, localY, width, middle);
-        }
-
-        if (index == totalModules - 1) {
-            renderBottomLines(localX, localY, offset, width, height, middle,index);
-        }
-    }
-
-    private void renderMiddleLines(float localX, float localY, float offset, int width, int middle, float lastWidth, int index) {
-        if (localX < middle) {
-            RenderUtils.drawRect(localX + width + 1, localY + offset, lastWidth - width, 1, setting.color(index));
-        } else {
-            RenderUtils.drawRect(localX + this.width - width - 4, localY + offset, -(lastWidth - width), 1, setting.color(index));
-        }
-    }
-
-    private void renderTopLines(float localX, float localY, int width, int middle) {
-        if (localX < middle) {
-            RenderUtils.drawRect(localX - PADDING, localY, width + 4, 1, setting.color(0));
-        } else {
-            RenderUtils.drawRect(localX - width - PADDING + this.width - 3, localY, width + 5, 1, setting.color(0));
-        }
-    }
-
-    private void renderBottomLines(float localX, float localY, float offset, int width, int height, int middle, int index) {
-        if (localX < middle) {
-            RenderUtils.drawRect(localX - 1, localY + offset + height + PADDING + setting.textHeight.get(),
-                    width + PADDING, 1, setting.color(index));
-        } else {
-            RenderUtils.drawRect(localX - 4 - width + this.width,
-                    localY + offset + height + PADDING + setting.textHeight.get(),
-                    width + 3, 1, setting.color(index));
         }
     }
 

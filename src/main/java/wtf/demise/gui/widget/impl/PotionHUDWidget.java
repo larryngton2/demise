@@ -29,7 +29,7 @@ public class PotionHUDWidget extends Widget {
             width = 92;
             height = heightAnimation.getOutput();
 
-            RoundedUtils.drawRound(renderX, renderY, width, height, 6, new Color(setting.bgColor(), true));
+            RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
 
             heightAnimation.animate(20 + potions.size() * 10, 20);
         }
@@ -55,8 +55,8 @@ public class PotionHUDWidget extends Widget {
                 String name = I18n.format(Potion.potionTypes[potion.getPotionID()].getName()) + " " + (potion.getAmplifier() > 0 ? I18n.format("enchantment.level." + (potion.getAmplifier() + 1)) : "");
                 String duration = Potion.getDurationString(potion);
 
-                Fonts.interRegular.get(11).drawString(name, renderX + 8, offset, -1);
-                Fonts.interRegular.get(11).drawString(duration, renderX + width - 8 - Fonts.interRegular.get(11).getStringWidth(duration), offset, -1);
+                Fonts.interRegular.get(11).drawStringWithShadow(name, renderX + 8, offset, -1);
+                Fonts.interRegular.get(11).drawStringWithShadow(duration, renderX + width - 8 - Fonts.interRegular.get(11).getStringWidth(duration), offset, -1);
 
                 offset += 10;
             }

@@ -22,7 +22,6 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.AntiBot;
-import wtf.demise.features.modules.impl.combat.HitBox;
 import wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler;
 import wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -61,7 +60,6 @@ public class KillAura extends Module {
     public final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
     public final SliderValue eClicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
     public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
-    public final BoolValue noPartialTicks = new BoolValue("No partial ticks", false, this, rayTrace::get);
     public final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayTrace::get);
     private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
 
@@ -73,7 +71,7 @@ public class KillAura extends Module {
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "Derp", "None"}, "Silent", this);
-    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Dynamic", "Assist"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None"));
@@ -446,10 +444,6 @@ public class KillAura extends Module {
     @EventTarget
     public void onMouseOver(MouseOverEvent e) {
         e.setRange(attackRange.get());
-
-        if (!getModule(HitBox.class).isEnabled()) {
-            e.setExpand(-0.1f);
-        }
     }
 
     @EventTarget
@@ -498,13 +492,14 @@ public class KillAura extends Module {
             case "Nearest":
                 targetVec = RotationUtils.getBestHitVec(entity);
                 break;
-            case "Straight":
+            case "Straight": {
                 final double ex = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
                 final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
                 final double ez = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
 
                 targetVec = new Vec3(ex, ey, ez);
                 break;
+            }
             case "Dynamic":
                 double targetY = entity.posY + entity.getEyeHeight();
 
@@ -521,6 +516,16 @@ public class KillAura extends Module {
 
                 targetVec = entityPos.add(0.0, targetY - entity.posY, 0.0);
                 break;
+            case "Assist": {
+                final Vec3 pos = playerPos.add(mc.thePlayer.getLookVec());
+
+                final double ex = MathHelper.clamp_double(pos.xCoord, entityBoundingBox.minX, entityBoundingBox.maxX);
+                final double ey = MathHelper.clamp_double(pos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
+                final double ez = MathHelper.clamp_double(pos.zCoord, entityBoundingBox.minZ, entityBoundingBox.maxZ);
+
+                targetVec = new Vec3(ex, ey, ez);
+                break;
+            }
         }
 
         if (delayed.get()) {
