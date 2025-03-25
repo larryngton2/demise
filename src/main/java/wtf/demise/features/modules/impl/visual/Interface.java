@@ -42,7 +42,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static wtf.demise.gui.click.neverlose.NeverLose.*;
+import static wtf.demise.gui.click.neverlose.NeverLose.iconRGB;
 
 @ModuleInfo(name = "Interface", category = ModuleCategory.Visual)
 public class Interface extends Module {
@@ -208,10 +208,10 @@ public class Interface extends Module {
         if (elements.isEnabled("Watermark")) {
             switch (watemarkMode.get()) {
                 case "Text":
-                if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                    Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
-                }
-                break;
+                    if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
+                        Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
+                    }
+                    break;
                 case "Modern":
                     String srv;
                     if (mc.isSingleplayer()) {

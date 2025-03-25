@@ -52,11 +52,11 @@ public final class BlinkComponent implements InstanceAccess {
 
             if (
                     packet instanceof C00Handshake ||
-                    packet instanceof C00PacketLoginStart ||
-                    packet instanceof C00PacketServerQuery ||
-                    packet instanceof C01PacketPing ||
-                    packet instanceof C01PacketEncryptionResponse ||
-                    packet instanceof C00PacketKeepAlive
+                            packet instanceof C00PacketLoginStart ||
+                            packet instanceof C00PacketServerQuery ||
+                            packet instanceof C01PacketPing ||
+                            packet instanceof C01PacketEncryptionResponse ||
+                            packet instanceof C00PacketKeepAlive
             ) {
                 return;
             }

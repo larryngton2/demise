@@ -1,7 +1,7 @@
 package wtf.demise.gui.widget.impl;
 
-import wtf.demise.features.modules.Module;
 import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.Animation;
@@ -107,18 +107,18 @@ public class ModuleListWidget extends Widget {
     private void renderShaderModule(Module module, float localX, float localY, float offset, int width, int height,
                                     float alphaAnimation, int middle, float lastWidth, int index, int totalModules) {
         if (setting.background.get()) {
-            renderShaderBackground(localX, localY, offset, width, height, middle,index);
+            renderShaderBackground(localX, localY, offset, width, height, middle, index);
         }
 
-        renderText(module, localX, localY, offset, width, alphaAnimation, middle,index);
+        renderText(module, localX, localY, offset, width, alphaAnimation, middle, index);
     }
 
     private void renderModule(Module module, float localX, float localY, float offset, int width, int height, float alphaAnimation, int middle, float lastWidth, int index, int totalModules) {
         if (setting.background.get()) {
-            renderBackground(localX, localY, offset, width, height, middle,index);
+            renderBackground(localX, localY, offset, width, height, middle, index);
         }
 
-        renderText(module, localX, localY, offset, width, alphaAnimation, middle,index);
+        renderText(module, localX, localY, offset, width, alphaAnimation, middle, index);
     }
 
     private void renderBackground(float localX, float localY, float offset, int width, int height, int middle, int index) {

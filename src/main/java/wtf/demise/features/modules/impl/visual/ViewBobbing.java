@@ -2,11 +2,11 @@ package wtf.demise.features.modules.impl.visual;
 
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MotionEvent;
+import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
-import wtf.demise.events.impl.render.ViewBobbingEvent;
 
 @ModuleInfo(name = "ViewBobbing", category = ModuleCategory.Visual)
 public class ViewBobbing extends Module {

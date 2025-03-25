@@ -1243,4 +1243,24 @@ public class RenderUtils implements InstanceAccess {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);
     }
+
+    public static void color(Color color) {
+        if (color == null)
+            color = Color.white;
+        color(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, color.getAlpha() / 255F);
+    }
+
+    public static void image(final ResourceLocation imageLocation, final float x, final float y, final float width, final float height, final Color color) {
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0F);
+        color(color);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+        mc.getTextureManager().bindTexture(imageLocation);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, (float) 0, (float) 0, (int) width, (int) height, width, height);
+        GlStateManager.resetColor();
+        GlStateManager.disableBlend();
+    }
 }

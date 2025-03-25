@@ -11,7 +11,6 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
-import wtf.demise.features.values.impl.TextValue;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.packet.PacketUtils;
 

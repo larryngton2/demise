@@ -29,10 +29,14 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
-import wtf.demise.utils.player.*;
+import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.player.MovementCorrection;
+import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 @ModuleInfo(name = "Scaffold", category = ModuleCategory.Player)
 public class Scaffold extends Module {

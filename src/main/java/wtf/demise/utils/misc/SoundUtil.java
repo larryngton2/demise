@@ -1,7 +1,6 @@
 package wtf.demise.utils.misc;
 
 import lombok.experimental.UtilityClass;
-import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.utils.InstanceAccess;

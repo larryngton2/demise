@@ -78,11 +78,11 @@ import org.lwjglx.util.glu.Project;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
+import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.impl.visual.Atmosphere;
 import wtf.demise.features.modules.impl.visual.Camera;
 import wtf.demise.features.modules.impl.visual.FreeLook;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
-import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.utils.render.shader.impl.Sky;
 
 import java.io.IOException;

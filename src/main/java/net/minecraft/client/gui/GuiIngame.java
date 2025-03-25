@@ -28,20 +28,20 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.src.Config;
 import net.minecraft.util.*;
 import net.minecraft.world.border.WorldBorder;
-import net.optifine.CustomColors;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.modules.impl.visual.Shaders;
+import wtf.demise.gui.ingame.CustomWidgets;
+import wtf.demise.utils.math.MathUtils;
 
 import java.awt.*;
+import java.util.Objects;
 import java.util.Random;
 import java.util.regex.Pattern;
 
 public class GuiIngame extends Gui {
     private static final ResourceLocation vignetteTexPath = new ResourceLocation("textures/misc/vignette.png");
-    private static final ResourceLocation widgetsTexPath = new ResourceLocation("textures/gui/widgets.png");
     private static final ResourceLocation pumpkinBlurTexPath = new ResourceLocation("textures/misc/pumpkinblur.png");
     private final Random rand = new Random();
     private final Minecraft mc;
@@ -69,7 +69,6 @@ public class GuiIngame extends Gui {
     public int lastPlayerHealth = 0;
     private long lastSystemTime = 0L;
     public long healthUpdateCounter = 0L;
-    private float x;
 
     public GuiIngame(Minecraft mcIn) {
         this.mc = mcIn;
@@ -92,7 +91,6 @@ public class GuiIngame extends Gui {
         int i = scaledresolution.getScaledWidth();
         int j = scaledresolution.getScaledHeight();
         this.mc.entityRenderer.setupOverlayRendering();
-
 
         GlStateManager.enableBlend();
 
@@ -329,7 +327,6 @@ public class GuiIngame extends Gui {
         int i = this.mc.thePlayer.xpBarCap();
 
 
-
         this.mc.mcProfiler.endSection();
 
         if (this.mc.thePlayer.experienceLevel > 0) {
@@ -341,16 +338,14 @@ public class GuiIngame extends Gui {
 
             int i1;
 
-                i1 = scaledRes.getScaledHeight() - 38;
-
+            i1 = scaledRes.getScaledHeight() - 38;
 
             this.getFontRenderer().drawString(s, l1 + 1, i1, 0);
             this.getFontRenderer().drawString(s, l1 - 1, i1, 0);
             this.getFontRenderer().drawString(s, l1, i1 + 1, 0);
             this.getFontRenderer().drawString(s, l1, i1 - 1, 0);
 
-                this.getFontRenderer().drawGradientWithShadow(s, l1, i1, (index) -> new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(index)));
-
+            this.getFontRenderer().drawGradientWithShadow(s, l1, i1, (index) -> new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(index)));
 
             this.mc.mcProfiler.endSection();
         }
@@ -414,7 +409,7 @@ public class GuiIngame extends Gui {
             if (this.mc.pointedEntity != null) {
                 return true;
             } else {
-                if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.MISS) {
                     BlockPos blockpos = this.mc.objectMouseOver.getBlockPos();
 
                     return this.mc.theWorld.getTileEntity(blockpos) instanceof IInventory;

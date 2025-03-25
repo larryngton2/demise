@@ -8,20 +8,15 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.render.RenderUtils;
-import wtf.demise.utils.render.shader.impl.Bloom;
 import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.Shadow;
 
 @ModuleInfo(name = "Shaders", category = ModuleCategory.Visual)
 public class Shaders extends Module {
     private final BoolValue blur = new BoolValue("Blur", true, this);
-    private final SliderValue blurRadius = new SliderValue("Blur Radius", 25, 1, 50, 1, this, this.blur::get);
-    private final SliderValue blurCompression = new SliderValue("Blur Compression", 1, 1, 50, 1f, this, this.blur::get);
     private final BoolValue shadow = new BoolValue("Shadow", true, this);
-    private final SliderValue shadowRadius = new SliderValue("Shadow Radius", 50, 1, 50, 1, this, shadow::get);
-    private final SliderValue shadowOffset = new SliderValue("Shadow Offset", 1, 1, 15, 1, this, shadow::get);
 
-    private Framebuffer stencilFramebuffer = new Framebuffer(1, 1, false);
+    public static Framebuffer stencilFramebuffer = new Framebuffer(1, 1, false);
 
     public void renderShaders() {
         if (!this.isEnabled()) return;
@@ -30,7 +25,7 @@ public class Shaders extends Module {
             RenderUtils.resetColor();
             Blur.startBlur();
             INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.BLUR));
-            Blur.endBlur(blurRadius.get(), (int) blurCompression.get());
+            Blur.endBlur(25, 1);
             RenderUtils.resetColor();
         }
 
@@ -43,7 +38,7 @@ public class Shaders extends Module {
             stencilFramebuffer.unbindFramebuffer();
             RenderUtils.resetColor();
 
-            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, (int) shadowRadius.get(), (int) shadowOffset.get());
+            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
         }
     }
 }

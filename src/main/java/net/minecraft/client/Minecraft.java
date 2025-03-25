@@ -34,7 +34,6 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -105,12 +104,11 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.events.impl.player.UpdateEvent;
-import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
-import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.render.RenderUtils;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -122,13 +120,13 @@ import java.nio.ByteOrder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 public class Minecraft implements IThreadListener, IPlayerUsage {
     private static final Logger logger = LogManager.getLogger();
-    private static final ResourceLocation locationMojangPng = new ResourceLocation("textures/gui/title/mojang.png");
     public static final boolean isRunningOnMac = Util.getOSType() == Util.EnumOS.OSX;
     public static byte[] memoryReserve = new byte[10485760];
     private static final List<DisplayMode> macDisplayModes = Lists.newArrayList(new DisplayMode(2560, 1600), new DisplayMode(2880, 1800));
@@ -224,15 +222,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     @Getter
     private SkinManager skinManager;
     private final Queue<FutureTask<?>> scheduledTasks = Queues.newArrayDeque();
-    private final long field_175615_aJ = 0L;
     private final Thread mcThread = Thread.currentThread();
     private ModelManager modelManager;
     private BlockRendererDispatcher blockRenderDispatcher;
     public volatile boolean running = true;
     public String debug = "";
-    public boolean field_175613_B = false;
-    public boolean field_175614_C = false;
-    public boolean field_175611_D = false;
     public boolean renderChunksMany = true;
     long debugUpdateTime = getSystemTime();
     int fpsCounter;
@@ -345,7 +339,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.refreshResources();
         this.renderEngine = new TextureManager(this.mcResourceManager);
         this.mcResourceManager.registerReloadListener(this.renderEngine);
-        this.drawSplashScreen(this.renderEngine);
+        this.drawSplashScreen();
         this.skinManager = new SkinManager(this.renderEngine, new File(this.fileAssets, "skins"), this.sessionService);
         this.saveLoader = new AnvilSaveConverter(new File(this.mcDataDir, "saves"));
         this.mcSoundHandler = new SoundHandler(this.mcResourceManager, this.gameSettings);
@@ -644,14 +638,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.displayHeight = displaymode.getHeight();
     }
 
-    private void drawSplashScreen(TextureManager textureManagerInstance) throws LWJGLException {
-        ScaledResolution scaledresolution = new ScaledResolution(this);
-        int i = scaledresolution.getScaleFactor();
-        Framebuffer framebuffer = new Framebuffer(scaledresolution.getScaledWidth() * i, scaledresolution.getScaledHeight() * i, true);
+    private void drawSplashScreen() {
+        ScaledResolution sr = new ScaledResolution(this);
+        int i = sr.getScaleFactor();
+        Framebuffer framebuffer = new Framebuffer(sr.getScaledWidth() * i, sr.getScaledHeight() * i, true);
         framebuffer.bindFramebuffer(false);
         GlStateManager.matrixMode(5889);
         GlStateManager.loadIdentity();
-        GlStateManager.ortho(0.0D, scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight(), 0.0D, 1000.0D, 3000.0D);
+        GlStateManager.ortho(0.0D, sr.getScaledWidth(), sr.getScaledHeight(), 0.0D, 1000.0D, 3000.0D);
         GlStateManager.matrixMode(5888);
         GlStateManager.loadIdentity();
         GlStateManager.translate(0.0F, 0.0F, -2000.0F);
@@ -659,34 +653,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         GlStateManager.disableFog();
         GlStateManager.disableDepth();
         GlStateManager.enableTexture2D();
-        InputStream inputstream = null;
 
-        try {
-            inputstream = this.mcDefaultResourcePack.getInputStream(locationMojangPng);
-            this.mojangLogo = textureManagerInstance.getDynamicTextureLocation("logo", new DynamicTexture(ImageIO.read(inputstream)));
-            textureManagerInstance.bindTexture(this.mojangLogo);
-        } catch (IOException ioexception) {
-            logger.error("Unable to load logo: " + locationMojangPng, ioexception);
-        } finally {
-            IOUtils.closeQuietly(inputstream);
-        }
+        RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), Color.black.getRGB());
+        RenderUtils.image(new ResourceLocation("demise/texture/splash.png"), (float) (sr.getScaledWidth() / 2 - 75), (float) (sr.getScaledHeight() / 2 - 25), 150, 50, Color.white);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        worldrenderer.pos(0.0D, this.displayHeight, 0.0D).tex(0.0D, 0.0D).color(255, 255, 255, 255).endVertex();
-        worldrenderer.pos(this.displayWidth, this.displayHeight, 0.0D).tex(0.0D, 0.0D).color(255, 255, 255, 255).endVertex();
-        worldrenderer.pos(this.displayWidth, 0.0D, 0.0D).tex(0.0D, 0.0D).color(255, 255, 255, 255).endVertex();
-        worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, 0.0D).color(255, 255, 255, 255).endVertex();
-        tessellator.draw();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        int j = 256;
-        int k = 256;
-        this.draw((scaledresolution.getScaledWidth() - j) / 2, (scaledresolution.getScaledHeight() - k) / 2, 0, 0, j, k, 255, 255, 255, 255);
         GlStateManager.disableLighting();
         GlStateManager.disableFog();
         framebuffer.unbindFramebuffer();
-        framebuffer.framebufferRender(scaledresolution.getScaledWidth() * i, scaledresolution.getScaledHeight() * i);
+        framebuffer.framebufferRender(sr.getScaledWidth() * i, sr.getScaledHeight() * i);
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.1F);
         this.updateDisplay();

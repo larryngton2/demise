@@ -50,7 +50,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                         }
                     }
                     case "Minecraft" ->
-                        this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/mc/" + Demise.INSTANCE.getModuleManager().getModule(Cape.class).mcMode.get() + ".png"));
+                            this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/mc/" + Demise.INSTANCE.getModuleManager().getModule(Cape.class).mcMode.get() + ".png"));
                 }
             } else {
                 this.playerRenderer.bindTexture(entitylivingbaseIn.getLocationCape());

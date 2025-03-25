@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render3DEvent;
@@ -116,7 +115,7 @@ public class ChestESP extends Module {
 
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-GL11.glDisable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_BLEND);
 
         Color white = Color.white;
 

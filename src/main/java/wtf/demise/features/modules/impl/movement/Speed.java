@@ -14,8 +14,8 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.DebugUtils;
-import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.RotationUtils;
 
 @ModuleInfo(name = "Speed", category = ModuleCategory.Movement)

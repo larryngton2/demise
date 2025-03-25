@@ -9,21 +9,26 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.player.*;
+import wtf.demise.events.impl.player.AttackEvent;
+import wtf.demise.events.impl.player.MoveEvent;
+import wtf.demise.events.impl.player.PlayerTickEvent;
+import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.AntiBot;
-import wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler;
 import wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler;
+import wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -36,11 +41,12 @@ import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
-import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
 import static wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler.setBlocking;
+import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
 import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.rayTraceFailed;
 
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)

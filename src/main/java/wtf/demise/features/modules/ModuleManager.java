@@ -15,7 +15,6 @@ import wtf.demise.features.modules.impl.misc.*;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
-import wtf.demise.gui.ingame.CustomWidgets;
 
 import java.util.ArrayList;
 import java.util.Comparator;

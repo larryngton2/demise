@@ -16,6 +16,7 @@ import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
@@ -25,6 +26,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
@@ -41,7 +43,9 @@ public class CustomWidgets implements InstanceAccess {
     private float x;
     public static ScoreObjective scoreObjective;
     private float interpolatedHeight;
-    private float interpolatedY;
+    private float interpolatedY = sr == null ? 1080 : sr.getScaledHeight() - 80 - 5;
+    private boolean fade = false;
+    private int alpha = 255;
 
     @EventTarget
     public void onRender2D(Render2DEvent e) {
@@ -49,15 +53,27 @@ public class CustomWidgets implements InstanceAccess {
 
         drawCustomHotbar(i);
         drawChat(GuiIngame.getUpdateCounter(), false);
-
         drawRealSlot(i, false);
         drawScoreboard(scoreObjective, sr, false);
+
+        if (fade) {
+            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, alpha).getRGB());
+
+            alpha -= 2;
+
+            if (alpha < 0) {
+                alpha = 255;
+                fade = false;
+            }
+        } else {
+            alpha = 255;
+        }
     }
 
     private void drawCustomHotbar(int i) {
+        if (x == 0) x = i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20;
 
         x = MathUtils.lerp(x, i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20, 0.25f);
-
 
         RoundedUtils.drawRound(i - 90, sr.getScaledHeight() - 26, 181, 21, 7, new Color(getModule(Interface.class).bgColor(), true));
         RoundedUtils.drawRound(x, sr.getScaledHeight() - 26, 21, 21, 7, new Color(getModule(Interface.class).bgColor(), true).darker());
@@ -267,6 +283,10 @@ public class CustomWidgets implements InstanceAccess {
     }
 
     private void drawScoreboard(ScoreObjective objective, ScaledResolution scaledRes, boolean shader) {
+        if (objective == null) {
+            return;
+        }
+
         Scoreboard scoreboard = objective.getScoreboard();
         Collection<Score> collection = scoreboard.getSortedScores(objective);
         List<Score> list = Lists.newArrayList(Iterables.filter(collection, p_apply_1_ -> p_apply_1_.getPlayerName() != null && !p_apply_1_.getPlayerName().startsWith("#")));
@@ -329,10 +349,13 @@ public class CustomWidgets implements InstanceAccess {
     }
 
     @EventTarget
+    public void onWorldChange(WorldChangeEvent e) {
+        fade = true;
+    }
+
+    @EventTarget
     public void onChatGUI(ChatGUIEvent e) {
-
         drawChatScreen(false);
-
     }
 
     @EventTarget
@@ -345,17 +368,14 @@ public class CustomWidgets implements InstanceAccess {
             RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
         }
 
-
         drawChat(GuiIngame.getUpdateCounter(), true);
 
-            if (GuiNewChat.getChatOpen()) {
-                drawChatScreen(true);
-            }
-
+        if (GuiNewChat.getChatOpen()) {
+            drawChatScreen(true);
+        }
 
         drawRealSlot(i, true);
-
-drawScoreboard(scoreObjective, sr, true);
+        drawScoreboard(scoreObjective, sr, true);
     }
 
     public <M extends Module> M getModule(Class<M> clazz) {

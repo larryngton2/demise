@@ -386,12 +386,12 @@ public class GuiTextField extends Gui {
             }
 
             if (flag1) {
-                if (flag2) {
-                    Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, new Color(-3092272).getRGB());
-                } else {
-                    int l1 = l + this.fontRendererInstance.getStringWidth(s.substring(0, k));
-                    this.drawCursorVertical(k1, i1 - 1, l1 - 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT);
-                }
+                Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, new Color(-3092272).getRGB());
+            }
+
+            if (k != j) {
+                int l1 = l + this.fontRendererInstance.getStringWidth(s.substring(0, k));
+                this.drawCursorVertical(k1, i1 - 1, l1 - 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT);
             }
         }
     }

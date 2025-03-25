@@ -4,7 +4,10 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
-import wtf.demise.gui.widget.impl.*;
+import wtf.demise.gui.widget.impl.ModuleListWidget;
+import wtf.demise.gui.widget.impl.PotionHUDWidget;
+import wtf.demise.gui.widget.impl.SessionInfoWidget;
+import wtf.demise.gui.widget.impl.TargetHUDWidget;
 import wtf.demise.utils.InstanceAccess;
 
 import java.util.ArrayList;

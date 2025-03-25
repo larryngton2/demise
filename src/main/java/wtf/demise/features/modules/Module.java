@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.network.Packet;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -183,7 +182,7 @@ public abstract class Module implements InstanceAccess {
         try {
             onDisable();
             Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Module", "Disabled " + getName());
-           //playClickSound(0.8F);
+            //playClickSound(0.8F);
             SoundUtil.toggleSound(false);
         } catch (Exception e) {
             handleException(e);
