@@ -3,6 +3,7 @@ package wtf.demise.features.modules.impl.visual;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.Module;
@@ -41,18 +42,21 @@ public class Camera extends Module {
     public final SliderValue bloomAmount = new SliderValue("Bloom Amount", 1, 0.05f, 0.75f, 0.05f, this, () -> setting.isEnabled("World Bloom"));
 
     @EventTarget
-    public void onTick(TickEvent event) {
+    public void onGameEvent(GameEvent e) {
         if (mc.theWorld != null) {
             if (setting.isEnabled("Motion Blur")) {
-                if ((mc.entityRenderer.getShaderGroup() == null))
+                if ((mc.entityRenderer.getShaderGroup() == null)) {
                     mc.entityRenderer.loadShader(new ResourceLocation("minecraft", "shaders/post/motion_blur.json"));
-                float uniform = 1F - Math.min(amount.get() / 10F, 0.9f);
+                }
+
                 if (mc.entityRenderer.getShaderGroup() != null) {
+                    float uniform = 1F - Math.min(amount.get() / 10F, 0.9f);
                     mc.entityRenderer.getShaderGroup().listShaders.get(0).getShaderManager().getShaderUniform("Phosphor").set(uniform, 0F, 0F);
                 }
             } else {
-                if (mc.entityRenderer.isShaderActive())
+                if (mc.entityRenderer.isShaderActive()) {
                     mc.entityRenderer.stopUseShader();
+                }
             }
         }
     }

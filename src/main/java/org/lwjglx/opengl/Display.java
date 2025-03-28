@@ -19,8 +19,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Display {
-
-    private static String windowTitle = "Minecraft 1.8.9";
+    private static String windowTitle = "Initializing...";
 
     private static boolean displayCreated = false;
     private static boolean displayFocused = false;

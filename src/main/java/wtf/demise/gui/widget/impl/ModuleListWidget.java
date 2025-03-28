@@ -41,8 +41,10 @@ public class ModuleListWidget extends Widget {
 
             renderShaderModule(module, position.x, position.y, offset, width, height, position.alphaAnimation, middle, lastWidth, i, enabledModules.size());
 
-            if (!module.isHidden() && ((setting.hideRender.get() && module.getCategory() != ModuleCategory.Visual) || !setting.hideRender.get())) {
-                offset = calculateNextOffset(module, height, offset);
+            if (!module.isHidden()) {
+                if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
+                    offset = calculateNextOffset(module, height, offset);
+                }
             }
 
             lastWidth = width;
@@ -69,8 +71,10 @@ public class ModuleListWidget extends Widget {
             renderModule(module, position.x, position.y, offset, width, height,
                     position.alphaAnimation, middle, lastWidth, i, enabledModules.size());
 
-            if (!module.isHidden() && module.getCategory() != ModuleCategory.Visual) {
-                offset = calculateNextOffset(module, height, offset);
+            if (!module.isHidden()) {
+                if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
+                    offset = calculateNextOffset(module, height, offset);
+                }
             }
 
             lastWidth = width;
@@ -80,7 +84,7 @@ public class ModuleListWidget extends Widget {
     private List<Module> getEnabledModules() {
         List<Module> enabledModules = new ArrayList<>();
         for (Module module : INSTANCE.getModuleManager().getModules()) {
-            if (module.isHidden() || module.getCategory() == ModuleCategory.Visual) {
+            if (module.isHidden() || (setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
                 continue;
             }
             Animation moduleAnimation = module.getAnimation();

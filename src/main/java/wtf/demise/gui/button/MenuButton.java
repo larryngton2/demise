@@ -72,7 +72,7 @@ public class MenuButton implements Button {
         stencilFramebuffer.unbindFramebuffer();
         Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
 
-        RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, new Color(0, 0, 0, 0));
+        RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, new Color(0, 0, 0, 75));
 
         Fonts.interRegular.get(15).drawCenteredString(text, interpolatedX + interpolatedWidth / 2f, interpolatedY + Fonts.interRegular.get(15).getMiddleOfBox(interpolatedHeight) + 2, -1);
     }

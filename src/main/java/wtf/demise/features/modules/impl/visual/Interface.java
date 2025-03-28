@@ -30,6 +30,7 @@ import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
+import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.misc.SpoofSlotUtils;
@@ -52,7 +53,6 @@ public class Interface extends Module {
             new BoolValue("Watermark", true),
             new BoolValue("Module List", true),
             new BoolValue("Armor", true),
-            new BoolValue("Info", true),
             new BoolValue("Potion HUD", true),
             new BoolValue("Target HUD", true),
             new BoolValue("Notification", false),
@@ -62,18 +62,17 @@ public class Interface extends Module {
     public final BoolValue cFont = new BoolValue("C Fonts", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue fontMode = new ModeValue("C Fonts Mode", new String[]{"Bold", "Semi Bold", "Regular", "Tahoma"}, "Regular", this, () -> cFont.canDisplay() && cFont.get());
     public final SliderValue fontSize = new SliderValue("Font Size", 17, 10, 25, this, cFont::get);
-    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi", "Modern"}, "Text", this, () -> elements.isEnabled("Watermark"));
+    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
-    public final ModeValue infoMode = new ModeValue("Info Mode", new String[]{"Exhi"}, "Exhi", this, () -> elements.isEnabled("Info"));
     public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Exhi", "Sexy"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
     public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Moon", "Demise"}, "Demise", this, () -> elements.isEnabled("Target HUD"));
     public final BoolValue targetHudParticle = new BoolValue("TargetHUD Particle", true, this, () -> elements.isEnabled("Target HUD"));
     public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
-    public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
     public final BoolValue centerNotif = new BoolValue("Center Notification", true, this, () -> notificationMode.is("Exhi"));
+    public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
     public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo", "NeverLose"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this, () -> !color.is("NeverLose"));
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
@@ -115,7 +114,7 @@ public class Interface extends Module {
                     }
 
                     String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
-                            " | " + Minecraft.getDebugFPS() + "fps" +
+                            " | " + CurrentUser.FINAL_USER +
                             " | " + srv;
 
                     int x = 7;
@@ -129,16 +128,13 @@ public class Interface extends Module {
             }
         }
 
-        if (infoMode.canDisplay()) {
-            if (infoMode.get().equals("Exhi")) {
-                float textY = (event.getScaledResolution().getScaledHeight() - 9) + (mc.currentScreen instanceof GuiChat ? -14.0f : -3.0f);
-                mc.fontRendererObj.drawStringWithShadow("XYZ: " + EnumChatFormatting.WHITE +
-                                xyzFormat.format(mc.thePlayer.posX) + " " +
-                                xyzFormat.format(mc.thePlayer.posY) + " " +
-                                xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET + "BPS: " + EnumChatFormatting.WHITE + this.bpsFormat.format(MoveUtil.getBPS())
-                        , 2, textY, color(0));
-            }
-        }
+        float textY = (event.getScaledResolution().getScaledHeight() - 9) + (mc.currentScreen instanceof GuiChat ? -14.0f : -3.0f);
+        mc.fontRendererObj.drawStringWithShadow("XYZ: " + EnumChatFormatting.WHITE +
+                xyzFormat.format(mc.thePlayer.posX) + " " +
+                xyzFormat.format(mc.thePlayer.posY) + " " +
+                xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET +
+                "BPS: " + EnumChatFormatting.WHITE +
+                this.bpsFormat.format(MoveUtil.getBPS()), 2, textY, color(0));
 
         if (armorMode.canDisplay()) {
             if (armorMode.get().equals("Default")) {
@@ -223,7 +219,7 @@ public class Interface extends Module {
                     }
 
                     String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
-                            " | " + Minecraft.getDebugFPS() + "fps" +
+                            " | " + CurrentUser.FINAL_USER +
                             " | " + srv;
 
                     int x = 7;

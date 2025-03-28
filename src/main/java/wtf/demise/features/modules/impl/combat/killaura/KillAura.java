@@ -11,6 +11,7 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
@@ -36,6 +37,7 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
@@ -100,7 +102,7 @@ public class KillAura extends Module {
     private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay());
 
     // offset
-    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave", "test"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave", "Drift"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
     private final SliderValue iHurtTime = new SliderValue("Intave hurtTime", 5, 1, 10, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Intave"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
     private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
@@ -136,11 +138,13 @@ public class KillAura extends Module {
     public static boolean isBlocking = false;
     private Vec3 targetVec;
     public Vec3 currentVec;
-    private double lastPitchOffset;
+    private float lastPitchOffset;
     private boolean pause;
-    private double lastYawOffset;
+    private float lastYawOffset;
     private float derpYaw;
     private boolean rotate;
+    private float currentYawOffset;
+    private float currentPitchOffset;
 
     @Override
     public void onEnable() {
@@ -468,9 +472,6 @@ public class KillAura extends Module {
     }
 
     public float[] calcToEntity(EntityLivingBase entity) {
-        float yaw;
-        float pitch;
-
         Vec3 playerPos;
 
         if (predict.get() && !predictProcesses.isEmpty()) {
@@ -563,79 +564,86 @@ public class KillAura extends Module {
         double deltaY = currentVec.yCoord - playerPos.yCoord;
         double deltaZ = currentVec.zCoord - playerPos.zCoord;
 
-        yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
-        pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
+        float yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
+        float pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
 
-        switch (offsetMode.get()) {
-            case "Gaussian": {
-                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
-                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
+        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            switch (offsetMode.get()) {
+                case "Gaussian": {
+                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
+                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
 
-                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
-                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
+                    double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
+                    double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
 
-                if (rand.nextInt(100) <= oChance.get()) {
-                    yaw += (float) yawOffset;
-                    pitch += (float) pitchOffset;
+                    if (rand.nextInt(100) <= oChance.get()) {
+                        currentYawOffset += (float) yawOffset;
+                        currentPitchOffset += (float) pitchOffset;
 
-                    lastYawOffset = yawOffset;
-                    lastPitchOffset = pitchOffset;
-                } else {
-                    yaw += (float) lastYawOffset;
-                    pitch += (float) lastPitchOffset;
+                        lastYawOffset = (float) yawOffset;
+                        lastPitchOffset = (float) pitchOffset;
+                    } else {
+                        currentYawOffset += lastYawOffset;
+                        currentPitchOffset += lastPitchOffset;
+                    }
                 }
-            }
-            break;
-            case "Intave": {
-                boolean dynamicCheck = entity.hurtTime > iHurtTime.get();
-
-                double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
-                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
-
-                double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
-                double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
-
-                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
-                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
-
-                float targetYaw = yaw;
-                float targetPitch = pitch;
-
-                if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
-                    targetYaw += (float) yawOffset;
-                    targetPitch += (float) pitchOffset;
-
-                    lastYawOffset = yawOffset;
-                    lastPitchOffset = pitchOffset;
-                } else {
-                    targetYaw += (float) lastYawOffset;
-                    targetPitch += (float) lastPitchOffset;
-                }
-
-                float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
-                float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
-
-                yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
-                pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
-            }
-            break;
-            case "test":
-                double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6) * 15;
-                double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4) * 10;
-
-                double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
-                double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
-
-                float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
-                float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
-
-                yaw += smoothedYaw;
-                pitch += smoothedPitch;
-
-                lastYawOffset = smoothedYaw;
-                lastPitchOffset = smoothedPitch;
                 break;
+                case "Intave": {
+                    boolean dynamicCheck = entity.hurtTime > iHurtTime.get();
+
+                    double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
+                    double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
+
+                    double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
+                    double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
+
+                    double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
+                    double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
+
+                    if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
+                        currentYawOffset += (float) yawOffset;
+                        currentPitchOffset += (float) pitchOffset;
+
+                        lastYawOffset = (float) yawOffset;
+                        lastPitchOffset = (float) pitchOffset;
+                    } else {
+                        currentYawOffset += lastYawOffset;
+                        currentPitchOffset += lastPitchOffset;
+                    }
+
+                    float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+                    float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+
+                    currentYawOffset = MathUtils.interpolate(lastYawOffset, currentYawOffset, yawLerp);
+                    currentPitchOffset = MathUtils.interpolate(lastPitchOffset, currentPitchOffset, pitchLerp);
+                }
+                break;
+                case "Drift":
+                    double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6) * 15;
+                    double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4) * 5;
+
+                    double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
+                    double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
+
+                    float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
+                    float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
+
+                    currentYawOffset += smoothedYaw;
+                    currentPitchOffset += smoothedPitch;
+
+                    lastYawOffset = smoothedYaw;
+                    lastPitchOffset = smoothedPitch;
+                    break;
+            }
+
+            yaw += currentYawOffset;
+            pitch += currentPitchOffset;
+        } else {
+            yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
+            pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
         }
+
+        DebugUtils.sendMessage(currentYawOffset + " / " + currentPitchOffset);
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 

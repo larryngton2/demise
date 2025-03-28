@@ -16,12 +16,8 @@
       ],
       "uniforms": [
         {
-          "name": "Phosphor",
-          "values": [
-            0.95,
-            0.95,
-            0.95
-          ]
+          "name": "Weight",
+          "values": [ 0.5 ]
         }
       ]
     },

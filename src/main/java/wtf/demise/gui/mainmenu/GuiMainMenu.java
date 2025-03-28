@@ -1,19 +1,26 @@
 package wtf.demise.gui.mainmenu;
 
-import net.minecraft.client.gui.GuiMultiplayer;
-import net.minecraft.client.gui.GuiOptions;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.*;
+import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
+import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.gui.button.MenuButton;
 import wtf.demise.gui.font.Fonts;
+import wtf.demise.userinfo.HWID;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.RoundedUtils;
+import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.MainMenu;
+import wtf.demise.utils.render.shader.impl.Shadow;
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
+
+import static wtf.demise.features.modules.impl.visual.Shaders.stencilFramebuffer;
 
 public class GuiMainMenu extends GuiScreen {
     private final List<MenuButton> buttons = List.of(
@@ -28,16 +35,16 @@ public class GuiMainMenu extends GuiScreen {
     public static boolean fade = true;
     private int alpha = 255;
     private boolean funny;
+    private ScaledResolution sr;
+    private final TimerUtils timer = new TimerUtils();
 
     @Override
     public void initGui() {
         buttons.forEach(MenuButton::initGui);
 
+        sr = new ScaledResolution(mc);
         funny = Math.random() > 0.99;
-
-        if (alpha != 255) {
-            fade = false;
-        }
+        timer.reset();
     }
 
     @Override
@@ -49,7 +56,9 @@ public class GuiMainMenu extends GuiScreen {
 
         int count = 20;
 
-        //Fonts.interMedium.get(14).drawStringWithShadow("Welcome back, " + EnumChatFormatting.AQUA + Demise.INSTANCE.getDiscordRP().getName(), width - (2 + Fonts.interMedium.get(14).getStringWidth("Welcome back, " + Demise.INSTANCE.getDiscordRP().getName())), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
+        if (!MainMenu.drawShader) {
+            RenderUtils.drawImage(new ResourceLocation("demise/texture/background.png"), 0, 0, sr.getScaledWidth(), sr.getScaledHeight());
+        }
 
         for (MenuButton button : buttons) {
             button.x = width / 2f - buttonWidth / 2f;
@@ -83,16 +92,54 @@ public class GuiMainMenu extends GuiScreen {
         Fonts.interBold.get(35).drawStringWithShadow(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, Color.lightGray.getRGB());
 
         if (fade) {
-            RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
+            if (CurrentUser.USER != null) {
+                RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
+            }
 
-            alpha -= 3;
+            alpha -= 2;
 
             if (alpha < 0) {
-                alpha = 255;
                 fade = false;
             }
+        }
+
+        mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
+        mc.fontRendererObj.drawStringWithShadow(HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
+        mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
+
+        if (CurrentUser.USER == null) {
+            String string = "Invalid account detected.";
+            String string1 = "Shutting down in 5s.";
+
+            float width = 150;
+            float height = Fonts.interBold.get(20).getHeight() + 23 + Fonts.interMedium.get(18).getHeight();
+            float xx = ((float) sr.getScaledWidth() / 2) - (width / 2);
+            float yy = ((float) sr.getScaledHeight() / 2) - (height / 2);
+
+            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, 0).getRGB());
+
+            Blur.startBlur();
+            RoundedUtils.drawShaderRound(xx, yy, width, height, 7, Color.black);
+            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), Color.black.getRGB());
+            Blur.endBlur(25, 1);
+
+            stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
+            stencilFramebuffer.framebufferClear();
+            stencilFramebuffer.bindFramebuffer(true);
+            RoundedUtils.drawShaderRound(xx, yy, width, height, 7, Color.black);
+            stencilFramebuffer.unbindFramebuffer();
+            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+
+            RoundedUtils.drawRound(xx, yy, width, height, 7, new Color(0, 0, 0, 100));
+
+            Fonts.interBold.get(20).drawCenteredStringWithShadow(string, xx + (width / 2), yy + 12, new Color(117, 47, 47).getRGB());
+            Fonts.interMedium.get(15).drawCenteredStringWithShadow(string1, xx + (width / 2), yy + Fonts.interBold.get(20).getHeight() + 15, -1);
+
+            if (timer.hasTimeElapsed(6000)) {
+                mc.shutdown();
+            }
         } else {
-            alpha = 255;
+            Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

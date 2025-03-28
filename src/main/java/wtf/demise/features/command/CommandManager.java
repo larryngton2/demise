@@ -21,7 +21,8 @@ public final class CommandManager {
                 new BindCommand(),
                 new HideCommand(),
                 new FriendCommand(),
-                new ConfigCommand()
+                new ConfigCommand(),
+                new HWIDCommand()
         );
 
         Demise.INSTANCE.getModuleManager().getModules().forEach(module -> {

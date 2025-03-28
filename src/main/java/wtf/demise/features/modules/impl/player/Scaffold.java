@@ -13,6 +13,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
@@ -53,6 +54,7 @@ public class Scaffold extends Module {
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
             new BoolValue("Sprint", true),
             new BoolValue("Swing", true),
+            new BoolValue("Ignore tick cycle", false),
             new BoolValue("Movement Fix", true),
             new BoolValue("Ray Trace", true),
             new BoolValue("Keep Y", false),
@@ -261,7 +263,7 @@ public class Scaffold extends Module {
                     float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
 
                     this.yaw = Math.round(yaw / 45) * 45;
-                    this.pitch = MoveUtil.isMoving() ? 75.6f : 90;
+                    this.pitch = MoveUtil.isMoving() ? 75.6f : 89;
                 }
                 break;
                 case "Derp": {
@@ -292,7 +294,21 @@ public class Scaffold extends Module {
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
             RotationUtils.setRotation(new float[]{yaw, pitch}, addons.isEnabled("Movement Fix") ? MovementCorrection.Silent : MovementCorrection.None, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
 
-            place(data.blockPos, data.facing, getVec3(data));
+            if (!addons.isEnabled("Ignore tick cycle")) {
+                place(data.blockPos, data.facing, getVec3(data));
+            }
+        }
+    }
+
+    @EventTarget
+    public void onGameEvent(GameEvent e) {
+        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
+            return;
+
+        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
+            if (addons.isEnabled("Ignore tick cycle")) {
+                place(data.blockPos, data.facing, getVec3(data));
+            }
         }
     }
 
@@ -508,7 +524,7 @@ public class Scaffold extends Module {
     @EventTarget
     public void onRender3D(Render3DEvent event) {
         if (addons.isEnabled("Target Block ESP")) {
-            RenderUtils.renderBlock(data.blockPos, getModule(Interface.class).color(0, 100), false, true);
+            RenderUtils.renderBlock(data.blockPos.offset(data.facing), getModule(Interface.class).color(0, 100), false, true);
         }
     }
 

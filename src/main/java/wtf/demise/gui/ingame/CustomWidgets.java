@@ -16,6 +16,7 @@ import net.minecraft.util.MathHelper;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
@@ -23,6 +24,7 @@ import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
+import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
@@ -67,6 +69,13 @@ public class CustomWidgets implements InstanceAccess {
             }
         } else {
             alpha = 255;
+        }
+    }
+
+    @EventTarget
+    public void onGameEvent(GameEvent e) {
+        if (!(mc.currentScreen instanceof GuiMainMenu)) {
+            GuiMainMenu.fade = false;
         }
     }
 

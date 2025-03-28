@@ -105,6 +105,7 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
+import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.render.RenderUtils;
 
 import javax.imageio.ImageIO;
@@ -216,7 +217,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     private TextureMap textureMapBlocks;
     private SoundHandler mcSoundHandler;
     private MusicTicker mcMusicTicker;
-    private ResourceLocation mojangLogo;
     @Getter
     private final MinecraftSessionService sessionService;
     @Getter
@@ -401,6 +401,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         GlStateManager.viewport(0, 0, this.displayWidth, this.displayHeight);
         this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
         this.checkGLError("Post startup");
+        GuiMainMenu.fade = true;
         this.ingameGUI = new GuiIngame(this);
 
         Demise.INSTANCE.init();
@@ -411,8 +412,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             this.displayGuiScreen(new GuiMainMenu());
         }
 
-        this.renderEngine.deleteTexture(this.mojangLogo);
-        this.mojangLogo = null;
         this.loadingScreen = new LoadingScreenRenderer(this);
 
         if (this.gameSettings.fullScreen && !this.fullscreen) {
@@ -434,7 +433,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
     private void createDisplay() throws LWJGLException {
         Display.setResizable(true);
-        Display.setTitle("Minecraft 1.8.9");
+        Display.setTitle("Initializing...");
 
         try {
             Display.create((new PixelFormat()).withDepthBits(24));
@@ -655,7 +654,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         GlStateManager.enableTexture2D();
 
         RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), Color.black.getRGB());
-        RenderUtils.image(new ResourceLocation("demise/texture/splash.png"), (float) (sr.getScaledWidth() / 2 - 75), (float) (sr.getScaledHeight() / 2 - 25), 150, 50, Color.white);
+        RenderUtils.drawImage(new ResourceLocation("demise/texture/splash.png"), (float) (sr.getScaledWidth() / 2 - 75), (float) (sr.getScaledHeight() / 2 - 25), 150, 50);
 
         GlStateManager.disableLighting();
         GlStateManager.disableFog();
@@ -752,7 +751,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         Demise.INSTANCE.getEventManager().call(new GameEvent());
 
-        if (Display.isCreated() && Display.isCloseRequested()) {
+        if ((Display.isCreated() && Display.isCloseRequested()) || (!(this.currentScreen instanceof GuiMainMenu) && CurrentUser.USER == null)) {
             this.shutdown();
         }
 

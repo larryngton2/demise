@@ -468,7 +468,7 @@ public class ShaderUtils implements InstanceAccess {
                 r.x = fbm(p + 1.0 * q + vec2(1.7, 9.2) + 0.15 * time2);
                 r.y = fbm(p + 1.0 * q + vec2(8.3, 2.8) + 0.126 * time2);
                 float f = fbm(p + r);
-               \s
+            
                 vec3 color = mix(
                     vec3(0.3, 0.3, 0.6),
                     vec3(0.7, 0.7, 0.7),
@@ -488,8 +488,8 @@ public class ShaderUtils implements InstanceAccess {
                 );
             
                 color = (f * f * f + 0.9 * f * f + 0.8 * f) * color;
-               \s
-                return color * 0.7;
+            
+                return color;
             }
             
             void mainImage(out vec4 fragColor, in vec2 fragCoord) {

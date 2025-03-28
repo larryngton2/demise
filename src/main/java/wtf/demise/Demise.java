@@ -20,6 +20,7 @@ import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.gui.notification.NotificationManager;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.gui.widget.WidgetManager;
+import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.discord.DiscordInfo;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BadPacketsComponent;
@@ -64,6 +65,7 @@ public class Demise {
     private SkeetUI skeetGUI;
     private AltRepositoryGUI altRepositoryGUI;
     private DiscordInfo discordRP;
+    private CurrentUser currentUser;
 
     // System Tray icon
     private TrayIcon trayIcon;
@@ -135,6 +137,7 @@ public class Demise {
         dropdownGUI = new DropdownGUI();
         skeetGUI = new SkeetUI();
         altRepositoryGUI = new AltRepositoryGUI(this);
+        currentUser = new CurrentUser();
     }
 
     private void registerEventHandlers() {
