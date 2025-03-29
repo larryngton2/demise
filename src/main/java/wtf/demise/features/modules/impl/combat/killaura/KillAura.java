@@ -37,7 +37,6 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.render.RenderUtils;
@@ -139,8 +138,8 @@ public class KillAura extends Module {
     private Vec3 targetVec;
     public Vec3 currentVec;
     private float lastPitchOffset;
-    private boolean pause;
     private float lastYawOffset;
+    private boolean pause;
     private float derpYaw;
     private boolean rotate;
     private float currentYawOffset;
@@ -642,8 +641,6 @@ public class KillAura extends Module {
             yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
             pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
         }
-
-        DebugUtils.sendMessage(currentYawOffset + " / " + currentPitchOffset);
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 

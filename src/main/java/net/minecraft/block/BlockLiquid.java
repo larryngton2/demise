@@ -11,6 +11,8 @@ import net.minecraft.util.*;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeColorHelper;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.movement.Jesus;
 
 import java.util.Random;
 
@@ -86,8 +88,13 @@ public abstract class BlockLiquid extends Block {
         return false;
     }
 
-    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
-        return null;
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(final World worldIn, final BlockPos pos, final IBlockState state) {
+        if (Demise.INSTANCE.getModuleManager().getModule(Jesus.class).isEnabled()) {
+            return AxisAlignedBB.fromBounds(pos.getX() + this.minX, pos.getY() + this.minY, pos.getZ() + this.minZ, pos.getX() + this.maxX, pos.getY() + this.maxY, pos.getZ() + this.maxZ);
+        } else {
+            return null;
+        }
     }
 
     public int getRenderType() {

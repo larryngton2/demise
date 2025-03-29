@@ -20,6 +20,7 @@ public class Dot extends Module {
 
     private Vec3 pos, lastPos;
 
+
     @EventTarget
     public void onPreMotion(MotionEvent e) {
         if (e.isPost() || mc.objectMouseOver == null || mc.objectMouseOver.hitVec == null) {

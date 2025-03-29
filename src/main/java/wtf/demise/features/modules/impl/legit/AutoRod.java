@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.combat;
+package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemFishingRod;
@@ -20,7 +20,7 @@ import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SmoothMode;
 
-@ModuleInfo(name = "AutoRod", category = ModuleCategory.Combat)
+@ModuleInfo(name = "AutoRod", category = ModuleCategory.Legit)
 public class AutoRod extends Module {
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this);
     private final SliderValue maxRange = new SliderValue("Max range", 4.5f, 1, 8, 0.1f, this);

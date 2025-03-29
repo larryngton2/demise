@@ -7,10 +7,7 @@ import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.modules.impl.exploit.*;
-import wtf.demise.features.modules.impl.legit.AutoClicker;
-import wtf.demise.features.modules.impl.legit.BackTrack;
-import wtf.demise.features.modules.impl.legit.LegitScaffold;
-import wtf.demise.features.modules.impl.legit.NoHitDelay;
+import wtf.demise.features.modules.impl.legit.*;
 import wtf.demise.features.modules.impl.misc.*;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
@@ -93,6 +90,7 @@ public class ModuleManager {
                 Sneak.class,
                 MotionModifier.class,
                 AutoWalk.class,
+                Jesus.class,
 
                 // Player
                 AntiFireball.class,

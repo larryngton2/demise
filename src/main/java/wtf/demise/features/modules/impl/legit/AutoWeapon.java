@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.combat;
+package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -13,7 +13,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.player.InventoryUtils;
 
-@ModuleInfo(name = "AutoWeapon", category = ModuleCategory.Combat)
+@ModuleInfo(name = "AutoWeapon", category = ModuleCategory.Legit)
 public class AutoWeapon extends Module {
     private final BoolValue switchBack = new BoolValue("Switch Back", true, this);
 
