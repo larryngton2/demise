@@ -52,7 +52,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-@ModuleInfo(name = "Stealer", category = ModuleCategory.Player, key = Keyboard.KEY_L)
+@ModuleInfo(name = "Stealer", category = ModuleCategory.Player)
 public class Stealer extends Module {
     private final SliderValue minDelay = new SliderValue("Min Delay", 1, 0, 5, 1, this);
     private final SliderValue maxDelay = new SliderValue("Max Delay", 1, 0, 5, 1, this);

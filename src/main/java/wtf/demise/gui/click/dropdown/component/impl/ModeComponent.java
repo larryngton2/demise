@@ -1,11 +1,11 @@
 package wtf.demise.gui.click.dropdown.component.impl;
 
-import wtf.demise.features.modules.impl.visual.ClickGUI;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.render.MouseUtils;
-import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 
@@ -18,49 +18,36 @@ public class ModeComponent extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
-        float offset = 0;
-        float heightoff = 0;
+        float heightoff = -1;
+        float lineHeight = Fonts.interRegular.get(13).getHeight() + 2;
 
-        RoundedUtils.drawRound(getX() + offset, getY() + Fonts.interRegular.get(15).getHeight() + 2, getWidth() - 5, heightoff, 4, new Color(50, 50, 108, 200));
-        Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY(), -1);
+        Fonts.interSemiBold.get(15).drawString(setting.getName(), getX() + 4, getY() + 1, -1);
 
         for (String text : setting.getModes()) {
-            float off = Fonts.interRegular.get(13).getStringWidth(text) + 2;
-            if (offset + off >= (getWidth() - 5)) {
-                offset = 0;
-                heightoff += 8;
-            }
-
             if (text.equals(setting.get())) {
-                Fonts.interRegular.get(13).drawString(text, getX() + offset + 8, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff,
-                        INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get().getRGB());
+                Fonts.interRegular.get(13).drawString(text, getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 4 + heightoff, Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor().getRGB());
             } else {
-                Fonts.interRegular.get(13).drawString(text, getX() + offset + 8, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff,
-                        Color.GRAY.getRGB());
+                Fonts.interRegular.get(13).drawString(text, getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 4 + heightoff, Color.GRAY.getRGB());
             }
 
-            offset += off;
-
+            heightoff += lineHeight;
         }
 
-        setHeight(Fonts.interRegular.get(15).getHeight() + 10 + heightoff);
+        setHeight(Fonts.interRegular.get(15).getHeight() + 6 + heightoff);
         super.drawScreen(mouseX, mouseY);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouse) {
-        float offset = 0;
         float heightoff = 0;
+        float lineHeight = Fonts.interRegular.get(13).getHeight() + 2;
+
         for (String text : setting.getModes()) {
-            float off = Fonts.interRegular.get(13).getStringWidth(text) + 2;
-            if (offset + off >= (getWidth() - 5)) {
-                offset = 0;
-                heightoff += 8;
-            }
-            if (MouseUtils.isHovered(getX() + offset + 8, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff, Fonts.interRegular.get(13).getStringWidth(text), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
+            if (MouseUtils.isHovered(getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 4 + heightoff,
+                    Fonts.interRegular.get(13).getStringWidth(text), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
                 setting.set(text);
             }
-            offset += off;
+            heightoff += lineHeight;
         }
         super.mouseClicked(mouseX, mouseY, mouse);
     }

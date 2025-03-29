@@ -2,8 +2,10 @@ package wtf.demise.gui.mainmenu;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.gui.button.MenuButton;
 import wtf.demise.gui.font.Fonts;
@@ -20,8 +22,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
-import static wtf.demise.features.modules.impl.visual.Shaders.stencilFramebuffer;
-
 public class GuiMainMenu extends GuiScreen {
     private final List<MenuButton> buttons = List.of(
             new MenuButton("Singleplayer"),
@@ -37,11 +37,11 @@ public class GuiMainMenu extends GuiScreen {
     private boolean funny;
     private ScaledResolution sr;
     private final TimerUtils timer = new TimerUtils();
+    private static Framebuffer stencilFramebuffer = new Framebuffer(1, 1, false);
 
     @Override
     public void initGui() {
         buttons.forEach(MenuButton::initGui);
-
         sr = new ScaledResolution(mc);
         funny = Math.random() > 0.99;
         timer.reset();
@@ -51,63 +51,66 @@ public class GuiMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
 
-        float buttonWidth = 120;
-        float buttonHeight = 23;
+        if (CurrentUser.USER != null) {
+            float buttonWidth = 120;
+            float buttonHeight = 23;
 
-        int count = 20;
+            if (!MainMenu.drawShader) {
+                RenderUtils.drawImage(new ResourceLocation("demise/texture/background.png"), 0, 0, sr.getScaledWidth(), sr.getScaledHeight());
+            }
 
-        if (!MainMenu.drawShader) {
-            RenderUtils.drawImage(new ResourceLocation("demise/texture/background.png"), 0, 0, sr.getScaledWidth(), sr.getScaledHeight());
-        }
+            Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
 
-        for (MenuButton button : buttons) {
-            button.x = width / 2f - buttonWidth / 2f;
-            button.y = ((height / 2f) + count - (buttons.size() * buttonHeight) / 2f) + Fonts.interBold.get(36).getHeight() + 2;
-            button.width = buttonWidth;
-            button.height = buttonHeight;
-            button.clickAction = () -> {
-                switch (button.text) {
-                    case "Singleplayer" -> mc.displayGuiScreen(new GuiSelectWorld(this));
-                    case "Multiplayer" -> mc.displayGuiScreen(new GuiMultiplayer(this));
-                    case "Alt Manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
-                    case "Options" -> mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
+            if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+                MenuButton.shader = true;
+                Blur.startBlur();
+                renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
+                Blur.endBlur(25, 1);
+            }
+
+            if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+                MenuButton.shader = true;
+                stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
+                stencilFramebuffer.framebufferClear();
+                stencilFramebuffer.bindFramebuffer(true);
+                renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
+                stencilFramebuffer.unbindFramebuffer();
+                Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 100, 1);
+            }
+
+            MenuButton.shader = false;
+            renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
+
+            float x = (width / 2f - buttonWidth / 2f) + buttonWidth / 2 - ((float) Fonts.interBold.get(35).getStringWidth(funny ? "dimaise" : Demise.INSTANCE.getClientName()) / 2);
+            float y = (height / 2f) + 20 - (buttons.size() * buttonHeight) / 2f;
+
+            if (interpolatedX == 0 || interpolatedY == 0) {
+                interpolatedX = x;
+                interpolatedY = y;
+            }
+
+            interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
+            interpolatedY = MathUtils.interpolate(interpolatedY, y, 0.25f);
+
+            Fonts.interBold.get(35).drawStringWithShadow(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, Color.lightGray.getRGB());
+
+            if (fade) {
+                if (CurrentUser.USER != null) {
+                    RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
                 }
-            };
 
-            button.drawScreen(mouseX, mouseY);
-            count += (int) (buttonHeight + 6);
-        }
+                alpha -= 2;
 
-        float x = (width / 2f - buttonWidth / 2f) + buttonWidth / 2 - ((float) Fonts.interBold.get(35).getStringWidth(funny ? "dimaise" : Demise.INSTANCE.getClientName()) / 2);
-        float y = (height / 2f) + 20 - (buttons.size() * buttonHeight) / 2f;
-
-        if (interpolatedX == 0 || interpolatedY == 0) {
-            interpolatedX = x;
-            interpolatedY = y;
-        }
-
-        interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
-        interpolatedY = MathUtils.interpolate(interpolatedY, y, 0.25f);
-
-        Fonts.interBold.get(35).drawStringWithShadow(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, Color.lightGray.getRGB());
-
-        if (fade) {
-            if (CurrentUser.USER != null) {
-                RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
+                if (alpha < 0) {
+                    fade = false;
+                }
             }
 
-            alpha -= 2;
-
-            if (alpha < 0) {
-                fade = false;
-            }
-        }
-
-        mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
-        mc.fontRendererObj.drawStringWithShadow(HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
-        mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
-
-        if (CurrentUser.USER == null) {
+            mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
+            mc.fontRendererObj.drawStringWithShadow(HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
+            mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
+        } else {
+            // best security anti hack systems halal allah habibi
             String string = "Invalid account detected.";
             String string1 = "Shutting down in 5s.";
 
@@ -138,11 +141,31 @@ public class GuiMainMenu extends GuiScreen {
             if (timer.hasTimeElapsed(6000)) {
                 mc.shutdown();
             }
-        } else {
-            Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    private void renderButtons(float buttonWidth, float buttonHeight, int mouseX, int mouseY) {
+        int count = 20;
+
+        for (MenuButton button : buttons) {
+            button.x = width / 2f - buttonWidth / 2f;
+            button.y = ((height / 2f) + count - (buttons.size() * buttonHeight) / 2f) + Fonts.interBold.get(36).getHeight() + 2;
+            button.width = buttonWidth;
+            button.height = buttonHeight;
+            button.clickAction = () -> {
+                switch (button.text) {
+                    case "Singleplayer" -> mc.displayGuiScreen(new GuiSelectWorld(this));
+                    case "Multiplayer" -> mc.displayGuiScreen(new GuiMultiplayer(this));
+                    case "Alt Manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
+                    case "Options" -> mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
+                }
+            };
+
+            button.drawScreen(mouseX, mouseY);
+            count += (int) (buttonHeight + 6);
+        }
     }
 
     @Override

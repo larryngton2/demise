@@ -27,7 +27,7 @@ import wtf.demise.utils.player.MoveUtil;
 
 import java.util.Objects;
 
-@ModuleInfo(name = "LongJump", category = ModuleCategory.Movement, key = Keyboard.KEY_F)
+@ModuleInfo(name = "LongJump", category = ModuleCategory.Movement)
 public class LongJump extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Watchdog Fireball", "Old Matrix", "Miniblox"}, "Watchdog Fireball", this);
     public final ModeValue wdFBMode = new ModeValue("Fireball Mode", new String[]{"Rise", "Chef", "Chef High"}, "Watchdog Fireball", this);

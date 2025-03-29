@@ -9,12 +9,14 @@ import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class ModuleListWidget extends Widget {
-    private final int PADDING = 2;
+    private final int xPadding = 6;
+    private final int yPadding = 4;
 
     public ModuleListWidget() {
         super("ModuleList");
@@ -127,37 +129,33 @@ public class ModuleListWidget extends Widget {
 
     private void renderBackground(float localX, float localY, float offset, int width, int height, int middle, int index) {
         if (localX < middle) {
-            RenderUtils.drawRect(localX - PADDING, localY + offset, width + 3,
-                    height + PADDING + setting.textHeight.get(), setting.bgColor(index));
+            RenderUtils.drawRect(localX - (float) xPadding / 2, localY + offset, width + xPadding, height + yPadding + setting.textHeight.get(), setting.bgColor());
         } else {
-            RenderUtils.drawRect(localX + this.width - 4 - width, localY + offset + 1,
-                    width + 3, height + PADDING + setting.textHeight.get(), setting.bgColor(index));
+            RenderUtils.drawRect(localX + this.width - xPadding - width, localY + offset, width + xPadding, height + yPadding + setting.textHeight.get(), setting.bgColor());
         }
     }
 
     private void renderShaderBackground(float localX, float localY, float offset, int width, int height, int middle, int index) {
         if (localX < middle) {
-            RenderUtils.drawRect(localX - PADDING, localY + offset, width + 3,
-                    height + PADDING + setting.textHeight.get(), setting.color(index));
+            RenderUtils.drawRect(localX - (float) xPadding / 2, localY + offset, width + xPadding, height + yPadding + setting.textHeight.get(), Color.black.getRGB());
         } else {
-            RenderUtils.drawRect(localX + this.width - 4 - width, localY + offset + 1,
-                    width + 3, height + PADDING + setting.textHeight.get(), setting.color(index));
+            RenderUtils.drawRect(localX + this.width - xPadding - width, localY + offset, width + xPadding, height + yPadding + setting.textHeight.get(), Color.black.getRGB());
         }
     }
 
     private void renderText(Module module, float localX, float localY, float offset, int width, float alphaAnimation, int middle, int index) {
         String text = module.getName() + module.getTag();
         int color = ColorUtils.swapAlpha(setting.color(index), (int) alphaAnimation * setting.getMainColor().getAlpha());
-        float textY = localY + offset + (setting.cFont.get() ? 4 : 2);
+        float textY = localY + offset + (setting.cFont.get() ? 4 : 2) - 0.5f;
 
         if (localX < middle) {
             if (!setting.cFont.get()) {
-                mc.fontRendererObj.drawStringWithShadow(text, localX, textY, color);
+                mc.fontRendererObj.drawStringWithShadow(text, (localX + (float) xPadding / 2) + 0.5f, textY, color);
             } else {
                 setting.getFr().drawStringWithShadow(text, localX, textY, color);
             }
         } else {
-            float textX = localX - width + this.width - 3;
+            float textX = localX - width + this.width - ((float) xPadding / 2) - 0.5f;
             if (!setting.cFont.get()) {
                 mc.fontRendererObj.drawStringWithShadow(text, textX, textY, color);
             } else {
@@ -195,7 +193,7 @@ public class ModuleListWidget extends Widget {
     }
 
     private float calculateNextOffset(Module module, int height, float offset) {
-        return (float) (offset + ((module.getAnimation().getOutput()) * (height + setting.textHeight.get())) + PADDING);
+        return (float) (offset + ((module.getAnimation().getOutput()) * (height + setting.textHeight.get())) + yPadding);
     }
 
     @Override

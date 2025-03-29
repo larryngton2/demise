@@ -156,7 +156,6 @@ public class RenderUtils implements InstanceAccess {
         drawImage(x, y, z, width, height, color1, color2, color3, color4);
     }
 
-
     public static void drawImage(double x, double y, double z, double width, double height, int color1, int color2, int color3, int color4) {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldRenderer = tessellator.getWorldRenderer();

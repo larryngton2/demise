@@ -77,6 +77,7 @@ import org.lwjglx.opengl.GLContext;
 import org.lwjglx.util.glu.Project;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.MouseOverEvent;
+import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.impl.visual.Atmosphere;

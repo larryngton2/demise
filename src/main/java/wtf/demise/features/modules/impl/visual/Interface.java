@@ -27,7 +27,6 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.values.impl.*;
-import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.userinfo.CurrentUser;
@@ -42,8 +41,6 @@ import wtf.demise.utils.render.RoundedUtils;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.*;
-
-import static wtf.demise.gui.click.neverlose.NeverLose.iconRGB;
 
 @ModuleInfo(name = "Interface", category = ModuleCategory.Visual)
 public class Interface extends Module {
@@ -73,14 +70,12 @@ public class Interface extends Module {
     public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
     public final BoolValue centerNotif = new BoolValue("Center Notification", true, this, () -> notificationMode.is("Exhi"));
     public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
-    public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo", "NeverLose"}, "Fade", this);
-    private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this, () -> !color.is("NeverLose"));
+    public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
+    private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
     public final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
     public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
-    public final ModeValue bgColor = new ModeValue("Background Color", new String[]{"Dark", "Synced", "Custom", "NeverLose"}, "Dark", this, background::get);
-    private final ColorValue bgCustomColor = new ColorValue("Background Custom Color", new Color(0, 0, 0), this, () -> bgColor.canDisplay() && bgColor.is("Custom"));
-    private final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
+    public final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
     public final BoolValue healthFix = new BoolValue("Health fix", true, this);
 
@@ -377,7 +372,6 @@ public class Interface extends Module {
                     ColorUtils.swapAlpha((ColorUtils.colorSwitch(getMainColor(), getSecondColor(), 2000.0F, counter, 75L, fadeSpeed.get()).getRGB()), alpha);
             case "Astolfo" ->
                     ColorUtils.swapAlpha(astolfoRainbow(counter, mainColor.getSaturation(), mainColor.getBrightness()), alpha);
-            case "NeverLose" -> ColorUtils.swapAlpha(iconRGB, alpha);
             default -> colors;
         };
         return colors;
@@ -387,25 +381,7 @@ public class Interface extends Module {
         return color(counter, 255);
     }
 
-    public int bgColor(int counter, int alpha) {
-        int colors = getMainColor().getRGB();
-        colors = switch (bgColor.get()) {
-            case "Dark" -> (new Color(21, 21, 21, alpha)).getRGB();
-            case "Synced" ->
-                    new Color(ColorUtils.applyOpacity(color(counter, alpha), alpha / 255f), true).darker().darker().getRGB();
-            case "None" -> new Color(0, 0, 0, 0).getRGB();
-            case "Custom" -> ColorUtils.swapAlpha(bgCustomColor.get().getRGB(), alpha);
-            case "NeverLose" -> ColorUtils.swapAlpha(NeverLose.bgColor.getRGB(), alpha);
-            default -> colors;
-        };
-        return colors;
-    }
-
-    public int bgColor(int counter) {
-        return bgColor(counter, (int) bgAlpha.get());
-    }
-
     public int bgColor() {
-        return bgColor(0);
+        return new Color(0, 0, 0, (int) bgAlpha.get()).getRGB();
     }
 }

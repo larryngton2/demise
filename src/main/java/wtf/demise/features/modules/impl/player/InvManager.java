@@ -22,7 +22,7 @@ import wtf.demise.utils.player.InventoryUtils;
 
 import java.util.*;
 
-@ModuleInfo(name = "InvManager", category = ModuleCategory.Player, key = Keyboard.KEY_L)
+@ModuleInfo(name = "InvManager", category = ModuleCategory.Player)
 public class InvManager extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Open Inventory", "Spoof"}, "Open Inventory", this);
     private final SliderValue minDelay = new SliderValue("Min Delay", 1, 0, 5, 1, this);

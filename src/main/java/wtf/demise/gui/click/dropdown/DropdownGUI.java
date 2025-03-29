@@ -1,15 +1,22 @@
 package wtf.demise.gui.click.dropdown;
 
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.shader.Framebuffer;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
+import wtf.demise.Demise;
 import wtf.demise.features.modules.ModuleCategory;
+import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.click.dropdown.panel.CategoryPanel;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseOutSine;
+import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.shader.impl.Blur;
+import wtf.demise.utils.render.shader.impl.Shadow;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +28,7 @@ public class DropdownGUI extends GuiScreen {
     private final Animation openingAnimation = new EaseOutSine(400, 1);
     private boolean closing;
     private final List<CategoryPanel> panels = new ArrayList<>();
-    public int scroll;
+    private static Framebuffer stencilFramebuffer = new Framebuffer(1, 1, false);
 
     public DropdownGUI() {
         openingAnimation.setDirection(Direction.BACKWARDS);
@@ -47,17 +54,8 @@ public class DropdownGUI extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 2, -1);
 
-        if (Mouse.hasWheel()) {
-            final float wheel = Mouse.getDWheel();
-
-            if (wheel != 0)
-                scroll += wheel > 0 ? 15 : -15;
-        }
-
-        mouseY -= scroll;
-
-        GlStateManager.translate(0, scroll, 0);
         if (closing) {
             openingAnimation.setDirection(Direction.BACKWARDS);
             if (openingAnimation.finished(Direction.BACKWARDS)) {
@@ -66,29 +64,65 @@ public class DropdownGUI extends GuiScreen {
         }
 
         int finalMouseY = mouseY;
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+            CategoryPanel.shader = true;
+            Blur.startBlur();
+            panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
+            Blur.endBlur(25, 1);
+        }
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+            CategoryPanel.shader = true;
+            stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
+            stencilFramebuffer.framebufferClear();
+            stencilFramebuffer.bindFramebuffer(true);
+            panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
+            stencilFramebuffer.unbindFramebuffer();
+            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+        }
+
+        CategoryPanel.shader = false;
         panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
-        GlStateManager.translate(0, -scroll, 0);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        mouseY -= scroll;
-        GlStateManager.translate(0, scroll, 0);
         int finalMouseY = mouseY;
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+            CategoryPanel.shader = true;
+            panels.forEach(panel -> panel.mouseClicked(mouseX, finalMouseY, mouseButton));
+        }
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+            CategoryPanel.shader = true;
+            panels.forEach(panel -> panel.mouseClicked(mouseX, finalMouseY, mouseButton));
+        }
+
+        CategoryPanel.shader = false;
         panels.forEach(panel -> panel.mouseClicked(mouseX, finalMouseY, mouseButton));
-        GlStateManager.translate(0, -scroll, 0);
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
-
-        mouseY -= scroll;
-        GlStateManager.translate(0, scroll, 0);
         int finalMouseY = mouseY;
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+            CategoryPanel.shader = true;
+            panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
+        }
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+            CategoryPanel.shader = true;
+            panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
+        }
+
+        CategoryPanel.shader = false;
+
         panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
-        GlStateManager.translate(0, -scroll, 0);
         super.mouseReleased(mouseX, mouseY, state);
     }
 

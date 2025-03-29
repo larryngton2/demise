@@ -1,6 +1,8 @@
 package wtf.demise.gui.click.dropdown.component.impl;
 
+import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.ClickGUI;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;
@@ -28,7 +30,7 @@ public class BooleanComponent extends Component {
 
         Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY() + 2.5f, -1);
 
-        RoundedUtils.drawRound(getX() + getWidth() - 15.5f, getY() + 2.5f, 13f, 5, 2, ColorUtils.interpolateColorC(new Color(128, 128, 128, 255), INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get(), (float) toggleAnimation.getOutput()));
+        RoundedUtils.drawRound(getX() + getWidth() - 15.5f, getY() + 2.5f, 13f, 5, 2, ColorUtils.interpolateColorC(new Color(128, 128, 128, 255), Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor(), (float) toggleAnimation.getOutput()));
         RoundedUtils.drawRound(getX() + getWidth() - 15.5f + 5 * (float) toggleAnimation.getOutput(), getY() + 2f, 7f, 5, 2, Color.WHITE);
         super.drawScreen(mouseX, mouseY);
     }

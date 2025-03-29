@@ -16,6 +16,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static wtf.demise.gui.click.neverlose.NeverLose.*;
+
 public class StringComponent extends Component {
     private final TextValue setting;
     private final Animation input = new DecelerateAnimation(250, 1);
@@ -80,11 +82,12 @@ public class StringComponent extends Component {
         float currentY = y;
 
         for (String line : lines) {
-            java.util.List<String> wrappedLines = wrapText(line, 0, maxWidth);
+            java.util.List<String> wrappedLines = wrapText(line, 6, maxWidth);
             for (String wrappedLine : wrappedLines) {
 
-                Fonts.interRegular.get(14).drawString(wrappedLine, x, currentY, ColorUtils.interpolateColor2(Color.GRAY, Color.WHITE, (float) input.getOutput()));
-                currentY += Fonts.interRegular.get(14).getHeight();
+                Fonts.interSemiBold.get(16).drawString(wrappedLine, x, currentY, ColorUtils.interpolateColor2(new Color(-1).darker(),
+                        new Color(-1), (float) input.getOutput()));
+                currentY += Fonts.interSemiBold.get(16).getHeight();
             }
         }
     }
@@ -95,8 +98,8 @@ public class StringComponent extends Component {
         StringBuilder currentLine = new StringBuilder();
 
         for (String word : words) {
-            if (Fonts.interRegular.get(14).getStringWidth(word) <= maxWidth) {
-                if (Fonts.interRegular.get(14).getStringWidth(currentLine.toString() + word) <= maxWidth) {
+            if (Fonts.interSemiBold.get(16).getStringWidth(word) <= maxWidth) {
+                if (Fonts.interSemiBold.get(16).getStringWidth(currentLine.toString() + word) <= maxWidth) {
                     currentLine.append(word).append(" ");
                 } else {
                     lines.add(currentLine.toString());
@@ -130,7 +133,7 @@ public class StringComponent extends Component {
         for (int i = 0; i < wordLength; i++) {
             char c = word.charAt(i);
             String nextPart = currentLine.toString() + c;
-            if (Fonts.interRegular.get(14).getStringWidth(nextPart) <= maxWidth) {
+            if (Fonts.interSemiBold.get(16).getStringWidth(nextPart) <= maxWidth) {
                 currentLine.append(c);
             } else {
                 lines.add(currentLine.toString());

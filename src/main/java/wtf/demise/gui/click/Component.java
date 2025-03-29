@@ -11,7 +11,6 @@ import java.awt.*;
 @Getter
 @Setter
 public class Component implements IComponent {
-
     private float x, y, width, height;
     private Color color = INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get();
     private int colorRGB = color.getRGB();

@@ -13,8 +13,8 @@ import wtf.demise.utils.render.shader.impl.Shadow;
 
 @ModuleInfo(name = "Shaders", category = ModuleCategory.Visual)
 public class Shaders extends Module {
-    private final BoolValue blur = new BoolValue("Blur", true, this);
-    private final BoolValue shadow = new BoolValue("Shadow", true, this);
+    public final BoolValue blur = new BoolValue("Blur", true, this);
+    public final BoolValue shadow = new BoolValue("Shadow", true, this);
 
     public static Framebuffer stencilFramebuffer = new Framebuffer(1, 1, false);
 
