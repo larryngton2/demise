@@ -2,7 +2,6 @@ package wtf.demise.gui.click.dropdown.component.impl;
 
 import net.minecraft.util.MathHelper;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.ClickGUI;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.click.Component;
@@ -13,6 +12,8 @@ import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class SliderComponent extends Component {
 
@@ -33,8 +34,8 @@ public class SliderComponent extends Component {
         float sliderWidth = anim;
 
         RoundedUtils.drawRound(getX() + 4, getY() + Fonts.interRegular.get(15).getHeight() + 2, getWidth() - 8, 2, 2, Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor().darker().darker().darker().darker());
-        RoundedUtils.drawRound(getX() + 4, getY() + Fonts.interRegular.get(15).getHeight() + 2, sliderWidth, 2, 2, Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor());
-        RenderUtils.drawCircle(getX() + 4 + sliderWidth, getY() + Fonts.interRegular.get(15).getHeight() + 3, 0, 360, 2, 0.1f, true, -1);
+        RoundedUtils.drawRound(getX() + 4, getY() + Fonts.interRegular.get(15).getHeight() + 2, sliderWidth, 2, 2, Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor().darker().darker());
+        RenderUtils.drawCircle(getX() + 4 + sliderWidth, getY() + Fonts.interRegular.get(15).getHeight() + 3, 0, 360, 2, 0.1f, true, Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor().brighter().brighter().getRGB());
 
         Fonts.interRegular.get(15).drawString(setting.getMin() + "", getX() + 2, getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, new Color(160, 160, 160).getRGB());
         Fonts.interRegular.get(15).drawCenteredString(setting.get() + "", getX() + getWidth() / 2, getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, -1);
@@ -42,8 +43,16 @@ public class SliderComponent extends Component {
 
         if (dragging) {
             final double difference = setting.getMax() - setting.getMin(), value = setting.getMin() + MathHelper.clamp_float((mouseX - getX()) / getWidth(), 0, 1) * difference;
-            setting.setValue((float) MathUtils.incValue(value, setting.getIncrement()));
+            setting.setValue(BigDecimal.valueOf(MathUtils.incValue(value, setting.getIncrement())).setScale(getDecimalPoints(String.valueOf(setting.getIncrement())), RoundingMode.FLOOR).floatValue());
         }
+    }
+
+    public static Integer getDecimalPoints(String n) {
+        if (n.contains(".")) {
+            return n.replaceAll(".*\\.(?=\\d?)", "").length();
+        }
+
+        return 0;
     }
 
     @Override

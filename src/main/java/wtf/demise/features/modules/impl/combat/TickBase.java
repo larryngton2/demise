@@ -31,7 +31,6 @@ public class TickBase extends Module {
     private final SliderValue maxTick = new SliderValue("Max Ticks", 4, 1, 20, this);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final BoolValue displayPredictPos = new BoolValue("Dislay Predict Pos", false, this);
-    private final BoolValue check = new BoolValue("Check", false, this);
     private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
     private final TimerUtils timer = new TimerUtils();
     private long shifted, previousTime;
@@ -106,10 +105,11 @@ public class TickBase extends Module {
         double predictedDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.get((int) maxTick.get() - 1).position, target);
 
         return predictedDistance < PlayerUtils.getDistanceToEntityBox(target) &&
-                predictedDistance <= attackRange.get() && predictedDistance <= searchRange.get() &&
+                predictedDistance <= attackRange.get() &&
+                predictedDistance <= searchRange.get() &&
+                PlayerUtils.getDistanceToEntityBox(target) >= attackRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&
                 target.canEntityBeSeen(mc.thePlayer) &&
-                (RotationUtils.getRotationDifference(mc.thePlayer, target) <= 90 && check.get() || !check.get()) &&
                 !selfPrediction.get((int) (maxTick.get() - 1)).isCollidedHorizontally;
     }
 

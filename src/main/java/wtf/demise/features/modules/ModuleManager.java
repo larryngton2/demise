@@ -47,12 +47,14 @@ public class ModuleManager {
                 MoreKB.class,
                 HitBox.class,
                 AutoRod.class,
+                TimerRange.class,
 
                 // Legit
                 AutoClicker.class,
                 NoHitDelay.class,
                 LegitScaffold.class,
                 BackTrack.class,
+                JumpReset.class,
 
                 // Exploit
                 Blink.class,

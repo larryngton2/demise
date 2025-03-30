@@ -576,14 +576,14 @@ public class KillAura extends Module {
                     double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
 
                     if (rand.nextInt(100) <= oChance.get()) {
-                        currentYawOffset += (float) yawOffset;
-                        currentPitchOffset += (float) pitchOffset;
+                        yaw += (float) yawOffset;
+                        pitch += (float) pitchOffset;
 
                         lastYawOffset = (float) yawOffset;
                         lastPitchOffset = (float) pitchOffset;
                     } else {
-                        currentYawOffset += lastYawOffset;
-                        currentPitchOffset += lastPitchOffset;
+                        yaw += lastYawOffset;
+                        pitch += lastPitchOffset;
                     }
                 }
                 break;
@@ -599,22 +599,25 @@ public class KillAura extends Module {
                     double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
                     double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
 
+                    float targetYaw = yaw;
+                    float targetPitch = pitch;
+
                     if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
-                        currentYawOffset += (float) yawOffset;
-                        currentPitchOffset += (float) pitchOffset;
+                        targetYaw += (float) yawOffset;
+                        targetPitch += (float) pitchOffset;
 
                         lastYawOffset = (float) yawOffset;
                         lastPitchOffset = (float) pitchOffset;
                     } else {
-                        currentYawOffset += lastYawOffset;
-                        currentPitchOffset += lastPitchOffset;
+                        targetYaw += lastYawOffset;
+                        targetPitch += lastPitchOffset;
                     }
 
                     float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
                     float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
 
-                    currentYawOffset = MathUtils.interpolate(lastYawOffset, currentYawOffset, yawLerp);
-                    currentPitchOffset = MathUtils.interpolate(lastPitchOffset, currentPitchOffset, pitchLerp);
+                    yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
+                    pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
                 }
                 break;
                 case "Drift":
@@ -627,19 +630,21 @@ public class KillAura extends Module {
                     float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
                     float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
 
-                    currentYawOffset += smoothedYaw;
+                    currentYawOffset += (float) (smoothedYaw * MoveUtil.getSpeed());
                     currentPitchOffset += smoothedPitch;
 
                     lastYawOffset = smoothedYaw;
                     lastPitchOffset = smoothedPitch;
+
+                    yaw += currentYawOffset;
+                    pitch += currentPitchOffset;
                     break;
             }
-
-            yaw += currentYawOffset;
-            pitch += currentPitchOffset;
         } else {
-            yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
-            pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
+            if (offsetMode.is("Drift")) {
+                yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
+                pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
+            }
         }
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);

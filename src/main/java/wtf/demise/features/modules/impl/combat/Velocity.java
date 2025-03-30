@@ -36,7 +36,7 @@ import java.util.Objects;
 
 @ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
 public class Velocity extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "JumpReset", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
     private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Reduce", "Test"}, "Reduce", this, () -> mode.is("Intave"));
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
@@ -135,15 +135,6 @@ public class Velocity extends Module {
         }
 
         this.setTag(mode.get());
-    }
-
-    @EventTarget
-    public void onMoveInput(MoveInputEvent e) {
-        if (mode.get().equals("JumpReset")) {
-            if (mc.thePlayer.onGround && mc.thePlayer.hurtTime > 5) {
-                e.setJumping(true);
-            }
-        }
     }
 
     @EventTarget

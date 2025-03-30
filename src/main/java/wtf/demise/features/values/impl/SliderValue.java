@@ -16,7 +16,6 @@ public class SliderValue extends Value {
     @Getter
     private final float increment;
 
-
     public SliderValue(String name, float value, float min, float max, float increment, Module module, Supplier<Boolean> visible) {
         super(name, module, visible);
         this.value = value;
