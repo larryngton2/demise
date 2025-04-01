@@ -65,15 +65,15 @@ public class DropdownGUI extends GuiScreen {
 
         int finalMouseY = mouseY;
 
+        CategoryPanel.shader = Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get();
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
-            CategoryPanel.shader = true;
             Blur.startBlur();
             panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
             Blur.endBlur(25, 1);
         }
 
+        CategoryPanel.shader = Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get();
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
-            CategoryPanel.shader = true;
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
