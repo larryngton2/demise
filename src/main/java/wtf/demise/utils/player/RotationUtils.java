@@ -36,6 +36,8 @@ public class RotationUtils implements InstanceAccess {
     public static SmoothMode smoothMode = SmoothMode.Linear;
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
 
+    static float[] acasddsd = new float[]{0,0};
+
     public static boolean shouldRotate() {
         return currentRotation != null;
     }
@@ -141,6 +143,30 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float acceleration, float err, float consterr, SmoothMode smoothMode) {
+        if (moduleRotation.silent.get()) {
+            if (smoothMode == SmoothMode.Acceleration) {
+                RotationUtils.currentRotation = smoothAcceleration(serverRotation, rotation, previousRotation, acceleration, err, consterr);
+            }
+        } else {
+            /*
+            if (smoothMode == SmoothMode.Acceleration) {
+                mc.thePlayer.rotationYaw = smoothAcceleration(serverRotation, rotation, acceleration, maxSpeed, deltaTime)[0];
+                mc.thePlayer.rotationPitch = smoothAcceleration(serverRotation, rotation, acceleration, maxSpeed, deltaTime)[1];
+            }
+
+             */
+        }
+
+        currentCorrection = correction;
+        //cachedHSpeed = hSpeed;
+        //cachedVSpeed = vSpeed;
+        //cachedMidpoint = midpoint;
+        RotationUtils.smoothMode = smoothMode;
+
+        enabled = true;
+    }
+
     @EventTarget
     @EventPriority(-100)
     public void onRotationUpdate(UpdateEvent event) {
@@ -161,7 +187,8 @@ public class RotationUtils implements InstanceAccess {
                                     smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                             case Bezier ->
                                     smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
-                        };
+                            default ->                                     smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                };
             }
         }
 
@@ -240,6 +267,7 @@ public class RotationUtils implements InstanceAccess {
                                         smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                                 case Bezier ->
                                         smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
+                                default ->                                     smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                             };
                 }
             }
@@ -319,6 +347,45 @@ public class RotationUtils implements InstanceAccess {
         float[] finalTargetRotation = new float[]{newYaw, newPitch};
 
         return applyGCDFix(currentRotation, finalTargetRotation);
+    }
+
+    public static float[] smoothAcceleration(final float[] currentRotation, final float[] targetRotation,
+                                             final float[] previousRotation, float maxAcceleration,
+                                             float accelerationError, float constantError) {
+        // Calculate previous frame's differences
+        float prevYawDiff = getAngleDifference(currentRotation[0], previousRotation[0]);
+        float prevPitchDiff = getAngleDifference(currentRotation[1], previousRotation[1]);
+
+        // Calculate current target differences
+        float yawDiff = getAngleDifference(targetRotation[0], currentRotation[0]);
+        float pitchDiff = getAngleDifference(targetRotation[1], currentRotation[1]);
+
+        // Compute acceleration for each axis
+        float yawAccel = getAngleDifference(yawDiff, prevYawDiff);
+        float pitchAccel = getAngleDifference(pitchDiff, prevPitchDiff);
+
+        // Apply acceleration limits
+        yawAccel = Math.max(-maxAcceleration, Math.min(maxAcceleration, yawAccel));
+        pitchAccel = Math.max(-maxAcceleration, Math.min(maxAcceleration, pitchAccel));
+
+        // Add some randomness to simulate human-like imperfection
+        float yawError = yawAccel * randomError(accelerationError) + randomError(constantError);
+        float pitchError = pitchAccel * randomError(accelerationError) + randomError(constantError);
+
+        // Calculate new rotation differences
+        float newYawDiff = prevYawDiff + yawAccel + yawError;
+        float newPitchDiff = prevPitchDiff + pitchAccel + pitchError;
+
+        // Apply new rotation
+        float newYaw = currentRotation[0] + newYawDiff;
+        float newPitch = currentRotation[1] + newPitchDiff;
+
+        float[] finalTargetRotation = new float[]{newYaw, newPitch};
+        return applyGCDFix(currentRotation, finalTargetRotation);
+    }
+
+    private static float randomError(float range) {
+        return (float)(Math.random() * range * 2 - range);
     }
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
