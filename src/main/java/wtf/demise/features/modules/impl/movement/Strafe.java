@@ -12,9 +12,9 @@ import wtf.demise.utils.player.MoveUtil;
 @ModuleInfo(name = "Strafe", category = ModuleCategory.Movement)
 public class Strafe extends Module {
     public final BoolValue ground = new BoolValue("Ground", true, this);
-    public final SliderValue groundSpeed = new SliderValue("Ground Speed", 1, 0.01f, 1, 0.1f, this, ground::get);
+    public final SliderValue groundSpeed = new SliderValue("Ground Speed", 1, 0.01f, 1, 0.01f, this, ground::get);
     public final BoolValue air = new BoolValue("Air", true, this);
-    public final SliderValue airSpeed = new SliderValue("Air Speed", 1, 0.01f, 1, 0.1f, this, air::get);
+    public final SliderValue airSpeed = new SliderValue("Air Speed", 1, 0.01f, 1, 0.01f, this, air::get);
 
     @EventTarget
     public void onUpdate(UpdateEvent event) {
