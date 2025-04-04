@@ -15,7 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ModuleListWidget extends Widget {
-    private final int xPadding = 6;
+    private final int xPadding = 5;
     private final int yPadding = 4;
 
     public ModuleListWidget() {

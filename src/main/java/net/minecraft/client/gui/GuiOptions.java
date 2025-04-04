@@ -82,7 +82,6 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
         this.buttonList.add(new GuiButton(105, this.width / 2 - 155, this.height / 6 + 144 - 6, 150, 20, I18n.format("options.resourcepack")));
         this.buttonList.add(new GuiButton(104, this.width / 2 + 5, this.height / 6 + 144 - 6, 150, 20, I18n.format("options.snooper.view")));
         this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, I18n.format("gui.done")));
-        this.buttonList.add(new GuiButton((int) 27.6, 5, this.height - 25, 150, 20, "Background shader: " + MainMenu.drawShader));
     }
 
     public String func_175355_a(EnumDifficulty p_175355_1_) {
@@ -168,12 +167,6 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
             if (button.id == 106) {
                 this.mc.gameSettings.saveOptions();
                 this.mc.displayGuiScreen(new GuiScreenOptionsSounds(this, this.game_settings_1));
-            }
-
-            if (button.id == (int) 27.6) {
-                this.mc.gameSettings.saveOptions();
-                MainMenu.drawShader = !MainMenu.drawShader;
-                mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings)); //todo: yeah...
             }
         }
     }

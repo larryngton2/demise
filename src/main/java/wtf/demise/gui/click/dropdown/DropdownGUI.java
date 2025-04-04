@@ -3,10 +3,8 @@ package wtf.demise.gui.click.dropdown;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;
 import org.lwjglx.input.Keyboard;
-import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Shaders;
@@ -33,14 +31,13 @@ public class DropdownGUI extends GuiScreen {
     public DropdownGUI() {
         openingAnimation.setDirection(Direction.BACKWARDS);
         for (ModuleCategory category : ModuleCategory.values()) {
-            if (category == ModuleCategory.Search || category == ModuleCategory.Config)
-                continue;
+            if (category == ModuleCategory.Search || category == ModuleCategory.Config) continue;
             panels.add(new CategoryPanel(category));
             float width = 0;
             for (CategoryPanel panel : panels) {
                 panel.setX(50 + width);
                 panel.setY(20);
-                width += panel.getWidth() + 10;
+                width += panel.getWidth() + 15;
             }
         }
     }
@@ -65,15 +62,15 @@ public class DropdownGUI extends GuiScreen {
 
         int finalMouseY = mouseY;
 
-        CategoryPanel.shader = Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get();
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+            CategoryPanel.shader = true;
             Blur.startBlur();
             panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
             Blur.endBlur(25, 1);
         }
 
-        CategoryPanel.shader = Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get();
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+            CategoryPanel.shader = true;
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
@@ -121,7 +118,6 @@ public class DropdownGUI extends GuiScreen {
         }
 
         CategoryPanel.shader = false;
-
         panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
         super.mouseReleased(mouseX, mouseY, state);
     }

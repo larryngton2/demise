@@ -42,7 +42,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.Queue;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler.setBlocking;
 import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
@@ -75,71 +74,44 @@ public class KillAura extends Module {
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
-    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "Derp", "None"}, "Silent", this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Acceleration"}, "Linear", this, () -> !Objects.equals(rotationMode.get(), "None"));
-    private final SliderValue acceleration = new SliderValue("accel", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && smoothMode.is("Acceleration"));
-    private final SliderValue error = new SliderValue("err", 0.1f, 0.01f, 1, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && smoothMode.is("Acceleration"));
-    private final SliderValue cerror = new SliderValue("consterr", 0.1f, 0.01f, 10, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && smoothMode.is("Acceleration"));
-    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && !smoothMode.is("Acceleration"));
-    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && !smoothMode.is("Acceleration"));
-    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && !smoothMode.is("Acceleration"));
-    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !Objects.equals(rotationMode.get(), "None") && !smoothMode.is("Acceleration"));
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier"));
-    private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None"));
+    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "Derp"}, "Silent", this);
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Acceleration", "None"}, "Linear", this);
+    private final SliderValue acceleration = new SliderValue("accel", 180, 0.01f, 180, 0.01f, this, () -> smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue error = new SliderValue("err", 0.1f, 0.01f, 1, 0.01f, this, () -> smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue cerror = new SliderValue("consterr", 0.1f, 0.01f, 10, 0.01f, this, () -> smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier") && !smoothMode.is("None"));
+    private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
 
-    // point
-    private final ModeValue pointMode = new ModeValue("Point mode", new String[]{"Basic", "Normal", "Advanced"}, "Basic", this);
-
-    // basic / normal
-    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this, () -> !Objects.equals(rotationMode.get(), "None") && !pointMode.is("Advanced"));
-
-    // basic
-    private final BoolValue preMotionFix = new BoolValue("PreMotion fix", false, this, () -> !Objects.equals(rotationMode.get(), "None") && pointMode.is("Basic"));
-
-    // normal
-    private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this, () -> pointMode.is("Normal"));
-    private final BoolValue slowDown = new BoolValue("Slow down", false, this, () -> !Objects.equals(rotationMode.get(), "None") && pointMode.is("Normal"));
-    private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get() && pointMode.is("Normal"));
-    private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this, () -> !Objects.equals(rotationMode.get(), "None") && pointMode.is("Normal"));
-    private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, () -> !Objects.equals(rotationMode.get(), "None") && pauseRotation.get() && pointMode.is("Normal"));
-    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Intave", "Drift"}, "None", this, () -> !Objects.equals(rotationMode.get(), "None") && pointMode.is("Normal"));
-    private final SliderValue iHurtTime = new SliderValue("Intave hurtTime", 5, 1, 10, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Intave") && pointMode.is("Normal"));
-    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian") && pointMode.is("Normal"));
-    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian") && pointMode.is("Normal"));
-    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian") && pointMode.is("Normal"));
-    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian") && pointMode.is("Normal"));
-    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian") && pointMode.is("Normal"));
-
-    // normal / advanced
-    private final BoolValue predict = new BoolValue("Rotation prediction", false, this, () -> !Objects.equals(rotationMode.get(), "None") && pointMode.is("Normal"));
-    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay() && !pointMode.is("Basic"));
-    private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay() && !pointMode.is("Basic"));
-    private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay() && pointMode.is("Normal"));
-    private final BoolValue delayed = new BoolValue("Delayed target pos", false, this, () -> !Objects.equals(rotationMode.get(), "None") && !pointMode.is("Basic"));
-    private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay() && !pointMode.is("Basic"));
-    private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay() && !pointMode.is("Basic"));
-    private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay() && !pointMode.is("Basic"));
-
-    // advanced
-    private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this, () -> pointMode.is("Advanced"));
-    private final SliderValue yOffset = new SliderValue("Static Y offset", 0, -2, 0.4f, 0.01f, this, () -> pointMode.is("Advanced"));
-    private final BoolValue randomizeOffsets = new BoolValue("Extra offset", false, this, () -> pointMode.is("Advanced"));
-    private final ModeValue extraMode = new ModeValue("Extra mode", new String[]{"Rand", "ThreadLocalRandom", "Gaussian"}, "Rand", this, () -> pointMode.is("Advanced") && randomizeOffsets.get());
-    private final SliderValue extraChance = new SliderValue("Extra chance", 100, 1, 100, 1, this, () -> pointMode.is("Advanced") && randomizeOffsets.get());
-    private final SliderValue minXOffset = new SliderValue("Min X offset", -0.4f, -0.4f, 0.4f, 0.01f, this, () -> pointMode.is("Advanced") && randomizeOffsets.get());
-    private final SliderValue maxXOffset = new SliderValue("Max X offset", 0.4f, -0.4f, 0.4f, 0.01f, this, () -> pointMode.is("Advanced") && randomizeOffsets.get());
-    private final SliderValue minYOffset = new SliderValue("Min Y offset", -2, -2, 0.4f, 0.01f, this, () -> pointMode.is("Advanced") && randomizeOffsets.get());
-    private final SliderValue maxYOffset = new SliderValue("Max Y offset", 0.4f, -2, 0.4f, 0.01f, this, () -> pointMode.is("Advanced") && randomizeOffsets.get());
-    private final BoolValue interpolateOffsets = new BoolValue("Interpolate offsets", false, this, () -> randomizeOffsets.get() && pointMode.is("Advanced"));
-    private final SliderValue minXLerp = new SliderValue("Min X Lerp", 0.5f, 0, 1, 0.01f, this, () -> interpolateOffsets.get() && interpolateOffsets.canDisplay());
-    private final SliderValue maxXLerp = new SliderValue("Max X Lerp", 0.5f, 0, 1, 0.01f, this, () -> interpolateOffsets.get() && interpolateOffsets.canDisplay());
-    private final SliderValue minYLerp = new SliderValue("Min Y Lerp", 0.5f, 0, 1, 0.01f, this, () -> interpolateOffsets.get() && interpolateOffsets.canDisplay());
-    private final SliderValue maxYLerp = new SliderValue("Max Y Lerp", 0.5f, 0, 1, 0.01f, this, () -> interpolateOffsets.get() && interpolateOffsets.canDisplay());
-    private final BoolValue hurtTimeBasedSlowDown = new BoolValue("HurtTime based slowdown", false, this, () -> pointMode.is("Advanced"));
-    private final SliderValue hurtTimeDecrement = new SliderValue("HurtTime decrement", 7, 0, 10, 1, this, () -> pointMode.is("Advanced") && hurtTimeBasedSlowDown.get());
-    private final SliderValue minSlowDown = new SliderValue("Min slowDown", 1, 0, 2, 1, this, () -> pointMode.is("Advanced") && hurtTimeBasedSlowDown.get());
-    private final BoolValue onlyUpdateOnMiss = new BoolValue("Only update on miss", false, this, () -> pointMode.is("Advanced"));
-    private final BoolValue onlyRotateOnMiss = new BoolValue("Only rotate on miss", false, this, () -> pointMode.is("Advanced"));
+    // aim point
+    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this);
+    private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
+    private final BoolValue slowDown = new BoolValue("Slow down", false, this);
+    private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
+    private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this);
+    private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, pauseRotation::get);
+    private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
+    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
+    private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
+    private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay());
+    private final BoolValue delayed = new BoolValue("Delayed target pos", false, this);
+    private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
+    private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
+    private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
+    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift"}, "None", this);
+    private final SliderValue nHurtTime = new SliderValue("Noise hurtTime", 5, 1, 10, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Noise"));
+    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this);
+    private final SliderValue yOffset = new SliderValue("Static Y offset", 0, -2, 0.4f, 0.01f, this);
+    private final BoolValue onlyUpdateOnMiss = new BoolValue("Only update on miss", false, this);
+    private final BoolValue onlyRotateOnMiss = new BoolValue("Only rotate on miss", false, this);
 
     // target
     private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch"}, "Single", this);
@@ -176,8 +148,6 @@ public class KillAura extends Module {
     private boolean rotate;
     private float currentYawOffset;
     private float currentPitchOffset;
-    private double currentXOffset;
-    private double currentYOffset;
 
     @Override
     public void onEnable() {
@@ -330,45 +300,19 @@ public class KillAura extends Module {
         float hSpeed;
         float vSpeed;
 
-        switch (pointMode.get()) {
-            case "Normal": {
-                float hurtTime = target.hurtTime - hurtTimeSubtraction.get();
+        float hurtTime = target.hurtTime - hurtTimeSubtraction.get();
 
-                if (hurtTime < 1) hurtTime = 1;
+        if (hurtTime < 1) hurtTime = 1;
 
-                hSpeed = MathUtils.randomizeFloat(
-                        slowDown.get() ? yawRotationSpeedMin.get() / hurtTime : yawRotationSpeedMin.get(),
-                        slowDown.get() ? yawRotationSpeedMax.get() / hurtTime : yawRotationSpeedMax.get()
-                );
+        hSpeed = MathUtils.randomizeFloat(
+                slowDown.get() ? yawRotationSpeedMin.get() / hurtTime : yawRotationSpeedMin.get(),
+                slowDown.get() ? yawRotationSpeedMax.get() / hurtTime : yawRotationSpeedMax.get()
+        );
 
-                vSpeed = MathUtils.randomizeFloat(
-                        slowDown.get() ? pitchRotationSpeedMin.get() / hurtTime : pitchRotationSpeedMin.get(),
-                        slowDown.get() ? pitchRotationSpeedMax.get() / hurtTime : pitchRotationSpeedMax.get()
-                );
-            }
-            break;
-            case "Advanced": {
-                float hurtTime = target.hurtTime - hurtTimeDecrement.get();
-
-                if (hurtTime < minSlowDown.get()) hurtTime = minSlowDown.get();
-
-                hSpeed = MathUtils.randomizeFloat(
-                        hurtTimeBasedSlowDown.get() ? yawRotationSpeedMin.get() / hurtTime : yawRotationSpeedMin.get(),
-                        hurtTimeBasedSlowDown.get() ? yawRotationSpeedMax.get() / hurtTime : yawRotationSpeedMax.get()
-                );
-
-                vSpeed = MathUtils.randomizeFloat(
-                        hurtTimeBasedSlowDown.get() ? pitchRotationSpeedMin.get() / hurtTime : pitchRotationSpeedMin.get(),
-                        hurtTimeBasedSlowDown.get() ? pitchRotationSpeedMax.get() / hurtTime : pitchRotationSpeedMax.get()
-                );
-            }
-            break;
-            default: {
-                hSpeed = MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get());
-                vSpeed = MathUtils.randomizeFloat(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get());
-            }
-            break;
-        }
+        vSpeed = MathUtils.randomizeFloat(
+                slowDown.get() ? pitchRotationSpeedMin.get() / hurtTime : pitchRotationSpeedMin.get(),
+                slowDown.get() ? pitchRotationSpeedMax.get() / hurtTime : pitchRotationSpeedMax.get()
+        );
 
 
         switch (mode) {
@@ -384,10 +328,10 @@ public class KillAura extends Module {
             case Acceleration:
                 RotationUtils.setRotation(calcToEntity(target), correction, acceleration.get(), error.get(), cerror.get(), SmoothMode.Acceleration);
                 break;
+            case None:
+                RotationUtils.setRotation(calcToEntity(target), correction);
+                break;
         }
-
-
-
     }
 
     private EntityLivingBase findNextTarget() {
@@ -543,7 +487,7 @@ public class KillAura extends Module {
     public float[] calcToEntity(EntityLivingBase entity) {
         Vec3 playerPos;
 
-        if ((predict.get() && !predictProcesses.isEmpty() && pointMode.is("Normal") || pointMode.is("Advanced")) || preMotionFix.get() && !predictProcesses.isEmpty() && pointMode.is("Basic")) {
+        if (predict.get() && !predictProcesses.isEmpty()) {
             PlayerUtils.PredictProcess predictedProcess = predictProcesses.get(predictProcesses.size() - 1);
             playerPos = new Vec3(predictedProcess.position.xCoord, predictedProcess.position.yCoord + mc.thePlayer.getEyeHeight(), predictedProcess.position.zCoord);
         } else {
@@ -552,123 +496,52 @@ public class KillAura extends Module {
 
         Vec3 entityPos = entity.getPositionVector();
 
-        double yTrim = pointMode.is("Normal") ? this.yTrim.get() + (mc.thePlayer.onGround ? 0 : 0.1) : 0;
+        double yTrim = this.yTrim.get() + (mc.thePlayer.onGround ? 0 : 0.1);
         AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().contract(0, yTrim, 0);
 
-        if (pointMode.is("Normal") || pointMode.is("Basic")) {
-            switch (aimPos.get()) {
-                case "Head":
-                    targetVec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
-                    break;
-                case "Torso":
-                    targetVec = entityPos.add(0.0, entity.height * 0.75, 0.0);
-                    break;
-                case "Legs":
-                    targetVec = entityPos.add(0.0, entity.height * 0.45, 0.0);
-                    break;
-                case "Nearest":
-                    targetVec = RotationUtils.getBestHitVec(entity);
-                    break;
-                case "Straight": {
-                    final double ex = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
-                    final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
-                    final double ez = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
+        Vec3 vec;
 
-                    targetVec = new Vec3(ex, ey, ez);
-                    break;
-                }
-                case "Assist": {
-                    final Vec3 pos = playerPos.add(mc.thePlayer.getLookVec());
+        switch (aimPos.get()) {
+            case "Head":
+                vec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
+                break;
+            case "Torso":
+                vec = entityPos.add(0.0, entity.height * 0.75, 0.0);
+                break;
+            case "Legs":
+                vec = entityPos.add(0.0, entity.height * 0.45, 0.0);
+                break;
+            case "Nearest":
+                vec = RotationUtils.getBestHitVec(entity);
+                break;
+            case "Straight": {
+                final double ex = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
+                final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
+                final double ez = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
 
-                    final double ex = MathHelper.clamp_double(pos.xCoord, entityBoundingBox.minX, entityBoundingBox.maxX);
-                    final double ey = MathHelper.clamp_double(pos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
-                    final double ez = MathHelper.clamp_double(pos.zCoord, entityBoundingBox.minZ, entityBoundingBox.maxZ);
-
-                    targetVec = new Vec3(ex, ey, ez);
-                    break;
-                }
+                vec = new Vec3(ex, ey, ez);
+                break;
             }
-        } else if (pointMode.is("Advanced")) {
-            double extraXZ = xOffset.get();
-            double extraY = yOffset.get();
+            case "Assist": {
+                final Vec3 pos = playerPos.add(mc.thePlayer.getLookVec());
 
-            if (randomizeOffsets.get()) {
-                if (rand.nextInt(100) <= extraChance.get()) {
-                    if (!interpolateOffsets.get()) {
-                        switch (extraMode.get()) {
-                            case "ThreadLocalRandom": {
-                                extraXZ += ThreadLocalRandom.current().nextFloat(minXOffset.get(), maxXOffset.get());
-                                extraY += ThreadLocalRandom.current().nextFloat(minYOffset.get(), maxYOffset.get());
-                            }
-                            break;
-                            case "Gaussian": {
-                                double meanX = (minXOffset.get() + maxXOffset.get()) / 2;
-                                double stdDevX = (maxXOffset.get() - minXOffset.get()) / 4;
-                                double meanY = (minYOffset.get() + maxYOffset.get()) / 2;
-                                double stdDevY = (maxYOffset.get() - minXOffset.get()) / 4;
+                final double ex = MathHelper.clamp_double(pos.xCoord, entityBoundingBox.minX, entityBoundingBox.maxX);
+                final double ey = MathHelper.clamp_double(pos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
+                final double ez = MathHelper.clamp_double(pos.zCoord, entityBoundingBox.minZ, entityBoundingBox.maxZ);
 
-                                extraXZ += ThreadLocalRandom.current().nextGaussian(meanX, stdDevX);
-                                extraY += ThreadLocalRandom.current().nextGaussian(meanY, stdDevY);
-                            }
-                            break;
-                            default: {
-                                extraXZ += MathUtils.randomizeFloat(minXOffset.get(), maxXOffset.get());
-                                extraY += MathUtils.randomizeFloat(minYOffset.get(), maxYOffset.get());
-                            }
-                            break;
-                        }
-                    } else {
-                        double plusX;
-                        double plusY;
-
-                        switch (extraMode.get()) {
-                            case "ThreadLocalRandom": {
-                                plusX = ThreadLocalRandom.current().nextFloat(minXOffset.get(), maxXOffset.get());
-                                plusY = ThreadLocalRandom.current().nextFloat(minYOffset.get(), maxYOffset.get());
-                            }
-                            break;
-                            case "Gaussian": {
-                                double meanX = (minXOffset.get() + maxXOffset.get()) / 2;
-                                double stdDevX = (maxXOffset.get() - minXOffset.get()) / 4;
-                                double meanY = (minYOffset.get() + maxYOffset.get()) / 2;
-                                double stdDevY = (maxYOffset.get() - minXOffset.get()) / 4;
-
-                                plusX = ThreadLocalRandom.current().nextGaussian(meanX, stdDevX);
-                                plusY = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY);
-                            }
-                            break;
-                            default: {
-                                plusX = MathUtils.randomizeFloat(minXOffset.get(), maxXOffset.get());
-                                plusY = MathUtils.randomizeFloat(minYOffset.get(), maxYOffset.get());
-                            }
-                            break;
-                        }
-
-                        double xLerp = MathUtils.randomizeFloat(minXLerp.get(), maxXLerp.get());
-                        double yLerp = MathUtils.randomizeFloat(minYLerp.get(), maxYLerp.get());
-
-                        extraXZ += MathUtils.interpolate(currentXOffset, plusX, xLerp);
-                        extraY += MathUtils.interpolate(currentYOffset, plusY, yLerp);
-                    }
-
-                    currentXOffset = extraXZ;
-                    currentYOffset = extraY;
-                } else {
-                    extraXZ = currentXOffset;
-                    extraY = currentYOffset;
-                }
+                vec = new Vec3(ex, ey, ez);
+                break;
             }
-
-            final double ex = ((entityBoundingBox.maxX + entityBoundingBox.minX) / 2) + extraXZ;
-            final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY) + extraY;
-            final double ez = ((entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2) + extraXZ;
-
-            if ((mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY && onlyUpdateOnMiss.get()) || !onlyUpdateOnMiss.get()) {
-                targetVec = new Vec3(ex, ey, ez);
-            }
+            default:
+                vec = entityPos.add(0, 0, 0);
+                break;
         }
 
-        if (delayed.get() && pointMode.is("Normal") || pointMode.is("Advanced")) {
+        if ((mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY && onlyUpdateOnMiss.get()) || !onlyUpdateOnMiss.get()) {
+            targetVec = new Vec3(vec.xCoord + xOffset.get(), vec.yCoord + yOffset.get(), vec.zCoord + xOffset.get());
+        }
+
+        if (delayed.get()) {
             positionHistory.add(targetVec);
 
             while (positionHistory.size() > delayedTicks.get()) {
@@ -700,110 +573,104 @@ public class KillAura extends Module {
         float yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
         float pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
 
-        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && pointMode.is("Normal")) {
-            switch (offsetMode.get()) {
-                case "Gaussian": {
-                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
-                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
+        switch (offsetMode.get()) {
+            case "Gaussian": {
+                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
+                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
 
-                    double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
-                    double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
+                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
+                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
 
-                    if (rand.nextInt(100) <= oChance.get()) {
-                        yaw += (float) yawOffset;
-                        pitch += (float) pitchOffset;
+                if (rand.nextInt(100) <= oChance.get()) {
+                    yaw += (float) yawOffset;
+                    pitch += (float) pitchOffset;
 
-                        lastYawOffset = (float) yawOffset;
-                        lastPitchOffset = (float) pitchOffset;
-                    } else {
-                        yaw += lastYawOffset;
-                        pitch += lastPitchOffset;
-                    }
+                    lastYawOffset = (float) yawOffset;
+                    lastPitchOffset = (float) pitchOffset;
+                } else {
+                    yaw += lastYawOffset;
+                    pitch += lastPitchOffset;
                 }
-                break;
-                case "Intave": {
-                    boolean dynamicCheck = entity.hurtTime > iHurtTime.get();
+            }
+            break;
+            case "Noise": {
+                boolean dynamicCheck = entity.hurtTime > nHurtTime.get();
 
-                    double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 30;
-                    double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 30;
+                double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 20;
+                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 20;
 
-                    double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
-                    double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
+                double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
+                double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
 
-                    double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
-                    double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
+                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
+                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
 
-                    float targetYaw = yaw;
-                    float targetPitch = pitch;
+                float targetYaw = yaw;
+                float targetPitch = pitch;
 
-                    if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
-                        targetYaw += (float) yawOffset;
-                        targetPitch += (float) pitchOffset;
+                if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
+                    targetYaw += (float) yawOffset;
+                    targetPitch += (float) pitchOffset;
 
-                        lastYawOffset = (float) yawOffset;
-                        lastPitchOffset = (float) pitchOffset;
-                    } else {
-                        targetYaw += lastYawOffset;
-                        targetPitch += lastPitchOffset;
-                    }
-
-                    float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
-                    float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
-
-                    yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
-                    pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
+                    lastYawOffset = (float) yawOffset;
+                    lastPitchOffset = (float) pitchOffset;
+                } else {
+                    targetYaw += lastYawOffset;
+                    targetPitch += lastPitchOffset;
                 }
+
+                float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+                float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+
+                yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
+                pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
+            }
+            break;
+            case "Drift":
+                double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6) * 15;
+                double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4) * 5;
+
+                double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
+                double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
+
+                float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
+                float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
+
+                currentYawOffset += smoothedYaw;
+                currentPitchOffset += smoothedPitch;
+
+                lastYawOffset = smoothedYaw;
+                lastPitchOffset = smoothedPitch;
+
+                yaw += currentYawOffset;
+                pitch += currentPitchOffset;
                 break;
-                case "Drift":
-                    double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6) * 15;
-                    double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4) * 5;
+        }
 
-                    double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
-                    double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
-
-                    float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
-                    float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
-
-                    currentYawOffset += (float) (smoothedYaw * MoveUtil.getSpeed());
-                    currentPitchOffset += smoothedPitch;
-
-                    lastYawOffset = smoothedYaw;
-                    lastPitchOffset = smoothedPitch;
-
-                    yaw += currentYawOffset;
-                    pitch += currentPitchOffset;
-                    break;
-            }
-        } else {
-            if (offsetMode.is("Drift")) {
-                yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
-                pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
-            }
+        if (offsetMode.is("Drift") && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
+            yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
+            pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
         }
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 
-        if (pointMode.is("Normal")) {
-            if (pauseRotation.get() && rand.nextInt(100) <= pauseChance.get() && !pause) {
-                pauseTimer.reset();
-                pause = true;
-            }
+        if (pauseRotation.get() && rand.nextInt(100) <= pauseChance.get() && !pause) {
+            pauseTimer.reset();
+            pause = true;
+        }
 
-            if (pause) {
-                if (!pauseTimer.hasTimeElapsed(100)) {
-                    yaw = RotationUtils.previousRotation[0];
-                    pitch = RotationUtils.previousRotation[1];
-                } else {
-                    pause = false;
-                }
+        if (pause) {
+            if (!pauseTimer.hasTimeElapsed(100)) {
+                yaw = RotationUtils.previousRotation[0];
+                pitch = RotationUtils.previousRotation[1];
+            } else {
+                pause = false;
             }
         }
 
-        if (pointMode.is("Advanced")) {
-            if (!((mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY && onlyRotateOnMiss.get()) || !onlyRotateOnMiss.get())) {
-                yaw = RotationUtils.previousRotation[0];
-                pitch = RotationUtils.previousRotation[1];
-            }
+        if (!((mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY && onlyRotateOnMiss.get()) || !onlyRotateOnMiss.get())) {
+            yaw = RotationUtils.previousRotation[0];
+            pitch = RotationUtils.previousRotation[1];
         }
 
         return new float[]{yaw, pitch};
@@ -813,38 +680,20 @@ public class KillAura extends Module {
     public void onMove(MoveEvent e) {
         predictProcesses.clear();
 
-        if (pointMode.is("Normal") || pointMode.is("Advanced")) {
-            SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, simulatedMotionMulti.get());
+        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, simulatedMotionMulti.get());
 
-            simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
 
-            for (int i = 0; i < predictTicks.get(); i++) {
-                simulatedPlayer.tick();
-                predictProcesses.add(
-                        new PlayerUtils.PredictProcess(
-                                simulatedPlayer.getPos(),
-                                simulatedPlayer.fallDistance,
-                                simulatedPlayer.onGround,
-                                simulatedPlayer.isCollidedHorizontally
-                        )
-                );
-            }
-        } else if (pointMode.is("Basic")) {
-            SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1.5f);
-
-            simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
-
-            for (int i = 0; i < 1; i++) {
-                simulatedPlayer.tick();
-                predictProcesses.add(
-                        new PlayerUtils.PredictProcess(
-                                simulatedPlayer.getPos(),
-                                simulatedPlayer.fallDistance,
-                                simulatedPlayer.onGround,
-                                simulatedPlayer.isCollidedHorizontally
-                        )
-                );
-            }
+        for (int i = 0; i < predictTicks.get(); i++) {
+            simulatedPlayer.tick();
+            predictProcesses.add(
+                    new PlayerUtils.PredictProcess(
+                            simulatedPlayer.getPos(),
+                            simulatedPlayer.fallDistance,
+                            simulatedPlayer.onGround,
+                            simulatedPlayer.isCollidedHorizontally
+                    )
+            );
         }
     }
 

@@ -6,6 +6,8 @@ import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjglx.Sys;
+import wtf.demise.Demise;
+import wtf.demise.utils.render.shader.impl.MainMenu;
 
 import java.io.File;
 import java.io.IOException;
@@ -162,7 +164,7 @@ public class GuiScreenResourcePacks extends GuiScreen {
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.drawBackground(0);
+        MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
         this.availableResourcePacksList.drawScreen(mouseX, mouseY, partialTicks);
         this.selectedResourcePacksList.drawScreen(mouseX, mouseY, partialTicks);
         this.drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.title"), this.width / 2, 16, 16777215);

@@ -6,10 +6,7 @@ import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityList;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.event.HoverEvent;
@@ -31,6 +28,11 @@ import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.RenderGuiEvent;
+import wtf.demise.features.modules.impl.visual.Shaders;
+import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.shader.impl.Blur;
+import wtf.demise.utils.render.shader.impl.MainMenu;
+import wtf.demise.utils.render.shader.impl.Shadow;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -43,6 +45,8 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static wtf.demise.features.modules.impl.visual.Shaders.stencilFramebuffer;
 
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -64,12 +68,35 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         Demise.INSTANCE.getEventManager().call(new RenderGuiEvent());
-        for (int i = 0; i < this.buttonList.size(); ++i) {
-            this.buttonList.get(i).drawButton(this.mc, mouseX, mouseY);
+
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+            GuiButton.shader = true;
+            Blur.startBlur();
+            for (GuiButton guiButton : this.buttonList) {
+                guiButton.drawButton(this.mc, mouseX, mouseY);
+            }
+            Blur.endBlur(25, 1);
         }
 
-        for (int j = 0; j < this.labelList.size(); ++j) {
-            this.labelList.get(j).drawLabel(this.mc, mouseX, mouseY);
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+            GuiButton.shader = true;
+            stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
+            stencilFramebuffer.framebufferClear();
+            stencilFramebuffer.bindFramebuffer(true);
+            for (GuiButton guiButton : this.buttonList) {
+                guiButton.drawButton(this.mc, mouseX, mouseY);
+            }
+            stencilFramebuffer.unbindFramebuffer();
+            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+        }
+
+        GuiButton.shader = false;
+        for (GuiButton guiButton : this.buttonList) {
+            guiButton.drawButton(this.mc, mouseX, mouseY);
+        }
+
+        for (GuiLabel guiLabel : this.labelList) {
+            guiLabel.drawLabel(this.mc, mouseX, mouseY);
         }
     }
 
@@ -438,24 +465,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
         if (this.mc.theWorld != null) {
             this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
         } else {
-            this.drawBackground(tint);
+            MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
         }
-    }
-
-    public void drawBackground(int tint) {
-        GlStateManager.disableLighting();
-        GlStateManager.disableFog();
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        this.mc.getTextureManager().bindTexture(optionsBackground);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        float f = 32.0F;
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        worldrenderer.pos(0.0D, this.height, 0.0D).tex(0.0D, (float) this.height / 32.0F + (float) tint).color(64, 64, 64, 255).endVertex();
-        worldrenderer.pos(this.width, this.height, 0.0D).tex((float) this.width / 32.0F, (float) this.height / 32.0F + (float) tint).color(64, 64, 64, 255).endVertex();
-        worldrenderer.pos(this.width, 0.0D, 0.0D).tex((float) this.width / 32.0F, tint).color(64, 64, 64, 255).endVertex();
-        worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, tint).color(64, 64, 64, 255).endVertex();
-        tessellator.draw();
     }
 
     public boolean doesGuiPauseGame() {

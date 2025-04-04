@@ -1,6 +1,5 @@
 package net.minecraft.client;
 
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -13,6 +12,8 @@ import net.minecraft.util.MinecraftError;
 import net.optifine.CustomLoadingScreen;
 import net.optifine.CustomLoadingScreens;
 import net.optifine.reflect.Reflector;
+import wtf.demise.Demise;
+import wtf.demise.utils.render.shader.impl.MainMenu;
 
 public class LoadingScreenRenderer implements IProgressUpdate {
     private String message = "";
@@ -130,6 +131,7 @@ public class LoadingScreenRenderer implements IProgressUpdate {
                     if (customloadingscreen != null) {
                         customloadingscreen.drawBackground(scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight());
                     } else {
+                        /*
                         this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
                         float f = 32.0F;
                         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -138,6 +140,9 @@ public class LoadingScreenRenderer implements IProgressUpdate {
                         worldrenderer.pos(k, 0.0D, 0.0D).tex((float) k / f, 0.0D).color(64, 64, 64, 255).endVertex();
                         worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, 0.0D).color(64, 64, 64, 255).endVertex();
                         tessellator.draw();
+
+                         */
+                        MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
                     }
 
                     if (progress >= 0) {

@@ -5,6 +5,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.optifine.CustomLoadingScreen;
 import net.optifine.CustomLoadingScreens;
+import wtf.demise.Demise;
+import wtf.demise.utils.render.shader.impl.MainMenu;
 
 import java.io.IOException;
 
@@ -36,7 +38,7 @@ public class GuiDownloadTerrain extends GuiScreen {
         if (this.customLoadingScreen != null) {
             this.customLoadingScreen.drawBackground(this.width, this.height);
         } else {
-            this.drawBackground(0);
+            MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
         }
 
         this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingTerrain"), this.width / 2, this.height / 2 - 50, 16777215);

@@ -10,6 +10,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.ChunkProviderSettings;
+import wtf.demise.Demise;
+import wtf.demise.utils.render.shader.impl.MainMenu;
 
 import java.io.IOException;
 import java.util.Random;
@@ -868,6 +870,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
         this.drawCenteredString(this.fontRendererObj, this.field_175335_g, this.width / 2, 22, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
 
+        /*
         if (this.field_175339_B != 0) {
             drawRect(0, 0, this.width, this.height, Integer.MIN_VALUE);
             this.drawHorizontalLine(this.width / 2 - 91, this.width / 2 + 90, 99, -2039584);
@@ -895,5 +898,8 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
             this.field_175352_x.drawButton(this.mc, mouseX, mouseY);
             this.field_175351_y.drawButton(this.mc, mouseX, mouseY);
         }
+
+         */
+        MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
     }
 }

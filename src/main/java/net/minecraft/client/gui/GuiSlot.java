@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 import org.lwjglx.input.Mouse;
+import wtf.demise.Demise;
+import wtf.demise.utils.render.shader.impl.MainMenu;
 
 public abstract class GuiSlot {
     protected final Minecraft mc;
@@ -164,6 +166,7 @@ public abstract class GuiSlot {
             this.drawSelectionBox(k, l, mouseXIn, mouseYIn);
             GlStateManager.disableDepth();
             int i1 = 4;
+            //todo this is a mark btw
             this.overlayBackground(0, this.top, 255, 255);
             this.overlayBackground(this.bottom, this.height, 255, 255);
             GlStateManager.enableBlend();

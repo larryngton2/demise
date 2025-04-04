@@ -26,11 +26,13 @@ public class GuiConnecting extends GuiScreen {
     private NetworkManager networkManager;
     private boolean cancel;
     private final GuiScreen previousGuiScreen;
+    private ServerAddress address;
 
     public GuiConnecting(GuiScreen p_i1181_1_, Minecraft mcIn, ServerData p_i1181_3_) {
         this.mc = mcIn;
         this.previousGuiScreen = p_i1181_1_;
         ServerAddress serveraddress = ServerAddress.fromString(p_i1181_3_.serverIP);
+        address = serveraddress;
         mcIn.loadWorld(null);
         mcIn.setServerData(p_i1181_3_);
         this.connect(serveraddress.getIP(), serveraddress.getPort());
@@ -100,7 +102,7 @@ public class GuiConnecting extends GuiScreen {
 
     public void initGui() {
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120 + 12, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 75, this.height / 2, 150, 20, I18n.format("gui.cancel")));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException {
@@ -119,9 +121,9 @@ public class GuiConnecting extends GuiScreen {
         this.drawDefaultBackground();
 
         if (this.networkManager == null) {
-            this.drawCenteredString(this.fontRendererObj, I18n.format("connect.connecting"), this.width / 2, this.height / 2 - 50, 16777215);
+            this.drawCenteredString(this.fontRendererObj, "Establishing connection with " + address.getIP() + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
         } else {
-            this.drawCenteredString(this.fontRendererObj, I18n.format("connect.authorizing"), this.width / 2, this.height / 2 - 50, 16777215);
+            this.drawCenteredString(this.fontRendererObj, "Logging in to " + address.getIP() + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

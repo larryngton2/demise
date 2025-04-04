@@ -36,8 +36,6 @@ public class RotationUtils implements InstanceAccess {
     public static SmoothMode smoothMode = SmoothMode.Linear;
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
 
-    static float[] acasddsd = new float[]{0,0};
-
     public static boolean shouldRotate() {
         return currentRotation != null;
     }

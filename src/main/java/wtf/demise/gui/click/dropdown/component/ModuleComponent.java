@@ -29,7 +29,6 @@ public class ModuleComponent implements IComponent {
     private final EaseInOutQuad openAnimation = new EaseInOutQuad(250, 1);
     private final EaseOutSine toggleAnimation = new EaseOutSine(300, 1);
     private final EaseOutSine hoverAnimation = new EaseOutSine(200, 1);
-    public static boolean shader;
 
     public ModuleComponent(Module module) {
         this.module = module;

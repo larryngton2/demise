@@ -4,5 +4,6 @@ public enum SmoothMode {
     Linear,
     Lerp,
     Bezier,
-    Acceleration
+    Acceleration,
+    None
 }

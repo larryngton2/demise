@@ -67,5 +67,4 @@ public class ViaMCP {
     public void initAsyncSlider(int x, int y, int width, int height) {
         asyncVersionSlider = new AsyncVersionSlider(-1, x, y, Math.max(width, 110), height);
     }
-
 }

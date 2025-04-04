@@ -9,26 +9,24 @@ import wtf.demise.gui.mainmenu.GuiMainMenu;
 import java.io.IOException;
 
 public class GuiIngameMenu extends GuiScreen {
-    private int field_146445_a;
-    private int field_146444_f;
-
     public void initGui() {
-        this.field_146445_a = 0;
         this.buttonList.clear();
         int i = -16;
-        int j = 98;
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + i, I18n.format("menu.returnToMenu")));
+
+        float initialY = (this.height / 2) - (98 / 2) - 5;
+
+        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, initialY + 96 + i, I18n.format("menu.returnToMenu")));
 
         if (!this.mc.isIntegratedServerRunning()) {
             this.buttonList.get(0).displayString = I18n.format("menu.disconnect");
         }
 
-        this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + i, I18n.format("menu.returnToGame")));
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + i, 98, 20, I18n.format("menu.options")));
+        this.buttonList.add(new GuiButton(4, this.width / 2 - 100, initialY + 24 + i, I18n.format("menu.returnToGame")));
+        this.buttonList.add(new GuiButton(5, this.width / 2 - 100, initialY + 48 + i, 98, 20, I18n.format("gui.achievements")));
+        this.buttonList.add(new GuiButton(6, this.width / 2 + 2, initialY + 48 + i, 98, 20, I18n.format("gui.stats")));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, initialY + 72 + i, 98, 20, I18n.format("menu.options")));
         GuiButton guibutton;
-        this.buttonList.add(guibutton = new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + i, 98, 20, I18n.format("menu.shareToLan")));
-        this.buttonList.add(new GuiButton(5, this.width / 2 - 100, this.height / 4 + 48 + i, 98, 20, I18n.format("gui.achievements")));
-        this.buttonList.add(new GuiButton(6, this.width / 2 + 2, this.height / 4 + 48 + i, 98, 20, I18n.format("gui.stats")));
+        this.buttonList.add(guibutton = new GuiButton(7, this.width / 2 + 2, initialY + 72 + i, 98, 20, I18n.format("menu.shareToLan")));
         guibutton.enabled = this.mc.isSingleplayer() && !this.mc.getIntegratedServer().getPublic();
     }
 
@@ -79,12 +77,11 @@ public class GuiIngameMenu extends GuiScreen {
 
     public void updateScreen() {
         super.updateScreen();
-        ++this.field_146444_f;
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game"), this.width / 2, 40, 16777215);
+        this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game"), this.width / 2, this.height / 2 - 65, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

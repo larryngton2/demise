@@ -2,9 +2,8 @@ package wtf.demise.gui.mainmenu;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.CustomGui;
 import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.gui.button.MenuButton;
@@ -22,6 +21,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
+import static wtf.demise.features.modules.impl.visual.Shaders.stencilFramebuffer;
+
 public class GuiMainMenu extends GuiScreen {
     private final List<MenuButton> buttons = List.of(
             new MenuButton("Singleplayer"),
@@ -37,7 +38,6 @@ public class GuiMainMenu extends GuiScreen {
     private boolean funny;
     private ScaledResolution sr;
     private final TimerUtils timer = new TimerUtils();
-    private static Framebuffer stencilFramebuffer = new Framebuffer(1, 1, false);
 
     @Override
     public void initGui() {
@@ -53,11 +53,12 @@ public class GuiMainMenu extends GuiScreen {
 
         if (CurrentUser.USER != null) {
             float buttonWidth = 120;
-            float buttonHeight = 23;
 
-            if (!MainMenu.drawShader) {
-                RenderUtils.drawImage(new ResourceLocation("demise/texture/background.png"), 0, 0, sr.getScaledWidth(), sr.getScaledHeight());
-            }
+            float buttonHeight = switch (Demise.INSTANCE.getModuleManager().getModule(CustomGui.class).buttonStyle.get()) {
+                case "Vanilla" -> 20;
+                case "Custom" -> 23;
+                default -> 0;
+            };
 
             Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
 
@@ -139,6 +140,7 @@ public class GuiMainMenu extends GuiScreen {
             Fonts.interMedium.get(15).drawCenteredStringWithShadow(string1, xx + (width / 2), yy + Fonts.interBold.get(20).getHeight() + 15, -1);
 
             if (timer.hasTimeElapsed(6000)) {
+                System.out.println("########## Your HWID is: " + HWID.getHWID() + " ##########");
                 mc.shutdown();
             }
         }
@@ -154,6 +156,8 @@ public class GuiMainMenu extends GuiScreen {
             button.y = ((height / 2f) + count - (buttons.size() * buttonHeight) / 2f) + Fonts.interBold.get(36).getHeight() + 2;
             button.width = buttonWidth;
             button.height = buttonHeight;
+            button.radius = 7;
+            //button.buttonType = MenuButton.ButtonType.VANILLA;
             button.clickAction = () -> {
                 switch (button.text) {
                     case "Singleplayer" -> mc.displayGuiScreen(new GuiSelectWorld(this));

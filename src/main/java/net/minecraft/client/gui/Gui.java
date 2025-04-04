@@ -161,7 +161,7 @@ public class Gui {
         GlStateManager.enableTexture2D();
     }
 
-    public void drawCenteredString(FontRenderer fontRendererIn, String text, float x, float y, int color) {
+    public static void drawCenteredString(FontRenderer fontRendererIn, String text, float x, float y, int color) {
         fontRendererIn.drawStringWithShadow(text, x - fontRendererIn.getStringWidth(text) / 2, y, color);
     }
 
@@ -169,16 +169,16 @@ public class Gui {
         fontRendererIn.drawStringWithShadow(text, (float) x, (float) y, color);
     }
 
-    public void drawTexturedModalRect(float x, float y, float textureX, float textureY, float width, float height) {
+    public static void drawTexturedModalRect(float x, float y, float textureX, float textureY, float width, float height) {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos(x, y + height, this.zLevel).tex(textureX * f, (textureY + height) * f1).endVertex();
-        worldrenderer.pos(x + width, y + height, this.zLevel).tex((textureX + width) * f, (textureY + height) * f1).endVertex();
-        worldrenderer.pos(x + width, y, this.zLevel).tex((textureX + width) * f, textureY * f1).endVertex();
-        worldrenderer.pos(x, y, this.zLevel).tex(textureX * f, textureY * f1).endVertex();
+        worldrenderer.pos(x, y + height, zLevel).tex(textureX * f, (textureY + height) * f1).endVertex();
+        worldrenderer.pos(x + width, y + height, zLevel).tex((textureX + width) * f, (textureY + height) * f1).endVertex();
+        worldrenderer.pos(x + width, y, zLevel).tex((textureX + width) * f, textureY * f1).endVertex();
+        worldrenderer.pos(x, y, zLevel).tex(textureX * f, textureY * f1).endVertex();
         tessellator.draw();
     }
 

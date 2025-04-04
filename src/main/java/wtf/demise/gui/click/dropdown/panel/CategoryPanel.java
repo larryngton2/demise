@@ -26,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Setter
 public class CategoryPanel implements IComponent {
     private float x, y;
-    private float width = 115, height;
+    private float width = 110, height;
     private boolean opened = true;
     private final EaseInOutQuad openAnimation = new EaseInOutQuad(250, 1);
     private final ModuleCategory category;
@@ -65,16 +65,14 @@ public class CategoryPanel implements IComponent {
 
         if (!shader) {
             RoundedUtils.drawRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 7, new Color(0, 0, 0, (int) Math.min(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get() + 50, 255)));
+            Fonts.interBold.get(18).drawCenteredStringWithShadow(category.getName(), x + width / 2, y + 4.5f, -1);
         } else {
             RoundedUtils.drawShaderRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 7, Color.black);
         }
 
-        Fonts.interBold.get(18).drawCenteredStringWithShadow(category.getName(), x + width / 2, y + 4.5f, -1);
-
         float componentOffsetY = 17;
 
         if (!shader) {
-            ModuleComponent.shader = false;
             for (ModuleComponent component : moduleComponents) {
                 component.setX(x);
                 component.setY(y + componentOffsetY);
@@ -85,17 +83,14 @@ public class CategoryPanel implements IComponent {
                 componentOffsetY += (float) (component.getHeight() * openAnimation.getOutput());
             }
         } else {
-            ModuleComponent.shader = true;
             for (ModuleComponent component : moduleComponents) {
                 component.setX(x);
                 component.setY(y + componentOffsetY);
                 component.setWidth(width);
-                if (openAnimation.getOutput() > 0.7f) {
-                    component.drawScreen(mouseX, mouseY);
-                }
                 componentOffsetY += (float) (component.getHeight() * openAnimation.getOutput());
             }
         }
+
         height = componentOffsetY;
 
         RenderUtils.scaleEnd();
@@ -107,22 +102,28 @@ public class CategoryPanel implements IComponent {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         mouseY -= scroll;
         GlStateManager.translate(0, scroll, 0);
-        if (MouseUtils.isHovered(x, y - 2, width, 19, mouseX, mouseY)) {
-            switch (mouseButton) {
-                case 1 -> opened = !opened;
+
+        if (!shader) {
+            if (MouseUtils.isHovered(x, y - 2, width, 19, mouseX, mouseY)) {
+                if (mouseButton == 1) {
+                    opened = !opened;
+                }
+            }
+            if (opened && !MouseUtils.isHovered(x, y - 2, width, 19, mouseX, mouseY)) {
+                int finalMouseY = mouseY;
+                moduleComponents.forEach(component -> component.mouseClicked(mouseX, finalMouseY, mouseButton));
             }
         }
-        if (opened && !MouseUtils.isHovered(x, y - 2, width, 19, mouseX, mouseY)) {
-            int finalMouseY = mouseY;
-            moduleComponents.forEach(component -> component.mouseClicked(mouseX, finalMouseY, mouseButton));
-        }
+
         GlStateManager.translate(0, -scroll, 0);
         IComponent.super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public void keyTyped(char typedChar, int keyCode) {
-        moduleComponents.forEach(component -> component.keyTyped(typedChar, keyCode));
+        if (!shader) {
+            moduleComponents.forEach(component -> component.keyTyped(typedChar, keyCode));
+        }
         IComponent.super.keyTyped(typedChar, keyCode);
     }
 
@@ -130,8 +131,10 @@ public class CategoryPanel implements IComponent {
     public void mouseReleased(int mouseX, int mouseY, int state) {
         mouseY -= scroll;
         GlStateManager.translate(0, scroll, 0);
-        int finalMouseY = mouseY;
-        moduleComponents.forEach(component -> component.mouseReleased(mouseX, finalMouseY, state));
+        if (!shader) {
+            int finalMouseY = mouseY;
+            moduleComponents.forEach(component -> component.mouseReleased(mouseX, finalMouseY, state));
+        }
         GlStateManager.translate(0, -scroll, 0);
         IComponent.super.mouseReleased(mouseX, mouseY, state);
     }
