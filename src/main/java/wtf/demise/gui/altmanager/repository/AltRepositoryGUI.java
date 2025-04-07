@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -26,7 +27,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.altmanager.login.AltLoginThread;
 import wtf.demise.gui.altmanager.login.AltType;
 import wtf.demise.gui.altmanager.login.SessionUpdatingAltLoginListener;
@@ -34,13 +35,14 @@ import wtf.demise.gui.altmanager.mslogin.Auth;
 import wtf.demise.gui.altmanager.repository.credential.AltCredential;
 import wtf.demise.gui.altmanager.repository.credential.MicrosoftAltCredential;
 import wtf.demise.gui.altmanager.utils.FakeEntityPlayer;
-import wtf.demise.gui.button.GuiCustomButton;
-import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.misc.FilteredArrayList;
 import wtf.demise.utils.misc.HttpResponse;
 import wtf.demise.utils.misc.HttpUtils;
+import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.MainMenu;
+import wtf.demise.utils.render.shader.impl.Shadow;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,15 +66,13 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static net.minecraft.util.EnumChatFormatting.GREEN;
 import static net.minecraft.util.EnumChatFormatting.RED;
+import static wtf.demise.features.modules.impl.visual.Shaders.stencilFramebuffer;
 
 public class AltRepositoryGUI extends GuiScreen {
     static final int PLAYER_BOX_WIDTH = 320;
     static final int PLAYER_BOX_HEIGHT = 36;
     static final float PLAYER_BOX_SPACE = 3F;
-    static final int BUTTON_WIDTH = PLAYER_BOX_WIDTH / 2 - 1;
-    static final int BUTTON_HEIGHT = 30;
-    static final int VERTICAL_MARGIN = 25;
-    static final int HORIZONTAL_MARGIN = 15;
+    static final int VERTICAL_MARGIN = 40;
     static final int SCROLL_ALTS = 1;
 
     @NonNull
@@ -81,14 +81,8 @@ public class AltRepositoryGUI extends GuiScreen {
     @Getter
     @Setter
     private Alt currentAlt;
+    private GuiTextField searchField;
 
-    private GuiGroupPlayerBox groupPlayerBox;
-
-    @NonNull
-    private EnumSort sortType = EnumSort.DATE;
-    private GuiCustomButton sortButton;
-
-    private TokenField searchField;
     private final FilteredArrayList<Alt, Alt> alts = new FilteredArrayList<>(
             ObjectLists.synchronize(new ObjectArrayList<>()), alt -> {
         if (this.searchField == null || StringUtils.isBlank(this.searchField.getText())) return alt;
@@ -105,7 +99,7 @@ public class AltRepositoryGUI extends GuiScreen {
         }
 
         return s.toLowerCase().startsWith(this.searchField.getText().trim().toLowerCase()) ? alt : null;
-    }, () -> this.sortType.getComparator());
+    }, EnumSort.DATE::getComparator);
 
     private final DynamicTexture viewportTexture = new DynamicTexture(256, 256);
     @Getter
@@ -140,12 +134,12 @@ public class AltRepositoryGUI extends GuiScreen {
                 clipboard.setContents(stringSelection, null);
                 break;
             case 0:
-                this.mc.displayGuiScreen(
-                        new GuiAddAlt(this, "Add Alt", "Add Alt", "Generate and save", (gui, credentials) -> {
+                mc.displayGuiScreen(
+                        new GuiAddAlt(this, "Add Alt", "Add Alt", (gui, credentials) -> {
                             addAlt(credentials);
                             saveAlts();
 
-                            this.mc.displayGuiScreen(this);
+                            mc.displayGuiScreen(this);
                         }));
 
                 break;
@@ -153,8 +147,8 @@ public class AltRepositoryGUI extends GuiScreen {
                 removeCurrentAlt();
                 break;
             case 2:
-                this.mc.displayGuiScreen(
-                        new GuiAddAlt(this, "Login", "Alt Login", "Generate and log in", (gui, credentials) -> {
+                mc.displayGuiScreen(
+                        new GuiAddAlt(this, "Login", "Alt Login", (gui, credentials) -> {
                             gui.getGroupAltInfo().updateStatus(GREEN + "Logging in...");
 
                             if (!(credentials instanceof MicrosoftAltCredential)) {
@@ -165,7 +159,7 @@ public class AltRepositoryGUI extends GuiScreen {
                                         super.onLoginSuccess(altType, session);
 
                                         demise.getNotificationManager().post(NotificationType.INFO, "Logged in! Username: " + session.getUsername());
-                                        AltRepositoryGUI.this.mc.displayGuiScreen(AltRepositoryGUI.this);
+                                        mc.displayGuiScreen(AltRepositoryGUI.this);
                                     }
 
                                     @Override
@@ -198,16 +192,6 @@ public class AltRepositoryGUI extends GuiScreen {
                 break;
             case 3:
                 refreshAlts();
-                break;
-            case 5:
-                final EnumSort[] values = EnumSort.values();
-
-                this.sortType = values[(this.sortType.ordinal() + 1) % values.length];
-                this.sortButton.displayString = this.sortType.getCriteria();
-
-                this.alts.update();
-                setScrolledAndUpdate(0);
-
                 break;
             case 71:
                 try {
@@ -291,7 +275,6 @@ public class AltRepositoryGUI extends GuiScreen {
                     e.printStackTrace();
                 }
                 break;*/
-
         }
     }
 
@@ -307,11 +290,27 @@ public class AltRepositoryGUI extends GuiScreen {
             }
         }
 
-        for (int i = 0; i < this.visibleAlts.size(); i++) {
-            Alt alt = this.visibleAlts.get(i);
+        int totalAlts = this.visibleAlts.size();
+        int maxColumns = 4;
+        int usedColumns = Math.min(maxColumns, totalAlts);
+        int rows = (int) Math.ceil((double) totalAlts / (double) maxColumns);
 
-            if (alt.mouseClicked(this.altWidth, VERTICAL_MARGIN + i * (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE), mouseX,
-                    mouseY)) {
+        float totalGridWidth = usedColumns * 150 + (usedColumns - 1) * PLAYER_BOX_SPACE;
+        float totalGridHeight = rows * PLAYER_BOX_HEIGHT + (rows - 1) * PLAYER_BOX_SPACE;
+
+        float startX = AltRepositoryGUI.width / 2f - totalGridWidth / 2f;
+        float startY = AltRepositoryGUI.height / 2f - totalGridHeight / 2f;
+
+        for (int i = 0; i < this.visibleAlts.size(); i++) {
+            final Alt alt = this.visibleAlts.get(i);
+
+            int column = i % maxColumns;
+            int row = i / maxColumns;
+
+            float x = startX + column * (150 + PLAYER_BOX_SPACE);
+            int y = (int) (startY + row * (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE));
+
+            if (alt.mouseClicked(150, x, y, mouseX, mouseY)) {
                 return;
             }
         }
@@ -320,12 +319,10 @@ public class AltRepositoryGUI extends GuiScreen {
             final float perAlt = (this.sliderHeight - VERTICAL_MARGIN) / this.alts.size();
             boolean b = mouseY >= VERTICAL_MARGIN + perAlt * this.scrolled;
 
-            if (b && mouseY <= Math.min(VERTICAL_MARGIN + perAlt * this.visibleAltsCount,
-                    this.sliderHeight) + VERTICAL_MARGIN + perAlt * this.scrolled) {
+            if (b && mouseY <= Math.min(VERTICAL_MARGIN + perAlt * this.visibleAltsCount, this.sliderHeight) + VERTICAL_MARGIN + perAlt * this.scrolled) {
                 this.dragging = true;
             } else {
-                setScrolledAndUpdate(
-                        this.scrolled + MathHelper.ceiling_double_int(this.alts.size() / 5.0D) * (b ? 1 : -1));
+                setScrolledAndUpdate(this.scrolled + MathHelper.ceiling_double_int(this.alts.size() / 5.0D) * (b ? 1 : -1));
             }
         }
 
@@ -340,32 +337,20 @@ public class AltRepositoryGUI extends GuiScreen {
         DECIMAL_FORMAT.setGroupingSize(3);
     }
 
-    private float altWidth = 0;
     @Getter
     private float altBoxAnimationStep, altBoxAlphaStep;
 
     @Override
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
-        ResourceLocation backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", this.viewportTexture);
-        final TokenField oldSearchField = this.searchField;
-
-        final int altInfoX = this.width - PLAYER_BOX_WIDTH - HORIZONTAL_MARGIN;
-        final int altInfoH = this.height - VERTICAL_MARGIN - 6 * (3 + 1) - BUTTON_HEIGHT * 3;
-        this.altWidth = -HORIZONTAL_MARGIN + this.width - HORIZONTAL_MARGIN - PLAYER_BOX_WIDTH - HORIZONTAL_MARGIN;
-        this.altBoxAnimationStep = this.altWidth / 564.0F * Alt.FHD_ANIMATION_STEP;
-        this.altBoxAlphaStep = 0xFF / (this.altWidth / Alt.FHD_ANIMATION_STEP);
-        this.searchField = new TokenField(0, this.mc.fontRendererObj, this.width - 740, 4, 180, 20, "Search:");
-        this.sortType = EnumSort.DATE;
+        final GuiTextField oldSearchField = this.searchField;
+        this.altBoxAnimationStep = 500 / 564.0F * Alt.FHD_ANIMATION_STEP;
+        this.altBoxAlphaStep = 0xFF / (200 / Alt.FHD_ANIMATION_STEP);
+        this.searchField = new GuiTextField(0, this.mc.fontRendererObj, (width / 2) - 100, 5, 200, 20);
 
         if (oldSearchField != null) {
             this.searchField.setText(oldSearchField.getText());
         }
-
-        this.groupPlayerBox = new GuiGroupPlayerBox(altInfoX, VERTICAL_MARGIN, PLAYER_BOX_WIDTH, altInfoH,
-                this::getSelectedAlt);
-        this.groupPlayerBox.addLine(alt -> "In-game name: " + alt.getPlayer().getName());
-        ;
 
         this.sliderHeight = -VERTICAL_MARGIN + this.height + -DOWN_MARGIN;
         final int oldVisibleAltsCount = this.visibleAltsCount;
@@ -377,25 +362,21 @@ public class AltRepositoryGUI extends GuiScreen {
 
         updateVisibleAlts();
 
-        this.buttonList.add(new GuiCustomButton("Add", 0, altInfoX, altInfoH + VERTICAL_MARGIN + 5, BUTTON_WIDTH - 1,
-                BUTTON_HEIGHT, 15, Fonts.interSemiBold.get(28)));
-        this.buttonList.add(new GuiCustomButton("Remove", 1, altInfoX + BUTTON_WIDTH + 3, altInfoH + VERTICAL_MARGIN + 5,
-                BUTTON_WIDTH - 1, BUTTON_HEIGHT, 15, Fonts.interSemiBold.get(28)));
-        this.buttonList
-                .add(new GuiCustomButton("Direct Login", 2, altInfoX, altInfoH + VERTICAL_MARGIN + 5 + BUTTON_HEIGHT + 6,
-                        PLAYER_BOX_WIDTH, BUTTON_HEIGHT, 15, Fonts.interSemiBold.get(28)));
-        this.buttonList
-                .add(new GuiCustomButton("Refresh", 3, altInfoX, altInfoH + VERTICAL_MARGIN + 5 + (BUTTON_HEIGHT + 6) * 2,
-                        PLAYER_BOX_WIDTH, BUTTON_HEIGHT, 15, Fonts.interSemiBold.get(28)));
+        float width = 75;
+        float x = this.width / 2 - (width / 2);
+        float y = this.height - 25;
 
-        this.buttonList.add(new GuiCustomButton("Change Skin", 71, this.width - 150, 2, 75, 20, 8, Fonts.interSemiBold.get(16)));
+        this.buttonList.add(new GuiButton(0, x - (width * 2 + 10), y, width, 20, "Add"));
+        this.buttonList.add(new GuiButton(1, x - (width + 5), y, width, 20, "Remove"));
+        this.buttonList.add(new GuiButton(2, x, y, width, 20, "Direct Login"));
+        this.buttonList.add(new GuiButton(69, x + (width + 5), y, width, 20, "Copy IGN"));
+        this.buttonList.add(new GuiButton(71, x + (width * 2 + 10), y, width, 20, "Change Skin"));
+
+        this.buttonList.add(new GuiButton(4, this.width - width - 5, y, width, 20, "Back"));
+        this.buttonList.add(new GuiButton(3, this.width - width * 2 - 10, y, width, 20, "Refresh"));
+
         //this.buttonList.add(new GuiCustomButton("TokenXGP (URL)", 72, this.width - 150, 2, 75, 20, 8, Fonts.interSemiBold.get(16)));
         //this.buttonList.add(new GuiCustomButton("TokenLogin", 70, this.width - 70, 2, 55, 20, 8, Fonts.interSemiBold.get(16)));
-        this.buttonList
-                .add(this.sortButton = new GuiCustomButton(this.sortType.getCriteria(), 5, this.width - 550, 2, 100, 20,
-                        8, Fonts.interSemiBold.get(16)));
-        this.buttonList.add(new GuiCustomButton("Copy IGN", 69, this.width - 445, 2, 95, 20, 8, Fonts.interSemiBold.get(16)));
-
     }
 
     private static final float DOWN_MARGIN = 5;
@@ -403,7 +384,6 @@ public class AltRepositoryGUI extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         try {
-
             GlStateManager.disableCull();
 
             MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
@@ -416,7 +396,6 @@ public class AltRepositoryGUI extends GuiScreen {
             GL11.glEnd();
             GL20.glUseProgram(0);
             final int altsCount = this.alts.size();
-            final float perAlt = this.sliderHeight / this.alts.size();
 
             if (this.dragging) {
                 int sliderValue = MathHelper
@@ -426,36 +405,64 @@ public class AltRepositoryGUI extends GuiScreen {
                 setScrolledAndUpdate(altIndex);
             }
 
-            drawRect(0, 0, this.width, this.height, new Color(0, 0, 0, 100).getRGB());
-            Fonts.interSemiBold.get(28).drawString("demise", HORIZONTAL_MARGIN, 5, 0xFFFFFFFF);
-            Fonts.interSemiBold.get(28).drawString("d", HORIZONTAL_MARGIN, 5,
-                    this.demise.getModuleManager().getModule(Interface.class).color());
-
             this.searchField.drawTextBox();
 
-            drawRect(3, VERTICAL_MARGIN,
-                    9, this.sliderHeight, SCROLL_BAR_EMPTY_COLOR);
-            drawRect(3, VERTICAL_MARGIN + Math.min(perAlt * this.scrolled, this.sliderHeight - Math.min(perAlt * this.visibleAltsCount, this.sliderHeight)),
-                    9, Math.min(perAlt * this.visibleAltsCount, this.sliderHeight), SCROLL_BAR_SELECTED_COLOR);
-
-            this.groupPlayerBox.drawGroup(this.mc, mouseX, mouseY);
+            if (StringUtils.isBlank(searchField.getText()) && !searchField.isFocused()) {
+                mc.fontRendererObj.drawStringWithShadow("Search...", width / 2 - 94, 11, 0xFF888888);
+            }
 
             if (!this.alts.isEmpty()) {
                 if (altsCount > this.visibleAltsCount) scrollWithWheel(altsCount);
 
-                for (int i = 0; i < this.visibleAlts.size(); i++) {
-                    final Alt alt = this.visibleAlts.get(i);
-                    alt.drawAlt(this.altWidth, (int) (VERTICAL_MARGIN + i * (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE)),
-                            mouseX, mouseY);
+                if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+                    Alt.shader = true;
+                    Blur.startBlur();
+                    drawAlts(mouseX, mouseY);
+                    Blur.endBlur(25, 1);
                 }
 
-                final Alt selectedAlt = getSelectedAlt();
-                //if (selectedAlt != null) selectedAlt.drawEntity(mouseX, mouseY);
+                if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+                    Alt.shader = true;
+                    stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
+                    stencilFramebuffer.framebufferClear();
+                    stencilFramebuffer.bindFramebuffer(true);
+                    drawAlts(mouseX, mouseY);
+                    stencilFramebuffer.unbindFramebuffer();
+                    Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+                }
+
+                Alt.shader = false;
+                drawAlts(mouseX, mouseY);
             }
 
             super.drawScreen(mouseX, mouseY, partialTicks);
         } catch (Throwable t) {
             this.logger.warn("scrolled: " + this.scrolled, t);
+        }
+    }
+
+    private void drawAlts(int mouseX, int mouseY) {
+        int totalAlts = this.visibleAlts.size();
+        int maxColumns = 4;
+        int usedColumns = Math.min(maxColumns, totalAlts);
+        int rows = (int) Math.ceil((double) totalAlts / (double) maxColumns);
+
+        float totalGridWidth = usedColumns * 150 + (usedColumns - 1) * PLAYER_BOX_SPACE;
+        float totalGridHeight = rows * PLAYER_BOX_HEIGHT + (rows - 1) * PLAYER_BOX_SPACE;
+
+        float startX = AltRepositoryGUI.width / 2f - totalGridWidth / 2f;
+        float startY = AltRepositoryGUI.height / 2f - totalGridHeight / 2f;
+
+        for (int i = 0; i < totalAlts; i++) {
+            final Alt alt = this.visibleAlts.get(i);
+
+            int column = i % maxColumns;
+            int row = i / maxColumns;
+
+            float x = startX + column * (150 + PLAYER_BOX_SPACE);
+            int y = (int) (startY + row * (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE));
+
+            alt.drawAlt(150, x, y, mouseX, mouseY);
         }
     }
 
@@ -484,8 +491,7 @@ public class AltRepositoryGUI extends GuiScreen {
         }
 
         final int size = this.alts.size();
-        this.visibleAlts = this.alts.subList(MathHelper.clamp_int(this.scrolled, 0, size),
-                MathHelper.clamp_int(this.scrolled + this.visibleAltsCount, 0, size));
+        this.visibleAlts = this.alts.subList(MathHelper.clamp_int(this.scrolled, 0, size), MathHelper.clamp_int(this.scrolled + this.visibleAltsCount, 0, size));
     }
 
     private void scrollWithWheel(int altsCount) {
@@ -506,10 +512,10 @@ public class AltRepositoryGUI extends GuiScreen {
     }
 
     private int getVisibleAltsCount() {
-        final float value = (this.height - VERTICAL_MARGIN) / (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE);
-        return MathHelper.floor_float(value);
+        final int columns = 4;
+        final float rows = (this.height - VERTICAL_MARGIN) / (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE);
+        return MathHelper.floor_float(rows) * columns;
     }
-
 
     @Nullable
     public String readApiKey() throws IOException {
@@ -525,7 +531,7 @@ public class AltRepositoryGUI extends GuiScreen {
 
     @Nullable
     public Alt getRandomAlt() {
-        List<Alt> alts = this.alts.stream().filter(alt1 -> alt1.getUnbanDate() == 0L && !alt1.isInvalid()).toList();
+        List<Alt> alts = this.alts.stream().filter(alt1 -> !alt1.isInvalid()).toList();
 
         if (alts.isEmpty()) return null;
 
@@ -734,11 +740,10 @@ public class AltRepositoryGUI extends GuiScreen {
             final String login = credential.getLogin();
             final String name = GuiAddAlt.isEmail(login) ? "<Unknown Name>" : login;
 
-            alt = new Alt(credential, null, this, false);
+            alt = new Alt(credential, new FakeEntityPlayer(new GameProfile(new UUID(0, 0), name), null), this, false);
         }
 
         if (!hasAlt(alt)) {
-
             this.alts.add(alt);
             updateVisibleAlts();
 

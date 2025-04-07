@@ -5,11 +5,6 @@ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
@@ -21,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
-import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.gui.altmanager.login.AltLoginThread;
 import wtf.demise.gui.altmanager.login.AltType;
@@ -33,7 +27,9 @@ import wtf.demise.gui.altmanager.utils.FakeEntityPlayer;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.net.URL;
@@ -49,14 +45,11 @@ import static com.mojang.authlib.minecraft.MinecraftProfileTexture.Type.SKIN;
 @Getter
 @Setter
 public class Alt {
-
     private final AltRepositoryGUI repository;
-
     private final AltCredential credential;
     private FakeEntityPlayer player;
-    private long unbanDate;
-
     private boolean invalid;
+    public static boolean shader;
 
     public Alt(@NotNull AltCredential credential,
                @NotNull FakeEntityPlayer player,
@@ -67,8 +60,8 @@ public class Alt {
         this.invalid = invalid;
     }
 
-    protected boolean mouseClicked(float width, float y, int mouseX, int mouseY) {
-        if (!isHovered(width, y, mouseX, mouseY)) return false;
+    protected boolean mouseClicked(float width, float x, float y, int mouseX, int mouseY) {
+        if (!MouseUtils.isHovered(x, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, mouseX, mouseY)) return false;
 
         if (Minecraft.getSystemTime() - lastClickTime < 250L) {
             logIn(true);
@@ -80,70 +73,42 @@ public class Alt {
         return true;
     }
 
-    public void drawAlt(float width, int y, int mouseX, int mouseY) {
+    public void drawAlt(float width, float x, int y, int mouseX, int mouseY) {
+        if (!shader) {
+            RoundedUtils.drawRound(x, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, new Color(!isSelected() ? DEFAULT_COLOR : SELECTED_COLOR, true));
 
-        RenderUtils.drawRoundedRect(AltRepositoryGUI.HORIZONTAL_MARGIN, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 5,
-                (!isSelected() ? DEFAULT_COLOR : SELECTED_COLOR));
-
-        if (triedAuthorizing() && alpha > 0) {
-            RenderUtils.drawRoundedRect(AltRepositoryGUI.HORIZONTAL_MARGIN, y, animationX,
-                    AltRepositoryGUI.PLAYER_BOX_HEIGHT, 5, (int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ?
-                            SUCCESS_LOGIN_COLOR :
-                            FAILED_LOGIN_COLOR));
-            renderAltBox(width, mouseX, mouseY);
-        }
-
-        drawSkull(player, y);
-        Fonts.interSemiBold.get(20).drawString((invalid ? EnumChatFormatting.STRIKETHROUGH : "") + player.getName(), 53, y + 3, TEXT_SELECTED_COLOR);
-
-        Fonts.interSemiBold.get(12).drawString("Email: " + credential.getLogin(), 53, y + AltRepositoryGUI.HORIZONTAL_MARGIN,
-                TEXT_SELECTED_COLOR);
-
-        String password = credential.getPassword();
-
-        if (StringUtils.isNotBlank(password)) {
-            Fonts.interSemiBold.get(12).drawString("Password:", 53, y + 24, TEXT_SELECTED_COLOR);
-            Fonts.interSemiBold.get(12).drawString(new String(new char[password.length()]).replace('\0', '*'),
-                    Fonts.interMedium.get(12).getStringWidth("Password:") + 57, y + 25, TEXT_SELECTED_COLOR);
-        }
-
-        if (repository.getCurrentAlt() == this) {
-            Fonts.interSemiBold.get(20).drawString("Logged", width - 35, y + AltRepositoryGUI.PLAYER_BOX_HEIGHT / 2F - 5,
-                    new Color(255, 255, 255, 50).getRGB());
-        }
-
-        if (unbanDate != -1) {
-            if (unbanDate - System.currentTimeMillis() < 0) {
-                unbanDate = 0;
-            }
-        }
-
-        if (unbanDate != 0) {
-            String unbansIn;
-            if (unbanDate != -1) {
-                int seconds = (int) ((unbanDate - System.currentTimeMillis()) / 1000);
-                String days = seconds > 86400 ? (seconds / 86400) + "d " : "";
-                seconds = !days.equals("") ? seconds % 86400 : seconds;
-                String hours = seconds > 3600 ? seconds / 3600 + "h " : "";
-                seconds = !hours.equals("") ? seconds % 3600 : seconds;
-                String minutes = seconds > 60 ? seconds / 60 + "m " : "";
-                unbansIn = days + hours + minutes;
-            } else {
-                unbansIn = "Permed";
+            if (triedAuthorizing() && alpha > 0) {
+                RoundedUtils.drawRound(x, y, animationX, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, new Color((int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ? SUCCESS_LOGIN_COLOR : FAILED_LOGIN_COLOR), true));
+                renderAltBox(width, mouseX, mouseY);
             }
 
-            Fonts.interSemiBold.get(20).drawString(unbansIn, width - Fonts.interSemiBold.get(20).getStringWidth(unbansIn) - (repository.getCurrentAlt() == this ? 45 : 0) + 5, y + AltRepositoryGUI.PLAYER_BOX_HEIGHT / 2F - 5,
-                    TEXT_SELECTED_COLOR);
+            drawSkull(player, y, x + 2);
+            Fonts.interSemiBold.get(20).drawString((invalid ? EnumChatFormatting.STRIKETHROUGH : "") + player.getName(), x + 37, y + 3, TEXT_SELECTED_COLOR);
+
+            Fonts.interSemiBold.get(12).drawString("Email: " + credential.getLogin(), x + 37, y + 17, TEXT_SELECTED_COLOR);
+
+            String password = credential.getPassword();
+
+            if (StringUtils.isNotBlank(password)) {
+                Fonts.interSemiBold.get(12).drawString("Password: ", x + 37, y + 23, TEXT_SELECTED_COLOR);
+                Fonts.interSemiBold.get(12).drawString(new String(new char[password.length()]).replace('\0', '*'), Fonts.interMedium.get(12).getStringWidth("Password: ") + x + 37, y + 25, TEXT_SELECTED_COLOR);
+            }
+
+            if (repository.getCurrentAlt() == this) {
+                Fonts.interSemiBold.get(20).drawString("Logged", x + width - 45, y + AltRepositoryGUI.PLAYER_BOX_HEIGHT / 2F - 5, new Color(255, 255, 255, 50).getRGB());
+            }
+        } else {
+            RoundedUtils.drawShaderRound(x, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, Color.black);
+
+            if (triedAuthorizing() && alpha > 0) {
+                RoundedUtils.drawShaderRound(x, y, animationX, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, new Color((int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ? SUCCESS_LOGIN_COLOR : FAILED_LOGIN_COLOR), true));
+                renderAltBox(width, mouseX, mouseY);
+            }
         }
-
-
     }
 
-    private void drawSkull(@NotNull FakeEntityPlayer player, int scrolled) {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        mc.getTextureManager().bindTexture(player.getLocationSkin());
-        Gui.drawScaledCustomSizeModalRect(18, scrolled + 2, 8.0F, 8.0F, 8, 8, 32, 32, 64.0F, 64.0F);
+    private void drawSkull(@NotNull FakeEntityPlayer player, int scrolled, float x) {
+        RenderUtils.renderPlayer2D(player, x, scrolled + 2, AltRepositoryGUI.PLAYER_BOX_HEIGHT - 4, 12, -1);
     }
 
     private final TimerUtils timer = new TimerUtils();
@@ -364,65 +329,6 @@ public class Alt {
     private static final float MODEL_SCALE_FACTOR = 0.71F;
     private static final int MODEL_BOTTOM_MARGIN = 24;
 
-    public void drawEntity(int mouseX, int mouseY) {
-        if (player != null) {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            int width = repository.width;
-            int height = repository.height;
-
-            final int distanceToSide = (int) (AltRepositoryGUI.HORIZONTAL_MARGIN + AltRepositoryGUI.PLAYER_BOX_WIDTH / 2F);
-            float targetHeight = height / 3f * MODEL_SCALE_FACTOR;
-
-            int posX = width - distanceToSide;
-            int posY = AltRepositoryGUI.VERTICAL_MARGIN + height - AltRepositoryGUI.VERTICAL_MARGIN - 6 * 4 - 3 * AltRepositoryGUI.BUTTON_HEIGHT - MODEL_BOTTOM_MARGIN;
-            int mouseX1 = width - distanceToSide - mouseX;
-            float mouseY1 = height / 2F + player.height * targetHeight - player.height * targetHeight * (player
-                    .getEyeHeight() / player.height) - mouseY;
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-            GlStateManager.enableColorMaterial();
-            GlStateManager.pushMatrix();
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GlStateManager.translate((float) posX, (float) posY, 50.0F);
-            GL11.glScalef(-targetHeight, targetHeight, targetHeight);
-            GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
-            RenderHelper.enableStandardItemLighting();
-            GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
-
-            float tanX = (float) Math.atan(mouseX1 / 40.0F);
-            float tanY = -((float) Math.atan(mouseY1 / 40.0F));
-
-            GlStateManager.rotate(tanY * 20.0F, 1.0F, 0.0F, 0.0F);
-            player.renderYawOffset = tanX * 20.0F;
-            player.rotationYaw = tanX * 40.0F;
-            player.rotationPitch = tanY * 20.0F;
-            player.rotationYawHead = player.rotationYaw;
-            player.prevRotationYawHead = player.rotationYaw;
-            GlStateManager.translate(0.0F, 0.0F, 0.0F);
-
-            try {
-                RenderManager renderManager = mc.getRenderManager();
-                renderManager.setPlayerViewY(180.0F);
-                renderManager.setRenderShadow(false);
-                renderManager.renderEntityWithPosYaw(player, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
-                renderManager.setRenderShadow(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GlStateManager.popMatrix();
-            RenderHelper.disableStandardItemLighting();
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-            GlStateManager.disableTexture2D();
-            GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-        }
-    }
-
     static final float FHD_ANIMATION_STEP = 5;
     private static final int UPDATES_PER_SECOND = 100;
 
@@ -434,11 +340,6 @@ public class Alt {
     private static final int TEXT_SELECTED_COLOR = new Color(198, 198, 198).getRGB();
     private static final int SUCCESS_LOGIN_COLOR = 0x6E8D3D;
     private static final int FAILED_LOGIN_COLOR = 0x9E3939;
-
-    private boolean isHovered(float width, float y, int mouseX, int mouseY) {
-        return mouseX >= AltRepositoryGUI.HORIZONTAL_MARGIN && mouseX <= width + AltRepositoryGUI.HORIZONTAL_MARGIN && mouseY >= y && mouseY <= y + AltRepositoryGUI.PLAYER_BOX_HEIGHT;
-    }
-
 
     @NotNull
     public static Alt fromNBT(AltRepositoryGUI gui, @NotNull NBTTagCompound tagCompound) {
@@ -468,7 +369,6 @@ public class Alt {
     public NBTBase asNBTCompound() {
         NBTTagCompound compound = new NBTTagCompound();
 
-        compound.setString("unbanDate", String.valueOf(unbanDate));
         compound.setString("login", credential.getLogin());
         compound.setBoolean("invalid", invalid);
         if (credential.getPassword() != null) compound.setString("password", credential.getPassword());

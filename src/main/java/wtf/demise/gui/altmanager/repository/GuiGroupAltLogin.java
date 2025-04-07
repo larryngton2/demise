@@ -23,9 +23,6 @@ public final class GuiGroupAltLogin extends GuiRoundedGroupWithLines<Object> {
     public void drawGroup(final Minecraft mc, final int mouseX, final int mouseY) {
         if (this.hidden) return;
 
-        RenderUtils.drawRoundedRect(this.xPosition, this.yPosition, this.width, this.height, this.radius,
-                new Color(48, 49, 54).getRGB());
-
         if (this.title != null) {
             this.titleFontRenderer.drawString(this.title,
                     this.xPosition + (this.width - this.titleFontRenderer.getStringWidth(this.title)) / 2.0F,

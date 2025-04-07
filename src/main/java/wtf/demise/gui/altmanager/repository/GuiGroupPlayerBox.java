@@ -16,7 +16,7 @@ public class GuiGroupPlayerBox extends GuiRoundedGroupWithLines<Alt> {
 
     @Override
     public void drawGroup(Minecraft mc, int mouseX, int mouseY) {
-        superDrawGroup(mc, mouseX, mouseY);
+        //superDrawGroup(mc, mouseX, mouseY);
 
         final Alt alt = this.supplier.get();
 

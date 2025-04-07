@@ -52,10 +52,10 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Set<String> PROTOCOLS = Sets.newHashSet("http", "https");
     private static final Splitter NEWLINE_SPLITTER = Splitter.on('\n');
-    protected Minecraft mc;
+    protected static Minecraft mc;
     protected RenderItem itemRender;
-    public int width;
-    public int height;
+    public static int width;
+    public static int height;
     protected List<GuiButton> buttonList = Lists.newArrayList();
     protected List<GuiLabel> labelList = Lists.newArrayList();
     public boolean allowUserInput;

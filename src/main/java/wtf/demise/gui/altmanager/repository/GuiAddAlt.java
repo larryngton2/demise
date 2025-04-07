@@ -15,9 +15,8 @@ import wtf.demise.gui.altmanager.repository.credential.AltCredential;
 import wtf.demise.gui.altmanager.repository.credential.MicrosoftAltCredential;
 import wtf.demise.gui.altmanager.utils.Checks;
 import wtf.demise.gui.button.GuiCustomButton;
-import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.render.RoundedUtils;
+import wtf.demise.utils.render.shader.impl.MainMenu;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -29,6 +28,8 @@ import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 import static net.minecraft.util.EnumChatFormatting.RED;
+import static wtf.demise.utils.misc.StringUtils.randomString;
+import static wtf.demise.utils.misc.StringUtils.sb;
 
 public final class GuiAddAlt extends GuiScreen {
 
@@ -38,40 +39,34 @@ public final class GuiAddAlt extends GuiScreen {
     private final BiConsumer<GuiAddAlt, ? super AltCredential> consumer;
 
     private final String addAltButtonName;
-    private final String generateButtonName;
     private final String title;
 
-    private PasswordTextField passwordField;
+    private GuiTextField passwordField;
     private GuiTextField usernameField;
     private final List<GuiCustomButton> buttons = new ArrayList<>();
 
-    public GuiAddAlt(@NotNull AltRepositoryGUI gui,
-                     @NotNull String addAltButtonName,
-                     @NotNull String title,
-                     @NotNull String generateButtonName,
-                     @NotNull BiConsumer<GuiAddAlt, ? super AltCredential> consumer) {
+    public GuiAddAlt(@NotNull AltRepositoryGUI gui, @NotNull String addAltButtonName, @NotNull String title, @NotNull BiConsumer<GuiAddAlt, ? super AltCredential> consumer) {
         this.gui = gui;
         this.addAltButtonName = addAltButtonName;
         this.title = title;
-        this.generateButtonName = generateButtonName;
         this.consumer = consumer;
     }
 
     @Override
     public void initGui() {
-        int height = this.height / 4 + 24;
+        int height = this.height / 2 - 30;
 
         this.groupAltInfo = new GuiGroupAltLogin(this, title);
 
         List<GuiButton> buttonList = this.buttonList;
-        buttonList.add(new GuiCustomButton(addAltButtonName, 0, width / 2 - 100, height + 72 + 12, 7, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton("Back", 1, width / 2 - 100, height + 72 + 12 + 24, 7, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton("Import alt", 2, width / 2 - 100, height + 72 + 12 + -24, 7, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton(generateButtonName, 3, width / 2 - 100, height + 72 + 12 + -48, 7, Fonts.interSemiBold.get(20)));
-        buttonList.add(new GuiCustomButton("Microsoft", 4, width / 2 - 100, height + 72 + 12 + -72, 7, Fonts.interSemiBold.get(20)));
+        buttonList.add(new GuiButton(0, width / 2 - 100, height + 72 + 12, addAltButtonName));
+        buttonList.add(new GuiButton(1, width / 2 - 100, height + 72 + 12 + 24, "Back"));
+        buttonList.add(new GuiButton(2, width / 2 - 100, height + 72 + 12 + -24, "Import alt"));
+        buttonList.add(new GuiButton(3,width / 2 - 100, height + 72 + 12 + -48, "Generate"));
+        buttonList.add(new GuiButton(4, width / 2 - 100, height + 72 + 12 + -72, "Microsoft"));
 
-        this.usernameField = new TokenField(0, mc.fontRendererObj, width / 2 - 100, 60, 200, 20, "Alt Email:");
-        this.passwordField = new PasswordTextField(1, mc.fontRendererObj, width / 2 - 100, 100, 200, 20, "Password:");
+        this.usernameField = new GuiTextField(0, mc.fontRendererObj, width / 2 - 100, height - 65, 200, 20);
+        this.passwordField = new GuiTextField(1, mc.fontRendererObj, width / 2 - 100, height - 30, 200, 20);
         usernameField.setFocused(true);
 
         Keyboard.enableRepeatEvents(true);
@@ -79,40 +74,37 @@ public final class GuiAddAlt extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        FontRenderer fontRenderer = Fonts.interMedium.get(18);
-
-        drawRect(0, 0, width, height, new Color(32, 34, 37).getRGB()); // background
+        MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
 
         GuiTextField usernameField = this.usernameField;
-        PasswordTextField passwordField = this.passwordField;
+        GuiTextField passwordField = this.passwordField;
 
         usernameField.drawTextBox();
         passwordField.drawTextBox();
 
         groupAltInfo.drawGroup(mc, mouseX, mouseY);
 
-        RoundedUtils.drawRound((int) ((gui.width - this.width) / 2F), 15, 200, 30, 15, new Color(48, 49, 54));
-
         if (this.title != null) {
             Fonts.interSemiBold.get(22).drawString(this.title,
                     (int) ((gui.width - this.width) / 2F) + (this.width - Fonts.interSemiBold.get(22).getStringWidth(this.title)) / 2.0F,
                     15 + 5,
-                    new Color(198, 198, 198).getRGB());
+                    -1);
         }
 
         if (StringUtils.isBlank(usernameField.getText()) && !usernameField.isFocused()) {
-            fontRenderer.drawString("Username / E-Mail", width / 2F - 96, 64, 0xFF888888);
+            mc.fontRendererObj.drawStringWithShadow("Username / E-Mail", width / 2F - 96, this.height / 2 - 89, 0xFF888888);
         }
 
         if (StringUtils.isBlank(passwordField.getText()) && !passwordField.isFocused()) {
-            fontRenderer.drawString("Password", width / 2F - 96, 104, 0xFF888888);
+            mc.fontRendererObj.drawStringWithShadow("Password", width / 2F - 96, this.height / 2 - 54, 0xFF888888);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)])$");
+            "^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)])$"
+    );
 
     static boolean isEmail(@NotNull String email) {
         Checks.notBlank(email, "email");
@@ -128,7 +120,7 @@ public final class GuiAddAlt extends GuiScreen {
 
             if (altCredential.getPassword() == null) {
                 if (!login.matches("^[a-zA-Z0-9_]+$")) {
-                    groupAltInfo.updateStatus(RED + "Illegal characters in username");
+                    groupAltInfo.updateStatus(RED + "Invalid characters in username");
                     return;
                 }
 
@@ -137,7 +129,7 @@ public final class GuiAddAlt extends GuiScreen {
                     return;
                 }
             } else if (!isEmail(login)) {
-                groupAltInfo.updateStatus(RED + "Illegal e-mail");
+                groupAltInfo.updateStatus(RED + "Invalid e-mail");
             }
 
             consumer.accept(this, altCredential);
@@ -191,7 +183,11 @@ public final class GuiAddAlt extends GuiScreen {
                         consumer.accept(this, o);
                     }
                 });
-
+                break;
+            case 3:
+                //wtf.demise.utils.misc.StringUtils.randomString(wtf.demise.utils.misc.StringUtils.sb, 10)
+                usernameField.setText(randomString(sb, 10));
+                passwordField.setText("");
                 break;
         }
     }
