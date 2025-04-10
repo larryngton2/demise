@@ -20,7 +20,7 @@ import wtf.demise.utils.player.RotationUtils;
 
 @ModuleInfo(name = "Speed", category = ModuleCategory.Movement)
 public class Speed extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC"}, "Strafe Hop", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC"}, "Strafe Hop", this);
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));

@@ -193,7 +193,7 @@ public class PlayerUtils implements InstanceAccess {
             if (Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).bots.contains(entity))
                 continue;
 
-            float tempDistance = mc.thePlayer.getDistanceToEntity(entity);
+            float tempDistance = mc.thePlayer.getDistanceToEntity(entity) - 0.5657f;
             if (entity != mc.thePlayer && tempDistance <= distance) {
                 target = entity;
                 distance = tempDistance;

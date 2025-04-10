@@ -59,18 +59,15 @@ public class BackTrack extends Module {
     @EventTarget
     public void onMotion(MotionEvent e) {
         if (e.isPost()) {
-            if (mc.thePlayer.isDead)
-                return;
+            if (mc.thePlayer.isDead) return;
 
             target = PlayerUtils.getTarget(9, teamCheck.get());
 
             if (ping == 0) ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
 
-            if (target == null)
-                return;
+            if (target == null) return;
 
-            if (swingCheck.get() && !mc.thePlayer.isSwingInProgress)
-                return;
+            if (swingCheck.get() && !mc.thePlayer.isSwingInProgress) return;
 
             double realDistance = realPosition.distanceTo(mc.thePlayer);
             double clientDistance = target.getDistanceToEntity(mc.thePlayer);
@@ -122,7 +119,7 @@ public class BackTrack extends Module {
         double realDistance = realPosition.distanceTo(mc.thePlayer);
         double clientDistance = target.getDistanceToEntity(mc.thePlayer);
 
-        boolean on = realDistance > clientDistance && realDistance > minRange.get() && realDistance < maxRange.get() && (releaseOnVelocity.get() && mc.thePlayer.hurtTime < 5 || !releaseOnVelocity.get());
+        boolean on = realDistance > clientDistance && realDistance > minRange.get() && realDistance < maxRange.get() && (releaseOnVelocity.get() && mc.thePlayer.hurtTime < 5 || !releaseOnVelocity.get()) && (mc.thePlayer.isSwingInProgress && swingCheck.get()) || !swingCheck.get();
 
         if (target != null) {
             switch (esp.get()) {

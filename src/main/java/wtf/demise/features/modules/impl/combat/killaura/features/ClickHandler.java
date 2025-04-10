@@ -11,6 +11,7 @@ import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
@@ -22,6 +23,7 @@ import static wtf.demise.utils.packet.PacketUtils.sendPacketNoEvent;
 public class ClickHandler implements InstanceAccess {
     private static final KillAura killAura = Demise.INSTANCE.getModuleManager().getModule(KillAura.class);
     public static final TimerUtils lastTargetTime = new TimerUtils();
+    private static final TimerUtils lastCPSUpdateTime = new TimerUtils();
     private static double currentCPS;
 
     public static void sendAttack() {
@@ -47,10 +49,18 @@ public class ClickHandler implements InstanceAccess {
     }
 
     public static boolean isAttackReady() {
+        /*
         double meanCPS = (killAura.minCPS.get() + killAura.maxCPS.get()) / 2.0;
         double stdDevCPS = (killAura.maxCPS.get() - killAura.minCPS.get()) / 4.0;
+        */
 
-        currentCPS = ThreadLocalRandom.current().nextGaussian(meanCPS, stdDevCPS);
+        //DebugUtils.sendMessage("CPS: " + currentCPS + " shouldUpdateCPS: " + lastCPSUpdateTime.hasTimeElapsed(killAura.cpsUpdateDelay.get() * 100));
+
+        if (lastCPSUpdateTime.hasTimeElapsed(killAura.cpsUpdateDelay.get() * 100)) {
+            //currentCPS = ThreadLocalRandom.current().nextGaussian(meanCPS, stdDevCPS);
+            currentCPS = ThreadLocalRandom.current().nextDouble(killAura.minCPS.get(), killAura.maxCPS.get() + 1);
+            lastCPSUpdateTime.reset();
+        }
 
         boolean check = lastTargetTime.hasTimeElapsed(1000 / currentCPS);
 

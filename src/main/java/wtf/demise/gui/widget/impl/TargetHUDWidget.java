@@ -150,6 +150,7 @@ class TargetHUD implements InstanceAccess {
                     RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
 
                     RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
+                    RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
                     String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
                     double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
                     String diff;
@@ -162,17 +163,29 @@ class TargetHUD implements InstanceAccess {
                         diff = "±" + initialDiff;
                     }
 
-                    RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
-                    RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
                     Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
                     Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
                     Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
+
+                    if (setting.targetHudParticle.get()) {
+                        ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f);
+                    }
+
+                    RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
+
+                    /*
+                    int redAlpha = (int) ((target.hurtTime - 2) * 10 * 2.55f) - 50;
+
+                    if (redAlpha > 0) {
+                        RoundedUtils.drawRound(x + 3.2f, y + 3.2f, 30.5f, 30.5f, 4.8f, new Color(255, 0, 0, redAlpha));
+                    }
+                    */
                 } else {
                     RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
-                }
 
-                if (setting.targetHudParticle.get()) {
-                    ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f);
+                    if (setting.targetHudParticle.get()) {
+                        ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f);
+                    }
                 }
             }
             break;

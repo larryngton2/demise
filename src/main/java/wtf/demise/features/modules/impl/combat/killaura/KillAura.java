@@ -42,6 +42,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Queue;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler.setBlocking;
 import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
@@ -60,6 +61,7 @@ public class KillAura extends Module {
     public final ModeValue swingMode = new ModeValue("Swing mode", new String[]{"Normal", "Client", "Server"}, "Normal", this, () -> clickMode.is("Packet"));
     public final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
     public final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
+    public final SliderValue cpsUpdateDelay = new SliderValue("CPS update delay", 5, 0, 50, 1, this);
     public final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
     public final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
     public final SliderValue eClicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
@@ -141,13 +143,15 @@ public class KillAura extends Module {
     public static boolean isBlocking = false;
     private Vec3 targetVec;
     public Vec3 currentVec;
-    private float lastPitchOffset;
-    private float lastYawOffset;
+    private double lastXOffset;
+    private double lastYOffset;
+    private double lastZOffset;
     private boolean pause;
     private float derpYaw;
     private boolean rotate;
-    private float currentYawOffset;
-    private float currentPitchOffset;
+    private double currentXOffset;
+    private double currentYOffset;
+    private double currentZOffset;
 
     @Override
     public void onEnable() {
@@ -537,8 +541,117 @@ public class KillAura extends Module {
                 break;
         }
 
+        switch (offsetMode.get()) {
+            case "Gaussian": {
+                double minXZ = -0.4;
+                double maxXZ = 0.4;
+                double minY = -2;
+                double maxY = 0.4;
+
+                double meanXZ = (minXZ + maxXZ) / 2;
+                double stdDevXZ = (maxXZ - minXZ) / 4;
+                double meanY = (minY + maxY) / 2;
+                double stdDevY = (maxY - minY) / 4;
+
+                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
+                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
+
+                double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+                double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
+                double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+
+                if (rand.nextInt(100) <= oChance.get()) {
+                    vec.xCoord += xOffset;
+                    vec.yCoord += yOffset;
+                    vec.zCoord += zOffset;
+
+                    lastXOffset = (float) xOffset;
+                    lastYOffset = (float) yOffset;
+                    lastZOffset = (float) zOffset;
+                } else {
+                    vec.xCoord += lastXOffset;
+                    vec.yCoord += lastYOffset;
+                    vec.zCoord += lastZOffset;
+                }
+            }
+            break;
+            case "Noise": {
+                boolean dynamicCheck = entity.hurtTime > nHurtTime.get();
+
+                double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8);
+                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5);
+
+                double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
+                double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
+
+                double minXZ = -0.4;
+                double maxXZ = 0.4;
+                double minY = -2;
+                double maxY = 0.4;
+
+                double meanXZ = (minXZ + maxXZ) / 2;
+                double stdDevXZ = (maxXZ - minXZ) / 4;
+                double meanY = (minY + maxY) / 2;
+                double stdDevY = (maxY - minY) / 4;
+
+                double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+                double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
+                double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+
+                float targetX = (float) vec.xCoord;
+                float targetY = (float) vec.yCoord;
+                float targetZ = (float) vec.zCoord;
+
+                if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
+                    targetX += (float) xOffset;
+                    targetY += (float) yOffset;
+
+                    lastXOffset = (float) xOffset;
+                    lastYOffset = (float) yOffset;
+                    lastZOffset = (float) zOffset;
+                } else {
+                    targetX += (float) lastXOffset;
+                    targetY += (float) lastYOffset;
+                    targetZ += (float) lastZOffset;
+                }
+
+                float lerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+
+                vec.xCoord = MathUtils.interpolate(vec.xCoord, targetX, lerp);
+                vec.yCoord = MathUtils.interpolate(vec.yCoord, targetY, lerp);
+                vec.zCoord = MathUtils.interpolate(vec.zCoord, targetZ, lerp);
+            }
+            break;
+            case "Drift":
+                if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+                    double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6);
+                    double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4);
+
+                    double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
+                    double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
+
+                    float smoothedX = (float) (lastXOffset * 0.75 + smoothYawOffset * 0.25);
+                    float smoothedY = (float) (lastYOffset * 0.75 + smoothPitchOffset * 0.25);
+
+                    currentXOffset += smoothedX;
+                    currentYOffset += smoothedY;
+
+                    lastXOffset = smoothedX;
+                    lastYOffset = smoothedY;
+
+                    vec.xCoord += currentXOffset;
+                    vec.yCoord += currentYOffset;
+                    vec.zCoord += currentXOffset;
+                } else {
+                    vec.xCoord += currentXOffset = MathUtils.interpolate(currentXOffset, 0, 0.75f);
+                    vec.yCoord += currentYOffset = MathUtils.interpolate(currentYOffset, 0, 0.75f);
+                    vec.zCoord += currentXOffset = MathUtils.interpolate(currentXOffset, 0, 0.75f);
+                }
+                break;
+        }
+
         if ((mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY && onlyUpdateOnMiss.get()) || !onlyUpdateOnMiss.get()) {
-            targetVec = new Vec3(vec.xCoord + xOffset.get(), vec.yCoord + yOffset.get(), vec.zCoord + xOffset.get());
+            targetVec = new Vec3(vec.xCoord, vec.yCoord, vec.zCoord).add(xOffset.get(), yOffset.get(), xOffset.get());
         }
 
         if (delayed.get()) {
@@ -572,85 +685,6 @@ public class KillAura extends Module {
 
         float yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
         float pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
-
-        switch (offsetMode.get()) {
-            case "Gaussian": {
-                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get()) * 20;
-                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get()) * 20;
-
-                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
-                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
-
-                if (rand.nextInt(100) <= oChance.get()) {
-                    yaw += (float) yawOffset;
-                    pitch += (float) pitchOffset;
-
-                    lastYawOffset = (float) yawOffset;
-                    lastPitchOffset = (float) pitchOffset;
-                } else {
-                    yaw += lastYawOffset;
-                    pitch += lastPitchOffset;
-                }
-            }
-            break;
-            case "Noise": {
-                boolean dynamicCheck = entity.hurtTime > nHurtTime.get();
-
-                double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8) * 20;
-                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5) * 20;
-
-                double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
-                double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
-
-                double yawOffset = rand.nextGaussian(0.00942273861037109, 0.23319837528201348) * yawFactor;
-                double pitchOffset = rand.nextGaussian(0.30075078007595923, 0.3492437109081718) * pitchFactor;
-
-                float targetYaw = yaw;
-                float targetPitch = pitch;
-
-                if (dynamicCheck ? rand.nextInt(100) <= 50 : rand.nextInt(100) <= 25) {
-                    targetYaw += (float) yawOffset;
-                    targetPitch += (float) pitchOffset;
-
-                    lastYawOffset = (float) yawOffset;
-                    lastPitchOffset = (float) pitchOffset;
-                } else {
-                    targetYaw += lastYawOffset;
-                    targetPitch += lastPitchOffset;
-                }
-
-                float yawLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
-                float pitchLerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
-
-                yaw = MathUtils.interpolate(yaw, targetYaw, yawLerp);
-                pitch = MathUtils.interpolate(pitch, targetPitch, pitchLerp);
-            }
-            break;
-            case "Drift":
-                double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6) * 15;
-                double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4) * 5;
-
-                double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
-                double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
-
-                float smoothedYaw = (float) (lastYawOffset * 0.75 + smoothYawOffset * 0.25);
-                float smoothedPitch = (float) (lastPitchOffset * 0.75 + smoothPitchOffset * 0.25);
-
-                currentYawOffset += smoothedYaw;
-                currentPitchOffset += smoothedPitch;
-
-                lastYawOffset = smoothedYaw;
-                lastPitchOffset = smoothedPitch;
-
-                yaw += currentYawOffset;
-                pitch += currentPitchOffset;
-                break;
-        }
-
-        if (offsetMode.is("Drift") && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY) {
-            yaw += currentYawOffset = MathUtils.interpolate(currentYawOffset, 0, 0.75f);
-            pitch += currentPitchOffset = MathUtils.interpolate(currentPitchOffset, 0, 0.75f);
-        }
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 

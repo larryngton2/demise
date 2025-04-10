@@ -12,7 +12,6 @@ import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "Sprint", category = ModuleCategory.Movement)
 public class Sprint extends Module {
-
     private final BoolValue omni = new BoolValue("Omni", false, this);
     public final BoolValue silent = new BoolValue("Silent", false, this);
 
