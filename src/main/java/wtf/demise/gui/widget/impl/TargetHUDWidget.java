@@ -32,33 +32,21 @@ public class TargetHUDWidget extends Widget {
 
     @Override
     public void render() {
-        int count = 0;
-        float lastTargetWidth = 0;
-        for (EntityPlayer target : setting.animationEntityPlayerMap.keySet()) {
-            if (count > 1) continue;
+        if (setting.target != null) {
             this.height = getTHUDHeight();
-            float currentTargetWidth = getTHUDWidth(target);
-            this.width = currentTargetWidth;
-            TargetHUD targetHUD = new TargetHUD((float) (renderX + ((count % 3) * (lastTargetWidth + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), (float) (this.renderY + ((count / 3) * (this.height + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), target, setting.animationEntityPlayerMap.get(target), false, setting.targetHudMode);
+            this.width = getTHUDWidth(setting.target);
+            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false, setting.targetHudMode);
             targetHUD.render();
-            lastTargetWidth = currentTargetWidth;
-            count++;
         }
     }
 
     @Override
     public void onShader(Shader2DEvent event) {
-        int count = 0;
-        float lastTargetWidth = 0;
-        for (EntityPlayer target : setting.animationEntityPlayerMap.keySet()) {
-            if (count > 1) continue;
+        if (setting.target != null) {
             this.height = getTHUDHeight();
-            float currentTargetWidth = getTHUDWidth(target);
-            this.width = currentTargetWidth;
-            TargetHUD targetHUD = new TargetHUD((float) (renderX + ((count % 3) * (lastTargetWidth + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), (float) (this.renderY + ((count / 3) * (this.height + 4)) * setting.animationEntityPlayerMap.get(target).getOutput()), target, setting.animationEntityPlayerMap.get(target), true, setting.targetHudMode);
+            this.width = getTHUDWidth(setting.target);
+            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, true, setting.targetHudMode);
             targetHUD.render();
-            lastTargetWidth = currentTargetWidth;
-            count++;
         }
     }
 

@@ -23,7 +23,6 @@ import static org.lwjgl.opengl.GL11.*;
 
 @ModuleInfo(name = "Camera", category = ModuleCategory.Visual)
 public class Camera extends Module {
-
     public final MultiBoolValue setting = new MultiBoolValue("Option", Arrays.asList(
             new BoolValue("View Clip", true),
             new BoolValue("Third Person Distance", false),

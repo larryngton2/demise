@@ -154,14 +154,12 @@ public class EntityPlayerSP extends AbstractClientPlayer {
         }
 
         if (this.isCurrentViewEntity()) {
-
             double d0 = motionEvent.getX() - this.lastReportedPosX;
             double d1 = motionEvent.getY() - this.lastReportedPosY;
             double d2 = motionEvent.getZ() - this.lastReportedPosZ;
 
             float yaw = motionEvent.getYaw();
             float pitch = motionEvent.getPitch();
-
 
             if (RotationUtils.currentRotation != null) {
                 RotationUtils.previousRotation = RotationUtils.currentRotation;
@@ -207,9 +205,11 @@ public class EntityPlayerSP extends AbstractClientPlayer {
                 this.lastReportedYaw = yaw;
                 this.lastReportedPitch = pitch;
             }
+
             mc.thePlayer.rotationYawHead = yaw;
             mc.thePlayer.rotationPitchHead = pitch;
         }
+
         Demise.INSTANCE.getEventManager().call(new MotionEvent(MotionEvent.State.POST));
     }
 

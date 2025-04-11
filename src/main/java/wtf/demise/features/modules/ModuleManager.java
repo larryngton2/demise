@@ -133,8 +133,7 @@ public class ModuleManager {
                 ViewBobbing.class,
                 BreakProgress.class,
                 Dot.class,
-                Cape.class,
-                CustomGui.class
+                VisualTweaks.class
         );
 
         // Sort modules by name for better organization

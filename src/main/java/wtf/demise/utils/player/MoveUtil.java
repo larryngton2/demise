@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
+import net.optifine.entity.model.anim.ModelUpdater;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
@@ -489,26 +490,16 @@ public class MoveUtil implements InstanceAccess {
 
         if (Math.abs(deltaYaw) < maxAngle) angle = Math.toDegrees(getDirection());
 
-        if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
-            mc.thePlayer.jump();
+        if (isMoving()) {
+            if (mc.thePlayer.onGround) {
+                angle = lastYaw2 = (float) Math.toDegrees(getDirection());
+            }
 
-            double groundSpeed = 0.47;
-
-            angle = lastYaw2 = (float) Math.toDegrees(getDirection());
-
-            MoveUtil.strafe(groundSpeed, Math.toRadians(angle));
-        }
-
-        if (MoveUtil.isMoving()) {
             MoveUtil.strafe(MoveUtil.getSpeed(), Math.toRadians(angle));
         }
 
         lastYaw2 = MathHelper.wrapAngleTo180_float((float) angle);
         e.setYaw((float) angle);
-
-        mc.thePlayer.rotationYawHead = e.getYaw();
-        float f = MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYawHead - mc.thePlayer.renderYawOffset);
-        mc.thePlayer.renderYawOffset += f * 0.3F;
     }
 
     private static float yaw = 0;

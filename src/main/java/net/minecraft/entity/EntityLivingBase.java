@@ -1327,7 +1327,6 @@ public abstract class EntityLivingBase extends Entity {
         }
 
         if (this.swingProgress > 0.0F) {
-            //f1 = this.rotationYaw;
             f1 = RotationUtils.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationUtils.currentRotation[0] : this.rotationYaw;
         }
 

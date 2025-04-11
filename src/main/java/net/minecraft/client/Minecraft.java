@@ -104,7 +104,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.features.modules.impl.visual.CustomGui;
+import wtf.demise.features.modules.impl.visual.VisualTweaks;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.render.RenderUtils;
@@ -756,8 +756,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             this.shutdown();
         }
 
-        if (Demise.INSTANCE.getModuleManager().getModule(CustomGui.class).isDisabled()) {
-            Demise.INSTANCE.getModuleManager().getModule(CustomGui.class).setEnabled(true);
+        if (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).isDisabled()) {
+            Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).setEnabled(true);
         }
 
         if (this.isGamePaused && this.theWorld != null) {

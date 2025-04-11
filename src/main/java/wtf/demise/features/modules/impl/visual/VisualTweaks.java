@@ -9,11 +9,11 @@ import wtf.demise.features.values.impl.ModeValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "Cape", category = ModuleCategory.Visual)
-public class Cape extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Minecraft", "Rise"}, "Normal", this);
-    public final ModeValue riseMode = new ModeValue("Rise mode", new String[]{"Normal", "Red", "Green", "Blue", "Dogshit"}, "Normal", this, () -> mode.is("Rise"));
-    public final ModeValue mcMode = new ModeValue("Minecraft mode",
+@ModuleInfo(name = "VisualTweaks", category = ModuleCategory.Visual)
+public class VisualTweaks extends Module {
+    public final ModeValue capeMode = new ModeValue("Cape mode", new String[]{"Default", "Normal", "Minecraft", "Rise", "What the fuck."}, "Normal", this);
+    public final ModeValue riseMode = new ModeValue("Rise cape mode", new String[]{"Normal", "Red", "Green", "Blue", "Dogshit"}, "Normal", this, () -> capeMode.is("Rise"));
+    public final ModeValue mcMode = new ModeValue("Minecraft cape mode",
             new String[]{
                     "15thAnniversary",
                     "Birthday",
@@ -46,10 +46,15 @@ public class Cape extends Module {
                     "Turtle",
                     "Valentine",
                     "Vanilla"
-            }, "Mojang", this, () -> mode.is("Minecraft"));
+            }, "Mojang", this, () -> capeMode.is("Minecraft"));
 
-    public final BoolValue enchanted = new BoolValue("Enchanted", false, this, () -> mode.is("Normal"));
-    public final BoolValue alternativePhysics = new BoolValue("Alternative physics", false, this);
-    public final BoolValue tint = new BoolValue("Tint", false, this);
-    public final ColorValue color = new ColorValue("Color", Color.white, this, tint::get);
+    public final BoolValue enchanted = new BoolValue("Enchanted", false, this, () -> capeMode.is("Normal"));
+    public final BoolValue alternativePhysics = new BoolValue("Alternative cape physics", false, this);
+    public final BoolValue tint = new BoolValue("Cape tint", false, this);
+    public final ColorValue color = new ColorValue("Tint color", Color.white, this, tint::get);
+
+    public final ModeValue buttonStyle = new ModeValue("Menu button style", new String[]{"Custom", "Vanilla"}, "Custom", this);
+    public final BoolValue shaderMenu = new BoolValue("Shader main menu", true, this);
+
+    public final BoolValue forceDinnerbone = new BoolValue("Force Dinnerbone state", false, this);
 }

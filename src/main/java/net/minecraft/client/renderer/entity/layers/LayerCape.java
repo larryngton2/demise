@@ -9,34 +9,35 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.Cape;
 import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.features.modules.impl.visual.VisualTweaks;
 
 import java.util.Iterator;
 
 public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
     private final RenderPlayer playerRenderer;
+    private float f;
 
     public LayerCape(RenderPlayer playerRendererIn) {
         this.playerRenderer = playerRendererIn;
     }
 
     public void doRenderLayer(AbstractClientPlayer entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale) {
-        if (!entitylivingbaseIn.isInvisible() && (entitylivingbaseIn.hasPlayerInfo() && entitylivingbaseIn.isWearing(EnumPlayerModelParts.CAPE) && entitylivingbaseIn.getLocationCape() != null || entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled())) {
-            Cape cape = Demise.INSTANCE.getModuleManager().getModule(Cape.class);
+        VisualTweaks visualTweaks = Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class);
 
-            if (cape.tint.get()) {
-                GlStateManager.color(cape.color.get().getRed() / 255f, cape.color.get().getGreen() / 255f, cape.color.get().getBlue() / 255f, cape.color.get().getAlpha() / 255f);
+        if (!entitylivingbaseIn.isInvisible() && (entitylivingbaseIn.hasPlayerInfo() && entitylivingbaseIn.isWearing(EnumPlayerModelParts.CAPE) && entitylivingbaseIn.getLocationCape() != null || entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && visualTweaks.isEnabled() && !visualTweaks.capeMode.is("Default"))) {
+            if (visualTweaks.tint.get()) {
+                GlStateManager.color(visualTweaks.color.get().getRed() / 255f, visualTweaks.color.get().getGreen() / 255f, visualTweaks.color.get().getBlue() / 255f, visualTweaks.color.get().getAlpha() / 255f);
             } else {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             }
 
-            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled()) {
-                switch (Demise.INSTANCE.getModuleManager().getModule(Cape.class).mode.get()) {
+            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && visualTweaks.isEnabled() && !visualTweaks.capeMode.is("Default")) {
+                switch (visualTweaks.capeMode.get()) {
                     case "Normal" ->
                             this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/cape.png"));
                     case "Rise" -> {
-                        switch (Demise.INSTANCE.getModuleManager().getModule(Cape.class).riseMode.get()) {
+                        switch (visualTweaks.riseMode.get()) {
                             case "Normal" ->
                                     this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/rise/RiseCape.png"));
                             case "Red" ->
@@ -50,7 +51,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                         }
                     }
                     case "Minecraft" ->
-                            this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/mc/" + Demise.INSTANCE.getModuleManager().getModule(Cape.class).mcMode.get() + ".png"));
+                            this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/mc/" + visualTweaks.mcMode.get() + ".png"));
                 }
             } else {
                 this.playerRenderer.bindTexture(entitylivingbaseIn.getLocationCape());
@@ -64,7 +65,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
 
             float f;
 
-            if (Demise.INSTANCE.getModuleManager().getModule(Cape.class).alternativePhysics.get()) {
+            if (visualTweaks.alternativePhysics.get()) {
                 f = entitylivingbaseIn.prevRotationYaw + (entitylivingbaseIn.rotationYaw - entitylivingbaseIn.prevRotationYaw) * partialTicks;
             } else {
                 f = entitylivingbaseIn.prevRenderYawOffset + (entitylivingbaseIn.renderYawOffset - entitylivingbaseIn.prevRenderYawOffset) * partialTicks;
@@ -103,7 +104,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
             this.playerRenderer.getMainModel().renderCape(0.0625F);
 
-            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && Demise.INSTANCE.getModuleManager().getModule(Cape.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Cape.class).mode.is("Normal")) {
+            if (entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && visualTweaks.isEnabled() && visualTweaks.capeMode.is("Normal")) {
                 this.playerRenderer.bindTexture(new ResourceLocation("demise/texture/cape/overlay.png"));
                 int rgb = Demise.INSTANCE.getModuleManager().getModule(Interface.class).color();
                 float alpha = 0.3F;
@@ -113,7 +114,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
                 GL11.glColor4f(red, green, blue, alpha);
                 this.playerRenderer.getMainModel().renderCape(0.0625F);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                if (Demise.INSTANCE.getModuleManager().getModule(Cape.class).enchanted.get()) {
+                if (visualTweaks.enchanted.get()) {
                     for (Iterator<LayerRenderer<AbstractClientPlayer>> var32 = this.playerRenderer.getLayerRenderers().iterator(); var32.hasNext(); GlStateManager.resetColor()) {
                         LayerRenderer var31 = var32.next();
                         if (var31 instanceof LayerArmorBase) {

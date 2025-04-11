@@ -9,6 +9,7 @@ import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
@@ -45,6 +46,9 @@ import net.minecraft.util.*;
 import net.minecraft.world.*;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
+import wtf.demise.features.modules.impl.combat.Velocity;
+import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.player.RotationUtils;
 
 import java.util.Collection;
@@ -932,6 +936,8 @@ public abstract class EntityPlayer extends EntityLivingBase {
                     boolean flag2 = targetEntity.attackEntityFrom(DamageSource.causePlayerDamage(this), f);
 
                     if (flag2) {
+                        Velocity velocity = Demise.INSTANCE.getModuleManager().getModule(Velocity.class);
+
                         if (i > 0) {
                             float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : this.rotationYaw;
 
@@ -943,6 +949,13 @@ public abstract class EntityPlayer extends EntityLivingBase {
                             this.motionX *= hitSlowDown.getSlowDown();
                             this.motionZ *= hitSlowDown.getSlowDown();
                             this.setSprinting(hitSlowDown.isSprint());
+
+                        } else if (velocity.isEnabled() && velocity.mode.is("Intave") && velocity.intaveMode.is("Reduce") && Minecraft.getMinecraft().thePlayer.hurtTime != 0) {
+                            double randMotion = MathUtils.randomizeDouble(velocity.rFactorMin.get(), velocity.rFactorMax.get());
+
+                            this.motionX *= randMotion;
+                            this.motionZ *= randMotion;
+                            this.setSprinting(false);
                         }
 
                         if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged) {

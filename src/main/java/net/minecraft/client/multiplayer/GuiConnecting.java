@@ -120,8 +120,10 @@ public class GuiConnecting extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
 
+        String finalIP = address.getIP().toLowerCase().contains("liquidproxy.net") ? "liquidproxy.net" : address.getIP();
+
         if (this.networkManager == null) {
-            this.drawCenteredString(this.fontRendererObj, "Establishing connection with " + address.getIP() + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
+            this.drawCenteredString(this.fontRendererObj, "Establishing connection with " + finalIP + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
         } else {
             this.drawCenteredString(this.fontRendererObj, "Logging in to " + address.getIP() + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
         }

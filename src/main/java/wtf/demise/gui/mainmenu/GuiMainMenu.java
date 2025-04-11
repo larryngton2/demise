@@ -3,7 +3,7 @@ package wtf.demise.gui.mainmenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.CustomGui;
+import wtf.demise.features.modules.impl.visual.VisualTweaks;
 import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.gui.button.MenuButton;
@@ -54,7 +54,7 @@ public class GuiMainMenu extends GuiScreen {
         if (CurrentUser.USER != null) {
             float buttonWidth = 120;
 
-            float buttonHeight = switch (Demise.INSTANCE.getModuleManager().getModule(CustomGui.class).buttonStyle.get()) {
+            float buttonHeight = switch (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).buttonStyle.get()) {
                 case "Vanilla" -> 20;
                 case "Custom" -> 23;
                 default -> 0;

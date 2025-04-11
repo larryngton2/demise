@@ -37,13 +37,13 @@ import java.util.Objects;
 @ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
 public class Velocity extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
-    private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Reduce", "Test"}, "Reduce", this, () -> mode.is("Intave"));
+    public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce", "Test"}, "Reduce", this, () -> mode.is("Intave"));
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
-    private final SliderValue rHurtTime = new SliderValue("HurtTime", 9, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Reduce")));
-    private final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && intaveMode.is("Reduce")));
-    private final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && intaveMode.is("Reduce")));
+    private final SliderValue rHurtTime = new SliderValue("HurtTime", 9, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
+    public final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
+    public final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
     private final BoolValue debug = new BoolValue("Debug", false, this, () -> Objects.equals(mode.get(), "Intave") && intaveMode.is("Test"));
     private final SliderValue packets = new SliderValue("Packets", 5, 1, 20, 1, this, () -> Objects.equals(mode.get(), "Legit packet"));
     private final SliderValue ticks = new SliderValue("Ticks", 0, 0, 6, 1, this, () -> mode.is("ReStrafe"));
@@ -203,7 +203,7 @@ public class Velocity extends Module {
         switch (mode.get()) {
             case "Intave":
                 switch (intaveMode.get()) {
-                    case "Reduce":
+                    case "Tick Reduce":
                         if (mc.thePlayer.hurtTime == rHurtTime.get()) {
                             double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
 

@@ -7,7 +7,7 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.CustomGui;
+import wtf.demise.features.modules.impl.visual.VisualTweaks;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.render.MouseUtils;
@@ -65,7 +65,7 @@ public class GuiButton extends Gui {
 
     public void drawButton(Minecraft mc, int mouseX, int mouseY) {
         if (visible) {
-            switch (Demise.INSTANCE.getModuleManager().getModule(CustomGui.class).buttonStyle.get()) {
+            switch (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).buttonStyle.get()) {
                 case "Vanilla": {
                     FontRenderer fontrenderer = mc.fontRendererObj;
                     mc.getTextureManager().bindTexture(buttonTextures);

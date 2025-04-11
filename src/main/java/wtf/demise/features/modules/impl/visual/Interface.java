@@ -6,8 +6,8 @@ import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S02PacketChat;
@@ -81,7 +81,8 @@ public class Interface extends Module {
 
     private final DecimalFormat bpsFormat = new DecimalFormat("0.00");
     private final DecimalFormat xyzFormat = new DecimalFormat("0");
-    public final Map<EntityPlayer, DecelerateAnimation> animationEntityPlayerMap = new HashMap<>();
+    public final DecelerateAnimation decelerateAnimation = new DecelerateAnimation(175, 1);
+    public EntityLivingBase target;
     public int lost = 0, killed = 0, won = 0;
     public int prevMatchKilled = 0, matchKilled = 0, match;
 
@@ -237,46 +238,23 @@ public class Interface extends Module {
         mainColor.setRainbow(color.is("Rainbow"));
         KillAura aura = getModule(KillAura.class);
 
-        if (aura.isEnabled()) {
-            animationEntityPlayerMap.entrySet().removeIf(entry -> KillAura.currentTarget != null && KillAura.currentTarget != entry.getKey());
-        }
-
-        if (!aura.isEnabled() && !(mc.currentScreen instanceof GuiChat)) {
-            Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<EntityPlayer, DecelerateAnimation> entry = iterator.next();
-                DecelerateAnimation animation = entry.getValue();
-
-                animation.setDirection(Direction.BACKWARDS);
-                if (animation.finished(Direction.BACKWARDS)) {
-                    iterator.remove();
+        if (!(mc.currentScreen instanceof GuiChat)) {
+            if (aura.isEnabled()) {
+                if (KillAura.currentTarget != null) {
+                    decelerateAnimation.setDirection(Direction.FORWARDS);
+                    target = KillAura.currentTarget;
                 }
             }
-        }
 
-        if (KillAura.currentTarget instanceof EntityPlayer) {
-            if (!(mc.currentScreen instanceof GuiChat)) {
-                animationEntityPlayerMap.putIfAbsent((EntityPlayer) KillAura.currentTarget, new DecelerateAnimation(175, 1));
-                animationEntityPlayerMap.get(KillAura.currentTarget).setDirection(Direction.FORWARDS);
-            }
-        }
-
-        if (aura.isEnabled() && KillAura.currentTarget == null && !(mc.currentScreen instanceof GuiChat)) {
-            Iterator<Map.Entry<EntityPlayer, DecelerateAnimation>> iterator = animationEntityPlayerMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<EntityPlayer, DecelerateAnimation> entry = iterator.next();
-                DecelerateAnimation animation = entry.getValue();
-
-                animation.setDirection(Direction.BACKWARDS);
-                if (animation.finished(Direction.BACKWARDS)) {
-                    iterator.remove();
+            if (!aura.isEnabled() || KillAura.currentTarget == null) {
+                decelerateAnimation.setDirection(Direction.BACKWARDS);
+                if (decelerateAnimation.finished(Direction.BACKWARDS)) {
+                    target = null;
                 }
             }
-        }
-
-        if (mc.currentScreen instanceof GuiChat && KillAura.currentTarget == null) {
-            animationEntityPlayerMap.putIfAbsent(mc.thePlayer, new DecelerateAnimation(175, 1));
-            animationEntityPlayerMap.get(mc.thePlayer).setDirection(Direction.FORWARDS);
+        } else if (target == null) {
+            decelerateAnimation.setDirection(Direction.FORWARDS);
+            target = mc.thePlayer;
         }
     }
 
