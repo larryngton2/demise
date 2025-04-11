@@ -62,25 +62,13 @@ public class AutoRod extends Module {
 
                 switch (mode) {
                     case Linear:
-                        RotationUtils.setRotation(finalRotation, correction,
-                                MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                                MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                                SmoothMode.Linear
-                        );
+                        RotationUtils.setRotation(finalRotation, correction, MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()), MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()), SmoothMode.Linear, midpoint.get());
                         break;
                     case Lerp:
-                        RotationUtils.setRotation(finalRotation, correction,
-                                MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                                MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                                SmoothMode.Lerp
-                        );
+                        RotationUtils.setRotation(finalRotation, correction, MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()), MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()), SmoothMode.Lerp, midpoint.get());
                         break;
                     case Bezier:
-                        RotationUtils.setRotation(finalRotation, correction,
-                                MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()),
-                                MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()),
-                                SmoothMode.Bezier, midpoint.get()
-                        );
+                        RotationUtils.setRotation(finalRotation, correction, MathUtils.randomizeInt((int) yawRotationSpeedMin.get(), (int) yawRotationSpeedMax.get()), MathUtils.randomizeInt((int) pitchRotationSpeedMin.get(), (int) pitchRotationSpeedMax.get()), SmoothMode.Bezier, midpoint.get());
                         break;
                 }
             }

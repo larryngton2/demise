@@ -77,15 +77,12 @@ public class KillAura extends Module {
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "Derp"}, "Silent", this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Acceleration", "None"}, "Linear", this);
-    private final SliderValue acceleration = new SliderValue("accel", 180, 0.01f, 180, 0.01f, this, () -> smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue error = new SliderValue("err", 0.1f, 0.01f, 1, 0.01f, this, () -> smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue cerror = new SliderValue("consterr", 0.1f, 0.01f, 10, 0.01f, this, () -> smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier") && !smoothMode.is("None"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Test", "None"}, "Linear", this);
+    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 1, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 1, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 1, 0.01f, 1, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 1, 0.01f, 1, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
+    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier") && !smoothMode.is("None") || smoothMode.is("Test"));
     private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
 
     // aim point
@@ -222,7 +219,7 @@ public class KillAura extends Module {
                             MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
                             derpYaw += MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()) / 6;
 
-                            RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, SmoothMode.Linear);
+                            RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, SmoothMode.Linear, midpoint.get());
                             break;
                     }
                 }
@@ -318,19 +315,21 @@ public class KillAura extends Module {
                 slowDown.get() ? pitchRotationSpeedMax.get() / hurtTime : pitchRotationSpeedMax.get()
         );
 
-
         switch (mode) {
             case Linear:
-                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed, vSpeed, SmoothMode.Linear);
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed * 180, vSpeed * 180, SmoothMode.Linear, midpoint.get());
                 break;
             case Lerp:
-                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed, vSpeed, SmoothMode.Lerp);
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed * 180, vSpeed * 180, SmoothMode.Lerp, midpoint.get());
                 break;
             case Bezier:
-                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed, vSpeed, SmoothMode.Bezier, midpoint.get());
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed * 180, vSpeed * 180, SmoothMode.Bezier, midpoint.get());
                 break;
-            case Acceleration:
-                RotationUtils.setRotation(calcToEntity(target), correction, acceleration.get(), error.get(), cerror.get(), SmoothMode.Acceleration);
+            case Exponential:
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed * 180, vSpeed * 180, SmoothMode.Exponential, midpoint.get());
+                break;
+            case Test:
+                RotationUtils.setRotation(calcToEntity(target), correction, hSpeed * 180, vSpeed * 180, SmoothMode.Test, midpoint.get());
                 break;
             case None:
                 RotationUtils.setRotation(calcToEntity(target), correction);
@@ -578,8 +577,8 @@ public class KillAura extends Module {
             case "Noise": {
                 boolean dynamicCheck = entity.hurtTime > nHurtTime.get();
 
-                double initialYawFactor = MathUtils.randomizeDouble(0.7, 0.8);
-                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.5);
+                double initialYawFactor = MathUtils.randomizeDouble(0.7, 1);
+                double initialPitchFactor = MathUtils.randomizeDouble(0.25, 0.6);
 
                 double yawFactor = dynamicCheck ? initialYawFactor + MoveUtil.getSpeed() * 8 : initialYawFactor;
                 double pitchFactor = dynamicCheck ? initialPitchFactor + MoveUtil.getSpeed() : initialPitchFactor;
@@ -589,14 +588,9 @@ public class KillAura extends Module {
                 double minY = -2;
                 double maxY = 0.4;
 
-                double meanXZ = (minXZ + maxXZ) / 2;
-                double stdDevXZ = (maxXZ - minXZ) / 4;
-                double meanY = (minY + maxY) / 2;
-                double stdDevY = (maxY - minY) / 4;
-
-                double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
-                double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
-                double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+                double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
+                double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
+                double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
 
                 float targetX = (float) vec.xCoord;
                 float targetY = (float) vec.yCoord;
@@ -615,7 +609,7 @@ public class KillAura extends Module {
                     targetZ += (float) lastZOffset;
                 }
 
-                float lerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 0.7);
+                float lerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 1);
 
                 vec.xCoord = MathUtils.interpolate(vec.xCoord, targetX, lerp);
                 vec.yCoord = MathUtils.interpolate(vec.yCoord, targetY, lerp);

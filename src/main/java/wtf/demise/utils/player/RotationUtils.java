@@ -73,37 +73,6 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode) {
-        if (moduleRotation.silent.get()) {
-            switch (smoothMode) {
-                case Linear:
-                    RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-                case Lerp:
-                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-            }
-        } else {
-            switch (smoothMode) {
-                case Linear:
-                    mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-                case Lerp:
-                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-            }
-        }
-
-        currentCorrection = correction;
-        cachedHSpeed = hSpeed;
-        cachedVSpeed = vSpeed;
-        RotationUtils.smoothMode = smoothMode;
-
-        enabled = true;
-    }
-
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float midpoint) {
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
@@ -115,6 +84,12 @@ public class RotationUtils implements InstanceAccess {
                     break;
                 case Bezier:
                     RotationUtils.currentRotation = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint);
+                    break;
+                case Exponential:
+                    RotationUtils.currentRotation = smoothExpo(serverRotation, rotation, hSpeed, vSpeed);
+                    break;
+                case Test:
+                    RotationUtils.currentRotation = smoothNatural(serverRotation, rotation, hSpeed, vSpeed);
                     break;
             }
         } else {
@@ -131,6 +106,14 @@ public class RotationUtils implements InstanceAccess {
                     mc.thePlayer.rotationYaw = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint)[0];
                     mc.thePlayer.rotationPitch = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint)[1];
                     break;
+                case Exponential:
+                    mc.thePlayer.rotationYaw = smoothExpo(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothExpo(serverRotation, rotation, hSpeed, vSpeed)[1];
+                    break;
+                case Test:
+                    mc.thePlayer.rotationYaw = smoothNatural(serverRotation, rotation, hSpeed, vSpeed)[0];
+                    mc.thePlayer.rotationPitch = smoothNatural(serverRotation, rotation, hSpeed, vSpeed)[1];
+                break;
             }
         }
 
@@ -138,30 +121,6 @@ public class RotationUtils implements InstanceAccess {
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         cachedMidpoint = midpoint;
-        RotationUtils.smoothMode = smoothMode;
-
-        enabled = true;
-    }
-
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float acceleration, float err, float consterr, SmoothMode smoothMode) {
-        if (moduleRotation.silent.get()) {
-            if (smoothMode == SmoothMode.Acceleration) {
-                RotationUtils.currentRotation = smoothAcceleration(serverRotation, rotation, previousRotation, acceleration, err, consterr);
-            }
-        } else {
-            /*
-            if (smoothMode == SmoothMode.Acceleration) {
-                mc.thePlayer.rotationYaw = smoothAcceleration(serverRotation, rotation, acceleration, maxSpeed, deltaTime)[0];
-                mc.thePlayer.rotationPitch = smoothAcceleration(serverRotation, rotation, acceleration, maxSpeed, deltaTime)[1];
-            }
-
-             */
-        }
-
-        currentCorrection = correction;
-        //cachedHSpeed = hSpeed;
-        //cachedVSpeed = vSpeed;
-        //cachedMidpoint = midpoint;
         RotationUtils.smoothMode = smoothMode;
 
         enabled = true;
@@ -187,8 +146,11 @@ public class RotationUtils implements InstanceAccess {
                                     smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                             case Bezier ->
                                     smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
-                            default ->                                     smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                };
+                            case Exponential ->
+                                    smoothExpo(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                            default ->
+                                    smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
+                        };
             }
         }
 
@@ -267,6 +229,8 @@ public class RotationUtils implements InstanceAccess {
                                         smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                                 case Bezier ->
                                         smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
+                                case Exponential ->
+                                        smoothExpo(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                                 default ->
                                         smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
                             };
@@ -279,9 +243,9 @@ public class RotationUtils implements InstanceAccess {
 
     @EventPriority(Integer.MIN_VALUE)
     @EventTarget
-    public void onLook(LookEvent event) {
+    public void onLook(LookEvent e) {
         if (shouldRotate()) {
-            event.rotation = currentRotation;
+            e.rotation = currentRotation;
         }
     }
 
@@ -350,44 +314,55 @@ public class RotationUtils implements InstanceAccess {
         return applyGCDFix(currentRotation, finalTargetRotation);
     }
 
-    public static float[] smoothAcceleration(final float[] currentRotation, final float[] targetRotation,
-                                             final float[] previousRotation, float maxAcceleration,
-                                             float accelerationError, float constantError) {
-        // Calculate previous frame's differences
-        float prevYawDiff = getAngleDifference(currentRotation[0], previousRotation[0]);
-        float prevPitchDiff = getAngleDifference(currentRotation[1], previousRotation[1]);
+    public static float[] smoothExpo(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
+        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
+        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
-        // Calculate current target differences
-        float yawDiff = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDiff = getAngleDifference(targetRotation[1], currentRotation[1]);
+        float smoothedYaw = currentRotation[0] + yawDifference * (1 - (float)Math.exp(-(hSpeed / 180)));
+        float smoothedPitch = currentRotation[1] + pitchDifference * (1 - (float)Math.exp(-(vSpeed / 180)));
 
-        // Compute acceleration for each axis
-        float yawAccel = getAngleDifference(yawDiff, prevYawDiff);
-        float pitchAccel = getAngleDifference(pitchDiff, prevPitchDiff);
+        float[] finalTargetRotation = new float[] {
+                smoothedYaw,
+                smoothedPitch
+        };
 
-        // Apply acceleration limits
-        yawAccel = Math.max(-maxAcceleration, Math.min(maxAcceleration, yawAccel));
-        pitchAccel = Math.max(-maxAcceleration, Math.min(maxAcceleration, pitchAccel));
-
-        // Add some randomness to simulate human-like imperfection
-        float yawError = yawAccel * randomError(accelerationError) + randomError(constantError);
-        float pitchError = pitchAccel * randomError(accelerationError) + randomError(constantError);
-
-        // Calculate new rotation differences
-        float newYawDiff = prevYawDiff + yawAccel + yawError;
-        float newPitchDiff = prevPitchDiff + pitchAccel + pitchError;
-
-        // Apply new rotation
-        float newYaw = currentRotation[0] + newYawDiff;
-        float newPitch = currentRotation[1] + newPitchDiff;
-
-        float[] finalTargetRotation = new float[]{newYaw, newPitch};
         return applyGCDFix(currentRotation, finalTargetRotation);
     }
 
-    private static float randomError(float range) {
-        return (float)(Math.random() * range * 2 - range);
+    public static float[] smoothNatural(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
+        float yawDiff = getAngleDifference(targetRotation[0], currentRotation[0]);
+        float pitchDiff = getAngleDifference(targetRotation[1], currentRotation[1]);
+
+        // Total difference for normalization
+        double totalDiff = Math.hypot(yawDiff, pitchDiff);
+
+        if (totalDiff == 0) return currentRotation;
+
+        // Nonlinear speed scaling based on difference — natural ease-in-out shape
+        float yawStep = nonlinearStep(yawDiff, hSpeed);
+        float pitchStep = nonlinearStep(pitchDiff, vSpeed);
+
+        float[] finalTargetRotation = new float[]{
+                currentRotation[0] + yawStep,
+                currentRotation[1] + pitchStep
+        };
+
+        return applyGCDFix(currentRotation, finalTargetRotation);
     }
+
+    // A nonlinear step function for natural smoothing
+    private static float nonlinearStep(float angleDiff, float maxSpeed) {
+        float absDiff = Math.abs(angleDiff);
+
+        // Sigmoid-like curve approximation: slows near 0 and near target
+        float speed = (float) (Math.sin(Math.toRadians(Math.min(absDiff, 180))) * (maxSpeed / 2f));
+
+        // Ensure it moves at least a tiny bit
+        speed = Math.max(speed, 0.05f);
+
+        return Math.copySign(Math.min(speed, absDiff), angleDiff);
+    }
+
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
         final float f = (float) (mc.gameSettings.mouseSensitivity * (1 + Math.random() / 100000) * 0.6F + 0.2F);

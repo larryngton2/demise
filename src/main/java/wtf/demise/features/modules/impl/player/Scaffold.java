@@ -29,6 +29,8 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
@@ -87,6 +89,8 @@ public class Scaffold extends Module {
     private float hypixelRandomYaw;
     private boolean isOnRightSide;
     private float yaw, pitch;
+    private TimerUtils clutchTime = new TimerUtils();
+    private boolean ambatufall;
 
     private HoverState hoverState = HoverState.DONE;
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
@@ -279,12 +283,24 @@ public class Scaffold extends Module {
             }
         }
 
-        /*
-        if (!mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.BLOCK) && addons.isEnabled("Ray Trace")) {
-            this.yaw = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[0];
-            this.pitch = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[1];
+        boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
+        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
+
+        if (nextBlockIsAir && isLeaningOffBlock) {
+            ambatufall = true;
+        } else if (ambatufall) {
+            clutchTime.reset();
+            ambatufall = false;
         }
-         */
+
+        if (ambatufall || !clutchTime.hasTimeElapsed(200)) {
+            Vec3 hitVec = getVec3(data);
+
+            this.yaw = RotationUtils.getRotations(hitVec)[0];
+            this.pitch = RotationUtils.getRotations(hitVec)[1];
+        }
+
+        DebugUtils.sendMessage(isLeaningOffBlock + " " + nextBlockIsAir + " " + data.blockPos.offset(data.facing).offset(data.facing));
 
         if (tower.canDisplay() && tower.is("Watchdog") && towering()) {
             yaw = RotationUtils.getRotations(getVec3(data))[0];
@@ -583,7 +599,7 @@ public class Scaffold extends Module {
     }
 
     private static boolean isInteractable(Block block) {
-        return block instanceof BlockFurnace || block instanceof BlockFenceGate || block instanceof BlockChest || block instanceof BlockEnderChest || block instanceof BlockEnchantmentTable || block instanceof BlockBrewingStand || block instanceof BlockBed || block instanceof BlockDropper || block instanceof BlockDispenser || block instanceof BlockHopper || block instanceof BlockAnvil || block == Blocks.crafting_table;
+        return block instanceof BlockFurnace || block instanceof BlockFenceGate || block instanceof BlockChest || block instanceof BlockEnderChest || block instanceof BlockEnchantmentTable || block instanceof BlockBrewingStand || block instanceof BlockBed || block instanceof BlockDispenser || block instanceof BlockHopper || block instanceof BlockAnvil || block == Blocks.crafting_table;
     }
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
