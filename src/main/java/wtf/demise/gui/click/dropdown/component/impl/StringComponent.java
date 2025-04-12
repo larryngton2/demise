@@ -16,8 +16,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static wtf.demise.gui.click.neverlose.NeverLose.*;
-
 public class StringComponent extends Component {
     private final TextValue setting;
     private final Animation input = new DecelerateAnimation(250, 1);
@@ -146,5 +144,10 @@ public class StringComponent extends Component {
     @Override
     public boolean isVisible() {
         return setting.visible.get();
+    }
+
+    @Override
+    public boolean isChild() {
+        return this.setting.isChild();
     }
 }

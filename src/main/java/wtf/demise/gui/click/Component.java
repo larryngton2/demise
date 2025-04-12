@@ -34,4 +34,8 @@ public class Component implements IComponent {
     public boolean isVisible() {
         return true;
     }
+
+    public boolean isChild() {
+        return false;
+    }
 }

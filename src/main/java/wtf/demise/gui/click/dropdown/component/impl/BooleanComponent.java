@@ -1,7 +1,6 @@
 package wtf.demise.gui.click.dropdown.component.impl;
 
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.ClickGUI;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.gui.click.Component;
@@ -45,5 +44,10 @@ public class BooleanComponent extends Component {
     @Override
     public boolean isVisible() {
         return this.setting.canDisplay();
+    }
+
+    @Override
+    public boolean isChild() {
+        return this.setting.isChild();
     }
 }

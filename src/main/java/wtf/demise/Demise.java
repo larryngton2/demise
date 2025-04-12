@@ -15,7 +15,6 @@ import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
 import wtf.demise.gui.click.dropdown.DropdownGUI;
-import wtf.demise.gui.click.neverlose.NeverLose;
 import wtf.demise.gui.click.skeet.SkeetUI;
 import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.gui.notification.NotificationManager;
@@ -61,7 +60,6 @@ public class Demise {
     private WidgetManager widgetManager;
     private CommandManager commandManager;
     private FriendManager friendManager;
-    private NeverLose neverLose;
     private DropdownGUI dropdownGUI;
     private SkeetUI skeetGUI;
     private AltRepositoryGUI altRepositoryGUI;
@@ -134,7 +132,6 @@ public class Demise {
         configManager = new ConfigManager();
         commandManager = new CommandManager();
         friendManager = new FriendManager();
-        neverLose = new NeverLose();
         dropdownGUI = new DropdownGUI();
         skeetGUI = new SkeetUI();
         altRepositoryGUI = new AltRepositoryGUI(this);

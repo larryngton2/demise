@@ -14,14 +14,13 @@ import java.awt.*;
 
 @ModuleInfo(name = "ClickGUI", category = ModuleCategory.Visual, key = Keyboard.KEY_RSHIFT)
 public class ClickGUI extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"NeverLose", "DropDown", "Exhi"}, "DropDown", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"DropDown", "Exhi"}, "DropDown", this);
     public final ColorValue color = new ColorValue("Color", new Color(80, 80, 80), this);
     public final BoolValue rainbow = new BoolValue("Rainbow", true, this, () -> mode.is("Exhi"));
 
     @Override
     public void onEnable() {
         GuiScreen guiScreen = switch (mode.get()) {
-            case "NeverLose" -> INSTANCE.getNeverLose();
             case "DropDown" -> INSTANCE.getDropdownGUI();
             case "Exhi" -> INSTANCE.getSkeetGUI();
             default -> null;

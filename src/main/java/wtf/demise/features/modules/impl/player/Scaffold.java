@@ -30,7 +30,6 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
@@ -49,6 +48,7 @@ public class Scaffold extends Module {
     private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "Hypixel", "GodBridge", "Derp", "Reverse"}, "Normal", this);
     private final SliderValue minSearch = new SliderValue("Min search", 0.1f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final SliderValue maxSearch = new SliderValue("Max search", 0.9f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
+    private final BoolValue clutch = new BoolValue("Clutch", false, this);
     private final SliderValue minYawRotSpeed = new SliderValue("Min Yaw Rotation Speed", 180, 0, 180, 1, this);
     private final SliderValue minPitchRotSpeed = new SliderValue("Min Pitch Rotation Speed", 180, 0, 180, 1, this);
     private final SliderValue maxYawRotSpeed = new SliderValue("Max Yaw Rotation Speed", 180, 0, 180, 1, this);
@@ -89,7 +89,7 @@ public class Scaffold extends Module {
     private float hypixelRandomYaw;
     private boolean isOnRightSide;
     private float yaw, pitch;
-    private TimerUtils clutchTime = new TimerUtils();
+    private final TimerUtils clutchTime = new TimerUtils();
     private boolean ambatufall;
 
     private HoverState hoverState = HoverState.DONE;
@@ -208,6 +208,9 @@ public class Scaffold extends Module {
                 break;
         }
 
+        boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
+        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
+
         mc.entityRenderer.getMouseOver(1);
 
         if (!mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
@@ -254,11 +257,6 @@ public class Scaffold extends Module {
                         isOnRightSide = Math.floor(mc.thePlayer.posX + Math.cos(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posX) ||
                                 Math.floor(mc.thePlayer.posZ + Math.sin(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posZ);
 
-                        BlockPos posInDirection = mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(movingYaw), 1);
-
-                        boolean isLeaningOffBlock = mc.theWorld.getBlockState(mc.thePlayer.getPosition().down()) instanceof BlockAir;
-                        boolean nextBlockIsAir = mc.theWorld.getBlockState(posInDirection.down()).getBlock() instanceof BlockAir;
-
                         if (isLeaningOffBlock && nextBlockIsAir) {
                             isOnRightSide = !isOnRightSide;
                         }
@@ -283,21 +281,20 @@ public class Scaffold extends Module {
             }
         }
 
-        boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
-        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
+        if (clutch.get()) {
+            if (nextBlockIsAir && isLeaningOffBlock) {
+                ambatufall = true;
+            } else if (ambatufall) {
+                clutchTime.reset();
+                ambatufall = false;
+            }
 
-        if (nextBlockIsAir && isLeaningOffBlock) {
-            ambatufall = true;
-        } else if (ambatufall) {
-            clutchTime.reset();
-            ambatufall = false;
-        }
+            if (ambatufall || !clutchTime.hasTimeElapsed(200)) {
+                Vec3 hitVec = getVec3(data);
 
-        if (ambatufall || !clutchTime.hasTimeElapsed(200)) {
-            Vec3 hitVec = getVec3(data);
-
-            this.yaw = RotationUtils.getRotations(hitVec)[0];
-            this.pitch = RotationUtils.getRotations(hitVec)[1];
+                this.yaw = RotationUtils.getRotations(hitVec)[0];
+                this.pitch = RotationUtils.getRotations(hitVec)[1];
+            }
         }
 
         if (tower.canDisplay() && tower.is("Watchdog") && towering()) {

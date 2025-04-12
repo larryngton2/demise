@@ -19,12 +19,12 @@ public class ColorValue extends Value {
     private boolean rainbow = false;
 
     public ColorValue(String name, Color color, Module module, Supplier<Boolean> visible) {
-        super(name, module, visible);
+        super(name, module, visible, true);
         set(color);
     }
 
     public ColorValue(String name, Color color, Module module) {
-        super(name, module, () -> true);
+        super(name, module, () -> true, false);
         set(color);
     }
 

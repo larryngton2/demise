@@ -10,17 +10,17 @@ public class BoolValue extends Value {
     public float anim;
 
     public BoolValue(String name, boolean value, Module module, Supplier<Boolean> visible) {
-        super(name, module, visible);
+        super(name, module, visible, true);
         this.value = value;
     }
 
     public BoolValue(String name, boolean value, Module module) {
-        super(name, module, () -> true);
+        super(name, module, () -> true, false);
         this.value = value;
     }
 
     public BoolValue(String name, boolean value) {
-        super(name, null, () -> true);
+        super(name, null, () -> true, false);
         this.value = value;
     }
 

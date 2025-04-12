@@ -60,4 +60,9 @@ public class ModeComponent extends Component {
     public boolean isVisible() {
         return setting.canDisplay();
     }
+
+    @Override
+    public boolean isChild() {
+        return this.setting.isChild();
+    }
 }

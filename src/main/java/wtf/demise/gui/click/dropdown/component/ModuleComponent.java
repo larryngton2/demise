@@ -15,6 +15,7 @@ import wtf.demise.utils.animations.impl.EaseInOutQuad;
 import wtf.demise.utils.animations.impl.EaseOutSine;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
+import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -68,11 +69,15 @@ public class ModuleComponent implements IComponent {
 
         for (Component component : settings) {
             if (!component.isVisible()) continue;
-            component.setX(x);
+            component.setX(component.isChild() ? x + 5 : x);
             component.setY((float) (y + yOffset * openAnimation.getOutput()) + 1);
-            component.setWidth(width);
+            component.setWidth(component.isChild() ? width - 5 : width);
             if (openAnimation.getOutput() > .7f) {
                 component.drawScreen(mouseX, mouseY);
+
+                if (component.isChild()) {
+                    RenderUtils.drawRect(x + 3.5f, component.getY() - 2.8f, 1, component.getHeight(), Color.gray.getRGB());
+                }
             }
             yOffset += (float) (component.getHeight() * openAnimation.getOutput());
             this.height = yOffset + 1.45f;

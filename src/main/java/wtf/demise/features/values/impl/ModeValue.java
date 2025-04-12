@@ -15,13 +15,13 @@ public class ModeValue extends Value {
     public String[] modes;
 
     public ModeValue(String name, String[] modes, String current, Module module, Supplier<Boolean> visible) {
-        super(name, module, visible);
+        super(name, module, visible, true);
         this.modes = modes;
         this.index = Arrays.asList(modes).indexOf(current);
     }
 
     public ModeValue(String name, String[] modes, String current, Module module) {
-        super(name, module, () -> true);
+        super(name, module, () -> true, false);
         this.modes = modes;
         this.index = Arrays.asList(modes).indexOf(current);
     }

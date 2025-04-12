@@ -72,4 +72,9 @@ public class SliderComponent extends Component {
     public boolean isVisible() {
         return this.setting.canDisplay();
     }
+
+    @Override
+    public boolean isChild() {
+        return this.setting.isChild();
+    }
 }

@@ -15,13 +15,13 @@ public class MultiBoolValue extends Value {
     public float animation;
 
     public MultiBoolValue(String name, List<BoolValue> options, Module module, Supplier<Boolean> visible) {
-        super(name, module, visible);
+        super(name, module, visible, true);
         this.options = options;
         index = options.size();
     }
 
     public MultiBoolValue(String name, List<BoolValue> options, Module module) {
-        super(name, module, () -> true);
+        super(name, module, () -> true, false);
         this.options = options;
         index = options.size();
     }

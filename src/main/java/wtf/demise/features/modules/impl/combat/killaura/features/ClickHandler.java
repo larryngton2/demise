@@ -97,7 +97,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private static boolean shouldClick() {
-        return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY < -0.1 || currentTarget.hurtTime <= 5;
+        return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.motionY < -0.1 || currentTarget.hurtTime <= 7;
     }
 
     private static void attack() {

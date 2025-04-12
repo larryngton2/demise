@@ -17,7 +17,7 @@ public class SliderValue extends Value {
     private final float increment;
 
     public SliderValue(String name, float value, float min, float max, float increment, Module module, Supplier<Boolean> visible) {
-        super(name, module, visible);
+        super(name, module, visible, true);
         this.value = value;
         this.min = min;
         this.max = max;
@@ -25,7 +25,7 @@ public class SliderValue extends Value {
     }
 
     public SliderValue(String name, float value, float min, float max, Module module, Supplier<Boolean> visible) {
-        super(name, module, visible);
+        super(name, module, visible, true);
         this.value = value;
         this.min = min;
         this.max = max;
@@ -33,7 +33,7 @@ public class SliderValue extends Value {
     }
 
     public SliderValue(String name, float value, float min, float max, float increment, Module module) {
-        super(name, module, () -> true);
+        super(name, module, () -> true, false);
         this.value = value;
         this.min = min;
         this.max = max;
@@ -41,7 +41,7 @@ public class SliderValue extends Value {
     }
 
     public SliderValue(String name, float value, float min, float max, Module module) {
-        super(name, module, () -> true);
+        super(name, module, () -> true, false);
         this.value = value;
         this.min = min;
         this.max = max;

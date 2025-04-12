@@ -13,13 +13,14 @@ public abstract class Value {
     @Getter
     public Supplier<Boolean> visible;
     public Color color = Color.WHITE;
+    public boolean child;
 
-    public Value(String name, Module module, Supplier<Boolean> visible) {
+    public Value(String name, Module module, Supplier<Boolean> visible, boolean child) {
         this.name = name;
         this.visible = visible;
+        this.child = child;
         Optional.ofNullable(module).ifPresent(m -> m.addValue(this));
     }
-
 
     public Boolean canDisplay() {
         return this.visible.get();
