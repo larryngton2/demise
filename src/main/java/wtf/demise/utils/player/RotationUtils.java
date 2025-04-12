@@ -25,8 +25,7 @@ import wtf.demise.utils.misc.DebugUtils;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.hypot;
+import static java.lang.Math.*;
 
 public class RotationUtils implements InstanceAccess {
     public static float[] currentRotation = null, serverRotation = new float[]{}, previousRotation = null;
@@ -330,39 +329,47 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static float[] smoothNatural(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
-        float yawDiff = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDiff = getAngleDifference(targetRotation[1], currentRotation[1]);
+        float normHSpeed = hSpeed;
+        float normVSpeed = vSpeed;
 
-        // Total difference for normalization
-        double totalDiff = Math.hypot(yawDiff, pitchDiff);
+        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
+        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
-        if (totalDiff == 0) return currentRotation;
+        double rotationDistance = hypot(abs(yawDifference), abs(pitchDifference));
 
-        // Nonlinear speed scaling based on difference — natural ease-in-out shape
-        float yawStep = nonlinearStep(yawDiff, hSpeed);
-        float pitchStep = nonlinearStep(pitchDiff, vSpeed);
+        float distanceFactor = (float) Math.log1p(rotationDistance / 45.0) / 2.0f;
+        distanceFactor = Math.min(distanceFactor, 1.0f);
 
-        float[] finalTargetRotation = new float[]{
-                currentRotation[0] + yawStep,
-                currentRotation[1] + pitchStep
-        };
+        float yawSign = Math.signum(yawDifference);
+        float pitchSign = Math.signum(pitchDifference);
 
-        return applyGCDFix(currentRotation, finalTargetRotation);
+        float dynamicYawSpeed = calculateDynamicSpeed(abs(yawDifference), normHSpeed, distanceFactor);
+        float dynamicPitchSpeed = calculateDynamicSpeed(abs(pitchDifference), normVSpeed, distanceFactor);
+
+        float newYaw = currentRotation[0] + yawSign * dynamicYawSpeed;
+        float newPitch = currentRotation[1] + pitchSign * dynamicPitchSpeed;
+
+        if (abs(yawDifference) < dynamicYawSpeed) {
+            newYaw = targetRotation[0];
+        }
+        if (abs(pitchDifference) < dynamicPitchSpeed) {
+            newPitch = targetRotation[1];
+        }
+
+        return applyGCDFix(currentRotation, new float[]{newYaw, newPitch});
     }
 
-    // A nonlinear step function for natural smoothing
-    private static float nonlinearStep(float angleDiff, float maxSpeed) {
-        float absDiff = Math.abs(angleDiff);
+    private static float calculateDynamicSpeed(float difference, float baseSpeed, float distanceFactor) {
+        float speed = baseSpeed * (0.7f + 0.3f * distanceFactor);
 
-        // Sigmoid-like curve approximation: slows near 0 and near target
-        float speed = (float) (Math.sin(Math.toRadians(Math.min(absDiff, 180))) * (maxSpeed / 2f));
-
-        // Ensure it moves at least a tiny bit
-        speed = Math.max(speed, 0.05f);
-
-        return Math.copySign(Math.min(speed, absDiff), angleDiff);
+        if (difference < 5.0f) {
+            return speed * (0.3f + 0.7f * (difference / 5.0f));
+        } else if (difference < 15.0f) {
+            return speed * (0.8f + 0.2f * (difference / 15.0f));
+        } else {
+            return speed;
+        }
     }
-
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
         final float f = (float) (mc.gameSettings.mouseSensitivity * (1 + Math.random() / 100000) * 0.6F + 0.2F);

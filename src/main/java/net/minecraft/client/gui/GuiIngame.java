@@ -422,8 +422,6 @@ public class GuiIngame extends Gui {
         }
     }
 
-    public static final Pattern LINK_PATTERN = Pattern.compile("(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[A-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&//=]*)");
-
     private void renderScoreboard(ScoreObjective objective) {
         CustomWidgets.scoreObjective = objective;
     }

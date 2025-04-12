@@ -92,10 +92,12 @@ public class KillAura extends Module {
     private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this);
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, pauseRotation::get);
-    private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
+    private final BoolValue predict = new BoolValue("Self prediction", false, this);
     private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
     private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
     private final BoolValue renderPredictPos = new BoolValue("Render predicted pos", false, this, () -> predict.get() && predict.canDisplay());
+    private final SliderValue targetOffset = new SliderValue("Target pos offset", 0, -5, 5, 0.01f, this);
+    private final BoolValue onlyOffsetOnMiss = new BoolValue("Only offset on miss", false, this);
     private final BoolValue delayed = new BoolValue("Delayed target pos", false, this);
     private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
@@ -497,11 +499,18 @@ public class KillAura extends Module {
             playerPos = mc.thePlayer.getPositionEyes(1);
         }
 
-        Vec3 entityPos = entity.getPositionVector();
+        double predictionAmount = 0;
+
+        if (onlyOffsetOnMiss.get() && PlayerUtils.getDistanceToEntityBox(entity) > attackRange.get() || !onlyOffsetOnMiss.get()) {
+            predictionAmount = targetOffset.get();
+        }
+
+        Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(2 + predictionAmount);
 
         double yTrim = this.yTrim.get() + (mc.thePlayer.onGround ? 0 : 0.1);
-        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().contract(0, yTrim, 0);
+        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().offset(prediction).contract(0, yTrim, 0);
 
+        Vec3 entityPos = entityBoundingBox.getCenter();
         Vec3 vec;
 
         switch (aimPos.get()) {

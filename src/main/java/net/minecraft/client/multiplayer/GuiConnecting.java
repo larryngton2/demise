@@ -125,7 +125,7 @@ public class GuiConnecting extends GuiScreen {
         if (this.networkManager == null) {
             this.drawCenteredString(this.fontRendererObj, "Establishing connection with " + finalIP + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
         } else {
-            this.drawCenteredString(this.fontRendererObj, "Logging in to " + address.getIP() + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
+            this.drawCenteredString(this.fontRendererObj, "Logging in to " + finalIP + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

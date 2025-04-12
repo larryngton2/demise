@@ -35,7 +35,7 @@ public class GuiChat extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.sentHistoryCursor = this.mc.ingameGUI.getChatGUI().getSentMessages().size();
-        this.inputField = new GuiTextField(0, this.fontRendererObj, 4, this.height - 12, this.width - 4, 12);
+        this.inputField = new GuiTextField(0, this.fontRendererObj, 10, this.height - 12 - 7, MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()), 12);
         this.inputField.setMaxStringLength(100);
         this.inputField.setEnableBackgroundDrawing(false);
         this.inputField.setFocused(true);
@@ -108,7 +108,6 @@ public class GuiChat extends GuiScreen {
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-
         if (mouseButton == 0) {
             IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
 

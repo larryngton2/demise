@@ -198,4 +198,14 @@ public class Vec3 {
     public Vec3 floor() {
         return new Vec3(Math.floor(this.xCoord), Math.floor(this.yCoord), Math.floor(this.zCoord));
     }
+
+    public Vec3 offset(EnumFacing direction, double value) {
+        Vec3i vec3i = direction.getDirectionVec();
+
+        return new Vec3(
+                this.xCoord + value * vec3i.getX(),
+                this.yCoord + value * vec3i.getY(),
+                this.zCoord + value * vec3i.getZ()
+        );
+    }
 }

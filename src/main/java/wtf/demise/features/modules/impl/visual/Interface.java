@@ -124,14 +124,6 @@ public class Interface extends Module {
             }
         }
 
-        float textY = (event.getScaledResolution().getScaledHeight() - 9) + (mc.currentScreen instanceof GuiChat ? -14.0f : -3.0f);
-        mc.fontRendererObj.drawStringWithShadow("XYZ: " + EnumChatFormatting.WHITE +
-                xyzFormat.format(mc.thePlayer.posX) + " " +
-                xyzFormat.format(mc.thePlayer.posY) + " " +
-                xyzFormat.format(mc.thePlayer.posZ) + " " + EnumChatFormatting.RESET +
-                "BPS: " + EnumChatFormatting.WHITE +
-                this.bpsFormat.format(MoveUtil.getBPS()), 2, textY, color(0));
-
         if (armorMode.canDisplay()) {
             if (armorMode.get().equals("Default")) {
                 ArrayList<ItemStack> stuff = new ArrayList<>();

@@ -300,8 +300,6 @@ public class Scaffold extends Module {
             this.pitch = RotationUtils.getRotations(hitVec)[1];
         }
 
-        DebugUtils.sendMessage(isLeaningOffBlock + " " + nextBlockIsAir + " " + data.blockPos.offset(data.facing).offset(data.facing));
-
         if (tower.canDisplay() && tower.is("Watchdog") && towering()) {
             yaw = RotationUtils.getRotations(getVec3(data))[0];
             pitch = RotationUtils.getRotations(getVec3(data))[1];

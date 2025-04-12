@@ -35,9 +35,9 @@ import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.minecraft.client.gui.Gui.drawRect;
-import static net.minecraft.client.gui.GuiIngame.LINK_PATTERN;
 
 public class CustomWidgets implements InstanceAccess {
     public static ScaledResolution sr;
@@ -46,6 +46,7 @@ public class CustomWidgets implements InstanceAccess {
     public static ScoreObjective scoreObjective;
     private float interpolatedHeight;
     private float interpolatedY = sr == null ? 1080 : sr.getScaledHeight() - 80 - 5;
+    private float interpolatedChatY;
     private boolean fade = false;
     private int alpha = 255;
 
@@ -127,10 +128,16 @@ public class CustomWidgets implements InstanceAccess {
                 if (flag) {
                     height = sr.getScaledHeight() - 33;
                 } else {
-                    height = sr.getScaledHeight() - 23;
+                    height = sr.getScaledHeight() - 10;
                 }
 
-                GlStateManager.translate(10, height, 0.0F);
+                if (interpolatedChatY == 0) {
+                    interpolatedChatY = height;
+                }
+
+                interpolatedChatY = MathUtils.interpolate(interpolatedChatY, height, 0.1f);
+
+                GlStateManager.translate(10, interpolatedChatY, 0.0F);
                 GlStateManager.scale(f1, f1, 1.0F);
 
                 for (int i1 = 0; i1 + GuiNewChat.scrollPos < GuiNewChat.drawnChatLines.size() && i1 < i; ++i1) {
@@ -157,9 +164,9 @@ public class CustomWidgets implements InstanceAccess {
 
                 if (chatBackgroundAlpha > 3) {
                     if (!shader) {
-                        RoundedUtils.drawRound(-2, -interpolatedHeight - 2, l + 2 + 2, interpolatedHeight + 4, radius, new Color(getModule(Interface.class).bgColor(), true));
+                        RoundedUtils.drawRound(-2, -interpolatedHeight - 2, l + 4, interpolatedHeight + 4, radius, new Color(getModule(Interface.class).bgColor(), true));
                     } else {
-                        RoundedUtils.drawShaderRound(-2, -interpolatedHeight - 2, l + 2 + 2, interpolatedHeight + 4, radius, Color.black);
+                        RoundedUtils.drawShaderRound(-2, -interpolatedHeight - 2, l + 4, interpolatedHeight + 4, radius, Color.black);
                     }
                 }
 
@@ -218,10 +225,10 @@ public class CustomWidgets implements InstanceAccess {
     }
 
     public void drawChatScreen(boolean shader) {
-        float x = 2;
-        float y = sr.getScaledHeight() - 14;
-        float width = sr.getScaledWidth() - 4;
+        float width = MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()) + 4;
         float height = 12;
+        float x = 8;
+        float y = sr.getScaledHeight() - height - x;
 
         if (!shader) {
             RoundedUtils.drawRound(x, y, width, height, 5, new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
@@ -290,6 +297,8 @@ public class CustomWidgets implements InstanceAccess {
 
         GL11.glPopMatrix();
     }
+
+    public static final Pattern LINK_PATTERN = Pattern.compile("(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[A-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&//=]*)");
 
     private void drawScoreboard(ScoreObjective objective, ScaledResolution scaledRes, boolean shader) {
         if (objective == null) {

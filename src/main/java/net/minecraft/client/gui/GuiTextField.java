@@ -386,7 +386,8 @@ public class GuiTextField extends Gui {
             }
 
             if (flag1) {
-                Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, new Color(-3092272).getRGB());
+                Gui.drawRect(k1 + 1, i1, k1 + 2, i1 + 2 + this.fontRendererInstance.FONT_HEIGHT, new Color(0, 0, 0, 100).getRGB());
+                Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRendererInstance.FONT_HEIGHT, Color.white.getRGB());
             }
 
             if (k != j) {
