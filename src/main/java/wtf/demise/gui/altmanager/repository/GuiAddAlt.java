@@ -28,8 +28,7 @@ import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 import static net.minecraft.util.EnumChatFormatting.RED;
-import static wtf.demise.utils.misc.StringUtils.randomString;
-import static wtf.demise.utils.misc.StringUtils.sb;
+import static wtf.demise.utils.misc.StringUtils.*;
 
 public final class GuiAddAlt extends GuiScreen {
 
@@ -186,7 +185,7 @@ public final class GuiAddAlt extends GuiScreen {
                 break;
             case 3:
                 //wtf.demise.utils.misc.StringUtils.randomString(wtf.demise.utils.misc.StringUtils.sb, 10)
-                usernameField.setText(randomString(sb, 10));
+                usernameField.setText(randomName());
                 passwordField.setText("");
                 break;
         }

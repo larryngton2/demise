@@ -48,11 +48,11 @@ public class CategoryPanel implements IComponent {
         this.openAnimation.setDirection(opened ? Direction.FORWARDS : Direction.BACKWARDS);
 
         if (MouseUtils.isHovered(x, 0, width, new ScaledResolution(mc).getScaledHeight(), mouseX, mouseY)) {
-            if (Mouse.hasWheel() && mouseX != new ScaledResolution(mc).getScaledWidth() / 2) {
+            if (Mouse.hasWheel() && openAnimation.isDone()) {
                 final float wheel = Mouse.getDWheel();
 
                 if (wheel != 0) {
-                    scroll += wheel > 0 ? 25 : -25;
+                    scroll += wheel > 0 ? 50 : -50;
                 }
             }
         }

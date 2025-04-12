@@ -609,11 +609,9 @@ public class KillAura extends Module {
                     targetZ += (float) lastZOffset;
                 }
 
-                float lerp = dynamicCheck ? 1.0f : (float) MathUtils.randomizeDouble(0.5, 1);
-
-                vec.xCoord = MathUtils.interpolate(vec.xCoord, targetX, lerp);
-                vec.yCoord = MathUtils.interpolate(vec.yCoord, targetY, lerp);
-                vec.zCoord = MathUtils.interpolate(vec.zCoord, targetZ, lerp);
+                vec.xCoord = targetX;
+                vec.yCoord = targetY;
+                vec.zCoord = targetZ;
             }
             break;
             case "Drift":

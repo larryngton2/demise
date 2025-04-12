@@ -31,7 +31,7 @@ public class MultiBooleanComponent extends Component {
         Fonts.interSemiBold.get(15).drawString(setting.getName(), getX() + 4, getY() + 2, -1);
 
         for (BoolValue boolValue : setting.getValues()) {
-            select.putIfAbsent(boolValue, new EaseOutSine(0, 1));
+            select.putIfAbsent(boolValue, new EaseOutSine(100, 1));
             select.get(boolValue).setDirection(boolValue.get() ? Direction.FORWARDS : Direction.BACKWARDS);
 
             Fonts.interRegular.get(13).drawString(boolValue.getName(), getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 1 + heightoff, ColorUtils.interpolateColor2(new Color(128, 128, 128), Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor(), (float) select.get(boolValue).getOutput()));
@@ -45,11 +45,11 @@ public class MultiBooleanComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouse) {
-        float heightoff = 0;
+        float heightoff = 4;
         float lineHeight = Fonts.interRegular.get(13).getHeight() + 2;
 
         for (BoolValue boolValue : setting.getValues()) {
-            if (MouseUtils.isHovered(getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 2 + heightoff, Fonts.interRegular.get(13).getStringWidth(boolValue.getName()), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
+            if (MouseUtils.isHovered(getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 1 + heightoff, Fonts.interRegular.get(13).getStringWidth(boolValue.getName()), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
                 boolValue.set(!boolValue.get());
             }
             heightoff += lineHeight;

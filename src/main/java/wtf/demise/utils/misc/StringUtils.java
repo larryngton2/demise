@@ -1,5 +1,7 @@
 package wtf.demise.utils.misc;
 
+import com.github.javafaker.Faker;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class StringUtils {
@@ -24,5 +26,10 @@ public class StringUtils {
         }
 
         return builder.toString();
+    }
+
+    public static String randomName() {
+        Faker faker = new Faker();
+        return faker.name().firstName() + faker.name().lastName();
     }
 }

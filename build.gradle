@@ -138,7 +138,7 @@ dependencies {
     implementation "com.paulscode.sound:codecwav:20101023"
     implementation "com.paulscode.sound:soundsystem:20120107"
     implementation "com.paulscode.sound:codecjorbis:20101023"
-
+    implementation 'com.github.javafaker:javafaker:1.0.2'
 
     implementation "com.mojang:authlib:1.5.21"
 
