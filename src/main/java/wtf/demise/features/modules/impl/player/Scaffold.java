@@ -210,6 +210,7 @@ public class Scaffold extends Module {
 
         boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
         boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
+        boolean shouldCorrect = isLeaningOffBlock && nextBlockIsAir;
 
         mc.entityRenderer.getMouseOver(1);
 
@@ -265,7 +266,7 @@ public class Scaffold extends Module {
                     float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
 
                     this.yaw = Math.round(yaw / 45) * 45;
-                    this.pitch = MoveUtil.isMoving() ? 75.6f : 89;
+                    this.pitch = nextBlockIsAir ? getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1] : 75.6f;
                 }
                 break;
                 case "Derp": {
@@ -282,7 +283,7 @@ public class Scaffold extends Module {
         }
 
         if (clutch.get()) {
-            if (nextBlockIsAir && isLeaningOffBlock) {
+            if (shouldCorrect) {
                 ambatufall = true;
             } else if (ambatufall) {
                 clutchTime.reset();

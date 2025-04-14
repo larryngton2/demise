@@ -305,6 +305,6 @@ public class AxisAlignedBB {
     }
 
     public Vec3 getCenter() {
-        return new Vec3(MathUtils.lerp(0.5D, this.minX, this.maxX), MathUtils.lerp(0.5D, this.minY, this.maxY), MathUtils.lerp(0.5D, this.minZ, this.maxZ));
+        return new Vec3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
     }
 }

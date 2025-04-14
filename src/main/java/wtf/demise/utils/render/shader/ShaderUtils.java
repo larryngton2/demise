@@ -489,7 +489,7 @@ public class ShaderUtils implements InstanceAccess {
             
                 color = (f * f * f + 0.9 * f * f + 0.8 * f) * color;
             
-                return color * 0.7;
+                return color * 0.5;
             }
             
             void mainImage(out vec4 fragColor, in vec2 fragCoord) {

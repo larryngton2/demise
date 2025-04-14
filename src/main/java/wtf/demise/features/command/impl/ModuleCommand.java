@@ -34,7 +34,6 @@ public class ModuleCommand extends Command {
 
     @Override
     public void execute(String[] args) throws CommandExecutionException {
-
         if (args.length == 1) {
             DebugUtils.sendMessage("Usage: " + getUsage());
             return;
@@ -42,8 +41,7 @@ public class ModuleCommand extends Command {
 
         Value value = module.getValue(args[1]);
 
-        if (value == null)
-            return;
+        if (value == null) return;
 
         if (value instanceof BoolValue boolValue) {
             boolean newValue = !boolValue.get();
@@ -51,7 +49,6 @@ public class ModuleCommand extends Command {
 
             DebugUtils.sendMessage(module.getName() + " " + args[1] + " was toggled " + (newValue ? "§8on" : "§8off") + ".");
         } else {
-
             if (args.length < 3) {
                 if (value instanceof SliderValue || value instanceof ColorValue)
                     DebugUtils.sendMessage(args[1].toLowerCase() + " <value>");
@@ -68,7 +65,6 @@ public class ModuleCommand extends Command {
                 sliderValue.setValue(Float.parseFloat(args[2]));
                 DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + sliderValue.get() + ".");
             } else if (value instanceof MultiBoolValue multiBoolValue) {
-
                 multiBoolValue.getValues().forEach(boolValue -> {
                     if (Objects.equals(boolValue.getName(), args[2])) {
                         boolean newValue = !boolValue.get();

@@ -41,7 +41,7 @@ public class ModuleManager {
                 Reach.class,
                 TickBase.class,
                 Velocity.class,
-                AutoHead.class,
+                AutoHeal.class,
                 Criticals.class,
                 FakeLag.class,
                 MoreKB.class,

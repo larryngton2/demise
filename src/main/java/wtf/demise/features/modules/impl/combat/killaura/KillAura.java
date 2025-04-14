@@ -85,12 +85,15 @@ public class KillAura extends Module {
     private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
 
     // aim point
-    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this);
+    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Nearest", "Straight", "Assist"}, "Straight", this);
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final BoolValue slowDown = new BoolValue("Slow down", false, this);
     private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this);
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, pauseRotation::get);
+    private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
+    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
+    private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
     private final SliderValue targetOffset = new SliderValue("Normal target pos offset", 0, -5, 5, 0.01f, this);
     private final BoolValue staticMissOffset = new BoolValue("Static miss offset", true, this);
     private final SliderValue missTargetOffset = new SliderValue("Miss target pos offset", 0, -5, 5, 0.01f, this, staticMissOffset::get);
@@ -130,6 +133,7 @@ public class KillAura extends Module {
             new BoolValue("Dead", false)
     ), this);
 
+    private final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
     private final Queue<Vec3> positionHistory = new LinkedList<>();
     private final TimerUtils lastSwitchTime = new TimerUtils();
     public List<EntityLivingBase> targets = new ArrayList<>();
@@ -477,7 +481,14 @@ public class KillAura extends Module {
     }
 
     public float[] calcToEntity(EntityLivingBase entity) {
-        Vec3 playerPos = mc.thePlayer.getPositionEyes(1);
+        Vec3 playerPos;
+
+        if (predict.get() && !predictProcesses.isEmpty()) {
+            PlayerUtils.PredictProcess predictedProcess = predictProcesses.get(predictProcesses.size() - 1);
+            playerPos = new Vec3(predictedProcess.position.xCoord, predictedProcess.position.yCoord + mc.thePlayer.getEyeHeight(), predictedProcess.position.zCoord);
+        } else {
+            playerPos = mc.thePlayer.getPositionEyes(1);
+        }
 
         double predictionAmount;
 
@@ -493,24 +504,15 @@ public class KillAura extends Module {
             }
         }
 
-        Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(2 + predictionAmount);
+        Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(1 + predictionAmount);
 
         double yTrim = this.yTrim.get() + (mc.thePlayer.onGround ? 0 : 0.1);
-        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox().offset(prediction).contract(0, yTrim, 0);
+        AxisAlignedBB entityBoundingBox = entity.getHitbox().offset(prediction).contract(0, yTrim, 0);
 
         Vec3 entityPos = entityBoundingBox.getCenter();
         Vec3 vec;
 
         switch (aimPos.get()) {
-            case "Head":
-                vec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
-                break;
-            case "Torso":
-                vec = entityPos.add(0.0, entity.height * 0.75, 0.0);
-                break;
-            case "Legs":
-                vec = entityPos.add(0.0, entity.height * 0.45, 0.0);
-                break;
             case "Nearest":
                 vec = RotationUtils.getBestHitVec(entity);
                 break;
@@ -695,6 +697,27 @@ public class KillAura extends Module {
         }
 
         return new float[]{yaw, pitch};
+    }
+
+    @EventTarget
+    public void onMove(MoveEvent e) {
+        predictProcesses.clear();
+
+        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, simulatedMotionMulti.get());
+
+        simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
+
+        for (int i = 0; i < predictTicks.get(); i++) {
+            simulatedPlayer.tick();
+            predictProcesses.add(
+                    new PlayerUtils.PredictProcess(
+                            simulatedPlayer.getPos(),
+                            simulatedPlayer.fallDistance,
+                            simulatedPlayer.onGround,
+                            simulatedPlayer.isCollidedHorizontally
+                    )
+            );
+        }
     }
 
     public static void drawCircle(final Entity entity) {

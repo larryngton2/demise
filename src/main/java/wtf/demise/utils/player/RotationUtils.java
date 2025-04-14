@@ -501,11 +501,7 @@ public class RotationUtils implements InstanceAccess {
         return MathHelper.clamp_float(n, -90, 90);
     }
 
-    public static float calculateYawFromSrcToDst(final float yaw,
-                                                 final double srcX,
-                                                 final double srcZ,
-                                                 final double dstX,
-                                                 final double dstZ) {
+    public static float calculateYawFromSrcToDst(final float yaw, final double srcX, final double srcZ, final double dstX, final double dstZ) {
         final double xDist = dstX - srcX;
         final double zDist = dstZ - srcZ;
         final float var1 = (float) (StrictMath.atan2(zDist, xDist) * 180.0 / Math.PI) - 90.0F;

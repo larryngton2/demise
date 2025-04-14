@@ -42,7 +42,8 @@ public final class GuiAddAlt extends GuiScreen {
 
     private GuiTextField passwordField;
     private GuiTextField usernameField;
-    private final List<GuiCustomButton> buttons = new ArrayList<>();
+    private GuiButton fakerMode;
+    private FakerMode currFMode = FakerMode.NORMAL;
 
     public GuiAddAlt(@NotNull AltRepositoryGUI gui, @NotNull String addAltButtonName, @NotNull String title, @NotNull BiConsumer<GuiAddAlt, ? super AltCredential> consumer) {
         this.gui = gui;
@@ -58,11 +59,11 @@ public final class GuiAddAlt extends GuiScreen {
         this.groupAltInfo = new GuiGroupAltLogin(this, title);
 
         List<GuiButton> buttonList = this.buttonList;
+        buttonList.add(new GuiButton(4, width / 2 - 100, height + 72 + 12 - 72, "Microsoft"));
+        buttonList.add(new GuiButton(3,width / 2 - 100, height + 72 + 12 - 48, "Generate"));
+        buttonList.add(fakerMode = new GuiButton(5, width / 2 - 100, height + 72 - 12, "Faker: NORMAL"));
         buttonList.add(new GuiButton(0, width / 2 - 100, height + 72 + 12, addAltButtonName));
-        buttonList.add(new GuiButton(1, width / 2 - 100, height + 72 + 12 + 24, "Back"));
-        buttonList.add(new GuiButton(2, width / 2 - 100, height + 72 + 12 + -24, "Import alt"));
-        buttonList.add(new GuiButton(3,width / 2 - 100, height + 72 + 12 + -48, "Generate"));
-        buttonList.add(new GuiButton(4, width / 2 - 100, height + 72 + 12 + -72, "Microsoft"));
+        buttonList.add(new GuiButton(1, width / 2 - 100, height + 72 + 36, "Back"));
 
         this.usernameField = new GuiTextField(0, mc.fontRendererObj, width / 2 - 100, height - 65, 200, 20);
         this.passwordField = new GuiTextField(1, mc.fontRendererObj, width / 2 - 100, height - 30, 200, 20);
@@ -143,23 +144,8 @@ public final class GuiAddAlt extends GuiScreen {
             case 0:
                 add_login();
                 break;
-
             case 1:
                 mc.displayGuiScreen(gui);
-                break;
-
-            case 2:
-                AltCredential parts = getDataFromClipboard();
-                if (parts == null) return;
-
-                try {
-                    usernameField.setText(parts.getLogin());
-                    passwordField.setText(parts.getPassword());
-                } catch (ArrayIndexOutOfBoundsException ignored) {
-                } catch (Throwable t) {
-                    Demise.LOGGER.warn("An unexpected error occurred while importing alt!", t);
-                }
-
                 break;
             case 4:
                 final MicrosoftAuthCallback callback = new MicrosoftAuthCallback();
@@ -185,8 +171,12 @@ public final class GuiAddAlt extends GuiScreen {
                 break;
             case 3:
                 //wtf.demise.utils.misc.StringUtils.randomString(wtf.demise.utils.misc.StringUtils.sb, 10)
-                usernameField.setText(randomName());
+                usernameField.setText(randomName(currFMode));
                 passwordField.setText("");
+                break;
+            case 5:
+                currFMode = FakerMode.values()[(currFMode.ordinal() + 1) % FakerMode.values().length];
+                fakerMode.displayString = "Faker: " + currFMode.name();
                 break;
         }
     }
@@ -218,7 +208,7 @@ public final class GuiAddAlt extends GuiScreen {
                 break;
 
             case '\r':
-                buttons.get(0).clickAction.run();
+                mc.displayGuiScreen(gui);
                 break;
         }
 
