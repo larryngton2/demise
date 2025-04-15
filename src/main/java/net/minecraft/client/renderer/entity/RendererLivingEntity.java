@@ -29,7 +29,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.render.RenderNameTagEvent;
 import wtf.demise.features.modules.impl.visual.Chams;
 import wtf.demise.features.modules.impl.visual.VisualTweaks;
-import wtf.demise.utils.math.MathUtils;
 
 import java.nio.FloatBuffer;
 import java.util.List;
