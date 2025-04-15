@@ -107,11 +107,7 @@ public abstract class World implements IBlockAccess {
             } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting biome");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Coordinates of biome request");
-                crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
-                    public String call() throws Exception {
-                        return CrashReportCategory.getCoordinateInfo(pos);
-                    }
-                });
+                crashreportcategory.addCrashSectionCallable("Location", () -> CrashReportCategory.getCoordinateInfo(pos));
                 throw new ReportedException(crashreport);
             }
         } else {
@@ -266,8 +262,8 @@ public abstract class World implements IBlockAccess {
     }
 
     public void markBlockForUpdate(BlockPos pos) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).markBlockForUpdate(pos);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.markBlockForUpdate(pos);
         }
     }
 
@@ -298,8 +294,8 @@ public abstract class World implements IBlockAccess {
     }
 
     public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.markBlockRangeForRenderUpdate(x1, y1, z1, x2, y2, z2);
         }
     }
 
@@ -347,13 +343,11 @@ public abstract class World implements IBlockAccess {
             } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being updated");
-                crashreportcategory.addCrashSectionCallable("Source block type", new Callable<String>() {
-                    public String call() throws Exception {
-                        try {
-                            return String.format("ID #%d (%s // %s)", Integer.valueOf(Block.getIdFromBlock(blockIn)), blockIn.getUnlocalizedName(), blockIn.getClass().getCanonicalName());
-                        } catch (Throwable var2) {
-                            return "ID #" + Block.getIdFromBlock(blockIn);
-                        }
+                crashreportcategory.addCrashSectionCallable("Source block type", () -> {
+                    try {
+                        return String.format("ID #%d (%s // %s)", Block.getIdFromBlock(blockIn), blockIn.getUnlocalizedName(), blockIn.getClass().getCanonicalName());
+                    } catch (Throwable var2) {
+                        return "ID #" + Block.getIdFromBlock(blockIn);
                     }
                 });
                 CrashReportCategory.addBlockInfo(crashreportcategory, pos, iblockstate);
@@ -547,8 +541,8 @@ public abstract class World implements IBlockAccess {
     }
 
     public void notifyLightSet(BlockPos pos) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).notifyLightSet(pos);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.notifyLightSet(pos);
         }
     }
 
@@ -726,20 +720,20 @@ public abstract class World implements IBlockAccess {
     }
 
     public void playSoundAtEntity(Entity entityIn, String name, float volume, float pitch) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).playSound(name, entityIn.posX, entityIn.posY, entityIn.posZ, volume, pitch);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.playSound(name, entityIn.posX, entityIn.posY, entityIn.posZ, volume, pitch);
         }
     }
 
     public void playSoundToNearExcept(EntityPlayer player, String name, float volume, float pitch) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).playSoundToNearExcept(player, name, player.posX, player.posY, player.posZ, volume, pitch);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.playSoundToNearExcept(player, name, player.posX, player.posY, player.posZ, volume, pitch);
         }
     }
 
     public void playSoundEffect(double x, double y, double z, String soundName, float volume, float pitch) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).playSound(soundName, x, y, z, volume, pitch);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.playSound(soundName, x, y, z, volume, pitch);
         }
     }
 
@@ -747,8 +741,8 @@ public abstract class World implements IBlockAccess {
     }
 
     public void playRecord(BlockPos pos, String name) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).playRecord(name, pos);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.playRecord(name, pos);
         }
     }
 
@@ -761,8 +755,8 @@ public abstract class World implements IBlockAccess {
     }
 
     private void spawnParticle(int particleID, boolean p_175720_2_, double xCood, double yCoord, double zCoord, double xOffset, double yOffset, double zOffset, int... p_175720_15_) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).spawnParticle(particleID, p_175720_2_, xCood, yCoord, zCoord, xOffset, yOffset, zOffset, p_175720_15_);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.spawnParticle(particleID, p_175720_2_, xCood, yCoord, zCoord, xOffset, yOffset, zOffset, p_175720_15_);
         }
     }
 
@@ -796,14 +790,14 @@ public abstract class World implements IBlockAccess {
     }
 
     protected void onEntityAdded(Entity entityIn) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).onEntityAdded(entityIn);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.onEntityAdded(entityIn);
         }
     }
 
     protected void onEntityRemoved(Entity entityIn) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            this.worldAccesses.get(i).onEntityRemoved(entityIn);
+        for (IWorldAccess worldAccess : this.worldAccesses) {
+            worldAccess.onEntityRemoved(entityIn);
         }
     }
 
@@ -1163,8 +1157,7 @@ public abstract class World implements IBlockAccess {
         this.theProfiler.endStartSection("remove");
         this.loadedEntityList.removeAll(this.unloadedEntityList);
 
-        for (int k = 0; k < this.unloadedEntityList.size(); ++k) {
-            Entity entity1 = this.unloadedEntityList.get(k);
+        for (Entity entity1 : this.unloadedEntityList) {
             int j = entity1.chunkCoordX;
             int l1 = entity1.chunkCoordZ;
 
@@ -1173,8 +1166,8 @@ public abstract class World implements IBlockAccess {
             }
         }
 
-        for (int l = 0; l < this.unloadedEntityList.size(); ++l) {
-            this.onEntityRemoved(this.unloadedEntityList.get(l));
+        for (Entity entity : this.unloadedEntityList) {
+            this.onEntityRemoved(entity);
         }
 
         this.unloadedEntityList.clear();
@@ -1266,9 +1259,7 @@ public abstract class World implements IBlockAccess {
         this.theProfiler.endStartSection("pendingBlockEntities");
 
         if (!this.addedTileEntityList.isEmpty()) {
-            for (int j1 = 0; j1 < this.addedTileEntityList.size(); ++j1) {
-                TileEntity tileentity1 = this.addedTileEntityList.get(j1);
-
+            for (TileEntity tileentity1 : this.addedTileEntityList) {
                 if (!tileentity1.isInvalid()) {
                     if (!this.loadedTileEntityList.contains(tileentity1)) {
                         this.addTileEntity(tileentity1);
@@ -1404,9 +1395,7 @@ public abstract class World implements IBlockAccess {
     public boolean checkNoEntityCollision(AxisAlignedBB bb, Entity entityIn) {
         List<Entity> list = this.getEntitiesWithinAABBExcludingEntity(null, bb);
 
-        for (int i = 0; i < list.size(); ++i) {
-            Entity entity = list.get(i);
-
+        for (Entity entity : list) {
             if (!entity.isDead && entity.preventEntitySpawning && entity != entityIn && (entityIn == null || entityIn.ridingEntity != entity && entityIn.riddenByEntity != entity)) {
                 return false;
             }
@@ -1513,7 +1502,7 @@ public abstract class World implements IBlockAccess {
                         Block block = iblockstate.getBlock();
 
                         if (block.getMaterial() == materialIn) {
-                            double d0 = (float) (l1 + 1) - BlockLiquid.getLiquidHeightPercent(iblockstate.getValue(BlockLiquid.LEVEL).intValue());
+                            double d0 = (float) (l1 + 1) - BlockLiquid.getLiquidHeightPercent(iblockstate.getValue(BlockLiquid.LEVEL));
 
                             if ((double) l >= d0) {
                                 flag = true;
@@ -1574,7 +1563,7 @@ public abstract class World implements IBlockAccess {
                     Block block = iblockstate.getBlock();
 
                     if (block.getMaterial() == materialIn) {
-                        int j2 = iblockstate.getValue(BlockLiquid.LEVEL).intValue();
+                        int j2 = iblockstate.getValue(BlockLiquid.LEVEL);
                         double d0 = l1 + 1;
 
                         if (j2 < 8) {
@@ -1663,9 +1652,7 @@ public abstract class World implements IBlockAccess {
             TileEntity tileentity = null;
 
             if (this.processingLoadedTiles) {
-                for (int i = 0; i < this.addedTileEntityList.size(); ++i) {
-                    TileEntity tileentity1 = this.addedTileEntityList.get(i);
-
+                for (TileEntity tileentity1 : this.addedTileEntityList) {
                     if (!tileentity1.isInvalid() && tileentity1.getPos().equals(pos)) {
                         tileentity = tileentity1;
                         break;
@@ -1678,9 +1665,7 @@ public abstract class World implements IBlockAccess {
             }
 
             if (tileentity == null) {
-                for (int j = 0; j < this.addedTileEntityList.size(); ++j) {
-                    TileEntity tileentity2 = this.addedTileEntityList.get(j);
-
+                for (TileEntity tileentity2 : this.addedTileEntityList) {
                     if (!tileentity2.isInvalid() && tileentity2.getPos().equals(pos)) {
                         tileentity = tileentity2;
                         break;
@@ -1745,7 +1730,7 @@ public abstract class World implements IBlockAccess {
     public static boolean doesBlockHaveSolidTopSurface(IBlockAccess blockAccess, BlockPos pos) {
         IBlockState iblockstate = blockAccess.getBlockState(pos);
         Block block = iblockstate.getBlock();
-        return block.getMaterial().isOpaque() && block.isFullCube() || (block instanceof BlockStairs ? iblockstate.getValue(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP : (block instanceof BlockSlab ? iblockstate.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP : (block instanceof BlockHopper || (block instanceof BlockSnow && iblockstate.getValue(BlockSnow.LAYERS).intValue() == 7))));
+        return block.getMaterial().isOpaque() && block.isFullCube() || (block instanceof BlockStairs ? iblockstate.getValue(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP : (block instanceof BlockSlab ? iblockstate.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP : (block instanceof BlockHopper || (block instanceof BlockSnow && iblockstate.getValue(BlockSnow.LAYERS) == 7))));
     }
 
     public boolean isBlockNormalCube(BlockPos pos, boolean _default) {
@@ -1862,8 +1847,7 @@ public abstract class World implements IBlockAccess {
         this.activeChunkSet.clear();
         this.theProfiler.startSection("buildList");
 
-        for (int i = 0; i < this.playerEntities.size(); ++i) {
-            EntityPlayer entityplayer = this.playerEntities.get(i);
+        for (EntityPlayer entityplayer : this.playerEntities) {
             int j = MathHelper.floor_double(entityplayer.posX / 16.0D);
             int k = MathHelper.floor_double(entityplayer.posZ / 16.0D);
             int l = this.getRenderDistanceChunks();
@@ -1954,7 +1938,7 @@ public abstract class World implements IBlockAccess {
                 IBlockState iblockstate = this.getBlockState(pos);
                 Block block = iblockstate.getBlock();
 
-                if ((block == Blocks.water || block == Blocks.flowing_water) && iblockstate.getValue(BlockLiquid.LEVEL).intValue() == 0) {
+                if ((block == Blocks.water || block == Blocks.flowing_water) && iblockstate.getValue(BlockLiquid.LEVEL) == 0) {
                     if (!noWaterAdj) {
                         return true;
                     }
@@ -2240,9 +2224,7 @@ public abstract class World implements IBlockAccess {
         T t = null;
         double d0 = Double.MAX_VALUE;
 
-        for (int i = 0; i < list.size(); ++i) {
-            T t1 = list.get(i);
-
+        for (T t1 : list) {
             if (t1 != closestTo && EntitySelectors.NOT_SPECTATING.apply(t1)) {
                 double d1 = closestTo.getDistanceSqToEntity(t1);
 
@@ -2393,9 +2375,7 @@ public abstract class World implements IBlockAccess {
         double d0 = -1.0D;
         EntityPlayer entityplayer = null;
 
-        for (int i = 0; i < this.playerEntities.size(); ++i) {
-            EntityPlayer entityplayer1 = this.playerEntities.get(i);
-
+        for (EntityPlayer entityplayer1 : this.playerEntities) {
             if (EntitySelectors.NOT_SPECTATING.apply(entityplayer1)) {
                 double d1 = entityplayer1.getDistanceSq(x, y, z);
 
@@ -2410,9 +2390,7 @@ public abstract class World implements IBlockAccess {
     }
 
     public boolean isAnyPlayerWithinRangeAt(double x, double y, double z, double range) {
-        for (int i = 0; i < this.playerEntities.size(); ++i) {
-            EntityPlayer entityplayer = this.playerEntities.get(i);
-
+        for (EntityPlayer entityplayer : this.playerEntities) {
             if (EntitySelectors.NOT_SPECTATING.apply(entityplayer)) {
                 double d0 = entityplayer.getDistanceSq(x, y, z);
 
@@ -2426,9 +2404,7 @@ public abstract class World implements IBlockAccess {
     }
 
     public EntityPlayer getPlayerEntityByName(String name) {
-        for (int i = 0; i < this.playerEntities.size(); ++i) {
-            EntityPlayer entityplayer = this.playerEntities.get(i);
-
+        for (EntityPlayer entityplayer : this.playerEntities) {
             if (name.equals(entityplayer.getName())) {
                 return entityplayer;
             }
@@ -2438,9 +2414,7 @@ public abstract class World implements IBlockAccess {
     }
 
     public EntityPlayer getPlayerEntityByUUID(UUID uuid) {
-        for (int i = 0; i < this.playerEntities.size(); ++i) {
-            EntityPlayer entityplayer = this.playerEntities.get(i);
-
+        for (EntityPlayer entityplayer : this.playerEntities) {
             if (uuid.equals(entityplayer.getUniqueID())) {
                 return entityplayer;
             }
@@ -2635,16 +2609,8 @@ public abstract class World implements IBlockAccess {
     public CrashReportCategory addWorldInfoToCrashReport(CrashReport report) {
         CrashReportCategory crashreportcategory = report.makeCategoryDepth("Affected level", 1);
         crashreportcategory.addCrashSection("Level name", this.worldInfo == null ? "????" : this.worldInfo.getWorldName());
-        crashreportcategory.addCrashSectionCallable("All players", new Callable<String>() {
-            public String call() {
-                return World.this.playerEntities.size() + " total; " + World.this.playerEntities;
-            }
-        });
-        crashreportcategory.addCrashSectionCallable("Chunk stats", new Callable<String>() {
-            public String call() {
-                return World.this.chunkProvider.makeString();
-            }
-        });
+        crashreportcategory.addCrashSectionCallable("All players", () -> World.this.playerEntities.size() + " total; " + World.this.playerEntities);
+        crashreportcategory.addCrashSectionCallable("Chunk stats", () -> World.this.chunkProvider.makeString());
 
         try {
             this.worldInfo.addToCrashReport(crashreportcategory);
@@ -2656,8 +2622,7 @@ public abstract class World implements IBlockAccess {
     }
 
     public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {
-        for (int i = 0; i < this.worldAccesses.size(); ++i) {
-            IWorldAccess iworldaccess = this.worldAccesses.get(i);
+        for (IWorldAccess iworldaccess : this.worldAccesses) {
             iworldaccess.sendBlockBreakProgress(breakerId, pos, progress);
         }
     }

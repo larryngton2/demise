@@ -24,12 +24,12 @@ public class GuiRenameWorld extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + 12, I18n.format("selectWorld.renameButton")));
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height / 4 + 120 + 12, I18n.format("gui.cancel")));
-        ISaveFormat isaveformat = this.mc.getSaveLoader();
+        this.buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.format("selectWorld.renameButton")));
+        this.buttonList.add(new GuiButton(1, width / 2 - 100, height / 4 + 120 + 12, I18n.format("gui.cancel")));
+        ISaveFormat isaveformat = mc.getSaveLoader();
         WorldInfo worldinfo = isaveformat.getWorldInfo(this.saveName);
         String s = worldinfo.getWorldName();
-        this.field_146583_f = new GuiTextField(2, this.fontRendererObj, this.width / 2 - 100, 60, 200, 20);
+        this.field_146583_f = new GuiTextField(2, this.fontRendererObj, width / 2 - 100, 60, 200, 20);
         this.field_146583_f.setFocused(true);
         this.field_146583_f.setText(s);
     }
@@ -41,18 +41,18 @@ public class GuiRenameWorld extends GuiScreen {
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.enabled) {
             if (button.id == 1) {
-                this.mc.displayGuiScreen(this.parentScreen);
+                mc.displayGuiScreen(this.parentScreen);
             } else if (button.id == 0) {
-                ISaveFormat isaveformat = this.mc.getSaveLoader();
+                ISaveFormat isaveformat = mc.getSaveLoader();
                 isaveformat.renameWorld(this.saveName, this.field_146583_f.getText().trim());
-                this.mc.displayGuiScreen(this.parentScreen);
+                mc.displayGuiScreen(this.parentScreen);
             }
         }
     }
 
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         this.field_146583_f.textboxKeyTyped(typedChar, keyCode);
-        this.buttonList.get(0).enabled = this.field_146583_f.getText().trim().length() > 0;
+        this.buttonList.get(0).enabled = !this.field_146583_f.getText().trim().isEmpty();
 
         if (keyCode == 28 || keyCode == 156) {
             this.actionPerformed(this.buttonList.get(0));
@@ -66,8 +66,8 @@ public class GuiRenameWorld extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, I18n.format("selectWorld.renameTitle"), this.width / 2, 20, 16777215);
-        this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterName"), this.width / 2 - 100, 47, 10526880);
+        drawCenteredString(this.fontRendererObj, I18n.format("selectWorld.renameTitle"), width / 2, 20, 16777215);
+        this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterName"), width / 2 - 100, 47, 10526880);
         this.field_146583_f.drawTextBox();
         super.drawScreen(mouseX, mouseY, partialTicks);
     }

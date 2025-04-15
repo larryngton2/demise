@@ -66,8 +66,7 @@ public class CryptManager {
             EncodedKeySpec encodedkeyspec = new X509EncodedKeySpec(encodedKey);
             KeyFactory keyfactory = KeyFactory.getInstance("RSA");
             return keyfactory.generatePublic(encodedkeyspec);
-        } catch (NoSuchAlgorithmException var3) {
-        } catch (InvalidKeySpecException var4) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException var3) {
         }
 
         LOGGER.error("Public key reconstitute failed!");
@@ -89,10 +88,8 @@ public class CryptManager {
     private static byte[] cipherOperation(int opMode, Key key, byte[] data) {
         try {
             return createTheCipherInstance(opMode, key.getAlgorithm(), key).doFinal(data);
-        } catch (IllegalBlockSizeException illegalblocksizeexception) {
+        } catch (IllegalBlockSizeException | BadPaddingException illegalblocksizeexception) {
             illegalblocksizeexception.printStackTrace();
-        } catch (BadPaddingException badpaddingexception) {
-            badpaddingexception.printStackTrace();
         }
 
         LOGGER.error("Cipher data failed!");
@@ -104,12 +101,8 @@ public class CryptManager {
             Cipher cipher = Cipher.getInstance(transformation);
             cipher.init(opMode, key);
             return cipher;
-        } catch (InvalidKeyException invalidkeyexception) {
+        } catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException invalidkeyexception) {
             invalidkeyexception.printStackTrace();
-        } catch (NoSuchAlgorithmException nosuchalgorithmexception) {
-            nosuchalgorithmexception.printStackTrace();
-        } catch (NoSuchPaddingException nosuchpaddingexception) {
-            nosuchpaddingexception.printStackTrace();
         }
 
         LOGGER.error("Cipher creation failed!");

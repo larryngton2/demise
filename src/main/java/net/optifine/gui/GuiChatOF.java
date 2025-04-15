@@ -15,7 +15,7 @@ public class GuiChatOF extends GuiChat {
 
     public void sendChatMessage(String msg) {
         if (this.checkCustomCommand(msg)) {
-            this.mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+            mc.ingameGUI.getChatGUI().addToSentMessages(msg);
         } else {
             super.sendChatMessage(msg);
         }
@@ -35,7 +35,7 @@ public class GuiChatOF extends GuiChat {
 
                 return true;
             } else if (msg.equals("/reloadChunks")) {
-                this.mc.renderGlobal.loadRenderers();
+                mc.renderGlobal.loadRenderers();
                 return true;
             } else {
                 return false;

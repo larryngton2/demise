@@ -192,8 +192,8 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
             if (aentity != null) {
                 int i = packetIn.getEntityID() - entity.getEntityId();
 
-                for (int j = 0; j < aentity.length; ++j) {
-                    aentity[j].setEntityId(aentity[j].getEntityId() + i);
+                for (Entity value : aentity) {
+                    value.setEntityId(value.getEntityId() + i);
                 }
             }
 
@@ -571,8 +571,8 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
         if (aentity != null) {
             int i = packetIn.getEntityID() - entitylivingbase.getEntityId();
 
-            for (int j = 0; j < aentity.length; ++j) {
-                aentity[j].setEntityId(aentity[j].getEntityId() + i);
+            for (Entity entity : aentity) {
+                entity.setEntityId(entity.getEntityId() + i);
             }
         }
 
@@ -946,7 +946,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
 
         for (Entry<StatBase, Integer> entry : packetIn.func_148974_c().entrySet()) {
             StatBase statbase = entry.getKey();
-            int i = entry.getValue().intValue();
+            int i = entry.getValue();
 
             if (statbase.isAchievement() && i > 0) {
                 if (this.field_147308_k && this.gameController.thePlayer.getStatFileWriter().readStat(statbase) == 0) {
@@ -1053,8 +1053,8 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
     }
 
     public void handlePlayerListHeaderFooter(S47PacketPlayerListHeaderFooter packetIn) {
-        this.gameController.ingameGUI.getTabList().setHeader(packetIn.getHeader().getFormattedText().length() == 0 ? null : packetIn.getHeader());
-        this.gameController.ingameGUI.getTabList().setFooter(packetIn.getFooter().getFormattedText().length() == 0 ? null : packetIn.getFooter());
+        this.gameController.ingameGUI.getTabList().setHeader(packetIn.getHeader().getFormattedText().isEmpty() ? null : packetIn.getHeader());
+        this.gameController.ingameGUI.getTabList().setFooter(packetIn.getFooter().getFormattedText().isEmpty() ? null : packetIn.getFooter());
     }
 
     public void handleRemoveEntityEffect(S1EPacketRemoveEntityEffect packetIn) {
@@ -1144,7 +1144,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
 
             if (file2.isFile()) {
                 this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.ACCEPTED));
-                Futures.addCallback(this.gameController.getResourcePackRepository().setResourcePackInstance(file2), new FutureCallback<Object>() {
+                Futures.addCallback(this.gameController.getResourcePackRepository().setResourcePackInstance(file2), new FutureCallback<>() {
                     public void onSuccess(Object p_onSuccess_1_) {
                         NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.SUCCESSFULLY_LOADED));
                     }
@@ -1159,7 +1159,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
         } else {
             if (this.gameController.getCurrentServerData() != null && this.gameController.getCurrentServerData().getResourceMode() == ServerData.ServerResourceMode.ENABLED) {
                 this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.ACCEPTED));
-                Futures.addCallback(this.gameController.getResourcePackRepository().downloadResourcePack(s, s1), new FutureCallback<Object>() {
+                Futures.addCallback(this.gameController.getResourcePackRepository().downloadResourcePack(s, s1), new FutureCallback<>() {
                     public void onSuccess(Object p_onSuccess_1_) {
                         NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.SUCCESSFULLY_LOADED));
                     }
@@ -1171,41 +1171,35 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
             } else if (this.gameController.getCurrentServerData() != null && this.gameController.getCurrentServerData().getResourceMode() != ServerData.ServerResourceMode.PROMPT) {
                 this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.DECLINED));
             } else {
-                this.gameController.addScheduledTask(new Runnable() {
-                    public void run() {
-                        NetHandlerPlayClient.this.gameController.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback() {
-                            public void confirmClicked(boolean result, int id) {
-                                NetHandlerPlayClient.this.gameController = Minecraft.getMinecraft();
+                this.gameController.addScheduledTask(() -> NetHandlerPlayClient.this.gameController.displayGuiScreen(new GuiYesNo((result, id) -> {
+                    NetHandlerPlayClient.this.gameController = Minecraft.getMinecraft();
 
-                                if (result) {
-                                    if (NetHandlerPlayClient.this.gameController.getCurrentServerData() != null) {
-                                        NetHandlerPlayClient.this.gameController.getCurrentServerData().setResourceMode(ServerData.ServerResourceMode.ENABLED);
-                                    }
+                    if (result) {
+                        if (NetHandlerPlayClient.this.gameController.getCurrentServerData() != null) {
+                            NetHandlerPlayClient.this.gameController.getCurrentServerData().setResourceMode(ServerData.ServerResourceMode.ENABLED);
+                        }
 
-                                    NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.ACCEPTED));
-                                    Futures.addCallback(NetHandlerPlayClient.this.gameController.getResourcePackRepository().downloadResourcePack(s, s1), new FutureCallback<Object>() {
-                                        public void onSuccess(Object p_onSuccess_1_) {
-                                            NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.SUCCESSFULLY_LOADED));
-                                        }
-
-                                        public void onFailure(Throwable p_onFailure_1_) {
-                                            NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.FAILED_DOWNLOAD));
-                                        }
-                                    });
-                                } else {
-                                    if (NetHandlerPlayClient.this.gameController.getCurrentServerData() != null) {
-                                        NetHandlerPlayClient.this.gameController.getCurrentServerData().setResourceMode(ServerData.ServerResourceMode.DISABLED);
-                                    }
-
-                                    NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.DECLINED));
-                                }
-
-                                ServerList.func_147414_b(NetHandlerPlayClient.this.gameController.getCurrentServerData());
-                                NetHandlerPlayClient.this.gameController.displayGuiScreen(null);
+                        NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.ACCEPTED));
+                        Futures.addCallback(NetHandlerPlayClient.this.gameController.getResourcePackRepository().downloadResourcePack(s, s1), new FutureCallback<>() {
+                            public void onSuccess(Object p_onSuccess_1_) {
+                                NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.SUCCESSFULLY_LOADED));
                             }
-                        }, I18n.format("multiplayer.texturePrompt.line1"), I18n.format("multiplayer.texturePrompt.line2"), 0));
+
+                            public void onFailure(Throwable p_onFailure_1_) {
+                                NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.FAILED_DOWNLOAD));
+                            }
+                        });
+                    } else {
+                        if (NetHandlerPlayClient.this.gameController.getCurrentServerData() != null) {
+                            NetHandlerPlayClient.this.gameController.getCurrentServerData().setResourceMode(ServerData.ServerResourceMode.DISABLED);
+                        }
+
+                        NetHandlerPlayClient.this.netManager.sendPacket(new C19PacketResourcePackStatus(s1, C19PacketResourcePackStatus.Action.DECLINED));
                     }
-                });
+
+                    ServerList.func_147414_b(NetHandlerPlayClient.this.gameController.getCurrentServerData());
+                    NetHandlerPlayClient.this.gameController.displayGuiScreen(null);
+                }, I18n.format("multiplayer.texturePrompt.line1"), I18n.format("multiplayer.texturePrompt.line2"), 0)));
             }
         }
     }
@@ -1291,7 +1285,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
         Scoreboard scoreboard = this.clientWorldController.getScoreboard();
 
-        if (packetIn.func_149370_d().length() == 0) {
+        if (packetIn.func_149370_d().isEmpty()) {
             scoreboard.setObjectiveInDisplaySlot(packetIn.func_149371_c(), null);
         } else {
             ScoreObjective scoreobjective = scoreboard.getObjective(packetIn.func_149370_d());

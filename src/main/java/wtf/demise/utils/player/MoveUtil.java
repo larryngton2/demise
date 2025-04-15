@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
-import net.optifine.entity.model.anim.ModelUpdater;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
@@ -400,9 +399,7 @@ public class MoveUtil implements InstanceAccess {
 
         final int[] down = {0};
 
-        Arrays.stream(gameSettings).forEach(keyBinding -> {
-            down[0] = down[0] + (keyBinding.isKeyDown() ? 1 : 0);
-        });
+        Arrays.stream(gameSettings).forEach(keyBinding -> down[0] = down[0] + (keyBinding.isKeyDown() ? 1 : 0));
 
         boolean active = down[0] == 1;
 

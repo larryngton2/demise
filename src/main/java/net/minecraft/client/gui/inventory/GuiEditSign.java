@@ -29,13 +29,13 @@ public class GuiEditSign extends GuiScreen {
     public void initGui() {
         this.buttonList.clear();
         Keyboard.enableRepeatEvents(true);
-        this.buttonList.add(this.doneBtn = new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120, I18n.format("gui.done")));
+        this.buttonList.add(this.doneBtn = new GuiButton(0, width / 2 - 100, height / 4 + 120, I18n.format("gui.done")));
         this.tileSign.setEditable(false);
     }
 
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(false);
-        NetHandlerPlayClient nethandlerplayclient = this.mc.getNetHandler();
+        NetHandlerPlayClient nethandlerplayclient = mc.getNetHandler();
 
         if (nethandlerplayclient != null) {
             nethandlerplayclient.addToSendQueue(new C12PacketUpdateSign(this.tileSign.getPos(), this.tileSign.signText));
@@ -52,7 +52,7 @@ public class GuiEditSign extends GuiScreen {
         if (button.enabled) {
             if (button.id == 0) {
                 this.tileSign.markDirty();
-                this.mc.displayGuiScreen(null);
+                mc.displayGuiScreen(null);
             }
         }
     }
@@ -68,7 +68,7 @@ public class GuiEditSign extends GuiScreen {
 
         String s = this.tileSign.signText[this.editLine].getUnformattedText();
 
-        if (keyCode == 14 && s.length() > 0) {
+        if (keyCode == 14 && !s.isEmpty()) {
             s = s.substring(0, s.length() - 1);
         }
 
@@ -85,10 +85,10 @@ public class GuiEditSign extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, I18n.format("sign.edit"), this.width / 2, 40, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("sign.edit"), width / 2, 40, 16777215);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float) (this.width / 2), 0.0F, 50.0F);
+        GlStateManager.translate((float) (width / 2), 0.0F, 50.0F);
         float f = 93.75F;
         GlStateManager.scale(-f, -f, -f);
         GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);

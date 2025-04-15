@@ -8,9 +8,7 @@ public class ArrayUtils {
         if (arr == null) {
             return false;
         } else {
-            for (int i = 0; i < arr.length; ++i) {
-                Object object = arr[i];
-
+            for (Object object : arr) {
                 if (object == val) {
                     return true;
                 }
@@ -78,7 +76,7 @@ public class ArrayUtils {
         if (arr == null) {
             return "";
         } else {
-            StringBuffer stringbuffer = new StringBuffer(arr.length * 5);
+            StringBuilder stringbuffer = new StringBuilder(arr.length * 5);
 
             for (int i = 0; i < arr.length; ++i) {
                 boolean flag = arr[i];
@@ -102,7 +100,7 @@ public class ArrayUtils {
         if (arr == null) {
             return "";
         } else {
-            StringBuffer stringbuffer = new StringBuffer(arr.length * 5);
+            StringBuilder stringbuffer = new StringBuilder(arr.length * 5);
 
             for (int i = 0; i < arr.length; ++i) {
                 float f = arr[i];
@@ -122,7 +120,7 @@ public class ArrayUtils {
         if (arr == null) {
             return "";
         } else {
-            StringBuffer stringbuffer = new StringBuffer(arr.length * 5);
+            StringBuilder stringbuffer = new StringBuilder(arr.length * 5);
 
             for (int i = 0; i < arr.length; ++i) {
                 float f = arr[i];
@@ -131,7 +129,7 @@ public class ArrayUtils {
                     stringbuffer.append(separator);
                 }
 
-                stringbuffer.append(String.format(format, Float.valueOf(f)));
+                stringbuffer.append(String.format(format, f));
             }
 
             return stringbuffer.toString();
@@ -146,7 +144,7 @@ public class ArrayUtils {
         if (arr == null) {
             return "";
         } else {
-            StringBuffer stringbuffer = new StringBuffer(arr.length * 5);
+            StringBuilder stringbuffer = new StringBuilder(arr.length * 5);
 
             for (int i = 0; i < arr.length; ++i) {
                 int j = arr[i];
@@ -166,7 +164,7 @@ public class ArrayUtils {
         if (arr == null) {
             return "";
         } else {
-            StringBuffer stringbuffer = new StringBuffer(arr.length * 5);
+            StringBuilder stringbuffer = new StringBuilder(arr.length * 5);
 
             for (int i = 0; i < arr.length; ++i) {
                 int j = arr[i];
@@ -191,7 +189,7 @@ public class ArrayUtils {
         if (arr == null) {
             return "";
         } else {
-            StringBuffer stringbuffer = new StringBuffer(arr.length * 5);
+            StringBuilder stringbuffer = new StringBuilder(arr.length * 5);
 
             for (int i = 0; i < arr.length; ++i) {
                 Object object = arr[i];
@@ -221,8 +219,8 @@ public class ArrayUtils {
     }
 
     public static boolean equalsOne(int val, int[] vals) {
-        for (int i = 0; i < vals.length; ++i) {
-            if (vals[i] == val) {
+        for (int j : vals) {
+            if (j == val) {
                 return true;
             }
         }
@@ -234,9 +232,7 @@ public class ArrayUtils {
         if (bs == null) {
             return false;
         } else {
-            for (int i = 0; i < bs.length; ++i) {
-                Object object = bs[i];
-
+            for (Object object : bs) {
                 if (equals(a, object)) {
                     return true;
                 }
@@ -254,9 +250,7 @@ public class ArrayUtils {
         if (bs == null) {
             return false;
         } else {
-            for (int i = 0; i < bs.length; ++i) {
-                Object object = bs[i];
-
+            for (Object object : bs) {
                 if (a == object) {
                     return true;
                 }
@@ -282,7 +276,7 @@ public class ArrayUtils {
             int[] aint = new int[arr.length];
 
             for (int i = 0; i < aint.length; ++i) {
-                aint[i] = arr[i].intValue();
+                aint[i] = arr[i];
             }
 
             return aint;

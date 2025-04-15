@@ -57,7 +57,7 @@ public class EnchantmentHelper {
             for (int i = 0; i < nbttaglist.tagCount(); ++i) {
                 int j = nbttaglist.getCompoundTagAt(i).getShort("id");
                 int k = nbttaglist.getCompoundTagAt(i).getShort("lvl");
-                map.put(Integer.valueOf(j), Integer.valueOf(k));
+                map.put(j, k);
             }
         }
 
@@ -66,20 +66,18 @@ public class EnchantmentHelper {
 
     public static void setEnchantments(Map<Integer, Integer> enchMap, ItemStack stack) {
         NBTTagList nbttaglist = new NBTTagList();
-        Iterator iterator = enchMap.keySet().iterator();
 
-        while (iterator.hasNext()) {
-            int i = ((Integer) iterator.next()).intValue();
+        for (int i : enchMap.keySet()) {
             Enchantment enchantment = Enchantment.getEnchantmentById(i);
 
             if (enchantment != null) {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
                 nbttagcompound.setShort("id", (short) i);
-                nbttagcompound.setShort("lvl", (short) enchMap.get(Integer.valueOf(i)).intValue());
+                nbttagcompound.setShort("lvl", (short) enchMap.get(i).intValue());
                 nbttaglist.appendTag(nbttagcompound);
 
                 if (stack.getItem() == Items.enchanted_book) {
-                    Items.enchanted_book.addEnchantment(stack, new EnchantmentData(enchantment, enchMap.get(Integer.valueOf(i)).intValue()));
+                    Items.enchanted_book.addEnchantment(stack, new EnchantmentData(enchantment, enchMap.get(i)));
                 }
             }
         }
@@ -307,7 +305,7 @@ public class EnchantmentHelper {
                             boolean flag = true;
 
                             for (EnchantmentData enchantmentdata1 : list) {
-                                if (!enchantmentdata1.enchantmentobj.canApplyTogether(Enchantment.getEnchantmentById(integer.intValue()))) {
+                                if (!enchantmentdata1.enchantmentobj.canApplyTogether(Enchantment.getEnchantmentById(integer))) {
                                     flag = false;
                                     break;
                                 }
@@ -343,7 +341,7 @@ public class EnchantmentHelper {
                             map = Maps.newHashMap();
                         }
 
-                        map.put(Integer.valueOf(enchantment.effectId), new EnchantmentData(enchantment, i));
+                        map.put(enchantment.effectId, new EnchantmentData(enchantment, i));
                     }
                 }
             }

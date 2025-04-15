@@ -10,7 +10,6 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
 
 @ModuleInfo(name = "JumpReset", category = ModuleCategory.Legit)
 public class JumpReset extends Module {

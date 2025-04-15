@@ -48,7 +48,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.features.modules.impl.combat.Velocity;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.player.RotationUtils;
 
 import java.util.Collection;
@@ -115,10 +114,10 @@ public abstract class EntityPlayer extends EntityLivingBase {
 
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
-        this.dataWatcher.addObject(17, Float.valueOf(0.0F));
-        this.dataWatcher.addObject(18, Integer.valueOf(0));
-        this.dataWatcher.addObject(10, Byte.valueOf((byte) 0));
+        this.dataWatcher.addObject(16, (byte) 0);
+        this.dataWatcher.addObject(17, 0.0F);
+        this.dataWatcher.addObject(18, 0);
+        this.dataWatcher.addObject(10, (byte) 0);
     }
 
     public ItemStack getItemInUse() {
@@ -458,9 +457,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
 
             List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, axisalignedbb);
 
-            for (int i = 0; i < list.size(); ++i) {
-                Entity entity = list.get(i);
-
+            for (Entity entity : list) {
                 if (!entity.isDead) {
                     this.collideWithPlayer(entity);
                 }
@@ -477,12 +474,12 @@ public abstract class EntityPlayer extends EntityLivingBase {
     }
 
     public void setScore(int p_85040_1_) {
-        this.dataWatcher.updateObject(18, Integer.valueOf(p_85040_1_));
+        this.dataWatcher.updateObject(18, p_85040_1_);
     }
 
     public void addScore(int p_85039_1_) {
         int i = this.getScore();
-        this.dataWatcher.updateObject(18, Integer.valueOf(i + p_85039_1_));
+        this.dataWatcher.updateObject(18, i + p_85039_1_);
     }
 
     public void onDeath(DamageSource cause) {
@@ -1151,7 +1148,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
         IBlockState iblockstate = this.worldObj.getBlockState(this.playerLocation);
 
         if (this.playerLocation != null && iblockstate.getBlock() == Blocks.bed) {
-            this.worldObj.setBlockState(this.playerLocation, iblockstate.withProperty(BlockBed.OCCUPIED, Boolean.valueOf(false)), 4);
+            this.worldObj.setBlockState(this.playerLocation, iblockstate.withProperty(BlockBed.OCCUPIED, Boolean.FALSE), 4);
             BlockPos blockpos = BlockBed.getSafeExitLocation(this.worldObj, this.playerLocation, 0);
 
             if (blockpos == null) {
@@ -1391,7 +1388,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
             this.triggerAchievement(AchievementList.killEnemy);
         }
 
-        EntityList.EntityEggInfo entitylist$entityegginfo = EntityList.entityEggs.get(Integer.valueOf(EntityList.getEntityID(entityLivingIn)));
+        EntityList.EntityEggInfo entitylist$entityegginfo = EntityList.entityEggs.get(EntityList.getEntityID(entityLivingIn));
 
         if (entitylist$entityegginfo != null) {
             this.triggerAchievement(entitylist$entityegginfo.field_151512_d);
@@ -1546,7 +1543,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
 
         this.xpSeed = oldPlayer.xpSeed;
         this.theInventoryEnderChest = oldPlayer.theInventoryEnderChest;
-        this.getDataWatcher().updateObject(10, Byte.valueOf(oldPlayer.getDataWatcher().getWatchableObjectByte(10)));
+        this.getDataWatcher().updateObject(10, oldPlayer.getDataWatcher().getWatchableObjectByte(10));
     }
 
     protected boolean canTriggerWalking() {
@@ -1635,7 +1632,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
             amount = 0.0F;
         }
 
-        this.getDataWatcher().updateObject(17, Float.valueOf(amount));
+        this.getDataWatcher().updateObject(17, amount);
     }
 
     public float getAbsorptionAmount() {

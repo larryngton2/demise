@@ -45,7 +45,7 @@ public class ReflectorForge {
     }
 
     public static boolean renderFirstPersonHand(RenderGlobal renderGlobal, float partialTicks, int pass) {
-        return Reflector.ForgeHooksClient_renderFirstPersonHand.exists() && Reflector.callBoolean(Reflector.ForgeHooksClient_renderFirstPersonHand, renderGlobal, Float.valueOf(partialTicks), Integer.valueOf(pass));
+        return Reflector.ForgeHooksClient_renderFirstPersonHand.exists() && Reflector.callBoolean(Reflector.ForgeHooksClient_renderFirstPersonHand, renderGlobal, partialTicks, pass);
     }
 
     public static InputStream getOptiFineResourceStream(String path) {
@@ -113,18 +113,18 @@ public class ReflectorForge {
                     }
                 }
 
-                String[] astring = list1.toArray(new String[list1.size()]);
+                String[] astring = list1.toArray(new String[0]);
                 return astring;
             }
         }
     }
 
     public static boolean canEntitySpawn(EntityLiving entityliving, World world, float x, float y, float z) {
-        Object object = Reflector.call(Reflector.ForgeEventFactory_canEntitySpawn, entityliving, world, Float.valueOf(x), Float.valueOf(y), Float.valueOf(z));
+        Object object = Reflector.call(Reflector.ForgeEventFactory_canEntitySpawn, entityliving, world, x, y, z);
         return object == EVENT_RESULT_ALLOW || object == EVENT_RESULT_DEFAULT && entityliving.getCanSpawnHere() && entityliving.isNotColliding();
     }
 
     public static boolean doSpecialSpawn(EntityLiving entityliving, World world, float x, int y, float z) {
-        return Reflector.ForgeEventFactory_doSpecialSpawn.exists() && Reflector.callBoolean(Reflector.ForgeEventFactory_doSpecialSpawn, entityliving, world, Float.valueOf(x), Integer.valueOf(y), Float.valueOf(z));
+        return Reflector.ForgeEventFactory_doSpecialSpawn.exists() && Reflector.callBoolean(Reflector.ForgeEventFactory_doSpecialSpawn, entityliving, world, x, y, z);
     }
 }

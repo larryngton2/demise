@@ -51,11 +51,11 @@ public class GuiShaders extends GuiScreenOF {
 
         int i = 120;
         int j = 20;
-        int k = this.width - i - 10;
+        int k = width - i - 10;
         int l = 30;
         int i1 = 20;
-        int j1 = this.width - i - 20;
-        this.shaderList = new GuiSlotShaders(this, j1, this.height, l, this.height - 50, 16);
+        int j1 = width - i - 20;
+        this.shaderList = new GuiSlotShaders(this, j1, height, l, height - 50, 16);
         this.shaderList.registerScrollButtons(7, 8);
         this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.ANTIALIASING, k, l, i, j));
         this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.NORMAL_MAP, k, i1 + l, i, j));
@@ -67,11 +67,11 @@ public class GuiShaders extends GuiScreenOF {
         this.buttonList.add(new GuiButtonEnumShaderOption(EnumShaderOption.OLD_LIGHTING, k, 7 * i1 + l, i, j));
         int k1 = Math.min(150, j1 / 2 - 10);
         int l1 = j1 / 4 - k1 / 2;
-        int i2 = this.height - 25;
+        int i2 = height - 25;
         this.buttonList.add(new GuiButton(201, l1, i2, k1 - 22 + 1, j, Lang.get("of.options.shaders.shadersFolder")));
         this.buttonList.add(new GuiButtonDownloadShaders(210, l1 + k1 - 22 - 1, i2));
-        this.buttonList.add(new GuiButton(202, j1 / 4 * 3 - k1 / 2, this.height - 25, k1, j, I18n.format("gui.done")));
-        this.buttonList.add(new GuiButton(203, k, this.height - 25, i, j, Lang.get("of.options.shaders.shaderOptions")));
+        this.buttonList.add(new GuiButton(202, j1 / 4 * 3 - k1 / 2, height - 25, k1, j, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(203, k, height - 25, i, j, Lang.get("of.options.shaders.shaderOptions")));
         this.updateButtons();
     }
 
@@ -130,7 +130,7 @@ public class GuiShaders extends GuiScreenOF {
                             try {
                                 Class oclass1 = Class.forName("java.awt.Desktop");
                                 Object object1 = oclass1.getMethod("getDesktop", new Class[0]).invoke(null);
-                                oclass1.getMethod("browse", new Class[]{URI.class}).invoke(object1, (new File(this.mc.mcDataDir, "shaderpacks")).toURI());
+                                oclass1.getMethod("browse", new Class[]{URI.class}).invoke(object1, (new File(mc.mcDataDir, "shaderpacks")).toURI());
                             } catch (Throwable throwable1) {
                                 throwable1.printStackTrace();
                                 flag = true;
@@ -146,7 +146,7 @@ public class GuiShaders extends GuiScreenOF {
                         case 202:
                             Shaders.storeConfig();
                             this.saved = true;
-                            this.mc.displayGuiScreen(this.parentGui);
+                            mc.displayGuiScreen(this.parentGui);
                             break;
 
                         case 203:
@@ -194,7 +194,7 @@ public class GuiShaders extends GuiScreenOF {
                         }
 
                         Shaders.uninit();
-                        this.mc.scheduleResourcesRefresh();
+                        mc.scheduleResourcesRefresh();
                         break;
 
                     case SPECULAR_MAP:
@@ -205,7 +205,7 @@ public class GuiShaders extends GuiScreenOF {
                         }
 
                         Shaders.uninit();
-                        this.mc.scheduleResourcesRefresh();
+                        mc.scheduleResourcesRefresh();
                         break;
 
                     case RENDER_RES_MUL:
@@ -244,7 +244,7 @@ public class GuiShaders extends GuiScreenOF {
 
                         Shaders.updateBlockLightLevel();
                         Shaders.uninit();
-                        this.mc.scheduleResourcesRefresh();
+                        mc.scheduleResourcesRefresh();
                         break;
 
                     case TWEAK_BLOCK_DAMAGE:
@@ -302,14 +302,14 @@ public class GuiShaders extends GuiScreenOF {
             this.updateTimer += 20;
         }
 
-        this.drawCenteredString(this.fontRendererObj, this.screenTitle + " ", this.width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.screenTitle + " ", width / 2, 15, 16777215);
         String s = "OpenGL: " + Shaders.glVersionString + ", " + Shaders.glVendorString + ", " + Shaders.glRendererString;
         int i = this.fontRendererObj.getStringWidth(s);
 
-        if (i < this.width - 5) {
-            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, this.height - 40, 8421504);
+        if (i < width - 5) {
+            drawCenteredString(this.fontRendererObj, s, width / 2, height - 40, 8421504);
         } else {
-            this.drawString(this.fontRendererObj, s, 5, this.height - 40, 8421504);
+            this.drawString(this.fontRendererObj, s, 5, height - 40, 8421504);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -322,11 +322,11 @@ public class GuiShaders extends GuiScreenOF {
     }
 
     public Minecraft getMc() {
-        return this.mc;
+        return mc;
     }
 
     public void drawCenteredString(String text, int x, int y, int color) {
-        this.drawCenteredString(this.fontRendererObj, text, x, y, color);
+        drawCenteredString(this.fontRendererObj, text, x, y, color);
     }
 
     public static String toStringOnOff(boolean value) {

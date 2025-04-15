@@ -84,15 +84,15 @@ public class GuiScreenBook extends GuiScreen {
         Keyboard.enableRepeatEvents(true);
 
         if (this.bookIsUnsigned) {
-            this.buttonList.add(this.buttonSign = new GuiButton(3, this.width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.signButton")));
-            this.buttonList.add(this.buttonDone = new GuiButton(0, this.width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.done")));
-            this.buttonList.add(this.buttonFinalize = new GuiButton(5, this.width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.finalizeButton")));
-            this.buttonList.add(this.buttonCancel = new GuiButton(4, this.width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.cancel")));
+            this.buttonList.add(this.buttonSign = new GuiButton(3, width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.signButton")));
+            this.buttonList.add(this.buttonDone = new GuiButton(0, width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.done")));
+            this.buttonList.add(this.buttonFinalize = new GuiButton(5, width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.finalizeButton")));
+            this.buttonList.add(this.buttonCancel = new GuiButton(4, width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.cancel")));
         } else {
-            this.buttonList.add(this.buttonDone = new GuiButton(0, this.width / 2 - 100, 4 + this.bookImageHeight, 200, 20, I18n.format("gui.done")));
+            this.buttonList.add(this.buttonDone = new GuiButton(0, width / 2 - 100, 4 + this.bookImageHeight, 200, 20, I18n.format("gui.done")));
         }
 
-        int i = (this.width - this.bookImageWidth) / 2;
+        int i = (width - this.bookImageWidth) / 2;
         int j = 2;
         this.buttonList.add(this.buttonNextPage = new GuiScreenBook.NextPageButton(1, i + 120, j + 154, true));
         this.buttonList.add(this.buttonPreviousPage = new GuiScreenBook.NextPageButton(2, i + 38, j + 154, false));
@@ -112,7 +112,7 @@ public class GuiScreenBook extends GuiScreen {
             this.buttonSign.visible = !this.bookGettingSigned;
             this.buttonCancel.visible = this.bookGettingSigned;
             this.buttonFinalize.visible = this.bookGettingSigned;
-            this.buttonFinalize.enabled = this.bookTitle.trim().length() > 0;
+            this.buttonFinalize.enabled = !this.bookTitle.trim().isEmpty();
         }
     }
 
@@ -122,7 +122,7 @@ public class GuiScreenBook extends GuiScreen {
                 while (this.bookPages.tagCount() > 1) {
                     String s = this.bookPages.getStringTagAt(this.bookPages.tagCount() - 1);
 
-                    if (s.length() != 0) {
+                    if (!s.isEmpty()) {
                         break;
                     }
 
@@ -155,7 +155,7 @@ public class GuiScreenBook extends GuiScreen {
 
                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
                 packetbuffer.writeItemStackToBuffer(this.bookObj);
-                this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s2, packetbuffer));
+                mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s2, packetbuffer));
             }
         }
     }
@@ -163,7 +163,7 @@ public class GuiScreenBook extends GuiScreen {
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.enabled) {
             if (button.id == 0) {
-                this.mc.displayGuiScreen(null);
+                mc.displayGuiScreen(null);
                 this.sendBookToServer(false);
             } else if (button.id == 3 && this.bookIsUnsigned) {
                 this.bookGettingSigned = true;
@@ -183,7 +183,7 @@ public class GuiScreenBook extends GuiScreen {
                 }
             } else if (button.id == 5 && this.bookGettingSigned) {
                 this.sendBookToServer(true);
-                this.mc.displayGuiScreen(null);
+                mc.displayGuiScreen(null);
             } else if (button.id == 4 && this.bookGettingSigned) {
                 this.bookGettingSigned = false;
             }
@@ -220,7 +220,7 @@ public class GuiScreenBook extends GuiScreen {
                 case 14:
                     String s = this.pageGetCurrent();
 
-                    if (s.length() > 0) {
+                    if (!s.isEmpty()) {
                         this.pageSetCurrent(s.substring(0, s.length() - 1));
                     }
 
@@ -253,7 +253,7 @@ public class GuiScreenBook extends GuiScreen {
             case 156:
                 if (!this.bookTitle.isEmpty()) {
                     this.sendBookToServer(true);
-                    this.mc.displayGuiScreen(null);
+                    mc.displayGuiScreen(null);
                 }
 
                 return;
@@ -290,10 +290,10 @@ public class GuiScreenBook extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(bookGuiTextures);
-        int i = (this.width - this.bookImageWidth) / 2;
+        mc.getTextureManager().bindTexture(bookGuiTextures);
+        int i = (width - this.bookImageWidth) / 2;
         int j = 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.bookImageWidth, this.bookImageHeight);
+        drawTexturedModalRect(i, j, 0, 0, this.bookImageWidth, this.bookImageHeight);
 
         if (this.bookGettingSigned) {
             String s = this.bookTitle;
@@ -317,7 +317,7 @@ public class GuiScreenBook extends GuiScreen {
             String s3 = I18n.format("book.finalizeWarning");
             this.fontRendererObj.drawSplitString(s3, i + 36, j + 80, 116, 0);
         } else {
-            String s4 = I18n.format("book.pageIndicator", Integer.valueOf(this.currPage + 1), Integer.valueOf(this.bookTotalPages));
+            String s4 = I18n.format("book.pageIndicator", this.currPage + 1, this.bookTotalPages);
             String s5 = "";
 
             if (this.bookPages != null && this.currPage >= 0 && this.currPage < this.bookPages.tagCount()) {
@@ -408,7 +408,7 @@ public class GuiScreenBook extends GuiScreen {
             boolean flag = super.handleComponentClick(component);
 
             if (flag && clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
-                this.mc.displayGuiScreen(null);
+                mc.displayGuiScreen(null);
             }
 
             return flag;
@@ -419,14 +419,14 @@ public class GuiScreenBook extends GuiScreen {
         if (this.field_175386_A == null) {
             return null;
         } else {
-            int i = p_175385_1_ - (this.width - this.bookImageWidth) / 2 - 36;
+            int i = p_175385_1_ - (width - this.bookImageWidth) / 2 - 36;
             int j = p_175385_2_ - 2 - 16 - 16;
 
             if (i >= 0 && j >= 0) {
                 int k = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
 
-                if (i <= 116 && j < this.mc.fontRendererObj.FONT_HEIGHT * k + k) {
-                    int l = j / this.mc.fontRendererObj.FONT_HEIGHT;
+                if (i <= 116 && j < mc.fontRendererObj.FONT_HEIGHT * k + k) {
+                    int l = j / mc.fontRendererObj.FONT_HEIGHT;
 
                     if (l >= 0 && l < this.field_175386_A.size()) {
                         IChatComponent ichatcomponent = this.field_175386_A.get(l);
@@ -434,7 +434,7 @@ public class GuiScreenBook extends GuiScreen {
 
                         for (IChatComponent ichatcomponent1 : ichatcomponent) {
                             if (ichatcomponent1 instanceof ChatComponentText) {
-                                i1 += this.mc.fontRendererObj.getStringWidth(((ChatComponentText) ichatcomponent1).getChatComponentText_TextValue());
+                                i1 += mc.fontRendererObj.getStringWidth(((ChatComponentText) ichatcomponent1).getChatComponentText_TextValue());
 
                                 if (i1 > i) {
                                     return ichatcomponent1;
@@ -477,7 +477,7 @@ public class GuiScreenBook extends GuiScreen {
                     j += 13;
                 }
 
-                this.drawTexturedModalRect(this.xPosition, this.yPosition, i, j, 23, 13);
+                drawTexturedModalRect(this.xPosition, this.yPosition, i, j, 23, 13);
             }
         }
     }

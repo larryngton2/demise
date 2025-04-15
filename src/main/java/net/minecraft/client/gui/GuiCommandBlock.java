@@ -32,20 +32,20 @@ public class GuiCommandBlock extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.buttonList.clear();
-        this.buttonList.add(this.doneBtn = new GuiButton(0, this.width / 2 - 4 - 150, this.height / 4 + 120 + 12, 150, 20, I18n.format("gui.done")));
-        this.buttonList.add(this.cancelBtn = new GuiButton(1, this.width / 2 + 4, this.height / 4 + 120 + 12, 150, 20, I18n.format("gui.cancel")));
-        this.buttonList.add(this.field_175390_s = new GuiButton(4, this.width / 2 + 150 - 20, 150, 20, 20, "O"));
-        this.commandTextField = new GuiTextField(2, this.fontRendererObj, this.width / 2 - 150, 50, 300, 20);
+        this.buttonList.add(this.doneBtn = new GuiButton(0, width / 2 - 4 - 150, height / 4 + 120 + 12, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.cancelBtn = new GuiButton(1, width / 2 + 4, height / 4 + 120 + 12, 150, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(this.field_175390_s = new GuiButton(4, width / 2 + 150 - 20, 150, 20, 20, "O"));
+        this.commandTextField = new GuiTextField(2, this.fontRendererObj, width / 2 - 150, 50, 300, 20);
         this.commandTextField.setMaxStringLength(32767);
         this.commandTextField.setFocused(true);
         this.commandTextField.setText(this.localCommandBlock.getCommand());
-        this.previousOutputTextField = new GuiTextField(3, this.fontRendererObj, this.width / 2 - 150, 150, 276, 20);
+        this.previousOutputTextField = new GuiTextField(3, this.fontRendererObj, width / 2 - 150, 150, 276, 20);
         this.previousOutputTextField.setMaxStringLength(32767);
         this.previousOutputTextField.setEnabled(false);
         this.previousOutputTextField.setText("-");
         this.field_175389_t = this.localCommandBlock.shouldTrackOutput();
         this.func_175388_a();
-        this.doneBtn.enabled = this.commandTextField.getText().trim().length() > 0;
+        this.doneBtn.enabled = !this.commandTextField.getText().trim().isEmpty();
     }
 
     public void onGuiClosed() {
@@ -56,20 +56,20 @@ public class GuiCommandBlock extends GuiScreen {
         if (button.enabled) {
             if (button.id == 1) {
                 this.localCommandBlock.setTrackOutput(this.field_175389_t);
-                this.mc.displayGuiScreen(null);
+                mc.displayGuiScreen(null);
             } else if (button.id == 0) {
                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
                 packetbuffer.writeByte(this.localCommandBlock.func_145751_f());
                 this.localCommandBlock.func_145757_a(packetbuffer);
                 packetbuffer.writeString(this.commandTextField.getText());
                 packetbuffer.writeBoolean(this.localCommandBlock.shouldTrackOutput());
-                this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload("MC|AdvCdm", packetbuffer));
+                mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload("MC|AdvCdm", packetbuffer));
 
                 if (!this.localCommandBlock.shouldTrackOutput()) {
                     this.localCommandBlock.setLastOutput(null);
                 }
 
-                this.mc.displayGuiScreen(null);
+                mc.displayGuiScreen(null);
             } else if (button.id == 4) {
                 this.localCommandBlock.setTrackOutput(!this.localCommandBlock.shouldTrackOutput());
                 this.func_175388_a();
@@ -80,7 +80,7 @@ public class GuiCommandBlock extends GuiScreen {
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         this.commandTextField.textboxKeyTyped(typedChar, keyCode);
         this.previousOutputTextField.textboxKeyTyped(typedChar, keyCode);
-        this.doneBtn.enabled = this.commandTextField.getText().trim().length() > 0;
+        this.doneBtn.enabled = !this.commandTextField.getText().trim().isEmpty();
 
         if (keyCode != 28 && keyCode != 156) {
             if (keyCode == 1) {
@@ -99,20 +99,20 @@ public class GuiCommandBlock extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, I18n.format("advMode.setCommand"), this.width / 2, 20, 16777215);
-        this.drawString(this.fontRendererObj, I18n.format("advMode.command"), this.width / 2 - 150, 37, 10526880);
+        drawCenteredString(this.fontRendererObj, I18n.format("advMode.setCommand"), width / 2, 20, 16777215);
+        this.drawString(this.fontRendererObj, I18n.format("advMode.command"), width / 2 - 150, 37, 10526880);
         this.commandTextField.drawTextBox();
         int i = 75;
         int j = 0;
-        this.drawString(this.fontRendererObj, I18n.format("advMode.nearestPlayer"), this.width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
-        this.drawString(this.fontRendererObj, I18n.format("advMode.randomPlayer"), this.width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
-        this.drawString(this.fontRendererObj, I18n.format("advMode.allPlayers"), this.width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
-        this.drawString(this.fontRendererObj, I18n.format("advMode.allEntities"), this.width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
-        this.drawString(this.fontRendererObj, "", this.width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
+        this.drawString(this.fontRendererObj, I18n.format("advMode.nearestPlayer"), width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
+        this.drawString(this.fontRendererObj, I18n.format("advMode.randomPlayer"), width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
+        this.drawString(this.fontRendererObj, I18n.format("advMode.allPlayers"), width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
+        this.drawString(this.fontRendererObj, I18n.format("advMode.allEntities"), width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
+        this.drawString(this.fontRendererObj, "", width / 2 - 150, i + j++ * this.fontRendererObj.FONT_HEIGHT, 10526880);
 
-        if (this.previousOutputTextField.getText().length() > 0) {
+        if (!this.previousOutputTextField.getText().isEmpty()) {
             i = i + j * this.fontRendererObj.FONT_HEIGHT + 16;
-            this.drawString(this.fontRendererObj, I18n.format("advMode.previousOutput"), this.width / 2 - 150, i, 10526880);
+            this.drawString(this.fontRendererObj, I18n.format("advMode.previousOutput"), width / 2 - 150, i, 10526880);
             this.previousOutputTextField.drawTextBox();
         }
 

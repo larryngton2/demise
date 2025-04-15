@@ -207,9 +207,9 @@ public class GuiPlayerTabOverlay extends Gui {
             j = 4;
         }
 
-        this.zLevel += 100.0F;
-        this.drawTexturedModalRect(p_175245_2_ + p_175245_1_ - 11, p_175245_3_, i * 10, 176 + j * 8, 10, 8);
-        this.zLevel -= 100.0F;
+        zLevel += 100.0F;
+        drawTexturedModalRect(p_175245_2_ + p_175245_1_ - 11, p_175245_3_, i * 10, 176 + j * 8, 10, 8);
+        zLevel -= 100.0F;
     }
 
     private void drawScoreboardValues(ScoreObjective p_175247_1_, int p_175247_2_, String p_175247_3_, int p_175247_4_, int p_175247_5_, NetworkPlayerInfo p_175247_6_) {
@@ -221,10 +221,10 @@ public class GuiPlayerTabOverlay extends Gui {
             if (this.lastTimeOpened == p_175247_6_.func_178855_p()) {
                 if (i < p_175247_6_.func_178835_l()) {
                     p_175247_6_.func_178846_a(Minecraft.getSystemTime());
-                    p_175247_6_.func_178844_b(this.guiIngame.getUpdateCounter() + 20);
+                    p_175247_6_.func_178844_b(GuiIngame.getUpdateCounter() + 20);
                 } else if (i > p_175247_6_.func_178835_l()) {
                     p_175247_6_.func_178846_a(Minecraft.getSystemTime());
-                    p_175247_6_.func_178844_b(this.guiIngame.getUpdateCounter() + 10);
+                    p_175247_6_.func_178844_b(GuiIngame.getUpdateCounter() + 10);
                 }
             }
 
@@ -238,7 +238,7 @@ public class GuiPlayerTabOverlay extends Gui {
             p_175247_6_.func_178836_b(i);
             int j = MathHelper.ceiling_float_int((float) Math.max(i, p_175247_6_.func_178860_m()) / 2.0F);
             int k = Math.max(MathHelper.ceiling_float_int((float) (i / 2)), Math.max(MathHelper.ceiling_float_int((float) (p_175247_6_.func_178860_m() / 2)), 10));
-            boolean flag = p_175247_6_.func_178858_o() > (long) this.guiIngame.getUpdateCounter() && (p_175247_6_.func_178858_o() - (long) this.guiIngame.getUpdateCounter()) / 3L % 2L == 1L;
+            boolean flag = p_175247_6_.func_178858_o() > (long) GuiIngame.getUpdateCounter() && (p_175247_6_.func_178858_o() - (long) GuiIngame.getUpdateCounter()) / 3L % 2L == 1L;
 
             if (j > 0) {
                 float f = Math.min((float) (p_175247_5_ - p_175247_4_ - 4) / (float) k, 9.0F);

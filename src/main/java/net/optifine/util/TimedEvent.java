@@ -9,19 +9,14 @@ public class TimedEvent {
     public static boolean isActive(String name, long timeIntervalMs) {
         synchronized (mapEventTimes) {
             long i = System.currentTimeMillis();
-            Long olong = mapEventTimes.get(name);
+            Long olong = mapEventTimes.computeIfAbsent(name, k -> i);
 
-            if (olong == null) {
-                olong = Long.valueOf(i);
-                mapEventTimes.put(name, olong);
-            }
-
-            long j = olong.longValue();
+            long j = olong;
 
             if (i < j + timeIntervalMs) {
                 return false;
             } else {
-                mapEventTimes.put(name, Long.valueOf(i));
+                mapEventTimes.put(name, i);
                 return true;
             }
         }

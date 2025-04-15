@@ -158,11 +158,11 @@ public abstract class Entity implements ICommandSender {
         }
 
         this.dataWatcher = new DataWatcher(this);
-        this.dataWatcher.addObject(0, Byte.valueOf((byte) 0));
-        this.dataWatcher.addObject(1, Short.valueOf((short) 300));
-        this.dataWatcher.addObject(3, Byte.valueOf((byte) 0));
+        this.dataWatcher.addObject(0, (byte) 0);
+        this.dataWatcher.addObject(1, (short) 300);
+        this.dataWatcher.addObject(3, (byte) 0);
         this.dataWatcher.addObject(2, "");
-        this.dataWatcher.addObject(4, Byte.valueOf((byte) 0));
+        this.dataWatcher.addObject(4, (byte) 0);
         this.entityInit();
     }
 
@@ -741,7 +741,7 @@ public abstract class Entity implements ICommandSender {
     }
 
     public void setSilent(boolean isSilent) {
-        this.dataWatcher.updateObject(4, Byte.valueOf((byte) (isSilent ? 1 : 0)));
+        this.dataWatcher.updateObject(4, (byte) (isSilent ? 1 : 0));
     }
 
     protected boolean canTriggerWalking() {
@@ -1190,7 +1190,7 @@ public abstract class Entity implements ICommandSender {
             tagCompund.setLong("UUIDMost", this.getUniqueID().getMostSignificantBits());
             tagCompund.setLong("UUIDLeast", this.getUniqueID().getLeastSignificantBits());
 
-            if (this.getCustomNameTag() != null && this.getCustomNameTag().length() > 0) {
+            if (this.getCustomNameTag() != null && !this.getCustomNameTag().isEmpty()) {
                 tagCompund.setString("CustomName", this.getCustomNameTag());
                 tagCompund.setBoolean("CustomNameVisible", this.getAlwaysRenderNameTag());
             }
@@ -1263,7 +1263,7 @@ public abstract class Entity implements ICommandSender {
             this.setPosition(this.posX, this.posY, this.posZ);
             this.setRotation(this.rotationYaw, this.rotationPitch);
 
-            if (tagCompund.hasKey("CustomName", 8) && tagCompund.getString("CustomName").length() > 0) {
+            if (tagCompund.hasKey("CustomName", 8) && !tagCompund.getString("CustomName").isEmpty()) {
                 this.setCustomNameTag(tagCompund.getString("CustomName"));
             }
 
@@ -1348,7 +1348,7 @@ public abstract class Entity implements ICommandSender {
             BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
             for (int i = 0; i < 8; ++i) {
-                int j = MathHelper.floor_double(this.posY + (double) (((float) ((i >> 0) % 2) - 0.5F) * 0.1F) + (double) this.getEyeHeight());
+                int j = MathHelper.floor_double(this.posY + (double) (((float) ((i) % 2) - 0.5F) * 0.1F) + (double) this.getEyeHeight());
                 int k = MathHelper.floor_double(this.posX + (double) (((float) ((i >> 1) % 2) - 0.5F) * this.width * 0.8F));
                 int l = MathHelper.floor_double(this.posZ + (double) (((float) ((i >> 2) % 2) - 0.5F) * this.width * 0.8F));
 
@@ -1592,9 +1592,9 @@ public abstract class Entity implements ICommandSender {
         byte b0 = this.dataWatcher.getWatchableObjectByte(0);
 
         if (set) {
-            this.dataWatcher.updateObject(0, Byte.valueOf((byte) (b0 | 1 << flag)));
+            this.dataWatcher.updateObject(0, (byte) (b0 | 1 << flag));
         } else {
-            this.dataWatcher.updateObject(0, Byte.valueOf((byte) (b0 & ~(1 << flag))));
+            this.dataWatcher.updateObject(0, (byte) (b0 & ~(1 << flag)));
         }
     }
 
@@ -1603,7 +1603,7 @@ public abstract class Entity implements ICommandSender {
     }
 
     public void setAir(int air) {
-        this.dataWatcher.updateObject(1, Short.valueOf((short) air));
+        this.dataWatcher.updateObject(1, (short) air);
     }
 
     public void onStruckByLightning(EntityLightningBolt lightningBolt) {
@@ -1728,7 +1728,7 @@ public abstract class Entity implements ICommandSender {
     }
 
     public String toString() {
-        return String.format("%s['%s'/%d, l='%s', x=%.2f, y=%.2f, z=%.2f]", this.getClass().getSimpleName(), this.getName(), Integer.valueOf(this.entityId), this.worldObj == null ? "~NULL~" : this.worldObj.getWorldInfo().getWorldName(), Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ));
+        return String.format("%s['%s'/%d, l='%s', x=%.2f, y=%.2f, z=%.2f]", this.getClass().getSimpleName(), this.getName(), this.entityId, this.worldObj == null ? "~NULL~" : this.worldObj.getWorldInfo().getWorldName(), this.posX, this.posY, this.posZ);
     }
 
     public boolean isEntityInvulnerable(DamageSource source) {
@@ -1815,30 +1815,14 @@ public abstract class Entity implements ICommandSender {
     }
 
     public void addEntityCrashInfo(CrashReportCategory category) {
-        category.addCrashSectionCallable("Entity Type", new Callable<String>() {
-            public String call() throws Exception {
-                return EntityList.getEntityString(Entity.this) + " (" + Entity.this.getClass().getCanonicalName() + ")";
-            }
-        });
-        category.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
-        category.addCrashSectionCallable("Entity Name", new Callable<String>() {
-            public String call() throws Exception {
-                return Entity.this.getName();
-            }
-        });
-        category.addCrashSection("Entity's Exact location", String.format("%.2f, %.2f, %.2f", Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ)));
+        category.addCrashSectionCallable("Entity Type", () -> EntityList.getEntityString(Entity.this) + " (" + Entity.this.getClass().getCanonicalName() + ")");
+        category.addCrashSection("Entity ID", this.entityId);
+        category.addCrashSectionCallable("Entity Name", () -> Entity.this.getName());
+        category.addCrashSection("Entity's Exact location", String.format("%.2f, %.2f, %.2f", this.posX, this.posY, this.posZ));
         category.addCrashSection("Entity's Block location", CrashReportCategory.getCoordinateInfo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
-        category.addCrashSection("Entity's Momentum", String.format("%.2f, %.2f, %.2f", Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ)));
-        category.addCrashSectionCallable("Entity's Rider", new Callable<String>() {
-            public String call() throws Exception {
-                return Entity.this.riddenByEntity.toString();
-            }
-        });
-        category.addCrashSectionCallable("Entity's Vehicle", new Callable<String>() {
-            public String call() throws Exception {
-                return Entity.this.ridingEntity.toString();
-            }
-        });
+        category.addCrashSection("Entity's Momentum", String.format("%.2f, %.2f, %.2f", this.motionX, this.motionY, this.motionZ));
+        category.addCrashSectionCallable("Entity's Rider", () -> Entity.this.riddenByEntity.toString());
+        category.addCrashSectionCallable("Entity's Vehicle", () -> Entity.this.ridingEntity.toString());
     }
 
     public boolean canRenderOnFire() {
@@ -1869,11 +1853,11 @@ public abstract class Entity implements ICommandSender {
     }
 
     public boolean hasCustomName() {
-        return this.dataWatcher.getWatchableObjectString(2).length() > 0;
+        return !this.dataWatcher.getWatchableObjectString(2).isEmpty();
     }
 
     public void setAlwaysRenderNameTag(boolean alwaysRenderNameTag) {
-        this.dataWatcher.updateObject(3, Byte.valueOf((byte) (alwaysRenderNameTag ? 1 : 0)));
+        this.dataWatcher.updateObject(3, (byte) (alwaysRenderNameTag ? 1 : 0));
     }
 
     public boolean getAlwaysRenderNameTag() {

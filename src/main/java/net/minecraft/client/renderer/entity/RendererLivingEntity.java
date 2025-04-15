@@ -90,7 +90,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     }
 
     public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        if (!Reflector.RenderLivingEvent_Pre_Constructor.exists() || !Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Pre_Constructor, entity, this, Double.valueOf(x), Double.valueOf(y), Double.valueOf(z))) {
+        if (!Reflector.RenderLivingEvent_Pre_Constructor.exists() || !Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Pre_Constructor, entity, this, x, y, z)) {
             if (animateModelLiving) {
                 entity.limbSwingAmount = 1.0F;
             }
@@ -241,7 +241,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
             }
 
             if (Reflector.RenderLivingEvent_Post_Constructor.exists()) {
-                Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Post_Constructor, entity, this, Double.valueOf(x), Double.valueOf(y), Double.valueOf(z));
+                Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Post_Constructor, entity, this, x, y, z);
             }
         }
     }
@@ -556,7 +556,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     }
 
     public void renderName(T entity, double x, double y, double z) {
-        if (!Reflector.RenderLivingEvent_Specials_Pre_Constructor.exists() || !Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Specials_Pre_Constructor, entity, this, Double.valueOf(x), Double.valueOf(y), Double.valueOf(z))) {
+        if (!Reflector.RenderLivingEvent_Specials_Pre_Constructor.exists() || !Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Specials_Pre_Constructor, entity, this, x, y, z)) {
             if (this.canRenderName(entity)) {
                 RenderNameTagEvent event = new RenderNameTagEvent(entity);
                 Demise.INSTANCE.getEventManager().call(event);
@@ -607,7 +607,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
             }
 
             if (Reflector.RenderLivingEvent_Specials_Post_Constructor.exists()) {
-                Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Specials_Post_Constructor, entity, this, Double.valueOf(x), Double.valueOf(y), Double.valueOf(z));
+                Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Specials_Post_Constructor, entity, this, x, y, z);
             }
         }
     }
@@ -622,22 +622,13 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
             if (team != null) {
                 Team.EnumVisible team$enumvisible = team.getNameTagVisibility();
 
-                switch (team$enumvisible) {
-                    case ALWAYS:
-                        return true;
-
-                    case NEVER:
-                        return false;
-
-                    case HIDE_FOR_OTHER_TEAMS:
-                        return team1 == null || team.isSameTeam(team1);
-
-                    case HIDE_FOR_OWN_TEAM:
-                        return team1 == null || !team.isSameTeam(team1);
-
-                    default:
-                        return true;
-                }
+                return switch (team$enumvisible) {
+                    case ALWAYS -> true;
+                    case NEVER -> false;
+                    case HIDE_FOR_OTHER_TEAMS -> team1 == null || team.isSameTeam(team1);
+                    case HIDE_FOR_OWN_TEAM -> team1 == null || !team.isSameTeam(team1);
+                    default -> true;
+                };
             }
         }
 

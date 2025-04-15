@@ -33,7 +33,6 @@ import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.misc.SpoofSlotUtils;
-import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;

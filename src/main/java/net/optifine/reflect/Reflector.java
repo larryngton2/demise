@@ -380,7 +380,7 @@ public class Reflector {
                 return false;
             } else {
                 Boolean obool = (Boolean) method.invoke(null, params);
-                return obool.booleanValue();
+                return obool;
             }
         } catch (Throwable throwable) {
             handleException(throwable, null, refMethod, params);
@@ -396,7 +396,7 @@ public class Reflector {
                 return 0;
             } else {
                 Integer integer = (Integer) method.invoke(null, params);
-                return integer.intValue();
+                return integer;
             }
         } catch (Throwable throwable) {
             handleException(throwable, null, refMethod, params);
@@ -412,7 +412,7 @@ public class Reflector {
                 return 0.0F;
             } else {
                 Float f = (Float) method.invoke(null, params);
-                return f.floatValue();
+                return f;
             }
         } catch (Throwable throwable) {
             handleException(throwable, null, refMethod, params);
@@ -428,7 +428,7 @@ public class Reflector {
                 return 0.0D;
             } else {
                 Double d0 = (Double) method.invoke(null, params);
-                return d0.doubleValue();
+                return d0;
             }
         } catch (Throwable throwable) {
             handleException(throwable, null, refMethod, params);
@@ -494,7 +494,7 @@ public class Reflector {
                 return false;
             } else {
                 Boolean obool = (Boolean) method.invoke(obj, params);
-                return obool.booleanValue();
+                return obool;
             }
         } catch (Throwable throwable) {
             handleException(throwable, obj, refMethod, params);
@@ -510,7 +510,7 @@ public class Reflector {
                 return 0;
             } else {
                 Integer integer = (Integer) method.invoke(obj, params);
-                return integer.intValue();
+                return integer;
             }
         } catch (Throwable throwable) {
             handleException(throwable, obj, refMethod, params);
@@ -526,7 +526,7 @@ public class Reflector {
                 return 0.0F;
             } else {
                 Float f = (Float) method.invoke(obj, params);
-                return f.floatValue();
+                return f;
             }
         } catch (Throwable throwable) {
             handleException(throwable, obj, refMethod, params);
@@ -542,7 +542,7 @@ public class Reflector {
                 return 0.0D;
             } else {
                 Double d0 = (Double) method.invoke(obj, params);
-                return d0.doubleValue();
+                return d0;
             }
         } catch (Throwable throwable) {
             handleException(throwable, obj, refMethod, params);
@@ -751,7 +751,7 @@ public class Reflector {
                 if (!(object1 instanceof Boolean obool)) {
                     return false;
                 } else {
-                    return obool.booleanValue();
+                    return obool;
                 }
             }
         }
@@ -905,11 +905,7 @@ public class Reflector {
     }
 
     private static boolean registerResolvable(final String str) {
-        IResolvable iresolvable = new IResolvable() {
-            public void resolve() {
-                Reflector.LOGGER.info("[OptiFine] " + str);
-            }
-        };
+        IResolvable iresolvable = () -> Reflector.LOGGER.info("[OptiFine] " + str);
         ReflectorResolver.register(iresolvable);
         return true;
     }

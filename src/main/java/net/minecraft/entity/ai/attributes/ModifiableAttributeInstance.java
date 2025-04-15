@@ -25,7 +25,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
         this.baseValue = genericAttributeIn.getDefaultValue();
 
         for (int i = 0; i < 3; ++i) {
-            this.mapByOperation.put(Integer.valueOf(i), Sets.newHashSet());
+            this.mapByOperation.put(i, Sets.newHashSet());
         }
     }
 
@@ -45,7 +45,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
     }
 
     public Collection<AttributeModifier> getModifiersByOperation(int operation) {
-        return this.mapByOperation.get(Integer.valueOf(operation));
+        return this.mapByOperation.get(operation);
     }
 
     public Collection<AttributeModifier> func_111122_c() {
@@ -70,14 +70,9 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
         if (this.getModifier(modifier.getID()) != null) {
             throw new IllegalArgumentException("Modifier is already applied on this attribute!");
         } else {
-            Set<AttributeModifier> set = this.mapByName.get(modifier.getName());
+            Set<AttributeModifier> set = this.mapByName.computeIfAbsent(modifier.getName(), k -> Sets.newHashSet());
 
-            if (set == null) {
-                set = Sets.newHashSet();
-                this.mapByName.put(modifier.getName(), set);
-            }
-
-            this.mapByOperation.get(Integer.valueOf(modifier.getOperation())).add(modifier);
+            this.mapByOperation.get(modifier.getOperation()).add(modifier);
             set.add(modifier);
             this.mapByUUID.put(modifier.getID(), modifier);
             this.flagForUpdate();
@@ -91,7 +86,7 @@ public class ModifiableAttributeInstance implements IAttributeInstance {
 
     public void removeModifier(AttributeModifier modifier) {
         for (int i = 0; i < 3; ++i) {
-            Set<AttributeModifier> set = this.mapByOperation.get(Integer.valueOf(i));
+            Set<AttributeModifier> set = this.mapByOperation.get(i);
             set.remove(modifier);
         }
 

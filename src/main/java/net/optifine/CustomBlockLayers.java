@@ -52,7 +52,7 @@ public class CustomBlockLayers {
         }
 
         if (!list.isEmpty()) {
-            renderLayers = list.toArray(new EnumWorldBlockLayer[list.size()]);
+            renderLayers = list.toArray(new EnumWorldBlockLayer[0]);
             active = true;
         }
     }
@@ -74,8 +74,7 @@ public class CustomBlockLayers {
             MatchBlock[] amatchblock = connectedparser.parseMatchBlocks(s1);
 
             if (amatchblock != null) {
-                for (int i = 0; i < amatchblock.length; ++i) {
-                    MatchBlock matchblock = amatchblock[i];
+                for (MatchBlock matchblock : amatchblock) {
                     int j = matchblock.getBlockId();
 
                     if (j > 0) {

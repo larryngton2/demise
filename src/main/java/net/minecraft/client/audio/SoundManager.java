@@ -68,33 +68,31 @@ public class SoundManager {
     private synchronized void loadSoundSystem() {
         if (!this.loaded) {
             try {
-                (new Thread(new Runnable() {
-                    public void run() {
-                        SoundSystemConfig.setLogger(new SoundSystemLogger() {
-                            public void message(String p_message_1_, int p_message_2_) {
-                                if (!p_message_1_.isEmpty()) {
-                                    SoundManager.logger.info(p_message_1_);
-                                }
+                (new Thread(() -> {
+                    SoundSystemConfig.setLogger(new SoundSystemLogger() {
+                        public void message(String p_message_1_, int p_message_2_) {
+                            if (!p_message_1_.isEmpty()) {
+                                SoundManager.logger.info(p_message_1_);
                             }
+                        }
 
-                            public void importantMessage(String p_importantMessage_1_, int p_importantMessage_2_) {
-                                if (!p_importantMessage_1_.isEmpty()) {
-                                    SoundManager.logger.warn(p_importantMessage_1_);
-                                }
+                        public void importantMessage(String p_importantMessage_1_, int p_importantMessage_2_) {
+                            if (!p_importantMessage_1_.isEmpty()) {
+                                SoundManager.logger.warn(p_importantMessage_1_);
                             }
+                        }
 
-                            public void errorMessage(String p_errorMessage_1_, String p_errorMessage_2_, int p_errorMessage_3_) {
-                                if (!p_errorMessage_2_.isEmpty()) {
-                                    SoundManager.logger.error("Error in class '" + p_errorMessage_1_ + "'");
-                                    SoundManager.logger.error(p_errorMessage_2_);
-                                }
+                        public void errorMessage(String p_errorMessage_1_, String p_errorMessage_2_, int p_errorMessage_3_) {
+                            if (!p_errorMessage_2_.isEmpty()) {
+                                SoundManager.logger.error("Error in class '" + p_errorMessage_1_ + "'");
+                                SoundManager.logger.error(p_errorMessage_2_);
                             }
-                        });
-                        SoundManager.this.sndSystem = SoundManager.this.new SoundSystemStarterThread();
-                        SoundManager.this.loaded = true;
-                        SoundManager.this.sndSystem.setMasterVolume(SoundManager.this.options.getSoundLevel(SoundCategory.MASTER));
-                        SoundManager.logger.info(SoundManager.LOG_MARKER, "Sound engine started");
-                    }
+                        }
+                    });
+                    SoundManager.this.sndSystem = SoundManager.this.new SoundSystemStarterThread();
+                    SoundManager.this.loaded = true;
+                    SoundManager.this.sndSystem.setMasterVolume(SoundManager.this.options.getSoundLevel(SoundCategory.MASTER));
+                    SoundManager.logger.info(SoundManager.LOG_MARKER, "Sound engine started");
                 }, "Sound Library Loader")).start();
             } catch (RuntimeException runtimeexception) {
                 logger.error(LOG_MARKER, "Error starting SoundSystem. Turning off sounds & music", runtimeexception);
@@ -174,13 +172,13 @@ public class SoundManager {
             ISound isound = entry.getValue();
 
             if (!this.sndSystem.playing(s1)) {
-                int i = this.playingSoundsStopTime.get(s1).intValue();
+                int i = this.playingSoundsStopTime.get(s1);
 
                 if (i <= this.playTime) {
                     int j = isound.getRepeatDelay();
 
                     if (isound.canRepeat() && j > 0) {
-                        this.delayedSounds.put(isound, Integer.valueOf(this.playTime + j));
+                        this.delayedSounds.put(isound, this.playTime + j);
                     }
 
                     iterator.remove();
@@ -206,7 +204,7 @@ public class SoundManager {
         while (iterator1.hasNext()) {
             Entry<ISound, Integer> entry1 = iterator1.next();
 
-            if (this.playTime >= entry1.getValue().intValue()) {
+            if (this.playTime >= entry1.getValue()) {
                 ISound isound1 = entry1.getKey();
 
                 if (isound1 instanceof ITickableSound) {
@@ -224,7 +222,7 @@ public class SoundManager {
             return false;
         } else {
             String s = this.invPlayingSounds.get(sound);
-            return s != null && (this.sndSystem.playing(s) || this.playingSoundsStopTime.containsKey(s) && this.playingSoundsStopTime.get(s).intValue() <= this.playTime);
+            return s != null && (this.sndSystem.playing(s) || this.playingSoundsStopTime.containsKey(s) && this.playingSoundsStopTime.get(s) <= this.playTime);
         }
     }
 
@@ -281,7 +279,7 @@ public class SoundManager {
                             this.sndSystem.setPitch(s, (float) d0);
                             this.sndSystem.setVolume(s, f2);
                             this.sndSystem.play(s);
-                            this.playingSoundsStopTime.put(s, Integer.valueOf(this.playTime + 20));
+                            this.playingSoundsStopTime.put(s, this.playTime + 20);
                             this.playingSounds.put(s, p_sound);
                             this.playingSoundPoolEntries.put(p_sound, soundpoolentry);
 
@@ -322,7 +320,7 @@ public class SoundManager {
     }
 
     public void playDelayedSound(ISound sound, int delay) {
-        this.delayedSounds.put(sound, Integer.valueOf(this.playTime + delay));
+        this.delayedSounds.put(sound, this.playTime + delay);
     }
 
     private static URL getURLForSoundResource(final ResourceLocation p_148612_0_) {

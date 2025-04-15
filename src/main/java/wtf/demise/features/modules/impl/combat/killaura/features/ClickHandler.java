@@ -11,7 +11,6 @@ import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 

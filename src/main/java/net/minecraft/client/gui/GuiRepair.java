@@ -32,8 +32,8 @@ public class GuiRepair extends GuiContainer implements ICrafting {
     public void initGui() {
         super.initGui();
         Keyboard.enableRepeatEvents(true);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
         this.nameField = new GuiTextField(0, this.fontRendererObj, i + 62, j + 24, 103, 12);
         this.nameField.setTextColor(-1);
         this.nameField.setDisabledTextColour(-1);
@@ -57,9 +57,9 @@ public class GuiRepair extends GuiContainer implements ICrafting {
         if (this.anvil.maximumCost > 0) {
             int i = 8453920;
             boolean flag = true;
-            String s = I18n.format("container.repair.cost", Integer.valueOf(this.anvil.maximumCost));
+            String s = I18n.format("container.repair.cost", this.anvil.maximumCost);
 
-            if (this.anvil.maximumCost >= 40 && !this.mc.thePlayer.capabilities.isCreativeMode) {
+            if (this.anvil.maximumCost >= 40 && !mc.thePlayer.capabilities.isCreativeMode) {
                 s = I18n.format("container.repair.expensive");
                 i = 16736352;
             } else if (!this.anvil.getSlot(2).getHasStack()) {
@@ -106,7 +106,7 @@ public class GuiRepair extends GuiContainer implements ICrafting {
         }
 
         this.anvil.updateItemName(s);
-        this.mc.thePlayer.sendQueue.addToSendQueue(new C17PacketCustomPayload("MC|ItemName", (new PacketBuffer(Unpooled.buffer())).writeString(s)));
+        mc.thePlayer.sendQueue.addToSendQueue(new C17PacketCustomPayload("MC|ItemName", (new PacketBuffer(Unpooled.buffer())).writeString(s)));
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
@@ -123,14 +123,14 @@ public class GuiRepair extends GuiContainer implements ICrafting {
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(anvilResource);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-        this.drawTexturedModalRect(i + 59, j + 20, 0, this.ySize + (this.anvil.getSlot(0).getHasStack() ? 0 : 16), 110, 16);
+        mc.getTextureManager().bindTexture(anvilResource);
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
+        drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        drawTexturedModalRect(i + 59, j + 20, 0, this.ySize + (this.anvil.getSlot(0).getHasStack() ? 0 : 16), 110, 16);
 
         if ((this.anvil.getSlot(0).getHasStack() || this.anvil.getSlot(1).getHasStack()) && !this.anvil.getSlot(2).getHasStack()) {
-            this.drawTexturedModalRect(i + 99, j + 45, this.xSize, 0, 28, 21);
+            drawTexturedModalRect(i + 99, j + 45, this.xSize, 0, 28, 21);
         }
     }
 

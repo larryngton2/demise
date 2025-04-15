@@ -15,13 +15,11 @@ public class FieldLocatorTypes implements IFieldLocator {
         Field[] afield = cls.getDeclaredFields();
         List<Class> list = new ArrayList();
 
-        for (int i = 0; i < afield.length; ++i) {
-            Field field = afield[i];
+        for (Field field : afield) {
             list.add(field.getType());
         }
 
-        List<Class> list1 = new ArrayList();
-        list1.addAll(Arrays.asList(preTypes));
+        List<Class> list1 = new ArrayList(Arrays.asList(preTypes));
         list1.add(type);
         list1.addAll(Arrays.asList(postTypes));
         int l = Collections.indexOfSubList(list, list1);

@@ -17,7 +17,7 @@ public class TokenParser {
             int i = pushbackreader.read();
 
             if (i < 0) {
-                Token[] atoken = list.toArray(new Token[list.size()]);
+                Token[] atoken = list.toArray(new Token[0]);
                 return atoken;
             }
 
@@ -37,7 +37,7 @@ public class TokenParser {
     }
 
     private static Token readToken(char chFirst, TokenType type, PushbackReader pr) throws IOException {
-        StringBuffer stringbuffer = new StringBuffer();
+        StringBuilder stringbuffer = new StringBuilder();
         stringbuffer.append(chFirst);
 
         while (true) {

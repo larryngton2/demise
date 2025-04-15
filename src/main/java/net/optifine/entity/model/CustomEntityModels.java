@@ -40,8 +40,7 @@ public class CustomEntityModels {
             if (Config.isCustomEntityModels()) {
                 ResourceLocation[] aresourcelocation = getModelLocations();
 
-                for (int i = 0; i < aresourcelocation.length; ++i) {
-                    ResourceLocation resourcelocation = aresourcelocation[i];
+                for (ResourceLocation resourcelocation : aresourcelocation) {
                     Config.dbg("CustomEntityModel: " + resourcelocation.getResourcePath());
                     IEntityRenderer ientityrenderer = parseEntityRender(resourcelocation);
 
@@ -96,8 +95,7 @@ public class CustomEntityModels {
         List<ResourceLocation> list = new ArrayList();
         String[] astring = CustomModelRegistry.getModelNames();
 
-        for (int i = 0; i < astring.length; ++i) {
-            String s2 = astring[i];
+        for (String s2 : astring) {
             String s3 = s + s2 + s1;
             ResourceLocation resourcelocation = new ResourceLocation(s3);
 
@@ -106,7 +104,7 @@ public class CustomEntityModels {
             }
         }
 
-        ResourceLocation[] aresourcelocation = list.toArray(new ResourceLocation[list.size()]);
+        ResourceLocation[] aresourcelocation = list.toArray(new ResourceLocation[0]);
         return aresourcelocation;
     }
 
@@ -115,11 +113,8 @@ public class CustomEntityModels {
             JsonObject jsonobject = CustomEntityModelParser.loadJson(location);
             IEntityRenderer ientityrenderer = parseEntityRender(jsonobject, location.getResourcePath());
             return ientityrenderer;
-        } catch (IOException ioexception) {
+        } catch (IOException | JsonParseException ioexception) {
             Config.error(ioexception.getClass().getName() + ": " + ioexception.getMessage());
-            return null;
-        } catch (JsonParseException jsonparseexception) {
-            Config.error(jsonparseexception.getClass().getName() + ": " + jsonparseexception.getMessage());
             return null;
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -179,9 +174,7 @@ public class CustomEntityModels {
     }
 
     private static boolean modifyModel(ModelAdapter modelAdapter, ModelBase model, CustomModelRenderer[] modelRenderers, ModelResolver mr) {
-        for (int i = 0; i < modelRenderers.length; ++i) {
-            CustomModelRenderer custommodelrenderer = modelRenderers[i];
-
+        for (CustomModelRenderer custommodelrenderer : modelRenderers) {
             if (!modifyModel(modelAdapter, model, custommodelrenderer, mr)) {
                 return false;
             }

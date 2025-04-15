@@ -10,6 +10,7 @@ import net.minecraft.world.gen.ChunkProviderSettings;
 import net.minecraft.world.gen.GeneratorBushFeature;
 import net.minecraft.world.gen.feature.*;
 
+import java.util.Objects;
 import java.util.Random;
 
 public class BiomeDecorator {
@@ -59,11 +60,7 @@ public class BiomeDecorator {
             this.currentWorld = worldIn;
             String s = worldIn.getWorldInfo().getGeneratorOptions();
 
-            if (s != null) {
-                this.chunkProviderSettings = ChunkProviderSettings.Factory.jsonToFactory(s).func_177864_b();
-            } else {
-                this.chunkProviderSettings = ChunkProviderSettings.Factory.jsonToFactory("").func_177864_b();
-            }
+            this.chunkProviderSettings = ChunkProviderSettings.Factory.jsonToFactory(Objects.requireNonNullElse(s, "")).func_177864_b();
 
             this.randomGenerator = random;
             this.field_180294_c = p_180292_4_;

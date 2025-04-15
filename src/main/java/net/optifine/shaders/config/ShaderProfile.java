@@ -26,8 +26,7 @@ public class ShaderProfile {
     }
 
     public void applyOptionValues(ShaderOption[] options) {
-        for (int i = 0; i < options.length; ++i) {
-            ShaderOption shaderoption = options[i];
+        for (ShaderOption shaderoption : options) {
             String s = shaderoption.getName();
             String s1 = this.mapOptionValues.get(s);
 
@@ -39,7 +38,7 @@ public class ShaderProfile {
 
     public String[] getOptions() {
         Set<String> set = this.mapOptionValues.keySet();
-        String[] astring = set.toArray(new String[set.size()]);
+        String[] astring = set.toArray(new String[0]);
         return astring;
     }
 

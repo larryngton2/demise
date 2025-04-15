@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySkullRenderer;
 import net.minecraft.entity.EntityLivingBase;
@@ -60,7 +61,7 @@ public class LayerCustomHead implements LayerRenderer<EntityLivingBase> {
                     GlStateManager.translate(0.0F, 0.1875F, 0.0F);
                 }
 
-                minecraft.getItemRenderer().renderItem(entitylivingbaseIn, itemstack, ItemCameraTransforms.TransformType.HEAD);
+                ItemRenderer.renderItem(entitylivingbaseIn, itemstack, ItemCameraTransforms.TransformType.HEAD);
             } else if (item == Items.skull) {
                 float f3 = 1.1875F;
                 GlStateManager.scale(f3, -f3, -f3);

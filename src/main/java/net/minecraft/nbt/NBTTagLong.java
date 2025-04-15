@@ -45,7 +45,7 @@ public class NBTTagLong extends NBTBase.NBTPrimitive {
     }
 
     public int hashCode() {
-        return super.hashCode() ^ (int) (this.data ^ this.data >>> 32);
+        return super.hashCode() ^ Long.hashCode(this.data);
     }
 
     public long getLong() {
@@ -53,7 +53,7 @@ public class NBTTagLong extends NBTBase.NBTPrimitive {
     }
 
     public int getInt() {
-        return (int) (this.data & -1L);
+        return (int) (this.data);
     }
 
     public short getShort() {

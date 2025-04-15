@@ -22,15 +22,15 @@ public class ScreenChatOptions extends GuiScreen {
 
         for (GameSettings.Options gamesettings$options : field_146399_a) {
             if (gamesettings$options.getEnumFloat()) {
-                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), gamesettings$options));
+                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), width / 2 - 155 + i % 2 * 160, height / 6 + 24 * (i >> 1), gamesettings$options));
             } else {
-                this.buttonList.add(new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), gamesettings$options, this.game_settings.getKeyBinding(gamesettings$options)));
+                this.buttonList.add(new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), width / 2 - 155 + i % 2 * 160, height / 6 + 24 * (i >> 1), gamesettings$options, this.game_settings.getKeyBinding(gamesettings$options)));
             }
 
             ++i;
         }
 
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 120, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(200, width / 2 - 100, height / 6 + 120, I18n.format("gui.done")));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException {
@@ -41,15 +41,15 @@ public class ScreenChatOptions extends GuiScreen {
             }
 
             if (button.id == 200) {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(this.parentScreen);
+                mc.gameSettings.saveOptions();
+                mc.displayGuiScreen(this.parentScreen);
             }
         }
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.field_146401_i, this.width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_146401_i, width / 2, 20, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

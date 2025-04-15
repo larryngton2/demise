@@ -26,9 +26,6 @@ public class FieldLocatorName implements IFieldLocator {
             } catch (NoSuchFieldException var3) {
                 Log.log("(Reflector) Field not present: " + oclass.getName() + "." + this.targetFieldName);
                 return null;
-            } catch (SecurityException securityexception) {
-                securityexception.printStackTrace();
-                return null;
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
                 return null;
@@ -39,9 +36,7 @@ public class FieldLocatorName implements IFieldLocator {
     private Field getDeclaredField(Class cls, String name) throws NoSuchFieldException {
         Field[] afield = cls.getDeclaredFields();
 
-        for (int i = 0; i < afield.length; ++i) {
-            Field field = afield[i];
-
+        for (Field field : afield) {
             if (field.getName().equals(name)) {
                 return field;
             }

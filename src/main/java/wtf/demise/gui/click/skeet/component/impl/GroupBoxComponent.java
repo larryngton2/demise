@@ -39,8 +39,7 @@ public final class GroupBoxComponent extends Component {
         float childYRight = 6.0f;
         boolean left = true;
         for (final Component component : this.children) {
-            if (component instanceof PredicateComponent) {
-                final PredicateComponent predicateComponent = (PredicateComponent) component;
+            if (component instanceof PredicateComponent predicateComponent) {
                 if (!predicateComponent.isVisible()) {
                     continue;
                 }
@@ -72,8 +71,7 @@ public final class GroupBoxComponent extends Component {
     @Override
     public void onMouseClick(final int mouseX, final int mouseY, final int button) {
         for (final Component child : this.children) {
-            if (child instanceof ComboBoxTextComponent) {
-                final ComboBoxTextComponent comboBoxTextComponent = (ComboBoxTextComponent) child;
+            if (child instanceof ComboBoxTextComponent comboBoxTextComponent) {
                 final ComboBoxComponent comboBox = comboBoxTextComponent.getComboBoxComponent();
                 if (!comboBox.isExpanded()) {
                     continue;
@@ -91,8 +89,7 @@ public final class GroupBoxComponent extends Component {
 
     public boolean isHoveredEntire(int mouseX, int mouseY) {
         for (Component child : getChildren()) {
-            if (child instanceof ExpandableComponent) {
-                ExpandableComponent expandable = (ExpandableComponent) child;
+            if (child instanceof ExpandableComponent expandable) {
 
                 if (expandable.isExpanded()) {
                     final float x = expandable.getExpandedX();
@@ -114,8 +111,7 @@ public final class GroupBoxComponent extends Component {
         final float initHeight = heightRight = (heightLeft = super.getHeight());
         boolean left = true;
         for (final Component component : this.getChildren()) {
-            if (component instanceof PredicateComponent) {
-                final PredicateComponent predicateComponent = (PredicateComponent) component;
+            if (component instanceof PredicateComponent predicateComponent) {
                 if (!predicateComponent.isVisible()) {
                     continue;
                 }

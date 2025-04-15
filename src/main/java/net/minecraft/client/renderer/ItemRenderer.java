@@ -540,7 +540,7 @@ public class ItemRenderer {
             EntityPlayer entityplayer = mc.thePlayer;
 
             for (int i = 0; i < 8; ++i) {
-                double d0 = entityplayer.posX + (double) (((float) ((i >> 0) % 2) - 0.5F) * entityplayer.width * 0.8F);
+                double d0 = entityplayer.posX + (double) (((float) ((i) % 2) - 0.5F) * entityplayer.width * 0.8F);
                 double d1 = entityplayer.posY + (double) (((float) ((i >> 1) % 2) - 0.5F) * 0.1F);
                 double d2 = entityplayer.posZ + (double) (((float) ((i >> 2) % 2) - 0.5F) * entityplayer.width * 0.8F);
                 BlockPos blockpos1 = new BlockPos(d0, d1 + (double) entityplayer.getEyeHeight(), d2);
@@ -555,18 +555,18 @@ public class ItemRenderer {
             if (iblockstate.getBlock().getRenderType() != -1) {
                 Object object = Reflector.getFieldValue(Reflector.RenderBlockOverlayEvent_OverlayType_BLOCK);
 
-                if (!Reflector.callBoolean(Reflector.ForgeEventFactory_renderBlockOverlay, mc.thePlayer, Float.valueOf(partialTicks), object, iblockstate, blockpos)) {
+                if (!Reflector.callBoolean(Reflector.ForgeEventFactory_renderBlockOverlay, mc.thePlayer, partialTicks, object, iblockstate, blockpos)) {
                     renderBlockInHand(partialTicks, mc.getBlockRendererDispatcher().getBlockModelShapes().getTexture(iblockstate));
                 }
             }
         }
 
         if (!mc.thePlayer.isSpectator()) {
-            if (mc.thePlayer.isInsideOfMaterial(Material.water) && !Reflector.callBoolean(Reflector.ForgeEventFactory_renderWaterOverlay, mc.thePlayer, Float.valueOf(partialTicks))) {
+            if (mc.thePlayer.isInsideOfMaterial(Material.water) && !Reflector.callBoolean(Reflector.ForgeEventFactory_renderWaterOverlay, mc.thePlayer, partialTicks)) {
                 renderWaterOverlayTexture(partialTicks);
             }
 
-            if (mc.thePlayer.isBurning() && !Reflector.callBoolean(Reflector.ForgeEventFactory_renderFireOverlay, mc.thePlayer, Float.valueOf(partialTicks))) {
+            if (mc.thePlayer.isBurning() && !Reflector.callBoolean(Reflector.ForgeEventFactory_renderFireOverlay, mc.thePlayer, partialTicks)) {
                 renderFireInFirstPerson(partialTicks);
             }
         }
@@ -682,7 +682,7 @@ public class ItemRenderer {
         if (itemToRender != null && itemstack != null) {
             if (!itemToRender.getIsItemStackEqual(itemstack)) {
                 if (Reflector.ForgeItem_shouldCauseReequipAnimation.exists()) {
-                    boolean flag1 = Reflector.callBoolean(itemToRender.getItem(), Reflector.ForgeItem_shouldCauseReequipAnimation, itemToRender, itemstack, Boolean.valueOf(equippedItemSlot != SpoofSlotUtils.getSpoofedSlot()));
+                    boolean flag1 = Reflector.callBoolean(itemToRender.getItem(), Reflector.ForgeItem_shouldCauseReequipAnimation, itemToRender, itemstack, equippedItemSlot != SpoofSlotUtils.getSpoofedSlot());
 
                     if (!flag1) {
                         itemToRender = itemstack;

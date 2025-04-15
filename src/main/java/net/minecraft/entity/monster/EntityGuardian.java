@@ -77,8 +77,8 @@ public class EntityGuardian extends EntityMob {
 
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(16, Integer.valueOf(0));
-        this.dataWatcher.addObject(17, Integer.valueOf(0));
+        this.dataWatcher.addObject(16, 0);
+        this.dataWatcher.addObject(17, 0);
     }
 
     private boolean isSyncedFlagSet(int flagId) {
@@ -89,9 +89,9 @@ public class EntityGuardian extends EntityMob {
         int i = this.dataWatcher.getWatchableObjectInt(16);
 
         if (state) {
-            this.dataWatcher.updateObject(16, Integer.valueOf(i | flagId));
+            this.dataWatcher.updateObject(16, i | flagId);
         } else {
-            this.dataWatcher.updateObject(16, Integer.valueOf(i & ~flagId));
+            this.dataWatcher.updateObject(16, i & ~flagId);
         }
     }
 
@@ -130,7 +130,7 @@ public class EntityGuardian extends EntityMob {
     }
 
     private void setTargetedEntity(int entityId) {
-        this.dataWatcher.updateObject(17, Integer.valueOf(entityId));
+        this.dataWatcher.updateObject(17, entityId);
     }
 
     public boolean hasTargetedEntity() {
@@ -310,11 +310,7 @@ public class EntityGuardian extends EntityMob {
             if ((this.ticksExisted + this.getEntityId()) % 1200 == 0) {
                 Potion potion = Potion.digSlowdown;
 
-                for (EntityPlayerMP entityplayermp : this.worldObj.getPlayers(EntityPlayerMP.class, new Predicate<EntityPlayerMP>() {
-                    public boolean apply(EntityPlayerMP p_apply_1_) {
-                        return EntityGuardian.this.getDistanceSqToEntity(p_apply_1_) < 2500.0D && p_apply_1_.theItemInWorldManager.survivalOrAdventure();
-                    }
-                })) {
+                for (EntityPlayerMP entityplayermp : this.worldObj.getPlayers(EntityPlayerMP.class, p_apply_1_ -> EntityGuardian.this.getDistanceSqToEntity(p_apply_1_) < 2500.0D && p_apply_1_.theItemInWorldManager.survivalOrAdventure())) {
                     if (!entityplayermp.isPotionActive(potion) || entityplayermp.getActivePotionEffect(potion).getAmplifier() < 2 || entityplayermp.getActivePotionEffect(potion).getDuration() < 1200) {
                         entityplayermp.playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(10, 0.0F));
                         entityplayermp.addPotionEffect(new PotionEffect(potion.id, 6000, 2));

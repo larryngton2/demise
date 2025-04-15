@@ -32,7 +32,7 @@ public class BlockDispenser extends BlockContainer {
 
     protected BlockDispenser() {
         super(Material.rock);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(TRIGGERED, Boolean.valueOf(false)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(TRIGGERED, Boolean.FALSE));
         this.setCreativeTab(CreativeTabs.tabRedstone);
     }
 
@@ -66,7 +66,7 @@ public class BlockDispenser extends BlockContainer {
                 }
             }
 
-            worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing).withProperty(TRIGGERED, Boolean.valueOf(false)), 2);
+            worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing).withProperty(TRIGGERED, Boolean.FALSE), 2);
         }
     }
 
@@ -117,13 +117,13 @@ public class BlockDispenser extends BlockContainer {
 
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
         boolean flag = worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up());
-        boolean flag1 = state.getValue(TRIGGERED).booleanValue();
+        boolean flag1 = state.getValue(TRIGGERED);
 
         if (flag && !flag1) {
             worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
-            worldIn.setBlockState(pos, state.withProperty(TRIGGERED, Boolean.valueOf(true)), 4);
+            worldIn.setBlockState(pos, state.withProperty(TRIGGERED, Boolean.TRUE), 4);
         } else if (!flag && flag1) {
-            worldIn.setBlockState(pos, state.withProperty(TRIGGERED, Boolean.valueOf(false)), 4);
+            worldIn.setBlockState(pos, state.withProperty(TRIGGERED, Boolean.FALSE), 4);
         }
     }
 
@@ -138,7 +138,7 @@ public class BlockDispenser extends BlockContainer {
     }
 
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        return this.getDefaultState().withProperty(FACING, BlockPistonBase.getFacingFromEntity(worldIn, pos, placer)).withProperty(TRIGGERED, Boolean.valueOf(false));
+        return this.getDefaultState().withProperty(FACING, BlockPistonBase.getFacingFromEntity(worldIn, pos, placer)).withProperty(TRIGGERED, Boolean.FALSE);
     }
 
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
@@ -193,14 +193,14 @@ public class BlockDispenser extends BlockContainer {
     }
 
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(FACING, getFacing(meta)).withProperty(TRIGGERED, Boolean.valueOf((meta & 8) > 0));
+        return this.getDefaultState().withProperty(FACING, getFacing(meta)).withProperty(TRIGGERED, (meta & 8) > 0);
     }
 
     public int getMetaFromState(IBlockState state) {
         int i = 0;
         i = i | state.getValue(FACING).getIndex();
 
-        if (state.getValue(TRIGGERED).booleanValue()) {
+        if (state.getValue(TRIGGERED)) {
             i |= 8;
         }
 

@@ -14,14 +14,12 @@ import wtf.demise.gui.altmanager.mslogin.MicrosoftAuthCallback;
 import wtf.demise.gui.altmanager.repository.credential.AltCredential;
 import wtf.demise.gui.altmanager.repository.credential.MicrosoftAltCredential;
 import wtf.demise.gui.altmanager.utils.Checks;
-import wtf.demise.gui.button.GuiCustomButton;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.render.shader.impl.MainMenu;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -54,7 +52,7 @@ public final class GuiAddAlt extends GuiScreen {
 
     @Override
     public void initGui() {
-        int height = this.height / 2 - 30;
+        int height = GuiScreen.height / 2 - 30;
 
         this.groupAltInfo = new GuiGroupAltLogin(this, title);
 
@@ -86,17 +84,17 @@ public final class GuiAddAlt extends GuiScreen {
 
         if (this.title != null) {
             Fonts.interSemiBold.get(22).drawString(this.title,
-                    (int) ((gui.width - this.width) / 2F) + (this.width - Fonts.interSemiBold.get(22).getStringWidth(this.title)) / 2.0F,
+                    (int) ((width - width) / 2F) + (width - Fonts.interSemiBold.get(22).getStringWidth(this.title)) / 2.0F,
                     15 + 5,
                     -1);
         }
 
         if (StringUtils.isBlank(usernameField.getText()) && !usernameField.isFocused()) {
-            mc.fontRendererObj.drawStringWithShadow("Username / E-Mail", width / 2F - 96, this.height / 2 - 89, 0xFF888888);
+            mc.fontRendererObj.drawStringWithShadow("Username / E-Mail", width / 2F - 96, height / 2 - 89, 0xFF888888);
         }
 
         if (StringUtils.isBlank(passwordField.getText()) && !passwordField.isFocused()) {
-            mc.fontRendererObj.drawStringWithShadow("Password", width / 2F - 96, this.height / 2 - 54, 0xFF888888);
+            mc.fontRendererObj.drawStringWithShadow("Password", width / 2F - 96, height / 2 - 54, 0xFF888888);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -150,10 +148,7 @@ public final class GuiAddAlt extends GuiScreen {
             case 4:
                 final MicrosoftAuthCallback callback = new MicrosoftAuthCallback();
 
-                CompletableFuture<MicrosoftAltCredential> future = callback.start((s, o) -> {
-
-                    groupAltInfo.updateStatus(String.format(s, o[0]));
-                });
+                CompletableFuture<MicrosoftAltCredential> future = callback.start((s, o) -> groupAltInfo.updateStatus(String.format(s, o[0])));
 
                 Sys.openURL(MicrosoftAuthCallback.url);
 

@@ -16,7 +16,6 @@ import wtf.demise.events.impl.misc.BlockAABBEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
-import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.Module;

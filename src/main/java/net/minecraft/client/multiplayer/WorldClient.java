@@ -251,8 +251,7 @@ public class WorldClient extends World {
     public void removeAllEntities() {
         this.loadedEntityList.removeAll(this.unloadedEntityList);
 
-        for (int i = 0; i < this.unloadedEntityList.size(); ++i) {
-            Entity entity = this.unloadedEntityList.get(i);
+        for (Entity entity : this.unloadedEntityList) {
             int j = entity.chunkCoordX;
             int k = entity.chunkCoordZ;
 
@@ -261,8 +260,8 @@ public class WorldClient extends World {
             }
         }
 
-        for (int l = 0; l < this.unloadedEntityList.size(); ++l) {
-            this.onEntityRemoved(this.unloadedEntityList.get(l));
+        for (Entity entity : this.unloadedEntityList) {
+            this.onEntityRemoved(entity);
         }
 
         this.unloadedEntityList.clear();
@@ -295,26 +294,10 @@ public class WorldClient extends World {
 
     public CrashReportCategory addWorldInfoToCrashReport(CrashReport report) {
         CrashReportCategory crashreportcategory = super.addWorldInfoToCrashReport(report);
-        crashreportcategory.addCrashSectionCallable("Forced entities", new Callable<String>() {
-            public String call() {
-                return WorldClient.this.entityList.size() + " total; " + WorldClient.this.entityList;
-            }
-        });
-        crashreportcategory.addCrashSectionCallable("Retry entities", new Callable<String>() {
-            public String call() {
-                return WorldClient.this.entitySpawnQueue.size() + " total; " + WorldClient.this.entitySpawnQueue;
-            }
-        });
-        crashreportcategory.addCrashSectionCallable("Server brand", new Callable<String>() {
-            public String call() throws Exception {
-                return WorldClient.this.mc.thePlayer.getClientBrand();
-            }
-        });
-        crashreportcategory.addCrashSectionCallable("Server type", new Callable<String>() {
-            public String call() throws Exception {
-                return WorldClient.this.mc.getIntegratedServer() == null ? "Non-integrated multiplayer server" : "Integrated singleplayer server";
-            }
-        });
+        crashreportcategory.addCrashSectionCallable("Forced entities", () -> WorldClient.this.entityList.size() + " total; " + WorldClient.this.entityList);
+        crashreportcategory.addCrashSectionCallable("Retry entities", () -> WorldClient.this.entitySpawnQueue.size() + " total; " + WorldClient.this.entitySpawnQueue);
+        crashreportcategory.addCrashSectionCallable("Server brand", () -> WorldClient.this.mc.thePlayer.getClientBrand());
+        crashreportcategory.addCrashSectionCallable("Server type", () -> WorldClient.this.mc.getIntegratedServer() == null ? "Non-integrated multiplayer server" : "Integrated singleplayer server");
         return crashreportcategory;
     }
 

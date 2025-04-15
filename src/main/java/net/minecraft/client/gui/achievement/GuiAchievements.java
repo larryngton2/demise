@@ -2,10 +2,7 @@ package net.minecraft.client.gui.achievement;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiOptionButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.IProgressMeter;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -56,23 +53,23 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
     }
 
     public void initGui() {
-        this.mc.getNetHandler().addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
+        mc.getNetHandler().addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS));
         this.buttonList.clear();
-        this.buttonList.add(new GuiOptionButton(1, this.width / 2 + 24, this.height / 2 + 74, 80, 20, I18n.format("gui.done")));
+        this.buttonList.add(new GuiOptionButton(1, width / 2 + 24, height / 2 + 74, 80, 20, I18n.format("gui.done")));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException {
         if (!this.loadingAchievements) {
             if (button.id == 1) {
-                this.mc.displayGuiScreen(this.parentScreen);
+                mc.displayGuiScreen(this.parentScreen);
             }
         }
     }
 
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
-            this.mc.displayGuiScreen(null);
-            this.mc.setIngameFocus();
+        if (keyCode == mc.gameSettings.keyBindInventory.getKeyCode()) {
+            mc.displayGuiScreen(null);
+            mc.setIngameFocus();
         } else {
             super.keyTyped(typedChar, keyCode);
         }
@@ -81,12 +78,12 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         if (this.loadingAchievements) {
             this.drawDefaultBackground();
-            this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats"), this.width / 2, this.height / 2, 16777215);
-            this.drawCenteredString(this.fontRendererObj, lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)], this.width / 2, this.height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+            drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats"), width / 2, height / 2, 16777215);
+            drawCenteredString(this.fontRendererObj, lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)], width / 2, height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
         } else {
             if (Mouse.isButtonDown(0)) {
-                int i = (this.width - this.field_146555_f) / 2;
-                int j = (this.height - this.field_146557_g) / 2;
+                int i = (width - this.field_146555_f) / 2;
+                int j = (height - this.field_146557_g) / 2;
                 int k = i + 8;
                 int l = j + 17;
 
@@ -180,8 +177,8 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
     }
 
     protected void drawTitle() {
-        int i = (this.width - this.field_146555_f) / 2;
-        int j = (this.height - this.field_146557_g) / 2;
+        int i = (width - this.field_146555_f) / 2;
+        int j = (height - this.field_146557_g) / 2;
         this.fontRendererObj.drawString(I18n.format("gui.achievements"), i + 15, j + 5, 4210752);
     }
 
@@ -205,11 +202,11 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
             j = field_146560_B - 1;
         }
 
-        int k = (this.width - this.field_146555_f) / 2;
-        int l = (this.height - this.field_146557_g) / 2;
+        int k = (width - this.field_146555_f) / 2;
+        int l = (height - this.field_146557_g) / 2;
         int i1 = k + 16;
         int j1 = l + 17;
-        this.zLevel = 0.0F;
+        zLevel = 0.0F;
         GlStateManager.depthFunc(518);
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) i1, (float) j1, -200.0F);
@@ -236,7 +233,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
             GlStateManager.color(f2, f2, f2, 1.0F);
 
             for (int i4 = 0; (float) i4 * f1 - (float) i2 < 224.0F; ++i4) {
-                random.setSeed(this.mc.getSession().getPlayerID().hashCode() + k1 + i4 + (l1 + l3) * 16L);
+                random.setSeed(mc.getSession().getPlayerID().hashCode() + k1 + i4 + (l1 + l3) * 16L);
                 int j4 = random.nextInt(1 + l1 + l3) + (l1 + l3) / 2;
                 TextureAtlasSprite textureatlassprite = this.func_175371_a(Blocks.sand);
 
@@ -261,14 +258,14 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
                     textureatlassprite = this.func_175371_a(block);
                 }
 
-                this.mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+                mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
                 this.drawTexturedModalRect(i4 * 16 - i2, l3 * 16 - j2, textureatlassprite, 16, 16);
             }
         }
 
         GlStateManager.enableDepth();
         GlStateManager.depthFunc(515);
-        this.mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
+        mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
 
         for (int j5 = 0; j5 < AchievementList.achievementList.size(); ++j5) {
             Achievement achievement1 = AchievementList.achievementList.get(j5);
@@ -295,13 +292,13 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
                     this.drawVerticalLine(j6, l5, k6, l4);
 
                     if (k5 > j6) {
-                        this.drawTexturedModalRect(k5 - 11 - 7, l5 - 5, 114, 234, 7, 11);
+                        drawTexturedModalRect(k5 - 11 - 7, l5 - 5, 114, 234, 7, 11);
                     } else if (k5 < j6) {
-                        this.drawTexturedModalRect(k5 + 11, l5 - 5, 107, 234, 7, 11);
+                        drawTexturedModalRect(k5 + 11, l5 - 5, 107, 234, 7, 11);
                     } else if (l5 > k6) {
-                        this.drawTexturedModalRect(k5 - 5, l5 - 11 - 7, 96, 234, 11, 7);
+                        drawTexturedModalRect(k5 - 5, l5 - 11 - 7, 96, 234, 11, 7);
                     } else if (l5 < k6) {
-                        this.drawTexturedModalRect(k5 - 5, l5 + 11, 96, 241, 11, 7);
+                        drawTexturedModalRect(k5 - 5, l5 + 11, 96, 241, 11, 7);
                     }
                 }
             }
@@ -344,12 +341,12 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
                     GlStateManager.color(f9, f9, f9, 1.0F);
                 }
 
-                this.mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
+                mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
 
                 if (achievement2.getSpecial()) {
-                    this.drawTexturedModalRect(l6 - 2, j7 - 2, 26, 202, 26, 26);
+                    drawTexturedModalRect(l6 - 2, j7 - 2, 26, 202, 26, 26);
                 } else {
-                    this.drawTexturedModalRect(l6 - 2, j7 - 2, 0, 202, 26, 26);
+                    drawTexturedModalRect(l6 - 2, j7 - 2, 0, 202, 26, 26);
                 }
 
                 if (!this.statFileWriter.canUnlockAchievement(achievement2)) {
@@ -380,9 +377,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
         GlStateManager.enableBlend();
         GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
-        this.drawTexturedModalRect(k, l, 0, 0, this.field_146555_f, this.field_146557_g);
-        this.zLevel = 0.0F;
+        mc.getTextureManager().bindTexture(ACHIEVEMENT_BACKGROUND);
+        drawTexturedModalRect(k, l, 0, 0, this.field_146555_f, this.field_146557_g);
+        zLevel = 0.0F;
         GlStateManager.depthFunc(515);
         GlStateManager.disableDepth();
         GlStateManager.enableTexture2D();

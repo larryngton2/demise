@@ -93,7 +93,7 @@ public class RecipeFireworks implements IRecipe {
 
                     if (itemstack2 != null) {
                         if (itemstack2.getItem() == Items.dye) {
-                            list.add(Integer.valueOf(ItemDye.dyeColors[itemstack2.getMetadata() & 15]));
+                            list.add(ItemDye.dyeColors[itemstack2.getMetadata() & 15]);
                         } else if (itemstack2.getItem() == Items.glowstone_dust) {
                             nbttagcompound2.setBoolean("Flicker", true);
                         } else if (itemstack2.getItem() == Items.diamond) {
@@ -113,7 +113,7 @@ public class RecipeFireworks implements IRecipe {
                 int[] aint1 = new int[list.size()];
 
                 for (int l2 = 0; l2 < aint1.length; ++l2) {
-                    aint1[l2] = list.get(l2).intValue();
+                    aint1[l2] = list.get(l2);
                 }
 
                 nbttagcompound2.setIntArray("Colors", aint1);
@@ -129,7 +129,7 @@ public class RecipeFireworks implements IRecipe {
 
                     if (itemstack1 != null) {
                         if (itemstack1.getItem() == Items.dye) {
-                            list1.add(Integer.valueOf(ItemDye.dyeColors[itemstack1.getMetadata() & 15]));
+                            list1.add(ItemDye.dyeColors[itemstack1.getMetadata() & 15]);
                         } else if (itemstack1.getItem() == Items.firework_charge) {
                             this.field_92102_a = itemstack1.copy();
                             this.field_92102_a.stackSize = 1;
@@ -140,7 +140,7 @@ public class RecipeFireworks implements IRecipe {
                 int[] aint = new int[list1.size()];
 
                 for (int j2 = 0; j2 < aint.length; ++j2) {
-                    aint[j2] = list1.get(j2).intValue();
+                    aint[j2] = list1.get(j2);
                 }
 
                 if (this.field_92102_a != null && this.field_92102_a.hasTagCompound()) {

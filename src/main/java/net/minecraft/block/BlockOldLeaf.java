@@ -19,14 +19,10 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class BlockOldLeaf extends BlockLeaves {
-    public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, new Predicate<BlockPlanks.EnumType>() {
-        public boolean apply(BlockPlanks.EnumType p_apply_1_) {
-            return p_apply_1_.getMetadata() < 4;
-        }
-    });
+    public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = PropertyEnum.create("variant", BlockPlanks.EnumType.class, p_apply_1_ -> p_apply_1_.getMetadata() < 4);
 
     public BlockOldLeaf() {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockPlanks.EnumType.OAK).withProperty(CHECK_DECAY, Boolean.valueOf(true)).withProperty(DECAYABLE, Boolean.valueOf(true)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, BlockPlanks.EnumType.OAK).withProperty(CHECK_DECAY, Boolean.TRUE).withProperty(DECAYABLE, Boolean.TRUE));
     }
 
     public int getRenderColor(IBlockState state) {
@@ -78,18 +74,18 @@ public class BlockOldLeaf extends BlockLeaves {
     }
 
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(VARIANT, this.getWoodType(meta)).withProperty(DECAYABLE, Boolean.valueOf((meta & 4) == 0)).withProperty(CHECK_DECAY, Boolean.valueOf((meta & 8) > 0));
+        return this.getDefaultState().withProperty(VARIANT, this.getWoodType(meta)).withProperty(DECAYABLE, (meta & 4) == 0).withProperty(CHECK_DECAY, (meta & 8) > 0);
     }
 
     public int getMetaFromState(IBlockState state) {
         int i = 0;
         i = i | state.getValue(VARIANT).getMetadata();
 
-        if (!state.getValue(DECAYABLE).booleanValue()) {
+        if (!state.getValue(DECAYABLE)) {
             i |= 4;
         }
 
-        if (state.getValue(CHECK_DECAY).booleanValue()) {
+        if (state.getValue(CHECK_DECAY)) {
             i |= 8;
         }
 

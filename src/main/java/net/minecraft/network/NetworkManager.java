@@ -193,20 +193,18 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
 
             channelfuture.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         } else {
-            this.channel.eventLoop().execute(new Runnable() {
-                public void run() {
-                    if (enumconnectionstate != enumconnectionstate1) {
-                        NetworkManager.this.setConnectionState(enumconnectionstate);
-                    }
-
-                    ChannelFuture channelfuture1 = NetworkManager.this.channel.writeAndFlush(inPacket);
-
-                    if (futureListeners != null) {
-                        channelfuture1.addListeners(futureListeners);
-                    }
-
-                    channelfuture1.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+            this.channel.eventLoop().execute(() -> {
+                if (enumconnectionstate != enumconnectionstate1) {
+                    NetworkManager.this.setConnectionState(enumconnectionstate);
                 }
+
+                ChannelFuture channelfuture1 = NetworkManager.this.channel.writeAndFlush(inPacket);
+
+                if (futureListeners != null) {
+                    channelfuture1.addListeners(futureListeners);
+                }
+
+                channelfuture1.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             });
         }
     }
@@ -288,7 +286,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
 
     public static NetworkManager provideLocalClient(SocketAddress address) {
         final NetworkManager networkmanager = new NetworkManager(EnumPacketDirection.CLIENTBOUND);
-        (new Bootstrap()).group(CLIENT_LOCAL_EVENTLOOP.getValue()).handler(new ChannelInitializer<Channel>() {
+        (new Bootstrap()).group(CLIENT_LOCAL_EVENTLOOP.getValue()).handler(new ChannelInitializer<>() {
             protected void initChannel(Channel p_initChannel_1_) throws Exception {
                 p_initChannel_1_.pipeline().addLast("packet_handler", networkmanager);
             }

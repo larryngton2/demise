@@ -58,30 +58,30 @@ public class GuiEnchantment extends GuiContainer {
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
 
         for (int k = 0; k < 3; ++k) {
             int l = mouseX - (i + 60);
             int i1 = mouseY - (j + 14 + 19 * k);
 
-            if (l >= 0 && i1 >= 0 && l < 108 && i1 < 19 && this.container.enchantItem(this.mc.thePlayer, k)) {
-                this.mc.playerController.sendEnchantPacket(this.container.windowId, k);
+            if (l >= 0 && i1 >= 0 && l < 108 && i1 < 19 && this.container.enchantItem(mc.thePlayer, k)) {
+                mc.playerController.sendEnchantPacket(this.container.windowId, k);
             }
         }
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
+        drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
         GlStateManager.pushMatrix();
         GlStateManager.matrixMode(5889);
         GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
-        ScaledResolution scaledresolution = new ScaledResolution(this.mc);
+        ScaledResolution scaledresolution = new ScaledResolution(mc);
         GlStateManager.viewport((scaledresolution.getScaledWidth() - 320) / 2 * scaledresolution.getScaleFactor(), (scaledresolution.getScaledHeight() - 240) / 2 * scaledresolution.getScaleFactor(), 320 * scaledresolution.getScaleFactor(), 240 * scaledresolution.getScaleFactor());
         GlStateManager.translate(-0.34F, 0.23F, 0.0F);
         Project.gluPerspective(90.0F, 1.3333334F, 9.0F, 80.0F);
@@ -94,7 +94,7 @@ public class GuiEnchantment extends GuiContainer {
         float f1 = 5.0F;
         GlStateManager.scale(f1, f1, f1);
         GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_BOOK_TEXTURE);
+        mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_BOOK_TEXTURE);
         GlStateManager.rotate(20.0F, 1.0F, 0.0F, 0.0F);
         float f2 = this.field_147076_A + (this.field_147080_z - this.field_147076_A) * partialTicks;
         GlStateManager.translate((1.0F - f2) * 0.2F, (1.0F - f2) * 0.1F, (1.0F - f2) * 0.25F);
@@ -126,7 +126,7 @@ public class GuiEnchantment extends GuiContainer {
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.matrixMode(5889);
-        GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
+        GlStateManager.viewport(0, 0, mc.displayWidth, mc.displayHeight);
         GlStateManager.popMatrix();
         GlStateManager.matrixMode(5888);
         GlStateManager.popMatrix();
@@ -140,21 +140,21 @@ public class GuiEnchantment extends GuiContainer {
             int j1 = i1 + 20;
             int k1 = 86;
             String s = EnchantmentNameParts.getInstance().generateNewRandomName();
-            this.zLevel = 0.0F;
-            this.mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
+            zLevel = 0.0F;
+            mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
             int l1 = this.container.enchantLevels[l];
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
             if (l1 == 0) {
-                this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 185, 108, 19);
+                drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 185, 108, 19);
             } else {
                 String s1 = "" + l1;
-                FontRenderer fontrenderer = this.mc.standardGalacticFontRenderer;
+                FontRenderer fontrenderer = mc.standardGalacticFontRenderer;
                 int i2 = 6839882;
 
-                if ((k < l + 1 || this.mc.thePlayer.experienceLevel < l1) && !this.mc.thePlayer.capabilities.isCreativeMode) {
-                    this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 185, 108, 19);
-                    this.drawTexturedModalRect(i1 + 1, j + 15 + 19 * l, 16 * l, 239, 16, 16);
+                if ((k < l + 1 || mc.thePlayer.experienceLevel < l1) && !mc.thePlayer.capabilities.isCreativeMode) {
+                    drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 185, 108, 19);
+                    drawTexturedModalRect(i1 + 1, j + 15 + 19 * l, 16 * l, 239, 16, 16);
                     fontrenderer.drawSplitString(s, j1, j + 16 + 19 * l, k1, (i2 & 16711422) >> 1);
                     i2 = 4226832;
                 } else {
@@ -162,18 +162,18 @@ public class GuiEnchantment extends GuiContainer {
                     int k2 = mouseY - (j + 14 + 19 * l);
 
                     if (j2 >= 0 && k2 >= 0 && j2 < 108 && k2 < 19) {
-                        this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 204, 108, 19);
+                        drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 204, 108, 19);
                         i2 = 16777088;
                     } else {
-                        this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 166, 108, 19);
+                        drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 166, 108, 19);
                     }
 
-                    this.drawTexturedModalRect(i1 + 1, j + 15 + 19 * l, 16 * l, 223, 16, 16);
+                    drawTexturedModalRect(i1 + 1, j + 15 + 19 * l, 16 * l, 223, 16, 16);
                     fontrenderer.drawSplitString(s, j1, j + 16 + 19 * l, k1, i2);
                     i2 = 8453920;
                 }
 
-                fontrenderer = this.mc.fontRendererObj;
+                fontrenderer = mc.fontRendererObj;
                 fontrenderer.drawStringWithShadow(s1, (float) (j1 + 86 - fontrenderer.getStringWidth(s1)), (float) (j + 16 + 19 * l + 7), i2);
             }
         }
@@ -181,7 +181,7 @@ public class GuiEnchantment extends GuiContainer {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        boolean flag = this.mc.thePlayer.capabilities.isCreativeMode;
+        boolean flag = mc.thePlayer.capabilities.isCreativeMode;
         int i = this.container.getLapisAmount();
 
         for (int j = 0; j < 3; ++j) {
@@ -202,7 +202,7 @@ public class GuiEnchantment extends GuiContainer {
                         list.add("");
                     }
 
-                    if (this.mc.thePlayer.experienceLevel < k) {
+                    if (mc.thePlayer.experienceLevel < k) {
                         list.add(EnumChatFormatting.RED + "Level Requirement: " + this.container.enchantLevels[j]);
                     } else {
                         String s1 = "";
@@ -210,7 +210,7 @@ public class GuiEnchantment extends GuiContainer {
                         if (i1 == 1) {
                             s1 = I18n.format("container.enchant.lapis.one");
                         } else {
-                            s1 = I18n.format("container.enchant.lapis.many", Integer.valueOf(i1));
+                            s1 = I18n.format("container.enchant.lapis.many", i1);
                         }
 
                         if (i >= i1) {
@@ -222,7 +222,7 @@ public class GuiEnchantment extends GuiContainer {
                         if (i1 == 1) {
                             s1 = I18n.format("container.enchant.level.one");
                         } else {
-                            s1 = I18n.format("container.enchant.level.many", Integer.valueOf(i1));
+                            s1 = I18n.format("container.enchant.level.many", i1);
                         }
 
                         list.add(EnumChatFormatting.GRAY + s1);

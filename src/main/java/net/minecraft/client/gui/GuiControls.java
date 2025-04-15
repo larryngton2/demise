@@ -23,17 +23,17 @@ public class GuiControls extends GuiScreen {
     }
 
     public void initGui() {
-        this.keyBindingList = new GuiKeyBindingList(this, this.mc);
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 155, this.height - 29, 150, 20, I18n.format("gui.done")));
-        this.buttonList.add(this.buttonReset = new GuiButton(201, this.width / 2 - 155 + 160, this.height - 29, 150, 20, I18n.format("controls.resetAll")));
+        this.keyBindingList = new GuiKeyBindingList(this, mc);
+        this.buttonList.add(new GuiButton(200, width / 2 - 155, height - 29, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.buttonReset = new GuiButton(201, width / 2 - 155 + 160, height - 29, 150, 20, I18n.format("controls.resetAll")));
         this.screenTitle = I18n.format("controls.title");
         int i = 0;
 
         for (GameSettings.Options gamesettings$options : optionsArr) {
             if (gamesettings$options.getEnumFloat()) {
-                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), gamesettings$options));
+                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), gamesettings$options));
             } else {
-                this.buttonList.add(new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), gamesettings$options, this.options.getKeyBinding(gamesettings$options)));
+                this.buttonList.add(new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), width / 2 - 155 + i % 2 * 160, 18 + 24 * (i >> 1), gamesettings$options, this.options.getKeyBinding(gamesettings$options)));
             }
 
             ++i;
@@ -47,9 +47,9 @@ public class GuiControls extends GuiScreen {
 
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.id == 200) {
-            this.mc.displayGuiScreen(this.parentScreen);
+            mc.displayGuiScreen(this.parentScreen);
         } else if (button.id == 201) {
-            for (KeyBinding keybinding : this.mc.gameSettings.keyBindings) {
+            for (KeyBinding keybinding : mc.gameSettings.keyBindings) {
                 keybinding.setKeyCode(keybinding.getKeyCodeDefault());
             }
 
@@ -97,7 +97,7 @@ public class GuiControls extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.keyBindingList.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, this.screenTitle, this.width / 2, 8, 16777215);
+        drawCenteredString(this.fontRendererObj, this.screenTitle, width / 2, 8, 16777215);
         boolean flag = true;
 
         for (KeyBinding keybinding : this.options.keyBindings) {

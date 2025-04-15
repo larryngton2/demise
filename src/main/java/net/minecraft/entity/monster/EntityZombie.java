@@ -73,9 +73,9 @@ public class EntityZombie extends EntityMob {
 
     protected void entityInit() {
         super.entityInit();
-        this.getDataWatcher().addObject(12, Byte.valueOf((byte) 0));
-        this.getDataWatcher().addObject(13, Byte.valueOf((byte) 0));
-        this.getDataWatcher().addObject(14, Byte.valueOf((byte) 0));
+        this.getDataWatcher().addObject(12, (byte) 0);
+        this.getDataWatcher().addObject(13, (byte) 0);
+        this.getDataWatcher().addObject(14, (byte) 0);
     }
 
     public int getTotalArmorValue() {
@@ -117,7 +117,7 @@ public class EntityZombie extends EntityMob {
     }
 
     public void setChild(boolean childZombie) {
-        this.getDataWatcher().updateObject(12, Byte.valueOf((byte) (childZombie ? 1 : 0)));
+        this.getDataWatcher().updateObject(12, (byte) (childZombie ? 1 : 0));
 
         if (this.worldObj != null && !this.worldObj.isRemote) {
             IAttributeInstance iattributeinstance = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
@@ -136,7 +136,7 @@ public class EntityZombie extends EntityMob {
     }
 
     public void setVillager(boolean villager) {
-        this.getDataWatcher().updateObject(13, Byte.valueOf((byte) (villager ? 1 : 0)));
+        this.getDataWatcher().updateObject(13, (byte) (villager ? 1 : 0));
     }
 
     public void onLivingUpdate() {
@@ -330,12 +330,11 @@ public class EntityZombie extends EntityMob {
     public void onKillEntity(EntityLivingBase entityLivingIn) {
         super.onKillEntity(entityLivingIn);
 
-        if ((this.worldObj.getDifficulty() == EnumDifficulty.NORMAL || this.worldObj.getDifficulty() == EnumDifficulty.HARD) && entityLivingIn instanceof EntityVillager) {
+        if ((this.worldObj.getDifficulty() == EnumDifficulty.NORMAL || this.worldObj.getDifficulty() == EnumDifficulty.HARD) && entityLivingIn instanceof EntityVillager entityliving) {
             if (this.worldObj.getDifficulty() != EnumDifficulty.HARD && this.rand.nextBoolean()) {
                 return;
             }
 
-            EntityLiving entityliving = (EntityLiving) entityLivingIn;
             EntityZombie entityzombie = new EntityZombie(this.worldObj);
             entityzombie.copyLocationAndAnglesFrom(entityLivingIn);
             this.worldObj.removeEntity(entityLivingIn);
@@ -462,7 +461,7 @@ public class EntityZombie extends EntityMob {
 
     protected void startConversion(int ticks) {
         this.conversionTime = ticks;
-        this.getDataWatcher().updateObject(14, Byte.valueOf((byte) 1));
+        this.getDataWatcher().updateObject(14, (byte) 1);
         this.removePotionEffect(Potion.weakness.id);
         this.addPotionEffect(new PotionEffect(Potion.damageBoost.id, ticks, Math.min(this.worldObj.getDifficulty().getDifficultyId() - 1, 0)));
         this.worldObj.setEntityState(this, (byte) 16);

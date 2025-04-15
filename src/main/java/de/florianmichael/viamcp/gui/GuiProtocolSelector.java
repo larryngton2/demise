@@ -66,7 +66,7 @@ public class GuiProtocolSelector extends GuiScreen {
         GlStateManager.pushMatrix();
         GlStateManager.scale(2.0, 2.0, 2.0);
         String title = EnumChatFormatting.BOLD + "ViaMCP";
-        drawString(this.fontRendererObj, title, (this.width - (this.fontRendererObj.getStringWidth(title) * 2)) / 4, 5, -1);
+        drawString(this.fontRendererObj, title, (width - (this.fontRendererObj.getStringWidth(title) * 2)) / 4, 5, -1);
         GlStateManager.popMatrix();
 
         drawString(this.fontRendererObj, "by EnZaXD/Flori2007", 1, 1, -1);

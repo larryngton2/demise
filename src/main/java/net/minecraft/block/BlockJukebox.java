@@ -22,14 +22,14 @@ public class BlockJukebox extends BlockContainer {
 
     protected BlockJukebox() {
         super(Material.wood, MapColor.dirtColor);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(HAS_RECORD, Boolean.valueOf(false)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(HAS_RECORD, Boolean.FALSE));
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (state.getValue(HAS_RECORD).booleanValue()) {
+        if (state.getValue(HAS_RECORD)) {
             this.dropRecord(worldIn, pos, state);
-            state = state.withProperty(HAS_RECORD, Boolean.valueOf(false));
+            state = state.withProperty(HAS_RECORD, Boolean.FALSE);
             worldIn.setBlockState(pos, state, 2);
             return true;
         } else {
@@ -43,7 +43,7 @@ public class BlockJukebox extends BlockContainer {
 
             if (tileentity instanceof BlockJukebox.TileEntityJukebox) {
                 ((BlockJukebox.TileEntityJukebox) tileentity).setRecord(new ItemStack(recordStack.getItem(), 1, recordStack.getMetadata()));
-                worldIn.setBlockState(pos, state.withProperty(HAS_RECORD, Boolean.valueOf(true)), 2);
+                worldIn.setBlockState(pos, state.withProperty(HAS_RECORD, Boolean.TRUE), 2);
             }
         }
     }
@@ -110,11 +110,11 @@ public class BlockJukebox extends BlockContainer {
     }
 
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(HAS_RECORD, Boolean.valueOf(meta > 0));
+        return this.getDefaultState().withProperty(HAS_RECORD, meta > 0);
     }
 
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(HAS_RECORD).booleanValue() ? 1 : 0;
+        return state.getValue(HAS_RECORD) ? 1 : 0;
     }
 
     protected BlockState createBlockState() {

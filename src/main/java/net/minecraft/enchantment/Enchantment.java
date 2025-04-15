@@ -138,6 +138,6 @@ public abstract class Enchantment {
             }
         }
 
-        enchantmentsBookList = list.toArray(new Enchantment[list.size()]);
+        enchantmentsBookList = list.toArray(new Enchantment[0]);
     }
 }

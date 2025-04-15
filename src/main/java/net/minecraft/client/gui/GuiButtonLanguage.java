@@ -19,7 +19,7 @@ public class GuiButtonLanguage extends GuiButton {
                 i += this.height;
             }
 
-            this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, i, this.width, this.height);
+            drawTexturedModalRect(this.xPosition, this.yPosition, 0, i, this.width, this.height);
         }
     }
 }

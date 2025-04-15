@@ -1,10 +1,8 @@
 package wtf.demise.utils.math;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
-import net.minecraft.util.Vec3i;
 
 import java.security.SecureRandom;
 

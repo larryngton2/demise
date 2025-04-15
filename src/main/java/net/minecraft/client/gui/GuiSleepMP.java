@@ -9,7 +9,7 @@ import java.io.IOException;
 public class GuiSleepMP extends GuiChat {
     public void initGui() {
         super.initGui();
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height - 40, I18n.format("multiplayer.stopSleeping")));
+        this.buttonList.add(new GuiButton(1, width / 2 - 100, height - 40, I18n.format("multiplayer.stopSleeping")));
     }
 
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
@@ -21,11 +21,11 @@ public class GuiSleepMP extends GuiChat {
             String s = this.inputField.getText().trim();
 
             if (!s.isEmpty()) {
-                this.mc.thePlayer.sendChatMessage(s);
+                mc.thePlayer.sendChatMessage(s);
             }
 
             this.inputField.setText("");
-            this.mc.ingameGUI.getChatGUI().resetScroll();
+            mc.ingameGUI.getChatGUI().resetScroll();
         }
     }
 
@@ -38,7 +38,7 @@ public class GuiSleepMP extends GuiChat {
     }
 
     private void wakeFromSleep() {
-        NetHandlerPlayClient nethandlerplayclient = this.mc.thePlayer.sendQueue;
-        nethandlerplayclient.addToSendQueue(new C0BPacketEntityAction(this.mc.thePlayer, C0BPacketEntityAction.Action.STOP_SLEEPING));
+        NetHandlerPlayClient nethandlerplayclient = mc.thePlayer.sendQueue;
+        nethandlerplayclient.addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SLEEPING));
     }
 }

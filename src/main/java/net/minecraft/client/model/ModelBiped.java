@@ -3,13 +3,11 @@ package net.minecraft.client.model;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.modules.impl.visual.Animations;
-import wtf.demise.utils.math.MathUtils;
 
 public class ModelBiped extends ModelBase {
     public ModelRenderer bipedHead;

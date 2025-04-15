@@ -333,9 +333,7 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
     }
 
     private void attackEntitiesInList(List<Entity> p_70971_1_) {
-        for (int i = 0; i < p_70971_1_.size(); ++i) {
-            Entity entity = p_70971_1_.get(i);
-
+        for (Entity entity : p_70971_1_) {
             if (entity instanceof EntityLivingBase) {
                 entity.attackEntityFrom(DamageSource.causeMobDamage(this), 10.0F);
                 this.applyEnchantments(this, entity);
@@ -346,13 +344,8 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
     private void setNewTarget() {
         this.forceNewTarget = false;
         List<EntityPlayer> list = Lists.newArrayList(this.worldObj.playerEntities);
-        Iterator<EntityPlayer> iterator = list.iterator();
 
-        while (iterator.hasNext()) {
-            if (iterator.next().isSpectator()) {
-                iterator.remove();
-            }
-        }
+        list.removeIf(EntityPlayer::isSpectator);
 
         if (this.rand.nextInt(2) == 0 && !list.isEmpty()) {
             this.target = list.get(this.rand.nextInt(list.size()));

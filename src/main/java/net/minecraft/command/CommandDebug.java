@@ -61,7 +61,7 @@ public class CommandDebug extends CommandBase {
                 int l = j - this.profileStartTick;
                 this.saveProfileResults(k, l);
                 MinecraftServer.getServer().theProfiler.profilingEnabled = false;
-                notifyOperators(sender, this, "commands.debug.stop", Float.valueOf((float) k / 1000.0F), Integer.valueOf(l));
+                notifyOperators(sender, this, "commands.debug.stop", (float) k / 1000.0F, l);
             }
         }
     }
@@ -87,7 +87,7 @@ public class CommandDebug extends CommandBase {
         stringbuilder.append("\n\n");
         stringbuilder.append("Time span: ").append(timeSpan).append(" ms\n");
         stringbuilder.append("Tick span: ").append(tickSpan).append(" ticks\n");
-        stringbuilder.append("// This is approximately ").append(String.format("%.2f", Float.valueOf((float) tickSpan / ((float) timeSpan / 1000.0F)))).append(" ticks per second. It should be ").append(20).append(" ticks per second\n\n");
+        stringbuilder.append("// This is approximately ").append(String.format("%.2f", (float) tickSpan / ((float) timeSpan / 1000.0F))).append(" ticks per second. It should be ").append(20).append(" ticks per second\n\n");
         stringbuilder.append("--- BEGIN PROFILE DUMP ---\n\n");
         this.func_147202_a(0, "root", stringbuilder);
         stringbuilder.append("--- END PROFILE DUMP ---\n\n");
@@ -100,13 +100,11 @@ public class CommandDebug extends CommandBase {
         if (list != null && list.size() >= 3) {
             for (int i = 1; i < list.size(); ++i) {
                 Profiler.Result profiler$result = list.get(i);
-                stringBuilder.append(String.format("[%02d] ", Integer.valueOf(p_147202_1_)));
+                stringBuilder.append(String.format("[%02d] ", p_147202_1_));
 
-                for (int j = 0; j < p_147202_1_; ++j) {
-                    stringBuilder.append(" ");
-                }
+                stringBuilder.append(" ".repeat(Math.max(0, p_147202_1_)));
 
-                stringBuilder.append(profiler$result.field_76331_c).append(" - ").append(String.format("%.2f", Double.valueOf(profiler$result.field_76332_a))).append("%/").append(String.format("%.2f", Double.valueOf(profiler$result.field_76330_b))).append("%\n");
+                stringBuilder.append(profiler$result.field_76331_c).append(" - ").append(String.format("%.2f", profiler$result.field_76332_a)).append("%/").append(String.format("%.2f", profiler$result.field_76330_b)).append("%\n");
 
                 if (!profiler$result.field_76331_c.equals("unspecified")) {
                     try {

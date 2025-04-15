@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TooltipProviderOptions implements TooltipProvider {
     public Rectangle getTooltipBounds(GuiScreen guiScreen, int x, int y) {
-        int i = guiScreen.width / 2 - 150;
-        int j = guiScreen.height / 6 - 7;
+        int i = GuiScreen.width / 2 - 150;
+        int j = GuiScreen.height / 6 - 7;
 
         if (y <= j + 98) {
             j += 105;
@@ -54,7 +54,7 @@ public class TooltipProviderOptions implements TooltipProvider {
         if (list.size() <= 0) {
             return null;
         } else {
-            String[] astring = list.toArray(new String[list.size()]);
+            String[] astring = list.toArray(new String[0]);
             return astring;
         }
     }

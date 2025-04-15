@@ -146,12 +146,11 @@ public class CustomItemProperties {
             String[] astring = Config.tokenize(str, " ");
             label45:
 
-            for (int i = 0; i < astring.length; ++i) {
-                String s = astring[i];
+            for (String s : astring) {
                 int j = Config.parseInt(s, -1);
 
                 if (j >= 0) {
-                    set.add(Integer.valueOf(j));
+                    set.add(j);
                 } else {
                     if (s.contains("-")) {
                         String[] astring1 = Config.tokenize(s, "-");
@@ -170,7 +169,7 @@ public class CustomItemProperties {
                                         continue label45;
                                     }
 
-                                    set.add(Integer.valueOf(k1));
+                                    set.add(k1);
                                     ++k1;
                                 }
                             }
@@ -187,17 +186,17 @@ public class CustomItemProperties {
                         if (i2 <= 0) {
                             Config.warn("Item not found: " + s);
                         } else {
-                            set.add(Integer.valueOf(i2));
+                            set.add(i2);
                         }
                     }
                 }
             }
 
-            Integer[] ainteger = (Integer[]) set.toArray(new Integer[set.size()]);
+            Integer[] ainteger = (Integer[]) set.toArray(new Integer[0]);
             int[] aint = new int[ainteger.length];
 
             for (int l1 = 0; l1 < aint.length; ++l1) {
-                aint[l1] = ainteger[l1].intValue();
+                aint[l1] = ainteger[l1];
             }
 
             return aint;
@@ -404,9 +403,7 @@ public class CustomItemProperties {
             String[] astring = Config.tokenize(str, " ");
             RangeListInt rangelistint = new RangeListInt();
 
-            for (int i = 0; i < astring.length; ++i) {
-                String s = astring[i];
-
+            for (String s : astring) {
                 if (parser != null) {
                     int j = parser.parse(s, Integer.MIN_VALUE);
 
@@ -495,7 +492,7 @@ public class CustomItemProperties {
                 list.add(nbttagvalue);
             }
 
-            NbtTagValue[] anbttagvalue = (NbtTagValue[]) list.toArray(new NbtTagValue[list.size()]);
+            NbtTagValue[] anbttagvalue = (NbtTagValue[]) list.toArray(new NbtTagValue[0]);
             return anbttagvalue;
         }
     }
@@ -521,21 +518,26 @@ public class CustomItemProperties {
         } else {
             str = str.toLowerCase();
 
-            if (str.equals("any")) {
-                return 0;
-            } else if (str.equals("main")) {
-                return 1;
-            } else if (str.equals("off")) {
-                return 2;
-            } else {
-                Config.warn("Invalid hand: " + str);
-                return 0;
+            switch (str) {
+                case "any" -> {
+                    return 0;
+                }
+                case "main" -> {
+                    return 1;
+                }
+                case "off" -> {
+                    return 2;
+                }
+                default -> {
+                    Config.warn("Invalid hand: " + str);
+                    return 0;
+                }
             }
         }
     }
 
     public boolean isValid(String path) {
-        if (this.name != null && this.name.length() > 0) {
+        if (this.name != null && !this.name.isEmpty()) {
             if (this.basePath == null) {
                 Config.warn("No base path found: " + path);
                 return false;
@@ -748,7 +750,7 @@ public class CustomItemProperties {
     }
 
     private static ModelBlock makeModelBlock(String[] modelTextures) {
-        StringBuffer stringbuffer = new StringBuffer();
+        StringBuilder stringbuffer = new StringBuilder();
         stringbuffer.append("{\"parent\": \"builtin/generated\",\"textures\": {");
 
         for (int i = 0; i < modelTextures.length; ++i) {
@@ -758,7 +760,7 @@ public class CustomItemProperties {
                 stringbuffer.append(", ");
             }
 
-            stringbuffer.append("\"layer" + i + "\": \"" + s + "\"");
+            stringbuffer.append("\"layer").append(i).append("\": \"").append(s).append("\"");
         }
 
         stringbuffer.append("}}");

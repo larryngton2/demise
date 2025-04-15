@@ -47,8 +47,8 @@ public abstract class Container {
     public List<ItemStack> getInventory() {
         List<ItemStack> list = Lists.newArrayList();
 
-        for (int i = 0; i < this.inventorySlots.size(); ++i) {
-            list.add(this.inventorySlots.get(i).getStack());
+        for (Slot inventorySlot : this.inventorySlots) {
+            list.add(inventorySlot.getStack());
         }
 
         return list;
@@ -63,8 +63,8 @@ public abstract class Container {
                 itemstack1 = itemstack == null ? null : itemstack.copy();
                 this.inventoryItemStacks.set(i, itemstack1);
 
-                for (int j = 0; j < this.crafters.size(); ++j) {
-                    this.crafters.get(j).sendSlotContents(this, i, itemstack1);
+                for (ICrafting crafter : this.crafters) {
+                    crafter.sendSlotContents(this, i, itemstack1);
                 }
             }
         }
@@ -75,9 +75,7 @@ public abstract class Container {
     }
 
     public Slot getSlotFromInventory(IInventory inv, int slotIn) {
-        for (int i = 0; i < this.inventorySlots.size(); ++i) {
-            Slot slot = this.inventorySlots.get(i);
-
+        for (Slot slot : this.inventorySlots) {
             if (slot.isHere(inv, slotIn)) {
                 return slot;
             }

@@ -11,9 +11,7 @@ public class ReflectorRaw {
         try {
             Field[] afield = cls.getDeclaredFields();
 
-            for (int i = 0; i < afield.length; ++i) {
-                Field field = afield[i];
-
+            for (Field field : afield) {
                 if (field.getType() == fieldType) {
                     field.setAccessible(true);
                     return field;
@@ -39,16 +37,14 @@ public class ReflectorRaw {
         try {
             List list = new ArrayList();
 
-            for (int i = 0; i < fields.length; ++i) {
-                Field field = fields[i];
-
+            for (Field field : fields) {
                 if (field.getType() == fieldType) {
                     field.setAccessible(true);
                     list.add(field);
                 }
             }
 
-            Field[] afield = (Field[]) list.toArray(new Field[list.size()]);
+            Field[] afield = (Field[]) list.toArray(new Field[0]);
             return afield;
         } catch (Exception var5) {
             return null;
@@ -65,7 +61,7 @@ public class ReflectorRaw {
                 return new Field[0];
             } else {
                 List<Field> list1 = list.subList(i + 1, list.size());
-                Field[] afield1 = list1.toArray(new Field[list1.size()]);
+                Field[] afield1 = list1.toArray(new Field[0]);
                 return getFields(afield1, fieldType);
             }
         } catch (Exception var8) {
@@ -77,9 +73,7 @@ public class ReflectorRaw {
         try {
             List<Field> list = new ArrayList();
 
-            for (int i = 0; i < fields.length; ++i) {
-                Field field = fields[i];
-
+            for (Field field : fields) {
                 if (field.getType() == fieldType) {
                     boolean flag = Modifier.isStatic(field.getModifiers());
 
@@ -96,7 +90,7 @@ public class ReflectorRaw {
                 }
             }
 
-            Field[] afield = list.toArray(new Field[list.size()]);
+            Field[] afield = list.toArray(new Field[0]);
             return afield;
         } catch (Exception var9) {
             return null;

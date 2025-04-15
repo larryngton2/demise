@@ -132,7 +132,7 @@ public class PlayerProfileCache {
 
     public String[] getUsernames() {
         List<String> list = Lists.newArrayList(this.usernameToProfileEntryMap.keySet());
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
     public GameProfile getProfileByUUID(UUID uuid) {
@@ -167,8 +167,7 @@ public class PlayerProfileCache {
                     this.addEntry(playerprofilecache$profileentry.getGameProfile(), playerprofilecache$profileentry.getExpirationDate());
                 }
             }
-        } catch (FileNotFoundException var9) {
-        } catch (JsonParseException var10) {
+        } catch (FileNotFoundException | JsonParseException var9) {
         } finally {
             IOUtils.closeQuietly(bufferedreader);
         }
@@ -181,7 +180,6 @@ public class PlayerProfileCache {
         try {
             bufferedwriter = Files.newWriter(this.usercacheFile, Charsets.UTF_8);
             bufferedwriter.write(s);
-        } catch (FileNotFoundException var8) {
         } catch (IOException var9) {
         } finally {
             IOUtils.closeQuietly(bufferedwriter);

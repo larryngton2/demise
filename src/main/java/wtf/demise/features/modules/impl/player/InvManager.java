@@ -6,7 +6,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C0DPacketCloseWindow;
 import net.minecraft.network.play.client.C16PacketClientStatus;
 import net.minecraft.network.play.server.S2DPacketOpenWindow;
-import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;

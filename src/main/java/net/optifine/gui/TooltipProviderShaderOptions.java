@@ -88,17 +88,13 @@ public class TooltipProviderShaderOptions extends TooltipProviderOptions {
         FontRenderer fontrenderer = Config.getMinecraft().fontRendererObj;
         List<String> list = new ArrayList();
 
-        for (int i = 0; i < args.size(); ++i) {
-            String s = args.get(i);
-
-            if (s != null && s.length() > 0) {
-                for (String s1 : fontrenderer.listFormattedStringToWidth(s, width)) {
-                    list.add(s1);
-                }
+        for (String s : args) {
+            if (s != null && !s.isEmpty()) {
+                list.addAll(fontrenderer.listFormattedStringToWidth(s, width));
             }
         }
 
-        String[] astring = list.toArray(new String[list.size()]);
+        String[] astring = list.toArray(new String[0]);
         return astring;
     }
 }

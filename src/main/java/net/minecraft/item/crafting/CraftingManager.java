@@ -173,11 +173,7 @@ public class CraftingManager {
         this.addRecipe(new ItemStack(Blocks.daylight_detector), "GGG", "QQQ", "WWW", 'G', Blocks.glass, 'Q', Items.quartz, 'W', Blocks.wooden_slab);
         this.addRecipe(new ItemStack(Blocks.hopper), "I I", "ICI", " I ", 'I', Items.iron_ingot, 'C', Blocks.chest);
         this.addRecipe(new ItemStack(Items.armor_stand, 1), "///", " / ", "/_/", '/', Items.stick, '_', new ItemStack(Blocks.stone_slab, 1, BlockStoneSlab.EnumType.STONE.getMetadata()));
-        Collections.sort(this.recipes, new Comparator<IRecipe>() {
-            public int compare(IRecipe p_compare_1_, IRecipe p_compare_2_) {
-                return p_compare_1_ instanceof ShapelessRecipes && p_compare_2_ instanceof ShapedRecipes ? 1 : (p_compare_2_ instanceof ShapelessRecipes && p_compare_1_ instanceof ShapedRecipes ? -1 : (p_compare_2_.getRecipeSize() < p_compare_1_.getRecipeSize() ? -1 : (p_compare_2_.getRecipeSize() > p_compare_1_.getRecipeSize() ? 1 : 0)));
-            }
-        });
+        this.recipes.sort((p_compare_1_, p_compare_2_) -> p_compare_1_ instanceof ShapelessRecipes && p_compare_2_ instanceof ShapedRecipes ? 1 : (p_compare_2_ instanceof ShapelessRecipes && p_compare_1_ instanceof ShapedRecipes ? -1 : (p_compare_2_.getRecipeSize() < p_compare_1_.getRecipeSize() ? -1 : (p_compare_2_.getRecipeSize() > p_compare_1_.getRecipeSize() ? 1 : 0))));
     }
 
     public ShapedRecipes addRecipe(ItemStack stack, Object... recipeComponents) {
@@ -189,8 +185,7 @@ public class CraftingManager {
         if (recipeComponents[i] instanceof String[]) {
             String[] astring = (String[]) recipeComponents[i++];
 
-            for (int l = 0; l < astring.length; ++l) {
-                String s2 = astring[l];
+            for (String s2 : astring) {
                 ++k;
                 j = s2.length();
                 s = s + s2;
@@ -226,8 +221,8 @@ public class CraftingManager {
         for (int i1 = 0; i1 < j * k; ++i1) {
             char c0 = s.charAt(i1);
 
-            if (map.containsKey(Character.valueOf(c0))) {
-                aitemstack[i1] = map.get(Character.valueOf(c0)).copy();
+            if (map.containsKey(c0)) {
+                aitemstack[i1] = map.get(c0).copy();
             } else {
                 aitemstack[i1] = null;
             }

@@ -6,7 +6,6 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.Shadow;

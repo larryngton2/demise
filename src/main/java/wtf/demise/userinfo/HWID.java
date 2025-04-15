@@ -8,9 +8,9 @@ public class HWID {
             String toEncrypt = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(toEncrypt.getBytes());
-            StringBuffer hexString = new StringBuffer();
+            StringBuilder hexString = new StringBuilder();
 
-            byte byteData[] = md.digest();
+            byte[] byteData = md.digest();
 
             for (byte aByteData : byteData) {
                 String hex = Integer.toHexString(0xff & aByteData);

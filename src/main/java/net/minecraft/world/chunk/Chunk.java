@@ -393,11 +393,7 @@ public class Chunk {
             return this.getBlock0(x & 15, y, z & 15);
         } catch (ReportedException reportedexception) {
             CrashReportCategory crashreportcategory = reportedexception.getCrashReport().makeCategory("Block being got");
-            crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
-                public String call() throws Exception {
-                    return CrashReportCategory.getCoordinateInfo(new BlockPos(Chunk.this.xPosition * 16 + x, y, Chunk.this.zPosition * 16 + z));
-                }
-            });
+            crashreportcategory.addCrashSectionCallable("Location", () -> CrashReportCategory.getCoordinateInfo(new BlockPos(Chunk.this.xPosition * 16 + x, y, Chunk.this.zPosition * 16 + z)));
             throw reportedexception;
         }
     }
@@ -407,11 +403,7 @@ public class Chunk {
             return this.getBlock0(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
         } catch (ReportedException reportedexception) {
             CrashReportCategory crashreportcategory = reportedexception.getCrashReport().makeCategory("Block being got");
-            crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
-                public String call() throws Exception {
-                    return CrashReportCategory.getCoordinateInfo(pos);
-                }
-            });
+            crashreportcategory.addCrashSectionCallable("Location", () -> CrashReportCategory.getCoordinateInfo(pos));
             throw reportedexception;
         }
     }
@@ -446,11 +438,7 @@ public class Chunk {
             } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting block state");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being got");
-                crashreportcategory.addCrashSectionCallable("Location", new Callable<String>() {
-                    public String call() throws Exception {
-                        return CrashReportCategory.getCoordinateInfo(pos);
-                    }
-                });
+                crashreportcategory.addCrashSectionCallable("Location", () -> CrashReportCategory.getCoordinateInfo(pos));
                 throw new ReportedException(crashreport);
             }
         }
@@ -722,12 +710,12 @@ public class Chunk {
         this.isChunkLoaded = true;
         this.worldObj.addTileEntities(this.chunkTileEntityMap.values());
 
-        for (int i = 0; i < this.entityLists.length; ++i) {
-            for (Entity entity : this.entityLists[i]) {
+        for (ClassInheritanceMultiMap<Entity> entityList : this.entityLists) {
+            for (Entity entity : entityList) {
                 entity.onChunkLoad();
             }
 
-            this.worldObj.loadEntities(this.entityLists[i]);
+            this.worldObj.loadEntities(entityList);
         }
     }
 
@@ -738,8 +726,8 @@ public class Chunk {
             this.worldObj.markTileEntityForRemoval(tileentity);
         }
 
-        for (int i = 0; i < this.entityLists.length; ++i) {
-            this.worldObj.unloadEntities(this.entityLists[i]);
+        for (ClassInheritanceMultiMap<Entity> entityList : this.entityLists) {
+            this.worldObj.unloadEntities(entityList);
         }
     }
 
@@ -764,8 +752,8 @@ public class Chunk {
                         Entity[] aentity = entity.getParts();
 
                         if (aentity != null) {
-                            for (int l = 0; l < aentity.length; ++l) {
-                                entity = aentity[l];
+                            for (Entity value : aentity) {
+                                entity = value;
 
                                 if (entity != entityIn && entity.getEntityBoundingBox().intersectsWith(aabb) && (p_177414_4_ == null || p_177414_4_.apply(entity))) {
                                     listToFill.add(entity);

@@ -86,7 +86,7 @@ public class ShadersRender {
                 Shaders.beginHand(false);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 Shaders.setSkipRenderHands(flag, flag1);
-                er.renderHand(par1, par2, true, false, false);
+                EntityRenderer.renderHand(par1, par2, true, false, false);
                 Shaders.endHand();
                 Shaders.setHandsRendered(!flag, !flag1);
                 Shaders.setSkipRenderHands(false, false);
@@ -101,7 +101,7 @@ public class ShadersRender {
             Shaders.beginHand(true);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             Shaders.setSkipRenderHands(Shaders.isHandRenderedMain(), Shaders.isHandRenderedOff());
-            er.renderHand(par1, par2, true, false, true);
+            EntityRenderer.renderHand(par1, par2, true, false, true);
             Shaders.endHand();
             Shaders.setHandsRendered(true, true);
             Shaders.setSkipRenderHands(false, false);
@@ -118,7 +118,7 @@ public class ShadersRender {
             IntBuffer intbuffer = Shaders.activeDrawBuffers;
             Shaders.setDrawBuffers(Shaders.drawBuffersNone);
             Shaders.renderItemKeepDepthMask = true;
-            itemRenderer.renderItemInFirstPerson(par1);
+            ItemRenderer.renderItemInFirstPerson(par1);
             Shaders.renderItemKeepDepthMask = false;
             Shaders.setDrawBuffers(intbuffer);
             GL11.glPopMatrix();
@@ -126,14 +126,14 @@ public class ShadersRender {
 
         GlStateManager.depthFunc(515);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        itemRenderer.renderItemInFirstPerson(par1);
+        ItemRenderer.renderItemInFirstPerson(par1);
         Shaders.setRenderingFirstPersonHand(false);
     }
 
     public static void renderFPOverlay(EntityRenderer er, float par1, int par2) {
         if (!Shaders.isShadowPass) {
             Shaders.beginFPOverlay();
-            er.renderHand(par1, par2, false, true, false);
+            EntityRenderer.renderHand(par1, par2, false, true, false);
             Shaders.endFPOverlay();
         }
     }
@@ -236,7 +236,7 @@ public class ShadersRender {
             minecraft.mcProfiler.endStartSection("shadow entities");
 
             if (Reflector.ForgeHooksClient_setRenderPass.exists()) {
-                Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(0));
+                Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, 0);
             }
 
             renderglobal.renderEntities(entity, frustum, partialTicks);
@@ -274,9 +274,9 @@ public class ShadersRender {
 
             if (Reflector.ForgeHooksClient_setRenderPass.exists()) {
                 RenderHelper.enableStandardItemLighting();
-                Reflector.call(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(1));
+                Reflector.call(Reflector.ForgeHooksClient_setRenderPass, 1);
                 renderglobal.renderEntities(entity, frustum, partialTicks);
-                Reflector.call(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(-1));
+                Reflector.call(Reflector.ForgeHooksClient_setRenderPass, -1);
                 RenderHelper.disableStandardItemLighting();
                 Shaders.checkGLError("shadow entities 1");
             }

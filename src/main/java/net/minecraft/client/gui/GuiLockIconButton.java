@@ -41,7 +41,7 @@ public class GuiLockIconButton extends GuiButton {
                 guilockiconbutton$icon = GuiLockIconButton.Icon.UNLOCKED;
             }
 
-            this.drawTexturedModalRect(this.xPosition, this.yPosition, guilockiconbutton$icon.func_178910_a(), guilockiconbutton$icon.func_178912_b(), this.width, this.height);
+            drawTexturedModalRect(this.xPosition, this.yPosition, guilockiconbutton$icon.func_178910_a(), guilockiconbutton$icon.func_178912_b(), this.width, this.height);
         }
     }
 

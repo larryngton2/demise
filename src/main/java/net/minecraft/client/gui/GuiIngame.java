@@ -33,12 +33,9 @@ import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.ingame.CustomWidgets;
-import wtf.demise.utils.math.MathUtils;
 
 import java.awt.*;
-import java.util.Objects;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 public class GuiIngame extends Gui {
     private static final ResourceLocation vignetteTexPath = new ResourceLocation("textures/misc/vignette.png");
@@ -127,7 +124,7 @@ public class GuiIngame extends Gui {
         if (this.showCrosshair()) {
             GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
             GlStateManager.enableAlpha();
-            this.drawTexturedModalRect(i / 2 - 7, j / 2 - 7, 0, 0, 16, 16);
+            drawTexturedModalRect(i / 2 - 7, j / 2 - 7, 0, 0, 16, 16);
         }
 
         GlStateManager.enableAlpha();
@@ -310,10 +307,10 @@ public class GuiIngame extends Gui {
         int i = 182;
         int j = (int) (f * (float) (i + 1));
         int k = scaledRes.getScaledHeight() - 32 + 3;
-        this.drawTexturedModalRect(x, k, 0, 84, i, 5);
+        drawTexturedModalRect(x, k, 0, 84, i, 5);
 
         if (j > 0) {
-            this.drawTexturedModalRect(x, k, 0, 89, j, 5);
+            drawTexturedModalRect(x, k, 0, 89, j, 5);
         }
 
         this.mc.mcProfiler.endSection();
@@ -429,14 +426,14 @@ public class GuiIngame extends Gui {
     private void renderPlayerStats(ScaledResolution scaledRes) {
         if (this.mc.getRenderViewEntity() instanceof EntityPlayer entityplayer) {
             int i = MathHelper.ceiling_float_int(entityplayer.getHealth());
-            boolean flag = this.healthUpdateCounter > (long) this.updateCounter && (this.healthUpdateCounter - (long) this.updateCounter) / 3L % 2L == 1L;
+            boolean flag = this.healthUpdateCounter > (long) updateCounter && (this.healthUpdateCounter - (long) updateCounter) / 3L % 2L == 1L;
 
             if (i < this.playerHealth && entityplayer.hurtResistantTime > 0) {
                 this.lastSystemTime = Minecraft.getSystemTime();
-                this.healthUpdateCounter = this.updateCounter + 20;
+                this.healthUpdateCounter = updateCounter + 20;
             } else if (i > this.playerHealth && entityplayer.hurtResistantTime > 0) {
                 this.lastSystemTime = Minecraft.getSystemTime();
-                this.healthUpdateCounter = this.updateCounter + 10;
+                this.healthUpdateCounter = updateCounter + 10;
             }
 
             if (Minecraft.getSystemTime() - this.lastSystemTime > 1000L) {
@@ -447,7 +444,7 @@ public class GuiIngame extends Gui {
 
             this.playerHealth = i;
             int j = this.lastPlayerHealth;
-            this.rand.setSeed(this.updateCounter * 312871L);
+            this.rand.setSeed(updateCounter * 312871L);
             boolean flag1 = false;
             FoodStats foodstats = entityplayer.getFoodStats();
             int k = foodstats.getFoodLevel();
@@ -466,7 +463,7 @@ public class GuiIngame extends Gui {
             int l2 = -1;
 
             if (entityplayer.isPotionActive(Potion.regeneration)) {
-                l2 = this.updateCounter % MathHelper.ceiling_float_int(f + 5.0F);
+                l2 = updateCounter % MathHelper.ceiling_float_int(f + 5.0F);
             }
 
             this.mc.mcProfiler.startSection("armor");
@@ -476,15 +473,15 @@ public class GuiIngame extends Gui {
                     int j3 = i1 + i3 * 8;
 
                     if (i3 * 2 + 1 < k2) {
-                        this.drawTexturedModalRect(j3, j2, 34, 9, 9, 9);
+                        drawTexturedModalRect(j3, j2, 34, 9, 9, 9);
                     }
 
                     if (i3 * 2 + 1 == k2) {
-                        this.drawTexturedModalRect(j3, j2, 25, 9, 9, 9);
+                        drawTexturedModalRect(j3, j2, 25, 9, 9, 9);
                     }
 
                     if (i3 * 2 + 1 > k2) {
-                        this.drawTexturedModalRect(j3, j2, 16, 9, 9, 9);
+                        drawTexturedModalRect(j3, j2, 16, 9, 9, 9);
                     }
                 }
             }
@@ -524,31 +521,31 @@ public class GuiIngame extends Gui {
                     k4 = 5;
                 }
 
-                this.drawTexturedModalRect(i4, j4, 16 + k3 * 9, 9 * k4, 9, 9);
+                drawTexturedModalRect(i4, j4, 16 + k3 * 9, 9 * k4, 9, 9);
 
                 if (flag) {
                     if (i6 * 2 + 1 < j) {
-                        this.drawTexturedModalRect(i4, j4, j6 + 54, 9 * k4, 9, 9);
+                        drawTexturedModalRect(i4, j4, j6 + 54, 9 * k4, 9, 9);
                     }
 
                     if (i6 * 2 + 1 == j) {
-                        this.drawTexturedModalRect(i4, j4, j6 + 63, 9 * k4, 9, 9);
+                        drawTexturedModalRect(i4, j4, j6 + 63, 9 * k4, 9, 9);
                     }
                 }
 
                 if (f2 <= 0.0F) {
                     if (i6 * 2 + 1 < i) {
-                        this.drawTexturedModalRect(i4, j4, j6 + 36, 9 * k4, 9, 9);
+                        drawTexturedModalRect(i4, j4, j6 + 36, 9 * k4, 9, 9);
                     }
 
                     if (i6 * 2 + 1 == i) {
-                        this.drawTexturedModalRect(i4, j4, j6 + 45, 9 * k4, 9, 9);
+                        drawTexturedModalRect(i4, j4, j6 + 45, 9 * k4, 9, 9);
                     }
                 } else {
                     if (f2 == f1 && f1 % 2.0F == 1.0F) {
-                        this.drawTexturedModalRect(i4, j4, j6 + 153, 9 * k4, 9, 9);
+                        drawTexturedModalRect(i4, j4, j6 + 153, 9 * k4, 9, 9);
                     } else {
-                        this.drawTexturedModalRect(i4, j4, j6 + 144, 9 * k4, 9, 9);
+                        drawTexturedModalRect(i4, j4, j6 + 144, 9 * k4, 9, 9);
                     }
 
                     f2 -= 2.0F;
@@ -570,7 +567,7 @@ public class GuiIngame extends Gui {
                         k8 = 13;
                     }
 
-                    if (entityplayer.getFoodStats().getSaturationLevel() <= 0.0F && this.updateCounter % (k * 3 + 1) == 0) {
+                    if (entityplayer.getFoodStats().getSaturationLevel() <= 0.0F && updateCounter % (k * 3 + 1) == 0) {
                         j7 = k1 + (this.rand.nextInt(3) - 1);
                     }
 
@@ -579,24 +576,24 @@ public class GuiIngame extends Gui {
                     }
 
                     int j9 = j1 - k6 * 8 - 9;
-                    this.drawTexturedModalRect(j9, j7, 16 + k8 * 9, 27, 9, 9);
+                    drawTexturedModalRect(j9, j7, 16 + k8 * 9, 27, 9, 9);
 
                     if (flag1) {
                         if (k6 * 2 + 1 < l) {
-                            this.drawTexturedModalRect(j9, j7, l7 + 54, 27, 9, 9);
+                            drawTexturedModalRect(j9, j7, l7 + 54, 27, 9, 9);
                         }
 
                         if (k6 * 2 + 1 == l) {
-                            this.drawTexturedModalRect(j9, j7, l7 + 63, 27, 9, 9);
+                            drawTexturedModalRect(j9, j7, l7 + 63, 27, 9, 9);
                         }
                     }
 
                     if (k6 * 2 + 1 < k) {
-                        this.drawTexturedModalRect(j9, j7, l7 + 36, 27, 9, 9);
+                        drawTexturedModalRect(j9, j7, l7 + 36, 27, 9, 9);
                     }
 
                     if (k6 * 2 + 1 == k) {
-                        this.drawTexturedModalRect(j9, j7, l7 + 45, 27, 9, 9);
+                        drawTexturedModalRect(j9, j7, l7 + 45, 27, 9, 9);
                     }
                 }
             } else if (entity instanceof EntityLivingBase entitylivingbase) {
@@ -624,14 +621,14 @@ public class GuiIngame extends Gui {
                         }
 
                         int l5 = j1 - i5 * 8 - 9;
-                        this.drawTexturedModalRect(l5, i9, j5 + k5 * 9, 9, 9, 9);
+                        drawTexturedModalRect(l5, i9, j5 + k5 * 9, 9, 9, 9);
 
                         if (i5 * 2 + 1 + k9 < i7) {
-                            this.drawTexturedModalRect(l5, i9, j5 + 36, 9, 9, 9);
+                            drawTexturedModalRect(l5, i9, j5 + 36, 9, 9, 9);
                         }
 
                         if (i5 * 2 + 1 + k9 == i7) {
-                            this.drawTexturedModalRect(l5, i9, j5 + 45, 9, 9, 9);
+                            drawTexturedModalRect(l5, i9, j5 + 45, 9, 9, 9);
                         }
                     }
 
@@ -648,9 +645,9 @@ public class GuiIngame extends Gui {
 
                 for (int l8 = 0; l8 < k7 + i8; ++l8) {
                     if (l8 < k7) {
-                        this.drawTexturedModalRect(j1 - l8 * 8 - 9, j2, 16, 18, 9, 9);
+                        drawTexturedModalRect(j1 - l8 * 8 - 9, j2, 16, 18, 9, 9);
                     } else {
-                        this.drawTexturedModalRect(j1 - l8 * 8 - 9, j2, 25, 18, 9, 9);
+                        drawTexturedModalRect(j1 - l8 * 8 - 9, j2, 25, 18, 9, 9);
                     }
                 }
             }
@@ -669,11 +666,11 @@ public class GuiIngame extends Gui {
             int k = i / 2 - j / 2;
             int l = (int) (BossStatus.healthScale * (float) (j + 1));
             int i1 = 12;
-            this.drawTexturedModalRect(k, i1, 0, 74, j, 5);
-            this.drawTexturedModalRect(k, i1, 0, 74, j, 5);
+            drawTexturedModalRect(k, i1, 0, 74, j, 5);
+            drawTexturedModalRect(k, i1, 0, 74, j, 5);
 
             if (l > 0) {
-                this.drawTexturedModalRect(k, i1, 0, 79, l, 5);
+                drawTexturedModalRect(k, i1, 0, 79, l, 5);
             }
 
             String s = BossStatus.bossName;
@@ -819,7 +816,7 @@ public class GuiIngame extends Gui {
             }
         }
 
-        ++this.updateCounter;
+        ++updateCounter;
 
         if (this.mc.thePlayer != null) {
             ItemStack itemstack = this.mc.thePlayer.inventory.getCurrentItem();

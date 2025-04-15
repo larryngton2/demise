@@ -7,8 +7,6 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 import org.lwjglx.input.Mouse;
-import wtf.demise.Demise;
-import wtf.demise.utils.render.shader.impl.MainMenu;
 
 public abstract class GuiSlot {
     protected final Minecraft mc;

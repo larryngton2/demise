@@ -45,7 +45,7 @@ public class RealmsServerStatusPinger {
                             StringBuilder stringbuilder = new StringBuilder();
 
                             for (GameProfile gameprofile : serverstatusresponse.getPlayerCountData().getPlayers()) {
-                                if (stringbuilder.length() > 0) {
+                                if (!stringbuilder.isEmpty()) {
                                     stringbuilder.append("\n");
                                 }
 
@@ -53,7 +53,7 @@ public class RealmsServerStatusPinger {
                             }
 
                             if (serverstatusresponse.getPlayerCountData().getPlayers().length < serverstatusresponse.getPlayerCountData().getOnlinePlayerCount()) {
-                                if (stringbuilder.length() > 0) {
+                                if (!stringbuilder.isEmpty()) {
                                     stringbuilder.append("\n");
                                 }
 

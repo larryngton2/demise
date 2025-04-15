@@ -71,8 +71,8 @@ public class GuiShaderOptions extends GuiScreenOF {
                 if (shaderoption != null && shaderoption.isVisible()) {
                     int j2 = i2 % k1;
                     int k2 = i2 / k1;
-                    int l2 = Math.min(this.width / k1, 200);
-                    j = (this.width - l2 * k1) / 2;
+                    int l2 = Math.min(width / k1, 200);
+                    j = (width - l2 * k1) / 2;
                     int i3 = j2 * l2 + 5 + j;
                     int j3 = k + k2 * l;
                     int k3 = l2 - 10;
@@ -91,8 +91,8 @@ public class GuiShaderOptions extends GuiScreenOF {
             }
         }
 
-        this.buttonList.add(new GuiButton(201, this.width / 2 - i1 - 20, this.height / 6 + 168 + 11, i1, j1, I18n.format("controls.reset")));
-        this.buttonList.add(new GuiButton(200, this.width / 2 + 20, this.height / 6 + 168 + 11, i1, j1, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(201, width / 2 - i1 - 20, height / 6 + 168 + 11, i1, j1, I18n.format("controls.reset")));
+        this.buttonList.add(new GuiButton(200, width / 2 + 20, height / 6 + 168 + 11, i1, j1, I18n.format("gui.done")));
     }
 
     public static String getButtonText(ShaderOption so, float btnWidth) {
@@ -103,7 +103,7 @@ public class GuiShaderOptions extends GuiScreenOF {
         } else {
             FontRenderer fontrenderer = Config.getMinecraft().fontRendererObj;
 
-            for (int i = fontrenderer.getStringWidth(": " + Lang.getOff()) + 5; fontrenderer.getStringWidth(s) + i >= btnWidth && s.length() > 0; s = s.substring(0, s.length() - 1)) {
+            for (int i = fontrenderer.getStringWidth(": " + Lang.getOff()) + 5; fontrenderer.getStringWidth(s) + i >= btnWidth && !s.isEmpty(); s = s.substring(0, s.length() - 1)) {
             }
 
             String s1 = so.isChanged() ? so.getValueColor(so.getValue()) : "";
@@ -120,7 +120,7 @@ public class GuiShaderOptions extends GuiScreenOF {
                 if (shaderoption instanceof ShaderOptionScreen) {
                     String s = shaderoption.getName();
                     GuiShaderOptions guishaderoptions = new GuiShaderOptions(this, this.settings, s);
-                    this.mc.displayGuiScreen(guishaderoptions);
+                    mc.displayGuiScreen(guishaderoptions);
                     return;
                 }
 
@@ -137,8 +137,7 @@ public class GuiShaderOptions extends GuiScreenOF {
             if (guibutton.id == 201) {
                 ShaderOption[] ashaderoption = Shaders.getChangedOptions(Shaders.getShaderPackOptions());
 
-                for (int i = 0; i < ashaderoption.length; ++i) {
-                    ShaderOption shaderoption1 = ashaderoption[i];
+                for (ShaderOption shaderoption1 : ashaderoption) {
                     shaderoption1.resetValue();
                     this.changed = true;
                 }
@@ -153,7 +152,7 @@ public class GuiShaderOptions extends GuiScreenOF {
                     Shaders.uninit();
                 }
 
-                this.mc.displayGuiScreen(this.prevScreen);
+                mc.displayGuiScreen(this.prevScreen);
             }
         }
     }
@@ -202,9 +201,9 @@ public class GuiShaderOptions extends GuiScreenOF {
         this.drawDefaultBackground();
 
         if (this.screenText != null) {
-            this.drawCenteredString(this.fontRendererObj, this.screenText, this.width / 2, 15, 16777215);
+            drawCenteredString(this.fontRendererObj, this.screenText, width / 2, 15, 16777215);
         } else {
-            this.drawCenteredString(this.fontRendererObj, this.title, this.width / 2, 15, 16777215);
+            drawCenteredString(this.fontRendererObj, this.title, width / 2, 15, 16777215);
         }
 
         super.drawScreen(x, y, f);

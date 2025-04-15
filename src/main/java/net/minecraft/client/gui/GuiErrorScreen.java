@@ -15,13 +15,13 @@ public class GuiErrorScreen extends GuiScreen {
 
     public void initGui() {
         super.initGui();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, 140, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, width / 2 - 100, 140, I18n.format("gui.cancel")));
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.drawGradientRect(0, 0, this.width, this.height, -12574688, -11530224);
-        this.drawCenteredString(this.fontRendererObj, this.field_146313_a, this.width / 2, 90, 16777215);
-        this.drawCenteredString(this.fontRendererObj, this.field_146312_f, this.width / 2, 110, 16777215);
+        this.drawGradientRect(0, 0, width, height, -12574688, -11530224);
+        drawCenteredString(this.fontRendererObj, this.field_146313_a, width / 2, 90, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_146312_f, width / 2, 110, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -29,6 +29,6 @@ public class GuiErrorScreen extends GuiScreen {
     }
 
     protected void actionPerformed(GuiButton button) throws IOException {
-        this.mc.displayGuiScreen(null);
+        mc.displayGuiScreen(null);
     }
 }

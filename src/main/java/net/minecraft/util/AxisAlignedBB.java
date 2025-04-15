@@ -1,7 +1,5 @@
 package net.minecraft.util;
 
-import wtf.demise.utils.math.MathUtils;
-
 public class AxisAlignedBB {
     public final double minX;
     public final double minY;

@@ -10,7 +10,7 @@ public class BlockStandingSign extends BlockSign {
     public static final PropertyInteger ROTATION = PropertyInteger.create("rotation", 0, 15);
 
     public BlockStandingSign() {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(ROTATION, Integer.valueOf(0)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(ROTATION, 0));
     }
 
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
@@ -23,11 +23,11 @@ public class BlockStandingSign extends BlockSign {
     }
 
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(ROTATION, Integer.valueOf(meta));
+        return this.getDefaultState().withProperty(ROTATION, meta);
     }
 
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(ROTATION).intValue();
+        return state.getValue(ROTATION);
     }
 
     protected BlockState createBlockState() {

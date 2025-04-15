@@ -213,8 +213,7 @@ public final class SkeetUI extends GuiScreen {
                             if (selectedTab != tabOrSideBar)
                                 continue;
                             for (Component groupBox : tabOrSideBar.getChildren()) {
-                                if (groupBox instanceof GroupBoxComponent) {
-                                    GroupBoxComponent groupBoxComponent = (GroupBoxComponent) groupBox;
+                                if (groupBox instanceof GroupBoxComponent groupBoxComponent) {
 
                                     if (groupBoxComponent.isHoveredEntire(mouseX, mouseY)) {
                                         return;
@@ -385,7 +384,7 @@ public final class SkeetUI extends GuiScreen {
         }
         if (isVisible()) {
             alpha = Translate.anim(alpha, this.targetAlpha, 1000 * 2);
-            this.rootComponent.drawComponent(new LockedResolution(this.width, this.height), mouseX, mouseY);
+            this.rootComponent.drawComponent(new LockedResolution(width, height), mouseX, mouseY);
             this.rootComponent.onMouseScroll(mouseX, mouseY, Mouse.getDWheel() * 6);
         }
     }

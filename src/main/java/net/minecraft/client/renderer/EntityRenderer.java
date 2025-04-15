@@ -250,12 +250,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 theShaderGroup = new ShaderGroup(mc.getTextureManager(), resourceManager, mc.getFramebuffer(), resourceLocationIn);
                 theShaderGroup.createBindFramebuffers(mc.displayWidth, mc.displayHeight);
                 useShader = true;
-            } catch (IOException ioexception) {
+            } catch (IOException | JsonSyntaxException ioexception) {
                 logger.warn("Failed to load shader: " + resourceLocationIn, ioexception);
-                shaderIndex = shaderCount;
-                useShader = false;
-            } catch (JsonSyntaxException jsonsyntaxexception) {
-                logger.warn("Failed to load shader: " + resourceLocationIn, jsonsyntaxexception);
                 shaderIndex = shaderCount;
                 useShader = false;
             }
@@ -529,7 +525,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 f = f * 60.0F / 70.0F;
             }
 
-            return Reflector.ForgeHooksClient_getFOVModifier.exists() ? Reflector.callFloat(Reflector.ForgeHooksClient_getFOVModifier, EntityRenderer.class, entity, block, Float.valueOf(partialTicks), Float.valueOf(f)) : f;
+            return Reflector.ForgeHooksClient_getFOVModifier.exists() ? Reflector.callFloat(Reflector.ForgeHooksClient_getFOVModifier, EntityRenderer.class, entity, block, partialTicks, f) : f;
         }
     }
 
@@ -680,7 +676,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 }
 
                 Block block1 = ActiveRenderInfo.getBlockAtEntityViewpoint(mc.theWorld, entity, partialTicks);
-                Object object = Reflector.newInstance(Reflector.EntityViewRenderEvent_CameraSetup_Constructor, this, entity, block1, Float.valueOf(partialTicks), Float.valueOf(f6), Float.valueOf(f7), Float.valueOf(f8));
+                Object object = Reflector.newInstance(Reflector.EntityViewRenderEvent_CameraSetup_Constructor, this, entity, block1, partialTicks, f6, f7, f8);
                 Reflector.postForgeBusEvent(object);
                 f8 = Reflector.getFieldValueFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_roll, f8);
                 f7 = Reflector.getFieldValueFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_pitch, f7);
@@ -830,7 +826,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                     if (Config.isShaders()) {
                         ShadersRender.renderItemFP(itemRenderer, p_renderHand_1_, p_renderHand_5_);
                     } else {
-                        itemRenderer.renderItemInFirstPerson(p_renderHand_1_);
+                        ItemRenderer.renderItemInFirstPerson(p_renderHand_1_);
                     }
 
                     disableLightmap();
@@ -1151,28 +1147,16 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
                 try {
                     if (Reflector.ForgeHooksClient_drawScreen.exists()) {
-                        Reflector.callVoid(Reflector.ForgeHooksClient_drawScreen, mc.currentScreen, Integer.valueOf(k1), Integer.valueOf(l1), Float.valueOf(partialTicks));
+                        Reflector.callVoid(Reflector.ForgeHooksClient_drawScreen, mc.currentScreen, k1, l1, partialTicks);
                     } else {
                         mc.currentScreen.drawScreen(k1, l1, partialTicks);
                     }
                 } catch (Throwable throwable) {
                     CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering screen");
                     CrashReportCategory crashreportcategory = crashreport.makeCategory("Screen render details");
-                    crashreportcategory.addCrashSectionCallable("Screen name", new Callable<String>() {
-                        public String call() throws Exception {
-                            return EntityRenderer.mc.currentScreen.getClass().getCanonicalName();
-                        }
-                    });
-                    crashreportcategory.addCrashSectionCallable("Mouse location", new Callable<String>() {
-                        public String call() throws Exception {
-                            return String.format("Scaled: (%d, %d). Absolute: (%d, %d)", Integer.valueOf(k1), Integer.valueOf(l1), Integer.valueOf(Mouse.getX()), Integer.valueOf(Mouse.getY()));
-                        }
-                    });
-                    crashreportcategory.addCrashSectionCallable("Screen size", new Callable<String>() {
-                        public String call() throws Exception {
-                            return String.format("Scaled: (%d, %d). Absolute: (%d, %d). Scale factor of %d", Integer.valueOf(scaledresolution.getScaledWidth()), Integer.valueOf(scaledresolution.getScaledHeight()), Integer.valueOf(EntityRenderer.mc.displayWidth), Integer.valueOf(EntityRenderer.mc.displayHeight), Integer.valueOf(scaledresolution.getScaleFactor()));
-                        }
-                    });
+                    crashreportcategory.addCrashSectionCallable("Screen name", () -> EntityRenderer.mc.currentScreen.getClass().getCanonicalName());
+                    crashreportcategory.addCrashSectionCallable("Mouse location", () -> String.format("Scaled: (%d, %d). Absolute: (%d, %d)", k1, l1, Mouse.getX(), Mouse.getY()));
+                    crashreportcategory.addCrashSectionCallable("Screen size", () -> String.format("Scaled: (%d, %d). Absolute: (%d, %d). Scale factor of %d", scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight(), EntityRenderer.mc.displayWidth, EntityRenderer.mc.displayHeight, scaledresolution.getScaleFactor()));
                     throw new ReportedException(crashreport);
                 }
             }
@@ -1447,13 +1431,13 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             mc.mcProfiler.endStartSection("entities");
 
             if (Reflector.ForgeHooksClient_setRenderPass.exists()) {
-                Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(0));
+                Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, 0);
             }
 
             renderglobal.renderEntities(entity, icamera, partialTicks);
 
             if (Reflector.ForgeHooksClient_setRenderPass.exists()) {
-                Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(-1));
+                Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, -1);
             }
 
             RenderHelper.disableStandardItemLighting();
@@ -1479,7 +1463,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             GlStateManager.disableAlpha();
             mc.mcProfiler.endStartSection("outline");
 
-            if ((!Reflector.ForgeHooksClient_onDrawBlockHighlight.exists() || !Reflector.callBoolean(Reflector.ForgeHooksClient_onDrawBlockHighlight, renderglobal, entityplayer1, mc.objectMouseOver, Integer.valueOf(0), entityplayer1.getHeldItem(), Float.valueOf(partialTicks))) && !mc.gameSettings.hideGUI) {
+            if ((!Reflector.ForgeHooksClient_onDrawBlockHighlight.exists() || !Reflector.callBoolean(Reflector.ForgeHooksClient_onDrawBlockHighlight, renderglobal, entityplayer1, mc.objectMouseOver, 0, entityplayer1.getHeldItem(), partialTicks)) && !mc.gameSettings.hideGUI) {
                 renderglobal.drawSelectionBox(entityplayer1, mc.objectMouseOver, 0, partialTicks);
             }
             GlStateManager.enableAlpha();
@@ -1575,10 +1559,10 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         if (Reflector.ForgeHooksClient_setRenderPass.exists() && !debugView) {
             RenderHelper.enableStandardItemLighting();
             mc.mcProfiler.endStartSection("entities");
-            Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(1));
+            Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, 1);
             mc.renderGlobal.renderEntities(entity, icamera, partialTicks);
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, Integer.valueOf(-1));
+            Reflector.callVoid(Reflector.ForgeHooksClient_setRenderPass, -1);
             RenderHelper.disableStandardItemLighting();
         }
 
@@ -1595,7 +1579,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
         if (Reflector.ForgeHooksClient_dispatchRenderLast.exists()) {
             mc.mcProfiler.endStartSection("forge_render_last");
-            Reflector.callVoid(Reflector.ForgeHooksClient_dispatchRenderLast, renderglobal, Float.valueOf(partialTicks));
+            Reflector.callVoid(Reflector.ForgeHooksClient_dispatchRenderLast, renderglobal, partialTicks);
         }
 
         mc.mcProfiler.endStartSection("hand");
@@ -1716,7 +1700,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             Object object = Reflector.call(worldprovider, Reflector.ForgeWorldProvider_getWeatherRenderer);
 
             if (object != null) {
-                Reflector.callVoid(object, Reflector.IRenderHandler_render, Float.valueOf(partialTicks), mc.theWorld, mc);
+                Reflector.callVoid(object, Reflector.IRenderHandler_render, partialTicks, mc.theWorld, mc);
                 return;
             }
         }
@@ -2030,7 +2014,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         }
 
         if (Reflector.EntityViewRenderEvent_FogColors_Constructor.exists()) {
-            Object object = Reflector.newInstance(Reflector.EntityViewRenderEvent_FogColors_Constructor, this, entity, block, Float.valueOf(partialTicks), Float.valueOf(fogColorRed), Float.valueOf(fogColorGreen), Float.valueOf(fogColorBlue));
+            Object object = Reflector.newInstance(Reflector.EntityViewRenderEvent_FogColors_Constructor, this, entity, block, partialTicks, fogColorRed, fogColorGreen, fogColorBlue);
             Reflector.postForgeBusEvent(object);
             fogColorRed = Reflector.getFieldValueFloat(object, Reflector.EntityViewRenderEvent_FogColors_red, fogColorRed);
             fogColorGreen = Reflector.getFieldValueFloat(object, Reflector.EntityViewRenderEvent_FogColors_green, fogColorGreen);
@@ -2056,7 +2040,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         float f = -1.0F;
 
         if (Reflector.ForgeHooksClient_getFogDensity.exists()) {
-            f = Reflector.callFloat(Reflector.ForgeHooksClient_getFogDensity, this, entity, block, Float.valueOf(partialTicks), Float.valueOf(0.1F));
+            f = Reflector.callFloat(Reflector.ForgeHooksClient_getFogDensity, this, entity, block, partialTicks, 0.1F);
         }
 
         if (f >= 0.0F) {
@@ -2127,7 +2111,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             }
 
             if (Reflector.ForgeHooksClient_onFogRender.exists()) {
-                Reflector.callVoid(Reflector.ForgeHooksClient_onFogRender, this, entity, block, Float.valueOf(partialTicks), Integer.valueOf(startCoords), Float.valueOf(f3));
+                Reflector.callVoid(Reflector.ForgeHooksClient_onFogRender, this, entity, block, partialTicks, startCoords, f3);
             }
         }
 
@@ -2289,7 +2273,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
             if (i != 0 && GlErrors.isEnabled(i)) {
                 String s = Config.getGlErrorString(i);
-                ChatComponentText chatcomponenttext = new ChatComponentText(I18n.format("of.message.openglError", Integer.valueOf(i), s));
+                ChatComponentText chatcomponenttext = new ChatComponentText(I18n.format("of.message.openglError", i, s));
                 mc.ingameGUI.getChatGUI().printChatMessage(chatcomponenttext);
             }
         }

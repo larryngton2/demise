@@ -30,17 +30,17 @@ public class GuiScreenHorseInventory extends GuiContainer {
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(horseGuiTextures);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        mc.getTextureManager().bindTexture(horseGuiTextures);
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
+        drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 
         if (this.horseEntity.isChested()) {
-            this.drawTexturedModalRect(i + 79, j + 17, 0, this.ySize, 90, 54);
+            drawTexturedModalRect(i + 79, j + 17, 0, this.ySize, 90, 54);
         }
 
         if (this.horseEntity.canWearArmor()) {
-            this.drawTexturedModalRect(i + 7, j + 35, 0, this.ySize + 54, 18, 18);
+            drawTexturedModalRect(i + 7, j + 35, 0, this.ySize + 54, 18, 18);
         }
 
         GuiInventory.drawEntityOnScreen(i + 51, j + 60, 17, (float) (i + 51) - this.mousePosx, (float) (j + 75 - 50) - this.mousePosY, this.horseEntity);

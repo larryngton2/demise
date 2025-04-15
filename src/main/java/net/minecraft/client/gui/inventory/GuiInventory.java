@@ -25,8 +25,8 @@ public class GuiInventory extends InventoryEffectRenderer {
     }
 
     public void updateScreen() {
-        if (this.mc.playerController.isInCreativeMode()) {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
+        if (mc.playerController.isInCreativeMode()) {
+            mc.displayGuiScreen(new GuiContainerCreative(mc.thePlayer));
         }
 
         this.updateActivePotionEffects();
@@ -35,8 +35,8 @@ public class GuiInventory extends InventoryEffectRenderer {
     public void initGui() {
         this.buttonList.clear();
 
-        if (this.mc.playerController.isInCreativeMode()) {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
+        if (mc.playerController.isInCreativeMode()) {
+            mc.displayGuiScreen(new GuiContainerCreative(mc.thePlayer));
         } else {
             super.initGui();
         }
@@ -54,11 +54,11 @@ public class GuiInventory extends InventoryEffectRenderer {
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(inventoryBackground);
+        mc.getTextureManager().bindTexture(inventoryBackground);
         int i = this.guiLeft;
         int j = this.guiTop;
         drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-        drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, this.mc.thePlayer);
+        drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, mc.thePlayer);
     }
 
     public static void drawEntityOnScreen(float posX, float posY, float scale, float mouseX, float mouseY, EntityLivingBase ent) {
@@ -102,11 +102,11 @@ public class GuiInventory extends InventoryEffectRenderer {
 
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.id == 0) {
-            this.mc.displayGuiScreen(new GuiAchievements(this, this.mc.thePlayer.getStatFileWriter()));
+            mc.displayGuiScreen(new GuiAchievements(this, mc.thePlayer.getStatFileWriter()));
         }
 
         if (button.id == 1) {
-            this.mc.displayGuiScreen(new GuiStats(this, this.mc.thePlayer.getStatFileWriter()));
+            mc.displayGuiScreen(new GuiStats(this, mc.thePlayer.getStatFileWriter()));
         }
     }
 }

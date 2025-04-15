@@ -41,11 +41,7 @@ public class EntityEnderman extends EntityMob {
         this.tasks.addTask(11, new EntityEnderman.AITakeBlock(this));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
         this.targetTasks.addTask(2, new EntityEnderman.AIFindPlayer(this));
-        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false, new Predicate<EntityEndermite>() {
-            public boolean apply(EntityEndermite p_apply_1_) {
-                return p_apply_1_.isSpawnedByPlayer();
-            }
-        }));
+        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false, (Predicate<EntityEndermite>) p_apply_1_ -> p_apply_1_.isSpawnedByPlayer()));
     }
 
     protected void applyEntityAttributes() {
@@ -58,9 +54,9 @@ public class EntityEnderman extends EntityMob {
 
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(16, Short.valueOf((short) 0));
-        this.dataWatcher.addObject(17, Byte.valueOf((byte) 0));
-        this.dataWatcher.addObject(18, Byte.valueOf((byte) 0));
+        this.dataWatcher.addObject(16, (short) 0);
+        this.dataWatcher.addObject(17, (byte) 0);
+        this.dataWatcher.addObject(18, (byte) 0);
     }
 
     public void writeEntityToNBT(NBTTagCompound tagCompound) {
@@ -239,7 +235,7 @@ public class EntityEnderman extends EntityMob {
     }
 
     public void setHeldBlockState(IBlockState state) {
-        this.dataWatcher.updateObject(16, Short.valueOf((short) (Block.getStateId(state) & 65535)));
+        this.dataWatcher.updateObject(16, (short) (Block.getStateId(state) & 65535));
     }
 
     public IBlockState getHeldBlockState() {
@@ -291,7 +287,7 @@ public class EntityEnderman extends EntityMob {
     }
 
     public void setScreaming(boolean screaming) {
-        this.dataWatcher.updateObject(18, Byte.valueOf((byte) (screaming ? 1 : 0)));
+        this.dataWatcher.updateObject(18, (byte) (screaming ? 1 : 0));
     }
 
     static {
@@ -325,7 +321,7 @@ public class EntityEnderman extends EntityMob {
         public boolean shouldExecute() {
             double d0 = this.getTargetDistance();
             List<EntityPlayer> list = this.taskOwner.worldObj.getEntitiesWithinAABB(EntityPlayer.class, this.taskOwner.getEntityBoundingBox().expand(d0, 4.0D, d0), this.targetEntitySelector);
-            Collections.sort(list, this.theNearestAttackableTargetSorter);
+            list.sort(this.theNearestAttackableTargetSorter);
 
             if (list.isEmpty()) {
                 return false;

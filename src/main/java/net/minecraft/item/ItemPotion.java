@@ -52,11 +52,11 @@ public class ItemPotion extends Item {
 
             return list1;
         } else {
-            List<PotionEffect> list = this.effectCache.get(Integer.valueOf(stack.getMetadata()));
+            List<PotionEffect> list = this.effectCache.get(stack.getMetadata());
 
             if (list == null) {
                 list = PotionHelper.getPotionEffects(stack.getMetadata(), false);
-                this.effectCache.put(Integer.valueOf(stack.getMetadata()), list);
+                this.effectCache.put(stack.getMetadata(), list);
             }
 
             return list;
@@ -64,11 +64,11 @@ public class ItemPotion extends Item {
     }
 
     public List<PotionEffect> getEffects(int meta) {
-        List<PotionEffect> list = this.effectCache.get(Integer.valueOf(meta));
+        List<PotionEffect> list = this.effectCache.get(meta);
 
         if (list == null) {
             list = PotionHelper.getPotionEffects(meta, false);
-            this.effectCache.put(Integer.valueOf(meta), list);
+            this.effectCache.put(meta, list);
         }
 
         return list;
@@ -192,7 +192,7 @@ public class ItemPotion extends Item {
                     Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
                     Map<IAttribute, AttributeModifier> map = potion.getAttributeModifierMap();
 
-                    if (map != null && map.size() > 0) {
+                    if (map != null && !map.isEmpty()) {
                         for (Entry<IAttribute, AttributeModifier> entry : map.entrySet()) {
                             AttributeModifier attributemodifier = entry.getValue();
                             AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), potion.getAttributeModifierAmount(potioneffect.getAmplifier(), attributemodifier), attributemodifier.getOperation());
@@ -278,17 +278,14 @@ public class ItemPotion extends Item {
                         List<PotionEffect> list = PotionHelper.getPotionEffects(i1, false);
 
                         if (list != null && !list.isEmpty()) {
-                            SUB_ITEMS_CACHE.put(list, Integer.valueOf(i1));
+                            SUB_ITEMS_CACHE.put(list, i1);
                         }
                     }
                 }
             }
         }
 
-        Iterator iterator = SUB_ITEMS_CACHE.values().iterator();
-
-        while (iterator.hasNext()) {
-            int j1 = ((Integer) iterator.next()).intValue();
+        for (int j1 : SUB_ITEMS_CACHE.values()) {
             subItems.add(new ItemStack(itemIn, 1, j1));
         }
     }

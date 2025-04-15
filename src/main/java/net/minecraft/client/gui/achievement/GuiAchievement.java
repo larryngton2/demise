@@ -100,7 +100,7 @@ public class GuiAchievement extends Gui {
             GlStateManager.enableTexture2D();
             this.mc.getTextureManager().bindTexture(achievementBg);
             GlStateManager.disableLighting();
-            this.drawTexturedModalRect(i, j, 96, 202, 160, 32);
+            drawTexturedModalRect(i, j, 96, 202, 160, 32);
 
             if (this.permanentNotification) {
                 this.mc.fontRendererObj.drawSplitString(this.achievementDescription, i + 30, j + 7, 120, -1);

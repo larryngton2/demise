@@ -27,7 +27,7 @@ public class GuiScreenRealmsProxy extends GuiScreen {
     }
 
     public void func_154325_a(String p_154325_1_, int p_154325_2_, int p_154325_3_, int p_154325_4_) {
-        super.drawCenteredString(this.fontRendererObj, p_154325_1_, p_154325_2_, p_154325_3_, p_154325_4_);
+        drawCenteredString(this.fontRendererObj, p_154325_1_, p_154325_2_, p_154325_3_, p_154325_4_);
     }
 
     public void func_154322_b(String p_154322_1_, int p_154322_2_, int p_154322_3_, int p_154322_4_, boolean p_154322_5_) {
@@ -40,7 +40,7 @@ public class GuiScreenRealmsProxy extends GuiScreen {
 
     public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height) {
         this.field_154330_a.blit(x, y, textureX, textureY, width, height);
-        super.drawTexturedModalRect(x, y, textureX, textureY, width, height);
+        Gui.drawTexturedModalRect(x, y, textureX, textureY, width, height);
     }
 
     public void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor) {

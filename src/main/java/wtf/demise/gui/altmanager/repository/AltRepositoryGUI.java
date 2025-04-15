@@ -165,7 +165,7 @@ public class AltRepositoryGUI extends GuiScreen {
                                     @Override
                                     public void onLoginFailed() {
                                         gui.getGroupAltInfo().updateStatus(RED + "Invalid credentials!");
-                                        AltRepositoryGUI.this.mc.displayGuiScreen(AltRepositoryGUI.this);
+                                        mc.displayGuiScreen(AltRepositoryGUI.this);
                                     }
                                 }).run();
                             } else {
@@ -182,7 +182,7 @@ public class AltRepositoryGUI extends GuiScreen {
                                     mc.session = new Session(microsoftAltCredential.getName(),
                                             microsoftAltCredential.getUUID().toString(),
                                             accessToken, "msa");
-                                    AltRepositoryGUI.this.mc.displayGuiScreen(AltRepositoryGUI.this);
+                                    mc.displayGuiScreen(AltRepositoryGUI.this);
                                     demise.getNotificationManager().post(NotificationType.OKAY, "Logged in! Username: " + microsoftAltCredential.getName());
                                 } catch (Exception e) {
                                     demise.getNotificationManager().post(NotificationType.WARNING, "Failed to logged in");
@@ -281,10 +281,10 @@ public class AltRepositoryGUI extends GuiScreen {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         for (GuiButton button : this.buttonList) {
-            if (button.mousePressed(this.mc, mouseX, mouseY)) {
+            if (button.mousePressed(mc, mouseX, mouseY)) {
                 this.selectedButton = button;
 
-                button.playPressSound(this.mc.getSoundHandler());
+                button.playPressSound(mc.getSoundHandler());
                 actionPerformed(button);
                 return;
             }
@@ -346,13 +346,13 @@ public class AltRepositoryGUI extends GuiScreen {
         final GuiTextField oldSearchField = this.searchField;
         this.altBoxAnimationStep = 500 / 564.0F * Alt.FHD_ANIMATION_STEP;
         this.altBoxAlphaStep = 0xFF / (200 / Alt.FHD_ANIMATION_STEP);
-        this.searchField = new GuiTextField(0, this.mc.fontRendererObj, (width / 2) - 100, 5, 200, 20);
+        this.searchField = new GuiTextField(0, mc.fontRendererObj, (width / 2) - 100, 5, 200, 20);
 
         if (oldSearchField != null) {
             this.searchField.setText(oldSearchField.getText());
         }
 
-        this.sliderHeight = -VERTICAL_MARGIN + this.height + -DOWN_MARGIN;
+        this.sliderHeight = -VERTICAL_MARGIN + height + -DOWN_MARGIN;
         final int oldVisibleAltsCount = this.visibleAltsCount;
         this.visibleAltsCount = getVisibleAltsCount();
 
@@ -363,8 +363,8 @@ public class AltRepositoryGUI extends GuiScreen {
         updateVisibleAlts();
 
         float width = 75;
-        float x = this.width / 2 - (width / 2);
-        float y = this.height - 25;
+        float x = GuiScreen.width / 2 - (width / 2);
+        float y = height - 25;
 
         this.buttonList.add(new GuiButton(0, x - (width * 2 + 10), y, width, 20, "Add"));
         this.buttonList.add(new GuiButton(1, x - (width + 5), y, width, 20, "Remove"));
@@ -372,8 +372,8 @@ public class AltRepositoryGUI extends GuiScreen {
         this.buttonList.add(new GuiButton(69, x + (width + 5), y, width, 20, "Copy IGN"));
         this.buttonList.add(new GuiButton(71, x + (width * 2 + 10), y, width, 20, "Change Skin"));
 
-        this.buttonList.add(new GuiButton(4, this.width - width - 5, y, width, 20, "Back"));
-        this.buttonList.add(new GuiButton(3, this.width - width * 2 - 10, y, width, 20, "Refresh"));
+        this.buttonList.add(new GuiButton(4, GuiScreen.width - width - 5, y, width, 20, "Back"));
+        this.buttonList.add(new GuiButton(3, GuiScreen.width - width * 2 - 10, y, width, 20, "Refresh"));
 
         //this.buttonList.add(new GuiCustomButton("TokenXGP (URL)", 72, this.width - 150, 2, 75, 20, 8, Fonts.interSemiBold.get(16)));
         //this.buttonList.add(new GuiCustomButton("TokenLogin", 70, this.width - 70, 2, 55, 20, 8, Fonts.interSemiBold.get(16)));
@@ -513,7 +513,7 @@ public class AltRepositoryGUI extends GuiScreen {
 
     private int getVisibleAltsCount() {
         final int columns = 4;
-        final float rows = (this.height - VERTICAL_MARGIN) / (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE);
+        final float rows = (height - VERTICAL_MARGIN) / (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE);
         return MathHelper.floor_float(rows) * columns;
     }
 

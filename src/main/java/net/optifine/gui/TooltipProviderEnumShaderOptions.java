@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class TooltipProviderEnumShaderOptions implements TooltipProvider {
     public Rectangle getTooltipBounds(GuiScreen guiScreen, int x, int y) {
-        int i = guiScreen.width - 450;
+        int i = GuiScreen.width - 450;
         int j = 35;
 
         if (i < 10) {

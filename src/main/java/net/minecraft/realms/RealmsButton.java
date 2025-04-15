@@ -1,6 +1,7 @@
 package net.minecraft.realms;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonRealmsProxy;
 import net.minecraft.util.ResourceLocation;
@@ -60,7 +61,7 @@ public class RealmsButton {
     }
 
     public void blit(float p_blit_1_, float p_blit_2_, int p_blit_3_, int p_blit_4_, int p_blit_5_, int p_blit_6_) {
-        this.proxy.drawTexturedModalRect(p_blit_1_, p_blit_2_, p_blit_3_, p_blit_4_, p_blit_5_, p_blit_6_);
+        Gui.drawTexturedModalRect(p_blit_1_, p_blit_2_, p_blit_3_, p_blit_4_, p_blit_5_, p_blit_6_);
     }
 
     public void renderBg(int p_renderBg_1_, int p_renderBg_2_) {

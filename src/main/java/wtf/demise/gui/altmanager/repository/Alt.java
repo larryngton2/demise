@@ -302,9 +302,7 @@ public class Alt {
 
         if (profileTexture != null) {
             mc.addScheduledTask(
-                    () -> mc.getSkinManager().loadSkin(profileTexture, SKIN, (type, skinLocation, texture) -> {
-                        setupPlayer(gameProfile, skinLocation);
-                    }));
+                    () -> mc.getSkinManager().loadSkin(profileTexture, SKIN, (type, skinLocation, texture) -> setupPlayer(gameProfile, skinLocation)));
         }
     }
 

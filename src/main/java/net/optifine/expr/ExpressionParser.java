@@ -107,7 +107,7 @@ public class ExpressionParser {
                     this.mergeOperators(listExpr, listFunc, k);
                 }
 
-                if (listExpr.size() == 1 && listFunc.size() == 0) {
+                if (listExpr.size() == 1 && listFunc.isEmpty()) {
                     return listExpr.get(0);
                 } else {
                     throw new ParseException("Error merging operators, expressions: " + listExpr.size() + ", operators: " + listFunc.size());
@@ -225,7 +225,7 @@ public class ExpressionParser {
             IExpression iexpression = this.parseInfix(deque2);
 
             if (iexpression == null) {
-                IExpression[] aiexpression = list.toArray(new IExpression[list.size()]);
+                IExpression[] aiexpression = list.toArray(new IExpression[0]);
                 return aiexpression;
             }
 

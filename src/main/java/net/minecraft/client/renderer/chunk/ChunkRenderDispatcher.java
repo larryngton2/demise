@@ -72,7 +72,7 @@ public class ChunkRenderDispatcher {
     }
 
     public String getDebugInfo() {
-        return String.format("pC: %03d, pU: %1d, aB: %1d", Integer.valueOf(this.queueChunkUpdates.size()), Integer.valueOf(this.queueChunkUploads.size()), Integer.valueOf(this.queueFreeRenderBuilders.size()));
+        return String.format("pC: %03d, pU: %1d, aB: %1d", this.queueChunkUpdates.size(), this.queueChunkUploads.size(), this.queueFreeRenderBuilders.size());
     }
 
     public boolean runChunkUploads(long p_178516_1_) {
@@ -112,11 +112,7 @@ public class ChunkRenderDispatcher {
 
         try {
             final ChunkCompileTaskGenerator chunkcompiletaskgenerator = chunkRenderer.makeCompileTaskChunk();
-            chunkcompiletaskgenerator.addFinishRunnable(new Runnable() {
-                public void run() {
-                    ChunkRenderDispatcher.this.queueChunkUpdates.remove(chunkcompiletaskgenerator);
-                }
-            });
+            chunkcompiletaskgenerator.addFinishRunnable(() -> ChunkRenderDispatcher.this.queueChunkUpdates.remove(chunkcompiletaskgenerator));
             boolean flag1 = this.queueChunkUpdates.offer(chunkcompiletaskgenerator);
 
             if (!flag1) {
@@ -189,11 +185,7 @@ public class ChunkRenderDispatcher {
             final ChunkCompileTaskGenerator chunkcompiletaskgenerator = chunkRenderer.makeCompileTaskTransparency();
 
             if (chunkcompiletaskgenerator != null) {
-                chunkcompiletaskgenerator.addFinishRunnable(new Runnable() {
-                    public void run() {
-                        ChunkRenderDispatcher.this.queueChunkUpdates.remove(chunkcompiletaskgenerator);
-                    }
-                });
+                chunkcompiletaskgenerator.addFinishRunnable(() -> ChunkRenderDispatcher.this.queueChunkUpdates.remove(chunkcompiletaskgenerator));
                 boolean flag2 = this.queueChunkUpdates.offer(chunkcompiletaskgenerator);
                 return flag2;
             }
@@ -218,11 +210,7 @@ public class ChunkRenderDispatcher {
             p_178503_2_.setTranslation(0.0D, 0.0D, 0.0D);
             return Futures.immediateFuture(null);
         } else {
-            ListenableFutureTask<Object> listenablefuturetask = ListenableFutureTask.create(new Runnable() {
-                public void run() {
-                    ChunkRenderDispatcher.this.uploadChunk(player, p_178503_2_, chunkRenderer, compiledChunkIn);
-                }
-            }, null);
+            ListenableFutureTask<Object> listenablefuturetask = ListenableFutureTask.create(() -> ChunkRenderDispatcher.this.uploadChunk(player, p_178503_2_, chunkRenderer, compiledChunkIn), null);
 
             synchronized (this.queueChunkUploads) {
                 this.queueChunkUploads.add(listenablefuturetask);

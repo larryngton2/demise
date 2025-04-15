@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelWitch;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderWitch;
 import net.minecraft.entity.monster.EntityWitch;
@@ -74,7 +75,7 @@ public class LayerHeldItemWitch implements LayerRenderer<EntityWitch> {
 
             GlStateManager.rotate(-15.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(40.0F, 0.0F, 0.0F, 1.0F);
-            minecraft.getItemRenderer().renderItem(entitylivingbaseIn, itemstack, ItemCameraTransforms.TransformType.THIRD_PERSON);
+            ItemRenderer.renderItem(entitylivingbaseIn, itemstack, ItemCameraTransforms.TransformType.THIRD_PERSON);
             GlStateManager.popMatrix();
         }
     }

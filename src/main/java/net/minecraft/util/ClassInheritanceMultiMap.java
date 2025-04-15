@@ -26,16 +26,14 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
             this.createLookup(oclass);
         }
 
-        this.empty = this.values.size() == 0;
+        this.empty = this.values.isEmpty();
     }
 
     protected void createLookup(Class<?> clazz) {
         field_181158_a.add(clazz);
         int i = this.values.size();
 
-        for (int j = 0; j < i; ++j) {
-            T t = this.values.get(j);
-
+        for (T t : this.values) {
             if (clazz.isAssignableFrom(t.getClass())) {
                 this.addForClass(t, clazz);
             }
@@ -63,7 +61,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
             }
         }
 
-        this.empty = this.values.size() == 0;
+        this.empty = this.values.isEmpty();
         return true;
     }
 
@@ -76,7 +74,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
             list.add(value);
         }
 
-        this.empty = this.values.size() == 0;
+        this.empty = this.values.isEmpty();
     }
 
     public boolean remove(Object p_remove_1_) {
@@ -93,7 +91,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
             }
         }
 
-        this.empty = this.values.size() == 0;
+        this.empty = this.values.isEmpty();
         return flag;
     }
 
@@ -102,16 +100,14 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
     }
 
     public <S> Iterable<S> getByClass(final Class<S> clazz) {
-        return new Iterable<S>() {
-            public Iterator<S> iterator() {
-                List<T> list = ClassInheritanceMultiMap.this.map.get(ClassInheritanceMultiMap.this.initializeClassLookup(clazz));
+        return () -> {
+            List<T> list = ClassInheritanceMultiMap.this.map.get(ClassInheritanceMultiMap.this.initializeClassLookup(clazz));
 
-                if (list == null) {
-                    return Iterators.emptyIterator();
-                } else {
-                    Iterator<T> iterator = list.iterator();
-                    return Iterators.filter(iterator, clazz);
-                }
+            if (list == null) {
+                return Iterators.emptyIterator();
+            } else {
+                Iterator<T> iterator = list.iterator();
+                return Iterators.filter(iterator, clazz);
             }
         };
     }

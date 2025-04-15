@@ -29,7 +29,7 @@ public class GuiConnecting extends GuiScreen {
     private ServerAddress address;
 
     public GuiConnecting(GuiScreen p_i1181_1_, Minecraft mcIn, ServerData p_i1181_3_) {
-        this.mc = mcIn;
+        mc = mcIn;
         this.previousGuiScreen = p_i1181_1_;
         ServerAddress serveraddress = ServerAddress.fromString(p_i1181_3_.serverIP);
         address = serveraddress;
@@ -39,7 +39,7 @@ public class GuiConnecting extends GuiScreen {
     }
 
     public GuiConnecting(GuiScreen p_i1182_1_, Minecraft mcIn, String hostName, int port) {
-        this.mc = mcIn;
+        mc = mcIn;
         this.previousGuiScreen = p_i1182_1_;
         mcIn.loadWorld(null);
         this.connect(hostName, port);
@@ -57,17 +57,17 @@ public class GuiConnecting extends GuiScreen {
                     }
 
                     inetaddress = InetAddress.getByName(ip);
-                    GuiConnecting.this.networkManager = NetworkManager.createNetworkManagerAndConnect(inetaddress, port, GuiConnecting.this.mc.gameSettings.isUsingNativeTransport());
-                    GuiConnecting.this.networkManager.setNetHandler(new NetHandlerLoginClient(GuiConnecting.this.networkManager, GuiConnecting.this.mc, GuiConnecting.this.previousGuiScreen));
+                    GuiConnecting.this.networkManager = NetworkManager.createNetworkManagerAndConnect(inetaddress, port, mc.gameSettings.isUsingNativeTransport());
+                    GuiConnecting.this.networkManager.setNetHandler(new NetHandlerLoginClient(GuiConnecting.this.networkManager, mc, GuiConnecting.this.previousGuiScreen));
                     GuiConnecting.this.networkManager.sendPacket(new C00Handshake(47, ip, port, EnumConnectionState.LOGIN));
-                    GuiConnecting.this.networkManager.sendPacket(new C00PacketLoginStart(GuiConnecting.this.mc.getSession().getProfile()));
+                    GuiConnecting.this.networkManager.sendPacket(new C00PacketLoginStart(mc.getSession().getProfile()));
                 } catch (UnknownHostException unknownhostexception) {
                     if (GuiConnecting.this.cancel) {
                         return;
                     }
 
                     GuiConnecting.logger.error("Couldn't connect to server", unknownhostexception);
-                    GuiConnecting.this.mc.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Unknown host")));
+                    mc.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Unknown host")));
                 } catch (Exception exception) {
                     if (GuiConnecting.this.cancel) {
                         return;
@@ -81,7 +81,7 @@ public class GuiConnecting extends GuiScreen {
                         s = s.replaceAll(s1, "");
                     }
 
-                    GuiConnecting.this.mc.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", s)));
+                    mc.displayGuiScreen(new GuiDisconnected(GuiConnecting.this.previousGuiScreen, "connect.failed", new ChatComponentTranslation("disconnect.genericReason", s)));
                 }
             }
         }).start();
@@ -102,7 +102,7 @@ public class GuiConnecting extends GuiScreen {
 
     public void initGui() {
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 75, this.height / 2, 150, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, width / 2 - 75, height / 2, 150, 20, I18n.format("gui.cancel")));
     }
 
     protected void actionPerformed(GuiButton button) throws IOException {
@@ -113,7 +113,7 @@ public class GuiConnecting extends GuiScreen {
                 this.networkManager.closeChannel(new ChatComponentText("Aborted"));
             }
 
-            this.mc.displayGuiScreen(this.previousGuiScreen);
+            mc.displayGuiScreen(this.previousGuiScreen);
         }
     }
 
@@ -123,9 +123,9 @@ public class GuiConnecting extends GuiScreen {
         String finalIP = address.getIP().toLowerCase().contains("liquidproxy.net") ? "liquidproxy.net" : address.getIP();
 
         if (this.networkManager == null) {
-            this.drawCenteredString(this.fontRendererObj, "Establishing connection with " + finalIP + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
+            drawCenteredString(this.fontRendererObj, "Establishing connection with " + finalIP + ":" + address.getPort(), width / 2, height / 2 - 27, 16777215);
         } else {
-            this.drawCenteredString(this.fontRendererObj, "Logging in to " + finalIP + ":" + address.getPort(), this.width / 2, this.height / 2 - 27, 16777215);
+            drawCenteredString(this.fontRendererObj, "Logging in to " + finalIP + ":" + address.getPort(), width / 2, height / 2 - 27, 16777215);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

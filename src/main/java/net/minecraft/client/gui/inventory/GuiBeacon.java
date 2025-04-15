@@ -102,14 +102,14 @@ public class GuiBeacon extends GuiContainer {
 
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.id == -2) {
-            this.mc.displayGuiScreen(null);
+            mc.displayGuiScreen(null);
         } else if (button.id == -1) {
             String s = "MC|Beacon";
             PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
             packetbuffer.writeInt(this.tileBeacon.getField(1));
             packetbuffer.writeInt(this.tileBeacon.getField(2));
-            this.mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s, packetbuffer));
-            this.mc.displayGuiScreen(null);
+            mc.getNetHandler().addToSendQueue(new C17PacketCustomPayload(s, packetbuffer));
+            mc.displayGuiScreen(null);
         } else if (button instanceof GuiBeacon.PowerButton) {
             if (((GuiBeacon.PowerButton) button).func_146141_c()) {
                 return;
@@ -133,8 +133,8 @@ public class GuiBeacon extends GuiContainer {
 
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         RenderHelper.disableStandardItemLighting();
-        this.drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.primary"), 62, 10, 14737632);
-        this.drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.secondary"), 169, 10, 14737632);
+        drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.primary"), 62, 10, 14737632);
+        drawCenteredString(this.fontRendererObj, I18n.format("tile.beacon.secondary"), 169, 10, 14737632);
 
         for (GuiButton guibutton : this.buttonList) {
             if (guibutton.isMouseOver()) {
@@ -148,10 +148,10 @@ public class GuiBeacon extends GuiContainer {
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(beaconGuiTextures);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        mc.getTextureManager().bindTexture(beaconGuiTextures);
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
+        drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
         this.itemRender.zLevel = 100.0F;
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.emerald), i + 42, j + 109);
         this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.diamond), i + 42 + 22, j + 109);
@@ -189,13 +189,13 @@ public class GuiBeacon extends GuiContainer {
                     j += this.width * 3;
                 }
 
-                this.drawTexturedModalRect(this.xPosition, this.yPosition, j, i, this.width, this.height);
+                drawTexturedModalRect(this.xPosition, this.yPosition, j, i, this.width, this.height);
 
                 if (!GuiBeacon.beaconGuiTextures.equals(this.field_146145_o)) {
                     mc.getTextureManager().bindTexture(this.field_146145_o);
                 }
 
-                this.drawTexturedModalRect(this.xPosition + 2, this.yPosition + 2, this.field_146144_p, this.field_146143_q, 18, 18);
+                drawTexturedModalRect(this.xPosition + 2, this.yPosition + 2, this.field_146144_p, this.field_146143_q, 18, 18);
             }
         }
 

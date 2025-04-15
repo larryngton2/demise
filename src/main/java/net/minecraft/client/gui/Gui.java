@@ -150,10 +150,10 @@ public class Gui {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(right, top, this.zLevel).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos(left, top, this.zLevel).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos(left, bottom, this.zLevel).color(f5, f6, f7, f4).endVertex();
-        worldrenderer.pos(right, bottom, this.zLevel).color(f5, f6, f7, f4).endVertex();
+        worldrenderer.pos(right, top, zLevel).color(f1, f2, f3, f).endVertex();
+        worldrenderer.pos(left, top, zLevel).color(f1, f2, f3, f).endVertex();
+        worldrenderer.pos(left, bottom, zLevel).color(f5, f6, f7, f4).endVertex();
+        worldrenderer.pos(right, bottom, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
         GlStateManager.shadeModel(7424);
         GlStateManager.disableBlend();
@@ -203,10 +203,10 @@ public class Gui {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos(xCoord, yCoord + heightIn, this.zLevel).tex(textureSprite.getMinU(), textureSprite.getMaxV()).endVertex();
-        worldrenderer.pos(xCoord + widthIn, yCoord + heightIn, this.zLevel).tex(textureSprite.getMaxU(), textureSprite.getMaxV()).endVertex();
-        worldrenderer.pos(xCoord + widthIn, yCoord, this.zLevel).tex(textureSprite.getMaxU(), textureSprite.getMinV()).endVertex();
-        worldrenderer.pos(xCoord, yCoord, this.zLevel).tex(textureSprite.getMinU(), textureSprite.getMinV()).endVertex();
+        worldrenderer.pos(xCoord, yCoord + heightIn, zLevel).tex(textureSprite.getMinU(), textureSprite.getMaxV()).endVertex();
+        worldrenderer.pos(xCoord + widthIn, yCoord + heightIn, zLevel).tex(textureSprite.getMaxU(), textureSprite.getMaxV()).endVertex();
+        worldrenderer.pos(xCoord + widthIn, yCoord, zLevel).tex(textureSprite.getMaxU(), textureSprite.getMinV()).endVertex();
+        worldrenderer.pos(xCoord, yCoord, zLevel).tex(textureSprite.getMinU(), textureSprite.getMinV()).endVertex();
         tessellator.draw();
     }
 

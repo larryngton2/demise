@@ -18,16 +18,14 @@ public class GuiScreenOF extends GuiScreen {
             GuiButton guibutton = getSelectedButton(mouseX, mouseY, this.buttonList);
 
             if (guibutton != null && guibutton.enabled) {
-                guibutton.playPressSound(this.mc.getSoundHandler());
+                guibutton.playPressSound(mc.getSoundHandler());
                 this.actionPerformedRightClick(guibutton);
             }
         }
     }
 
     public static GuiButton getSelectedButton(int x, int y, List<GuiButton> listButtons) {
-        for (int i = 0; i < listButtons.size(); ++i) {
-            GuiButton guibutton = listButtons.get(i);
-
+        for (GuiButton guibutton : listButtons) {
             if (guibutton.visible) {
                 float j = GuiVideoSettings.getButtonWidth(guibutton);
                 float k = GuiVideoSettings.getButtonHeight(guibutton);

@@ -26,11 +26,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 
 public class EntityHorse extends EntityAnimal implements IInvBasic {
-    private static final Predicate<Entity> horseBreedingSelector = new Predicate<Entity>() {
-        public boolean apply(Entity p_apply_1_) {
-            return p_apply_1_ instanceof EntityHorse && ((EntityHorse) p_apply_1_).isBreeding();
-        }
-    };
+    private static final Predicate<Entity> horseBreedingSelector = p_apply_1_ -> p_apply_1_ instanceof EntityHorse && ((EntityHorse) p_apply_1_).isBreeding();
     private static final IAttribute horseJumpStrength = (new RangedAttribute(null, "horse.jumpStrength", 0.7D, 0.0D, 2.0D)).setDescription("Jump Strength").setShouldWatch(true);
     private static final String[] horseArmorTextures = new String[]{null, "textures/entity/horse/armor/horse_armor_iron.png", "textures/entity/horse/armor/horse_armor_gold.png", "textures/entity/horse/armor/horse_armor_diamond.png"};
     private static final String[] HORSE_ARMOR_TEXTURES_ABBR = new String[]{"", "meo", "goo", "dio"};
@@ -80,15 +76,15 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
 
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(16, Integer.valueOf(0));
-        this.dataWatcher.addObject(19, Byte.valueOf((byte) 0));
-        this.dataWatcher.addObject(20, Integer.valueOf(0));
+        this.dataWatcher.addObject(16, 0);
+        this.dataWatcher.addObject(19, (byte) 0);
+        this.dataWatcher.addObject(20, 0);
         this.dataWatcher.addObject(21, "");
-        this.dataWatcher.addObject(22, Integer.valueOf(0));
+        this.dataWatcher.addObject(22, 0);
     }
 
     public void setHorseType(int type) {
-        this.dataWatcher.updateObject(19, Byte.valueOf((byte) type));
+        this.dataWatcher.updateObject(19, (byte) type);
         this.resetTexturePrefix();
     }
 
@@ -97,7 +93,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
     }
 
     public void setHorseVariant(int variant) {
-        this.dataWatcher.updateObject(20, Integer.valueOf(variant));
+        this.dataWatcher.updateObject(20, variant);
         this.resetTexturePrefix();
     }
 
@@ -111,23 +107,13 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
         } else {
             int i = this.getHorseType();
 
-            switch (i) {
-                case 0:
-                default:
-                    return StatCollector.translateToLocal("entity.horse.name");
-
-                case 1:
-                    return StatCollector.translateToLocal("entity.donkey.name");
-
-                case 2:
-                    return StatCollector.translateToLocal("entity.mule.name");
-
-                case 3:
-                    return StatCollector.translateToLocal("entity.zombiehorse.name");
-
-                case 4:
-                    return StatCollector.translateToLocal("entity.skeletonhorse.name");
-            }
+            return switch (i) {
+                default -> StatCollector.translateToLocal("entity.horse.name");
+                case 1 -> StatCollector.translateToLocal("entity.donkey.name");
+                case 2 -> StatCollector.translateToLocal("entity.mule.name");
+                case 3 -> StatCollector.translateToLocal("entity.zombiehorse.name");
+                case 4 -> StatCollector.translateToLocal("entity.skeletonhorse.name");
+            };
         }
     }
 
@@ -139,9 +125,9 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
         int i = this.dataWatcher.getWatchableObjectInt(16);
 
         if (p_110208_2_) {
-            this.dataWatcher.updateObject(16, Integer.valueOf(i | p_110208_1_));
+            this.dataWatcher.updateObject(16, i | p_110208_1_);
         } else {
-            this.dataWatcher.updateObject(16, Integer.valueOf(i & ~p_110208_1_));
+            this.dataWatcher.updateObject(16, i & ~p_110208_1_);
         }
     }
 
@@ -233,7 +219,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
     }
 
     public void setHorseArmorStack(ItemStack itemStackIn) {
-        this.dataWatcher.updateObject(22, Integer.valueOf(this.getHorseArmorIndex(itemStackIn)));
+        this.dataWatcher.updateObject(22, this.getHorseArmorIndex(itemStackIn));
         this.resetTexturePrefix();
     }
 
@@ -1077,7 +1063,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
             s = PreYggdrasilConverter.getStringUUIDFromName(s1);
         }
 
-        if (s.length() > 0) {
+        if (!s.isEmpty()) {
             this.setOwnerId(s);
         }
 

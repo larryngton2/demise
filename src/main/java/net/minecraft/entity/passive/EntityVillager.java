@@ -157,7 +157,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
         boolean flag = itemstack != null && itemstack.getItem() == Items.spawn_egg;
 
         if (!flag && this.isEntityAlive() && !this.isTrading() && !this.isChild()) {
-            if (!this.worldObj.isRemote && (this.buyingList == null || this.buyingList.size() > 0)) {
+            if (!this.worldObj.isRemote && (this.buyingList == null || !this.buyingList.isEmpty())) {
                 this.setCustomer(player);
                 player.displayVillagerTradeGui(this);
             }
@@ -171,7 +171,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(16, Integer.valueOf(0));
+        this.dataWatcher.addObject(16, 0);
     }
 
     public void writeEntityToNBT(NBTTagCompound tagCompound) {
@@ -243,7 +243,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
     }
 
     public void setProfession(int professionId) {
-        this.dataWatcher.updateObject(16, Integer.valueOf(professionId));
+        this.dataWatcher.updateObject(16, professionId);
     }
 
     public int getProfession() {
@@ -436,7 +436,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
     public IChatComponent getDisplayName() {
         String s = this.getCustomNameTag();
 
-        if (s != null && s.length() > 0) {
+        if (s != null && !s.isEmpty()) {
             ChatComponentText chatcomponenttext = new ChatComponentText(s);
             chatcomponenttext.getChatStyle().setChatHoverEvent(this.getHoverEvent());
             chatcomponenttext.getChatStyle().setInsertion(this.getUniqueID().toString());
@@ -782,11 +782,11 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
 
     static class PriceInfo extends Tuple<Integer, Integer> {
         public PriceInfo(int p_i45810_1_, int p_i45810_2_) {
-            super(Integer.valueOf(p_i45810_1_), Integer.valueOf(p_i45810_2_));
+            super(p_i45810_1_, p_i45810_2_);
         }
 
         public int getPrice(Random rand) {
-            return this.getFirst().intValue() >= this.getSecond().intValue() ? this.getFirst().intValue() : this.getFirst().intValue() + rand.nextInt(this.getSecond().intValue() - this.getFirst().intValue() + 1);
+            return this.getFirst() >= this.getSecond() ? this.getFirst() : this.getFirst() + rand.nextInt(this.getSecond() - this.getFirst() + 1);
         }
     }
 }

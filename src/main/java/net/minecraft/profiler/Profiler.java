@@ -69,13 +69,13 @@ public class Profiler {
 
         if (this.profilerLocalEnabled) {
             if (this.profilingEnabled) {
-                if (this.profilingSection.length() > 0) {
+                if (!this.profilingSection.isEmpty()) {
                     this.profilingSection = this.profilingSection + ".";
                 }
 
                 this.profilingSection = this.profilingSection + name;
                 this.sectionList.add(this.profilingSection);
-                this.timestampList.add(Long.valueOf(System.nanoTime()));
+                this.timestampList.add(System.nanoTime());
             }
         }
     }
@@ -84,14 +84,14 @@ public class Profiler {
         if (this.profilerLocalEnabled) {
             if (this.profilingEnabled) {
                 long i = System.nanoTime();
-                long j = this.timestampList.remove(this.timestampList.size() - 1).longValue();
+                long j = this.timestampList.remove(this.timestampList.size() - 1);
                 this.sectionList.remove(this.sectionList.size() - 1);
                 long k = i - j;
 
                 if (this.profilingMap.containsKey(this.profilingSection)) {
-                    this.profilingMap.put(this.profilingSection, Long.valueOf(this.profilingMap.get(this.profilingSection).longValue() + k));
+                    this.profilingMap.put(this.profilingSection, this.profilingMap.get(this.profilingSection) + k);
                 } else {
-                    this.profilingMap.put(this.profilingSection, Long.valueOf(k));
+                    this.profilingMap.put(this.profilingSection, k);
                 }
 
                 if (k > 100000000L) {
@@ -107,11 +107,11 @@ public class Profiler {
         if (!this.profilingEnabled) {
             return null;
         } else {
-            long i = this.profilingMap.containsKey("root") ? this.profilingMap.get("root").longValue() : 0L;
-            long j = this.profilingMap.containsKey(profilerName) ? this.profilingMap.get(profilerName).longValue() : -1L;
+            long i = this.profilingMap.getOrDefault("root", 0L);
+            long j = this.profilingMap.getOrDefault(profilerName, -1L);
             List<Profiler.Result> list = Lists.newArrayList();
 
-            if (profilerName.length() > 0) {
+            if (!profilerName.isEmpty()) {
                 profilerName = profilerName + ".";
             }
 
@@ -119,7 +119,7 @@ public class Profiler {
 
             for (String s : this.profilingMap.keySet()) {
                 if (s.length() > profilerName.length() && s.startsWith(profilerName) && s.indexOf(".", profilerName.length() + 1) < 0) {
-                    k += this.profilingMap.get(s).longValue();
+                    k += this.profilingMap.get(s);
                 }
             }
 
@@ -135,7 +135,7 @@ public class Profiler {
 
             for (String s1 : this.profilingMap.keySet()) {
                 if (s1.length() > profilerName.length() && s1.startsWith(profilerName) && s1.indexOf(".", profilerName.length() + 1) < 0) {
-                    long l = this.profilingMap.get(s1).longValue();
+                    long l = this.profilingMap.get(s1);
                     double d0 = (double) l * 100.0D / (double) k;
                     double d1 = (double) l * 100.0D / (double) i;
                     String s2 = s1.substring(profilerName.length());
@@ -143,9 +143,7 @@ public class Profiler {
                 }
             }
 
-            for (String s3 : this.profilingMap.keySet()) {
-                this.profilingMap.put(s3, Long.valueOf(this.profilingMap.get(s3).longValue() * 950L / 1000L));
-            }
+            this.profilingMap.replaceAll((s, v) -> this.profilingMap.get(s) * 950L / 1000L);
 
             if ((float) k > f) {
                 list.add(new Profiler.Result("unspecified", (double) ((float) k - f) * 100.0D / (double) k, (double) ((float) k - f) * 100.0D / (double) i));
@@ -165,7 +163,7 @@ public class Profiler {
     }
 
     public String getNameOfLastSection() {
-        return this.sectionList.size() == 0 ? "[UNKNOWN]" : this.sectionList.get(this.sectionList.size() - 1);
+        return this.sectionList.isEmpty() ? "[UNKNOWN]" : this.sectionList.get(this.sectionList.size() - 1);
     }
 
     public void startSection(Class<?> p_startSection_1_) {

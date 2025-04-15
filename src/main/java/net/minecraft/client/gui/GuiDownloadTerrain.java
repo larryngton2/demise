@@ -36,12 +36,12 @@ public class GuiDownloadTerrain extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         if (this.customLoadingScreen != null) {
-            this.customLoadingScreen.drawBackground(this.width, this.height);
+            this.customLoadingScreen.drawBackground(width, height);
         } else {
             MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
         }
 
-        this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingTerrain"), this.width / 2, this.height / 2 - 50, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingTerrain"), width / 2, height / 2 - 50, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

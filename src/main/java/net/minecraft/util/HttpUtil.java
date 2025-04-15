@@ -28,7 +28,7 @@ public class HttpUtil {
         StringBuilder stringbuilder = new StringBuilder();
 
         for (Entry<String, Object> entry : data.entrySet()) {
-            if (stringbuilder.length() > 0) {
+            if (!stringbuilder.isEmpty()) {
                 stringbuilder.append('&');
             }
 
@@ -69,7 +69,7 @@ public class HttpUtil {
             dataoutputstream.flush();
             dataoutputstream.close();
             BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(httpurlconnection.getInputStream()));
-            StringBuffer stringbuffer = new StringBuffer();
+            StringBuilder stringbuffer = new StringBuilder();
             String s;
 
             while ((s = bufferedreader.readLine()) != null) {
@@ -89,122 +89,120 @@ public class HttpUtil {
     }
 
     public static ListenableFuture<Object> downloadResourcePack(final File saveFile, final String packUrl, final Map<String, String> p_180192_2_, final int maxSize, final IProgressUpdate p_180192_4_, final Proxy p_180192_5_) {
-        ListenableFuture<?> listenablefuture = field_180193_a.submit(new Runnable() {
-            public void run() {
-                HttpURLConnection httpurlconnection = null;
-                InputStream inputstream = null;
-                OutputStream outputstream = null;
+        ListenableFuture<?> listenablefuture = field_180193_a.submit(() -> {
+            HttpURLConnection httpurlconnection = null;
+            InputStream inputstream = null;
+            OutputStream outputstream = null;
 
-                if (p_180192_4_ != null) {
-                    p_180192_4_.resetProgressAndMessage("Downloading Resource Pack");
-                    p_180192_4_.displayLoadingString("Making Request...");
-                }
+            if (p_180192_4_ != null) {
+                p_180192_4_.resetProgressAndMessage("Downloading Resource Pack");
+                p_180192_4_.displayLoadingString("Making Request...");
+            }
 
+            try {
                 try {
-                    try {
-                        byte[] abyte = new byte[4096];
-                        URL url = new URL(packUrl);
-                        httpurlconnection = (HttpURLConnection) url.openConnection(p_180192_5_);
-                        float f = 0.0F;
-                        float f1 = (float) p_180192_2_.entrySet().size();
+                    byte[] abyte = new byte[4096];
+                    URL url = new URL(packUrl);
+                    httpurlconnection = (HttpURLConnection) url.openConnection(p_180192_5_);
+                    float f = 0.0F;
+                    float f1 = (float) p_180192_2_.entrySet().size();
 
-                        for (Entry<String, String> entry : p_180192_2_.entrySet()) {
-                            httpurlconnection.setRequestProperty(entry.getKey(), entry.getValue());
-
-                            if (p_180192_4_ != null) {
-                                p_180192_4_.setLoadingProgress((int) (++f / f1 * 100.0F));
-                            }
-                        }
-
-                        inputstream = httpurlconnection.getInputStream();
-                        f1 = (float) httpurlconnection.getContentLength();
-                        int i = httpurlconnection.getContentLength();
+                    for (Entry<String, String> entry : p_180192_2_.entrySet()) {
+                        httpurlconnection.setRequestProperty(entry.getKey(), entry.getValue());
 
                         if (p_180192_4_ != null) {
-                            p_180192_4_.displayLoadingString(String.format("Downloading file (%.2f MB)...", Float.valueOf(f1 / 1000.0F / 1000.0F)));
+                            p_180192_4_.setLoadingProgress((int) (++f / f1 * 100.0F));
                         }
+                    }
 
-                        if (saveFile.exists()) {
-                            long j = saveFile.length();
+                    inputstream = httpurlconnection.getInputStream();
+                    f1 = (float) httpurlconnection.getContentLength();
+                    int i = httpurlconnection.getContentLength();
 
-                            if (j == (long) i) {
-                                if (p_180192_4_ != null) {
-                                    p_180192_4_.setDoneWorking();
-                                }
+                    if (p_180192_4_ != null) {
+                        p_180192_4_.displayLoadingString(String.format("Downloading file (%.2f MB)...", f1 / 1000.0F / 1000.0F));
+                    }
 
-                                return;
-                            }
+                    if (saveFile.exists()) {
+                        long j = saveFile.length();
 
-                            HttpUtil.logger.warn("Deleting " + saveFile + " as it does not match what we currently have (" + i + " vs our " + j + ").");
-                            FileUtils.deleteQuietly(saveFile);
-                        } else if (saveFile.getParentFile() != null) {
-                            saveFile.getParentFile().mkdirs();
-                        }
-
-                        outputstream = new DataOutputStream(new FileOutputStream(saveFile));
-
-                        if (maxSize > 0 && f1 > (float) maxSize) {
+                        if (j == (long) i) {
                             if (p_180192_4_ != null) {
                                 p_180192_4_.setDoneWorking();
                             }
 
-                            throw new IOException("Filesize is bigger than maximum allowed (file is " + f + ", limit is " + maxSize + ")");
+                            return;
                         }
 
-                        int k = 0;
+                        HttpUtil.logger.warn("Deleting " + saveFile + " as it does not match what we currently have (" + i + " vs our " + j + ").");
+                        FileUtils.deleteQuietly(saveFile);
+                    } else if (saveFile.getParentFile() != null) {
+                        saveFile.getParentFile().mkdirs();
+                    }
 
-                        while ((k = inputstream.read(abyte)) >= 0) {
-                            f += (float) k;
+                    outputstream = new DataOutputStream(new FileOutputStream(saveFile));
+
+                    if (maxSize > 0 && f1 > (float) maxSize) {
+                        if (p_180192_4_ != null) {
+                            p_180192_4_.setDoneWorking();
+                        }
+
+                        throw new IOException("Filesize is bigger than maximum allowed (file is " + f + ", limit is " + maxSize + ")");
+                    }
+
+                    int k = 0;
+
+                    while ((k = inputstream.read(abyte)) >= 0) {
+                        f += (float) k;
+
+                        if (p_180192_4_ != null) {
+                            p_180192_4_.setLoadingProgress((int) (f / f1 * 100.0F));
+                        }
+
+                        if (maxSize > 0 && f > (float) maxSize) {
+                            if (p_180192_4_ != null) {
+                                p_180192_4_.setDoneWorking();
+                            }
+
+                            throw new IOException("Filesize was bigger than maximum allowed (got >= " + f + ", limit was " + maxSize + ")");
+                        }
+
+                        if (Thread.interrupted()) {
+                            HttpUtil.logger.error("INTERRUPTED");
 
                             if (p_180192_4_ != null) {
-                                p_180192_4_.setLoadingProgress((int) (f / f1 * 100.0F));
+                                p_180192_4_.setDoneWorking();
                             }
 
-                            if (maxSize > 0 && f > (float) maxSize) {
-                                if (p_180192_4_ != null) {
-                                    p_180192_4_.setDoneWorking();
-                                }
-
-                                throw new IOException("Filesize was bigger than maximum allowed (got >= " + f + ", limit was " + maxSize + ")");
-                            }
-
-                            if (Thread.interrupted()) {
-                                HttpUtil.logger.error("INTERRUPTED");
-
-                                if (p_180192_4_ != null) {
-                                    p_180192_4_.setDoneWorking();
-                                }
-
-                                return;
-                            }
-
-                            outputstream.write(abyte, 0, k);
+                            return;
                         }
 
-                        if (p_180192_4_ != null) {
-                            p_180192_4_.setDoneWorking();
-                        }
-                    } catch (Throwable throwable) {
-                        throwable.printStackTrace();
+                        outputstream.write(abyte, 0, k);
+                    }
 
-                        if (httpurlconnection != null) {
-                            InputStream inputstream1 = httpurlconnection.getErrorStream();
+                    if (p_180192_4_ != null) {
+                        p_180192_4_.setDoneWorking();
+                    }
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
 
-                            try {
-                                HttpUtil.logger.error(IOUtils.toString(inputstream1));
-                            } catch (IOException ioexception) {
-                                ioexception.printStackTrace();
-                            }
-                        }
+                    if (httpurlconnection != null) {
+                        InputStream inputstream1 = httpurlconnection.getErrorStream();
 
-                        if (p_180192_4_ != null) {
-                            p_180192_4_.setDoneWorking();
+                        try {
+                            HttpUtil.logger.error(IOUtils.toString(inputstream1));
+                        } catch (IOException ioexception) {
+                            ioexception.printStackTrace();
                         }
                     }
-                } finally {
-                    IOUtils.closeQuietly(inputstream);
-                    IOUtils.closeQuietly(outputstream);
+
+                    if (p_180192_4_ != null) {
+                        p_180192_4_.setDoneWorking();
+                    }
                 }
+            } finally {
+                IOUtils.closeQuietly(inputstream);
+                IOUtils.closeQuietly(outputstream);
             }
         });
         return (ListenableFuture<Object>) listenablefuture;
@@ -283,7 +281,7 @@ public class HttpUtil {
             } catch (Exception ignore) {
                 throw e;
             }
-            throw new IOException(e.getMessage() + "\n" + stringbuilder.toString());
+            throw new IOException(e.getMessage() + "\n" + stringbuilder);
         }
     }
 

@@ -45,12 +45,12 @@ public class GuiSpectator extends Gui implements ISpectatorMenuRecipient {
                 this.field_175271_i.func_178641_d();
             } else {
                 int i = p_175264_1_.getScaledWidth() / 2;
-                float f1 = this.zLevel;
-                this.zLevel = -90.0F;
+                float f1 = zLevel;
+                zLevel = -90.0F;
                 float f2 = (float) p_175264_1_.getScaledHeight() - 22.0F * f;
                 SpectatorDetails spectatordetails = this.field_175271_i.func_178646_f();
                 this.func_175258_a(p_175264_1_, f, i, f2, spectatordetails);
-                this.zLevel = f1;
+                zLevel = f1;
             }
         }
     }

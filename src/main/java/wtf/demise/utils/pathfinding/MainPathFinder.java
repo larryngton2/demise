@@ -45,7 +45,7 @@ public class MainPathFinder implements InstanceAccess {
             this.workingPathHubList.sort(new CompareHub());
             int j = 0;
 
-            if (this.workingPathHubList.size() == 0) {
+            if (this.workingPathHubList.isEmpty()) {
                 break;
             }
 

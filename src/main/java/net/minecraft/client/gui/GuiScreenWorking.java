@@ -35,19 +35,19 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         if (this.doneWorking) {
-            if (!this.mc.isConnectedToRealms()) {
-                this.mc.displayGuiScreen(null);
+            if (!mc.isConnectedToRealms()) {
+                mc.displayGuiScreen(null);
             }
         } else {
-            if (this.customLoadingScreen != null && this.mc.theWorld == null) {
-                this.customLoadingScreen.drawBackground(this.width, this.height);
+            if (this.customLoadingScreen != null && mc.theWorld == null) {
+                this.customLoadingScreen.drawBackground(width, height);
             } else {
                 this.drawDefaultBackground();
             }
 
             if (this.progress > 0) {
-                this.drawCenteredString(this.fontRendererObj, this.field_146591_a, this.width / 2, 70, 16777215);
-                this.drawCenteredString(this.fontRendererObj, this.field_146589_f + " " + this.progress + "%", this.width / 2, 90, 16777215);
+                drawCenteredString(this.fontRendererObj, this.field_146591_a, width / 2, 70, 16777215);
+                drawCenteredString(this.fontRendererObj, this.field_146589_f + " " + this.progress + "%", width / 2, 90, 16777215);
             }
 
             super.drawScreen(mouseX, mouseY, partialTicks);

@@ -13,14 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.misc.DebugUtils;
 
 import java.util.List;
 import java.util.Objects;

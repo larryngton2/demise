@@ -342,11 +342,7 @@ public class WorldServer extends World implements IThreadListener {
     protected BlockPos adjustPosToNearbyEntity(BlockPos pos) {
         BlockPos blockpos = this.getPrecipitationHeight(pos);
         AxisAlignedBB axisalignedbb = (new AxisAlignedBB(blockpos, new BlockPos(blockpos.getX(), this.getHeight(), blockpos.getZ()))).expand(3.0D, 3.0D, 3.0D);
-        List<EntityLivingBase> list = this.getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb, new Predicate<EntityLivingBase>() {
-            public boolean apply(EntityLivingBase p_apply_1_) {
-                return p_apply_1_ != null && p_apply_1_.isEntityAlive() && WorldServer.this.canSeeSky(p_apply_1_.getPosition());
-            }
-        });
+        List<EntityLivingBase> list = this.getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb, p_apply_1_ -> p_apply_1_ != null && p_apply_1_.isEntityAlive() && WorldServer.this.canSeeSky(p_apply_1_.getPosition()));
         return !list.isEmpty() ? list.get(this.rand.nextInt(list.size())).getPosition() : blockpos;
     }
 
@@ -557,8 +553,7 @@ public class WorldServer extends World implements IThreadListener {
     public List<TileEntity> getTileEntitiesIn(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         List<TileEntity> list = Lists.newArrayList();
 
-        for (int i = 0; i < this.loadedTileEntityList.size(); ++i) {
-            TileEntity tileentity = this.loadedTileEntityList.get(i);
+        for (TileEntity tileentity : this.loadedTileEntityList) {
             BlockPos blockpos = tileentity.getPos();
 
             if (blockpos.getX() >= minX && blockpos.getY() >= minY && blockpos.getZ() >= minZ && blockpos.getX() < maxX && blockpos.getY() < maxY && blockpos.getZ() < maxZ) {
@@ -723,8 +718,8 @@ public class WorldServer extends World implements IThreadListener {
         Entity[] aentity = entityIn.getParts();
 
         if (aentity != null) {
-            for (int i = 0; i < aentity.length; ++i) {
-                this.entitiesById.addKey(aentity[i].getEntityId(), aentity[i]);
+            for (Entity entity : aentity) {
+                this.entitiesById.addKey(entity.getEntityId(), entity);
             }
         }
     }
@@ -736,8 +731,8 @@ public class WorldServer extends World implements IThreadListener {
         Entity[] aentity = entityIn.getParts();
 
         if (aentity != null) {
-            for (int i = 0; i < aentity.length; ++i) {
-                this.entitiesById.removeObject(aentity[i].getEntityId());
+            for (Entity entity : aentity) {
+                this.entitiesById.removeObject(entity.getEntityId());
             }
         }
     }
@@ -860,8 +855,8 @@ public class WorldServer extends World implements IThreadListener {
     public void spawnParticle(EnumParticleTypes particleType, boolean longDistance, double xCoord, double yCoord, double zCoord, int numberOfParticles, double xOffset, double yOffset, double zOffset, double particleSpeed, int... particleArguments) {
         Packet packet = new S2APacketParticles(particleType, longDistance, (float) xCoord, (float) yCoord, (float) zCoord, (float) xOffset, (float) yOffset, (float) zOffset, (float) particleSpeed, numberOfParticles, particleArguments);
 
-        for (int i = 0; i < this.playerEntities.size(); ++i) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP) this.playerEntities.get(i);
+        for (EntityPlayer playerEntity : this.playerEntities) {
+            EntityPlayerMP entityplayermp = (EntityPlayerMP) playerEntity;
             BlockPos blockpos = entityplayermp.getPosition();
             double d0 = blockpos.distanceSq(xCoord, yCoord, zCoord);
 

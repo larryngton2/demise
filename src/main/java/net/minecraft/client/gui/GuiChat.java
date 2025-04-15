@@ -34,8 +34,8 @@ public class GuiChat extends GuiScreen {
 
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
-        this.sentHistoryCursor = this.mc.ingameGUI.getChatGUI().getSentMessages().size();
-        this.inputField = new GuiTextField(0, this.fontRendererObj, 10, this.height - 12 - 6, MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()), 12);
+        this.sentHistoryCursor = mc.ingameGUI.getChatGUI().getSentMessages().size();
+        this.inputField = new GuiTextField(0, this.fontRendererObj, 10, height - 12 - 6, MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()), 12);
         this.inputField.setMaxStringLength(256);
         this.inputField.setEnableBackgroundDrawing(false);
         this.inputField.setFocused(true);
@@ -45,7 +45,7 @@ public class GuiChat extends GuiScreen {
 
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(false);
-        this.mc.ingameGUI.getChatGUI().resetScroll();
+        mc.ingameGUI.getChatGUI().resetScroll();
     }
 
     public void updateScreen() {
@@ -62,27 +62,27 @@ public class GuiChat extends GuiScreen {
         }
 
         if (keyCode == 1) {
-            this.mc.displayGuiScreen(null);
+            mc.displayGuiScreen(null);
         } else if (keyCode != 28 && keyCode != 156) {
             if (keyCode == 200) {
                 this.getSentHistory(-1);
             } else if (keyCode == 208) {
                 this.getSentHistory(1);
             } else if (keyCode == 201) {
-                this.mc.ingameGUI.getChatGUI().scroll(this.mc.ingameGUI.getChatGUI().getLineCount() - 1);
+                mc.ingameGUI.getChatGUI().scroll(GuiNewChat.getLineCount() - 1);
             } else if (keyCode == 209) {
-                this.mc.ingameGUI.getChatGUI().scroll(-this.mc.ingameGUI.getChatGUI().getLineCount() + 1);
+                mc.ingameGUI.getChatGUI().scroll(-GuiNewChat.getLineCount() + 1);
             } else {
                 this.inputField.textboxKeyTyped(typedChar, keyCode);
             }
         } else {
             String s = this.inputField.getText().trim();
 
-            if (s.length() > 0) {
+            if (!s.isEmpty()) {
                 this.sendChatMessage(s);
             }
 
-            this.mc.displayGuiScreen(null);
+            mc.displayGuiScreen(null);
         }
     }
 
@@ -103,13 +103,13 @@ public class GuiChat extends GuiScreen {
                 i *= 7;
             }
 
-            this.mc.ingameGUI.getChatGUI().scroll(i);
+            mc.ingameGUI.getChatGUI().scroll(i);
         }
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         if (mouseButton == 0) {
-            IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
+            IChatComponent ichatcomponent = mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
 
             if (this.handleComponentClick(ichatcomponent)) {
                 return;
@@ -155,35 +155,35 @@ public class GuiChat extends GuiScreen {
             StringBuilder stringbuilder = new StringBuilder();
 
             for (String s2 : this.foundPlayerNames) {
-                if (stringbuilder.length() > 0) {
+                if (!stringbuilder.isEmpty()) {
                     stringbuilder.append(", ");
                 }
 
                 stringbuilder.append(s2);
             }
 
-            this.mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(stringbuilder.toString()), 1);
+            mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText(stringbuilder.toString()), 1);
         }
 
         this.inputField.writeText(this.foundPlayerNames.get(this.autocompleteIndex++));
     }
 
     private void sendAutocompleteRequest(String p_146405_1_, String p_146405_2_) {
-        if (p_146405_1_.length() >= 1) {
+        if (!p_146405_1_.isEmpty()) {
             BlockPos blockpos = null;
 
-            if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                blockpos = this.mc.objectMouseOver.getBlockPos();
+            if (mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                blockpos = mc.objectMouseOver.getBlockPos();
             }
 
-            this.mc.thePlayer.sendQueue.addToSendQueue(new C14PacketTabComplete(p_146405_1_, blockpos));
+            mc.thePlayer.sendQueue.addToSendQueue(new C14PacketTabComplete(p_146405_1_, blockpos));
             this.waitingOnAutocomplete = true;
         }
     }
 
     public void getSentHistory(int msgPos) {
         int i = this.sentHistoryCursor + msgPos;
-        int j = this.mc.ingameGUI.getChatGUI().getSentMessages().size();
+        int j = mc.ingameGUI.getChatGUI().getSentMessages().size();
         i = MathHelper.clamp_int(i, 0, j);
 
         if (i != this.sentHistoryCursor) {
@@ -195,7 +195,7 @@ public class GuiChat extends GuiScreen {
                     this.historyBuffer = this.inputField.getText();
                 }
 
-                this.inputField.setText(this.mc.ingameGUI.getChatGUI().getSentMessages().get(i));
+                this.inputField.setText(mc.ingameGUI.getChatGUI().getSentMessages().get(i));
                 this.sentHistoryCursor = i;
             }
         }
@@ -203,7 +203,7 @@ public class GuiChat extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.inputField.drawTextBox();
-        IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
+        IChatComponent ichatcomponent = mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
 
         if (ichatcomponent != null && ichatcomponent.getChatStyle().getChatHoverEvent() != null) {
             this.handleComponentHover(ichatcomponent, mouseX, mouseY);
@@ -220,7 +220,7 @@ public class GuiChat extends GuiScreen {
             this.foundPlayerNames.clear();
 
             for (String s : p_146406_1_) {
-                if (s.length() > 0) {
+                if (!s.isEmpty()) {
                     this.foundPlayerNames.add(s);
                 }
             }
@@ -228,10 +228,10 @@ public class GuiChat extends GuiScreen {
             String s1 = this.inputField.getText().substring(this.inputField.func_146197_a(-1, this.inputField.getCursorPosition(), false));
             String s2 = StringUtils.getCommonPrefix(p_146406_1_);
 
-            if (s2.length() > 0 && !s1.equalsIgnoreCase(s2)) {
+            if (!s2.isEmpty() && !s1.equalsIgnoreCase(s2)) {
                 this.inputField.deleteFromCursor(this.inputField.func_146197_a(-1, this.inputField.getCursorPosition(), false) - this.inputField.getCursorPosition());
                 this.inputField.writeText(s2);
-            } else if (this.foundPlayerNames.size() > 0) {
+            } else if (!this.foundPlayerNames.isEmpty()) {
                 this.playerNamesFound = true;
                 this.autocompletePlayerNames();
             }

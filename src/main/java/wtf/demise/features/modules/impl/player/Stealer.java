@@ -20,7 +20,6 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
-import org.lwjglx.input.Keyboard;
 import org.lwjglx.opengl.Display;
 import org.lwjglx.util.glu.GLU;
 import wtf.demise.events.annotations.EventTarget;
@@ -154,9 +153,7 @@ public class Stealer extends Module {
     @EventTarget
     public void onRender3D(Render3DEvent event) {
         if (!posList.isEmpty()) {
-            posList.forEach(blockPos -> {
-                RenderUtils.renderBlock(blockPos, getModule(Interface.class).color(), true, true);
-            });
+            posList.forEach(blockPos -> RenderUtils.renderBlock(blockPos, getModule(Interface.class).color(), true, true));
         }
     }
 

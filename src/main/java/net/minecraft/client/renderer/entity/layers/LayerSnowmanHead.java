@@ -1,7 +1,7 @@
 package net.minecraft.client.renderer.entity.layers;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderSnowMan;
 import net.minecraft.entity.monster.EntitySnowman;
@@ -23,7 +23,7 @@ public class LayerSnowmanHead implements LayerRenderer<EntitySnowman> {
             GlStateManager.translate(0.0F, -0.34375F, 0.0F);
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
             GlStateManager.scale(f, -f, -f);
-            Minecraft.getMinecraft().getItemRenderer().renderItem(entitylivingbaseIn, new ItemStack(Blocks.pumpkin, 1), ItemCameraTransforms.TransformType.HEAD);
+            ItemRenderer.renderItem(entitylivingbaseIn, new ItemStack(Blocks.pumpkin, 1), ItemCameraTransforms.TransformType.HEAD);
             GlStateManager.popMatrix();
         }
     }

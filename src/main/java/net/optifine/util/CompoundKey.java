@@ -2,6 +2,8 @@ package net.optifine.util;
 
 import net.minecraft.src.Config;
 
+import java.util.Objects;
+
 public class CompoundKey {
     private final Object[] keys;
     private int hashcode;
@@ -23,9 +25,7 @@ public class CompoundKey {
         if (this.hashcode == 0) {
             this.hashcode = 7;
 
-            for (int i = 0; i < this.keys.length; ++i) {
-                Object object = this.keys[i];
-
+            for (Object object : this.keys) {
                 if (object != null) {
                     this.hashcode = 31 * this.hashcode + object.hashCode();
                 }
@@ -60,7 +60,7 @@ public class CompoundKey {
     }
 
     private static boolean compareKeys(Object key1, Object key2) {
-        return key1 == key2 || (key1 != null && (key1.equals(key2)));
+        return Objects.equals(key1, key2);
     }
 
     private Object[] getKeys() {

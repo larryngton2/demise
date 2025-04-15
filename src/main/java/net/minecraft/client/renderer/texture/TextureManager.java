@@ -91,11 +91,7 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Registering texture");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Resource location being registered");
             crashreportcategory.addCrashSection("Resource location", textureLocation);
-            crashreportcategory.addCrashSectionCallable("Texture object class", new Callable<String>() {
-                public String call() throws Exception {
-                    return textureObjf.getClass().getName();
-                }
-            });
+            crashreportcategory.addCrashSectionCallable("Texture object class", () -> textureObjf.getClass().getName());
             throw new ReportedException(crashreport);
         }
 
@@ -115,9 +111,9 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
         Integer integer = this.mapTextureCounters.get(name);
 
         if (integer == null) {
-            integer = Integer.valueOf(1);
+            integer = 1;
         } else {
-            integer = Integer.valueOf(integer.intValue() + 1);
+            integer = integer + 1;
         }
 
         this.mapTextureCounters.put(name, integer);

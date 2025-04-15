@@ -51,12 +51,12 @@ public class Stitcher {
     }
 
     public void doStitch() {
-        Stitcher.Holder[] astitcher$holder = (Stitcher.Holder[]) this.setStitchHolders.toArray(new Stitcher.Holder[this.setStitchHolders.size()]);
+        Stitcher.Holder[] astitcher$holder = (Stitcher.Holder[]) this.setStitchHolders.toArray(new Holder[0]);
         Arrays.sort((Object[]) astitcher$holder);
 
         for (Stitcher.Holder stitcher$holder : astitcher$holder) {
             if (!this.allocateSlot(stitcher$holder)) {
-                String s = String.format("Unable to fit: %s - size: %dx%d - Maybe try a lowerresolution resourcepack?", new Object[]{stitcher$holder.getAtlasSprite().getIconName(), Integer.valueOf(stitcher$holder.getAtlasSprite().getIconWidth()), Integer.valueOf(stitcher$holder.getAtlasSprite().getIconHeight())});
+                String s = String.format("Unable to fit: %s - size: %dx%d - Maybe try a lowerresolution resourcepack?", new Object[]{stitcher$holder.getAtlasSprite().getIconName(), stitcher$holder.getAtlasSprite().getIconWidth(), stitcher$holder.getAtlasSprite().getIconHeight()});
                 throw new StitcherException(stitcher$holder, s);
             }
         }
@@ -94,14 +94,14 @@ public class Stitcher {
      * Attempts to find space for specified tile
      */
     private boolean allocateSlot(Stitcher.Holder p_94310_1_) {
-        for (int i = 0; i < this.stitchSlots.size(); ++i) {
-            if (((Stitcher.Slot) this.stitchSlots.get(i)).addSlot(p_94310_1_)) {
+        for (Slot stitchSlot : this.stitchSlots) {
+            if (((Slot) stitchSlot).addSlot(p_94310_1_)) {
                 return true;
             }
 
             p_94310_1_.rotate();
 
-            if (((Stitcher.Slot) this.stitchSlots.get(i)).addSlot(p_94310_1_)) {
+            if (((Slot) stitchSlot).addSlot(p_94310_1_)) {
                 return true;
             }
 

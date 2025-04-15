@@ -8,7 +8,6 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import org.apache.commons.lang3.Range;
-import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;

@@ -22,16 +22,12 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockRailDetector extends BlockRailBase {
-    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class, new Predicate<BlockRailBase.EnumRailDirection>() {
-        public boolean apply(BlockRailBase.EnumRailDirection p_apply_1_) {
-            return p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_WEST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_WEST;
-        }
-    });
+    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class, p_apply_1_ -> p_apply_1_ != EnumRailDirection.NORTH_EAST && p_apply_1_ != EnumRailDirection.NORTH_WEST && p_apply_1_ != EnumRailDirection.SOUTH_EAST && p_apply_1_ != EnumRailDirection.SOUTH_WEST);
     public static final PropertyBool POWERED = PropertyBool.create("powered");
 
     public BlockRailDetector() {
         super(true);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(POWERED, Boolean.valueOf(false)).withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(POWERED, Boolean.FALSE).withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
         this.setTickRandomly(true);
     }
 
@@ -45,7 +41,7 @@ public class BlockRailDetector extends BlockRailBase {
 
     public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
         if (!worldIn.isRemote) {
-            if (!state.getValue(POWERED).booleanValue()) {
+            if (!state.getValue(POWERED)) {
                 this.updatePoweredState(worldIn, pos, state);
             }
         }
@@ -55,21 +51,21 @@ public class BlockRailDetector extends BlockRailBase {
     }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        if (!worldIn.isRemote && state.getValue(POWERED).booleanValue()) {
+        if (!worldIn.isRemote && state.getValue(POWERED)) {
             this.updatePoweredState(worldIn, pos, state);
         }
     }
 
     public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
-        return state.getValue(POWERED).booleanValue() ? 15 : 0;
+        return state.getValue(POWERED) ? 15 : 0;
     }
 
     public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side) {
-        return !state.getValue(POWERED).booleanValue() ? 0 : (side == EnumFacing.UP ? 15 : 0);
+        return !state.getValue(POWERED) ? 0 : (side == EnumFacing.UP ? 15 : 0);
     }
 
     private void updatePoweredState(World worldIn, BlockPos pos, IBlockState state) {
-        boolean flag = state.getValue(POWERED).booleanValue();
+        boolean flag = state.getValue(POWERED);
         boolean flag1 = false;
         List<EntityMinecart> list = this.findMinecarts(worldIn, pos, EntityMinecart.class);
 
@@ -78,14 +74,14 @@ public class BlockRailDetector extends BlockRailBase {
         }
 
         if (flag1 && !flag) {
-            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(true)), 3);
+            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.TRUE), 3);
             worldIn.notifyNeighborsOfStateChange(pos, this);
             worldIn.notifyNeighborsOfStateChange(pos.down(), this);
             worldIn.markBlockRangeForRenderUpdate(pos, pos);
         }
 
         if (!flag1 && flag) {
-            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(false)), 3);
+            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.FALSE), 3);
             worldIn.notifyNeighborsOfStateChange(pos, this);
             worldIn.notifyNeighborsOfStateChange(pos.down(), this);
             worldIn.markBlockRangeForRenderUpdate(pos, pos);
@@ -112,7 +108,7 @@ public class BlockRailDetector extends BlockRailBase {
     }
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos) {
-        if (worldIn.getBlockState(pos).getValue(POWERED).booleanValue()) {
+        if (worldIn.getBlockState(pos).getValue(POWERED)) {
             List<EntityMinecartCommandBlock> list = this.findMinecarts(worldIn, pos, EntityMinecartCommandBlock.class);
 
             if (!list.isEmpty()) {
@@ -140,14 +136,14 @@ public class BlockRailDetector extends BlockRailBase {
     }
 
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(meta & 7)).withProperty(POWERED, Boolean.valueOf((meta & 8) > 0));
+        return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(meta & 7)).withProperty(POWERED, (meta & 8) > 0);
     }
 
     public int getMetaFromState(IBlockState state) {
         int i = 0;
         i = i | state.getValue(SHAPE).getMetadata();
 
-        if (state.getValue(POWERED).booleanValue()) {
+        if (state.getValue(POWERED)) {
             i |= 8;
         }
 

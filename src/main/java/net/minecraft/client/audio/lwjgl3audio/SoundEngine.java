@@ -116,10 +116,8 @@ public class SoundEngine extends Library {
     public void cleanup() {
         super.cleanup();
         Set<String> keys = this.bufferMap.keySet();
-        Iterator iter = keys.iterator();
 
-        while (iter.hasNext()) {
-            String filename = (String) iter.next();
+        for (String filename : keys) {
             IntBuffer buffer = this.ALBufferMap.get(filename);
             if (buffer != null) {
                 AL10.alDeleteBuffers(buffer);
@@ -483,28 +481,33 @@ public class SoundEngine extends Library {
     }
 
     private boolean checkALError() {
-        switch (AL10.alGetError()) {
-            case 0:
-                return false;
-            case 40961:
+        return switch (AL10.alGetError()) {
+            case 0 -> false;
+            case 40961 -> {
                 this.errorMessage("Invalid name parameter.");
-                return true;
-            case 40962:
+                yield true;
+            }
+            case 40962 -> {
                 this.errorMessage("Invalid parameter.");
-                return true;
-            case 40963:
+                yield true;
+            }
+            case 40963 -> {
                 this.errorMessage("Invalid enumerated parameter value.");
-                return true;
-            case 40964:
+                yield true;
+            }
+            case 40964 -> {
                 this.errorMessage("Illegal call.");
-                return true;
-            case 40965:
+                yield true;
+            }
+            case 40965 -> {
                 this.errorMessage("Unable to allocate memory.");
-                return true;
-            default:
+                yield true;
+            }
+            default -> {
                 this.errorMessage("An unrecognized error occurred.");
-                return true;
-        }
+                yield true;
+            }
+        };
     }
 
     public static boolean alPitchSupported() {

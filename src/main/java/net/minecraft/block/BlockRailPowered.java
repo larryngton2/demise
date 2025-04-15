@@ -10,16 +10,12 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class BlockRailPowered extends BlockRailBase {
-    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class, new Predicate<BlockRailBase.EnumRailDirection>() {
-        public boolean apply(BlockRailBase.EnumRailDirection p_apply_1_) {
-            return p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_WEST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_WEST;
-        }
-    });
+    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class, p_apply_1_ -> p_apply_1_ != EnumRailDirection.NORTH_EAST && p_apply_1_ != EnumRailDirection.NORTH_WEST && p_apply_1_ != EnumRailDirection.SOUTH_EAST && p_apply_1_ != EnumRailDirection.SOUTH_WEST);
     public static final PropertyBool POWERED = PropertyBool.create("powered");
 
     protected BlockRailPowered() {
         super(true);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH).withProperty(POWERED, Boolean.valueOf(false)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH).withProperty(POWERED, Boolean.FALSE));
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -111,16 +107,16 @@ public class BlockRailPowered extends BlockRailBase {
             return false;
         } else {
             BlockRailBase.EnumRailDirection blockrailbase$enumraildirection = iblockstate.getValue(SHAPE);
-            return (p_176567_5_ != EnumRailDirection.EAST_WEST || blockrailbase$enumraildirection != EnumRailDirection.NORTH_SOUTH && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_NORTH && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_SOUTH) && ((p_176567_5_ != EnumRailDirection.NORTH_SOUTH || blockrailbase$enumraildirection != EnumRailDirection.EAST_WEST && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_EAST && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_WEST) && (iblockstate.getValue(POWERED).booleanValue() && (worldIn.isBlockPowered(p_176567_2_) || this.func_176566_a(worldIn, p_176567_2_, iblockstate, p_176567_3_, distance + 1))));
+            return (p_176567_5_ != EnumRailDirection.EAST_WEST || blockrailbase$enumraildirection != EnumRailDirection.NORTH_SOUTH && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_NORTH && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_SOUTH) && ((p_176567_5_ != EnumRailDirection.NORTH_SOUTH || blockrailbase$enumraildirection != EnumRailDirection.EAST_WEST && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_EAST && blockrailbase$enumraildirection != EnumRailDirection.ASCENDING_WEST) && (iblockstate.getValue(POWERED) && (worldIn.isBlockPowered(p_176567_2_) || this.func_176566_a(worldIn, p_176567_2_, iblockstate, p_176567_3_, distance + 1))));
         }
     }
 
     protected void onNeighborChangedInternal(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
-        boolean flag = state.getValue(POWERED).booleanValue();
+        boolean flag = state.getValue(POWERED);
         boolean flag1 = worldIn.isBlockPowered(pos) || this.func_176566_a(worldIn, pos, state, true, 0) || this.func_176566_a(worldIn, pos, state, false, 0);
 
         if (flag1 != flag) {
-            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(flag1)), 3);
+            worldIn.setBlockState(pos, state.withProperty(POWERED, flag1), 3);
             worldIn.notifyNeighborsOfStateChange(pos.down(), this);
 
             if (state.getValue(SHAPE).isAscending()) {
@@ -134,14 +130,14 @@ public class BlockRailPowered extends BlockRailBase {
     }
 
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(meta & 7)).withProperty(POWERED, Boolean.valueOf((meta & 8) > 0));
+        return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(meta & 7)).withProperty(POWERED, (meta & 8) > 0);
     }
 
     public int getMetaFromState(IBlockState state) {
         int i = 0;
         i = i | state.getValue(SHAPE).getMetadata();
 
-        if (state.getValue(POWERED).booleanValue()) {
+        if (state.getValue(POWERED)) {
             i |= 8;
         }
 

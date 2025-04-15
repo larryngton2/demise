@@ -127,7 +127,7 @@ public class LinkedList<T> {
     }
 
     public Iterator<LinkedList.Node<T>> iterator() {
-        Iterator<LinkedList.Node<T>> iterator = new Iterator<LinkedList.Node<T>>() {
+        Iterator<LinkedList.Node<T>> iterator = new Iterator<>() {
             LinkedList.Node<T> node = LinkedList.this.getFirst();
 
             public boolean hasNext() {
@@ -168,11 +168,11 @@ public class LinkedList<T> {
     }
 
     public String toString() {
-        StringBuffer stringbuffer = new StringBuffer();
+        StringBuilder stringbuffer = new StringBuilder();
 
         for (Iterator<Node<T>> it = iterator(); it.hasNext(); ) {
             Node<T> node = it.next();
-            if (stringbuffer.length() > 0) {
+            if (!stringbuffer.isEmpty()) {
                 stringbuffer.append(", ");
             }
 

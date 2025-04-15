@@ -25,52 +25,34 @@ public class GuiBrewingStand extends GuiContainer {
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(brewingStandGuiTextures);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        mc.getTextureManager().bindTexture(brewingStandGuiTextures);
+        int i = (width - this.xSize) / 2;
+        int j = (height - this.ySize) / 2;
+        drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
         int k = this.tileBrewingStand.getField(0);
 
         if (k > 0) {
             int l = (int) (28.0F * (1.0F - (float) k / 400.0F));
 
             if (l > 0) {
-                this.drawTexturedModalRect(i + 97, j + 16, 176, 0, 9, l);
+                drawTexturedModalRect(i + 97, j + 16, 176, 0, 9, l);
             }
 
             int i1 = k / 2 % 7;
 
-            switch (i1) {
-                case 0:
-                    l = 29;
-                    break;
-
-                case 1:
-                    l = 24;
-                    break;
-
-                case 2:
-                    l = 20;
-                    break;
-
-                case 3:
-                    l = 16;
-                    break;
-
-                case 4:
-                    l = 11;
-                    break;
-
-                case 5:
-                    l = 6;
-                    break;
-
-                case 6:
-                    l = 0;
-            }
+            l = switch (i1) {
+                case 0 -> 29;
+                case 1 -> 24;
+                case 2 -> 20;
+                case 3 -> 16;
+                case 4 -> 11;
+                case 5 -> 6;
+                case 6 -> 0;
+                default -> l;
+            };
 
             if (l > 0) {
-                this.drawTexturedModalRect(i + 65, j + 14 + 29 - l, 185, 29 - l, 12, l);
+                drawTexturedModalRect(i + 65, j + 14 + 29 - l, 185, 29 - l, 12, l);
             }
         }
     }

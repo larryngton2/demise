@@ -73,7 +73,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
             int j = (i >> 3 & 1) * 85;
             int k = (i >> 2 & 1) * 170 + j;
             int l = (i >> 1 & 1) * 170 + j;
-            int i1 = (i >> 0 & 1) * 170 + j;
+            int i1 = (i & 1) * 170 + j;
 
             if (i == 6) {
                 k += 85;
@@ -164,7 +164,6 @@ public class FontRenderer implements IResourceManagerReloadListener {
             }
 
             if (i1 == 65) {
-                i1 = i1;
             }
 
             if (i1 == 32) {
@@ -229,7 +228,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
 
     private ResourceLocation getUnicodePageLocation(int page) {
         if (unicodePageLocations[page] == null) {
-            unicodePageLocations[page] = new ResourceLocation(String.format("textures/font/unicode_page_%02x.png", Integer.valueOf(page)));
+            unicodePageLocations[page] = new ResourceLocation(String.format("textures/font/unicode_page_%02x.png", page));
             unicodePageLocations[page] = FontUtils.getHdFontLocation(unicodePageLocations[page]);
         }
 

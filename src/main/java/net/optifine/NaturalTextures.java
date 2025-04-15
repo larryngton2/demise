@@ -45,8 +45,8 @@ public class NaturalTextures {
 
                 TextureMap texturemap = TextureUtils.getTextureMapBlocks();
 
-                for (int i = 0; i < astring.length; ++i) {
-                    String s2 = astring[i].trim();
+                for (String string : astring) {
+                    String s2 = string.trim();
 
                     if (!s2.startsWith("#")) {
                         String[] astring1 = Config.tokenize(s2, "=");
@@ -86,7 +86,7 @@ public class NaturalTextures {
                     }
                 }
 
-                propertiesByIndex = (NaturalProperties[]) arraylist.toArray(new NaturalProperties[arraylist.size()]);
+                propertiesByIndex = (NaturalProperties[]) arraylist.toArray(new NaturalProperties[0]);
             } catch (FileNotFoundException var17) {
                 Config.warn("NaturalTextures: configuration \"" + s + "\" not found");
             } catch (Exception exception) {

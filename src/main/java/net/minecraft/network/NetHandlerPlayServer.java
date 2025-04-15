@@ -109,17 +109,9 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 
     public void kickPlayerFromServer(String reason) {
         final ChatComponentText chatcomponenttext = new ChatComponentText(reason);
-        this.netManager.sendPacket(new S40PacketDisconnect(chatcomponenttext), new GenericFutureListener<Future<? super Void>>() {
-            public void operationComplete(Future<? super Void> p_operationComplete_1_) throws Exception {
-                NetHandlerPlayServer.this.netManager.closeChannel(chatcomponenttext);
-            }
-        });
+        this.netManager.sendPacket(new S40PacketDisconnect(chatcomponenttext), p_operationComplete_1_ -> NetHandlerPlayServer.this.netManager.closeChannel(chatcomponenttext));
         this.netManager.disableAutoRead();
-        Futures.getUnchecked(this.serverController.addScheduledTask(new Runnable() {
-            public void run() {
-                NetHandlerPlayServer.this.netManager.checkDisconnected();
-            }
-        }));
+        Futures.getUnchecked(this.serverController.addScheduledTask(() -> NetHandlerPlayServer.this.netManager.checkDisconnected()));
     }
 
     public void processInput(C0CPacketInput packetIn) {
@@ -445,7 +437,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
 
             flag = true;
         } else {
-            ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("build.tooHigh", Integer.valueOf(this.serverController.getBuildLimit()));
+            ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("build.tooHigh", this.serverController.getBuildLimit());
             chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
             this.playerEntity.playerNetServerHandler.sendPacket(new S02PacketChat(chatcomponenttranslation));
             flag = true;
@@ -560,11 +552,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
         } catch (Throwable throwable) {
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Sending packet");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Packet being sent");
-            crashreportcategory.addCrashSectionCallable("Packet class", new Callable<String>() {
-                public String call() throws Exception {
-                    return packetIn.getClass().getCanonicalName();
-                }
-            });
+            crashreportcategory.addCrashSectionCallable("Packet class", () -> packetIn.getClass().getCanonicalName());
             throw new ReportedException(crashreport);
         }
     }
@@ -766,7 +754,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
                     this.playerEntity.updateHeldItem();
                     this.playerEntity.isChangingQuantityOnly = false;
                 } else {
-                    this.field_147372_n.addKey(this.playerEntity.openContainer.windowId, Short.valueOf(packetIn.getActionNumber()));
+                    this.field_147372_n.addKey(this.playerEntity.openContainer.windowId, packetIn.getActionNumber());
                     this.playerEntity.playerNetServerHandler.sendPacket(new S32PacketConfirmTransaction(packetIn.getWindowId(), packetIn.getActionNumber(), false));
                     this.playerEntity.openContainer.setCanCraft(this.playerEntity, false);
                     List<ItemStack> list1 = Lists.newArrayList();
@@ -839,7 +827,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.playerEntity.getServerForPlayer());
         Short oshort = this.field_147372_n.lookup(this.playerEntity.openContainer.windowId);
 
-        if (oshort != null && packetIn.getUid() == oshort.shortValue() && this.playerEntity.openContainer.windowId == packetIn.getWindowId() && !this.playerEntity.openContainer.getCanCraft(this.playerEntity) && !this.playerEntity.isSpectator()) {
+        if (oshort != null && packetIn.getUid() == oshort && this.playerEntity.openContainer.windowId == packetIn.getWindowId() && !this.playerEntity.openContainer.getCanCraft(this.playerEntity) && !this.playerEntity.isSpectator()) {
             this.playerEntity.openContainer.setCanCraft(this.playerEntity, true);
         }
     }
@@ -893,11 +881,9 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.playerEntity.getServerForPlayer());
         List<String> list = Lists.newArrayList();
 
-        for (String s : this.serverController.getTabCompletions(this.playerEntity, packetIn.getMessage(), packetIn.getTargetBlock())) {
-            list.add(s);
-        }
+        list.addAll(this.serverController.getTabCompletions(this.playerEntity, packetIn.getMessage(), packetIn.getTargetBlock()));
 
-        this.playerEntity.playerNetServerHandler.sendPacket(new S3APacketTabComplete(list.toArray(new String[list.size()])));
+        this.playerEntity.playerNetServerHandler.sendPacket(new S3APacketTabComplete(list.toArray(new String[0])));
     }
 
     public void processClientSettings(C15PacketClientSettings packetIn) {

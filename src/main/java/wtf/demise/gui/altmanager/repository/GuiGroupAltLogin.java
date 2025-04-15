@@ -1,10 +1,10 @@
 package wtf.demise.gui.altmanager.repository;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.gui.altmanager.group.GuiRoundedGroupWithLines;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
@@ -15,7 +15,7 @@ public final class GuiGroupAltLogin extends GuiRoundedGroupWithLines<Object> {
     public GuiGroupAltLogin(final GuiAddAlt gui, final String text) {
         super(text, 0, 15, 200, 30, 15, () -> null, Fonts.interMedium.get(20), Fonts.interSemiBold.get(22));
 
-        this.xPosition = (int) ((gui.width - this.width) / 2F);
+        this.xPosition = (int) ((GuiScreen.width - this.width) / 2F);
         addLine(t -> this.status);
     }
 

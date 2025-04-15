@@ -16,7 +16,7 @@ public class GuiKeyBindingList extends GuiListExtended {
     private int maxListLabelWidth = 0;
 
     public GuiKeyBindingList(GuiControls controls, Minecraft mcIn) {
-        super(mcIn, controls.width, controls.height, 63, controls.height - 32, 20);
+        super(mcIn, GuiScreen.width, GuiScreen.height, 63, GuiScreen.height - 32, 20);
         this.field_148191_k = controls;
         this.mc = mcIn;
         KeyBinding[] akeybinding = ArrayUtils.clone(mcIn.gameSettings.keyBindings);
@@ -69,7 +69,7 @@ public class GuiKeyBindingList extends GuiListExtended {
         }
 
         public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
-            GuiKeyBindingList.this.mc.fontRendererObj.drawString(this.labelText, GuiKeyBindingList.this.mc.currentScreen.width / 2 - this.labelWidth / 2, y + slotHeight - GuiKeyBindingList.this.mc.fontRendererObj.FONT_HEIGHT - 1, 16777215);
+            GuiKeyBindingList.this.mc.fontRendererObj.drawString(this.labelText, GuiScreen.width / 2 - this.labelWidth / 2, y + slotHeight - GuiKeyBindingList.this.mc.fontRendererObj.FONT_HEIGHT - 1, 16777215);
         }
 
         public boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_) {

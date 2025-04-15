@@ -78,7 +78,7 @@ public class EntitySheep extends EntityAnimal {
 
     protected void entityInit() {
         super.entityInit();
-        this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+        this.dataWatcher.addObject(16, (byte) 0);
     }
 
     protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
@@ -179,7 +179,7 @@ public class EntitySheep extends EntityAnimal {
 
     public void setFleeceColor(EnumDyeColor color) {
         byte b0 = this.dataWatcher.getWatchableObjectByte(16);
-        this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 & 240 | color.getMetadata() & 15)));
+        this.dataWatcher.updateObject(16, (byte) (b0 & 240 | color.getMetadata() & 15));
     }
 
     public boolean getSheared() {
@@ -190,9 +190,9 @@ public class EntitySheep extends EntityAnimal {
         byte b0 = this.dataWatcher.getWatchableObjectByte(16);
 
         if (sheared) {
-            this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 | 16)));
+            this.dataWatcher.updateObject(16, (byte) (b0 | 16));
         } else {
-            this.dataWatcher.updateObject(16, Byte.valueOf((byte) (b0 & -17)));
+            this.dataWatcher.updateObject(16, (byte) (b0 & -17));
         }
     }
 
