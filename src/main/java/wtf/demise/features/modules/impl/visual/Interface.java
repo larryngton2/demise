@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S02PacketChat;
@@ -231,13 +232,13 @@ public class Interface extends Module {
 
         if (!(mc.currentScreen instanceof GuiChat)) {
             if (aura.isEnabled()) {
-                if (KillAura.currentTarget != null) {
+                if (KillAura.currentTarget instanceof EntityPlayer) {
                     decelerateAnimation.setDirection(Direction.FORWARDS);
                     target = KillAura.currentTarget;
                 }
             }
 
-            if (!aura.isEnabled() || KillAura.currentTarget == null) {
+            if (!aura.isEnabled() || !(KillAura.currentTarget instanceof EntityPlayer)) {
                 decelerateAnimation.setDirection(Direction.BACKWARDS);
                 if (decelerateAnimation.finished(Direction.BACKWARDS)) {
                     target = null;

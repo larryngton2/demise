@@ -16,6 +16,12 @@ import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.CustomSkin;
+import wtf.demise.features.modules.impl.visual.VisualTweaks;
+import wtf.demise.gui.altmanager.repository.Alt;
+import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
+import wtf.demise.utils.misc.DebugUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -90,13 +96,28 @@ public class SkinManager {
 
             try {
                 map.putAll(SkinManager.this.sessionService.getTextures(profile, requireSecure));
-            } catch (InsecureTextureException var3) {
+            } catch (InsecureTextureException ignored) {
             }
 
-            if (map.isEmpty() && profile.getId().equals(Minecraft.getMinecraft().getSession().getProfile().getId())) {
-                profile.getProperties().clear();
-                profile.getProperties().putAll(Minecraft.getMinecraft().getProfileProperties());
-                map.putAll(SkinManager.this.sessionService.getTextures(profile, false));
+            CustomSkin visualTweaks = Demise.INSTANCE.getModuleManager().getModule(CustomSkin.class);
+
+            GameProfile currentProfile = Minecraft.getMinecraft().getSession().getProfile();
+
+            if ((currentProfile.getId() == null && profile.getName().equals(currentProfile.getName())) || (currentProfile.getId() != null && currentProfile.getId().equals(profile.getId()))) {
+                if (visualTweaks.isEnabled()) {
+                    Map<String, String> metadata = Maps.newHashMap();
+                    metadata.put("model", visualTweaks.slimSkin.get() ? "slim" : "default");
+
+                    MinecraftProfileTexture customSkin = new MinecraftProfileTexture(
+                            visualTweaks.skinURL.get(),
+                            metadata
+                    );
+                    map.put(Type.SKIN, customSkin);
+                } else if (map.isEmpty()) {
+                    profile.getProperties().clear();
+                    profile.getProperties().putAll(currentProfile.getProperties());
+                    map.putAll(SkinManager.this.sessionService.getTextures(profile, false));
+                }
             }
 
             Minecraft.getMinecraft().addScheduledTask(() -> {

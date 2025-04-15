@@ -67,11 +67,10 @@ public final class AltLoginThread {
             auth.logIn();
             final GameProfile selectedProfile = auth.getSelectedProfile();
             return new Session(selectedProfile.getName(), selectedProfile.getId().toString(),
-                    auth.getAuthenticatedToken(), "mojang");
+                    auth.getAuthenticatedToken(), "crack cocaine");
         } catch (AuthenticationException e) {
             e.printStackTrace();
             return null;
         }
     }
-
 }

@@ -134,7 +134,9 @@ public class ModuleManager {
                 BreakProgress.class,
                 Dot.class,
                 VisualTweaks.class,
-                ItemGlow.class
+                ItemGlow.class,
+                Cape.class,
+                CustomSkin.class
         );
 
         // Sort modules by name for better organization

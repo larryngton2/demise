@@ -51,9 +51,7 @@ public class Alt {
     private boolean invalid;
     public static boolean shader;
 
-    public Alt(@NotNull AltCredential credential,
-               @NotNull FakeEntityPlayer player,
-               @NotNull AltRepositoryGUI repository, boolean invalid) {
+    public Alt(@NotNull AltCredential credential, @NotNull FakeEntityPlayer player, @NotNull AltRepositoryGUI repository, boolean invalid) {
         this.repository = repository;
         this.credential = credential;
         this.player = player;
@@ -301,8 +299,7 @@ public class Alt {
         MinecraftProfileTexture profileTexture = mc.getSessionService().getTextures(gameProfile, false).get(SKIN);
 
         if (profileTexture != null) {
-            mc.addScheduledTask(
-                    () -> mc.getSkinManager().loadSkin(profileTexture, SKIN, (type, skinLocation, texture) -> setupPlayer(gameProfile, skinLocation)));
+            mc.addScheduledTask(() -> mc.getSkinManager().loadSkin(profileTexture, SKIN, (type, skinLocation, texture) -> setupPlayer(gameProfile, skinLocation)));
         }
     }
 
@@ -310,8 +307,7 @@ public class Alt {
         Minecraft mc = Minecraft.getMinecraft();
         this.player = new FakeEntityPlayer(gameProfile, skinLocation);
 
-        mc.getRenderManager().cacheActiveRenderInfo(player.worldObj, mc.fontRendererObj, player, player,
-                mc.gameSettings, 0.0F);
+        mc.getRenderManager().cacheActiveRenderInfo(player.worldObj, mc.fontRendererObj, player, player, mc.gameSettings, 0.0F);
     }
 
     long lastClickTime;

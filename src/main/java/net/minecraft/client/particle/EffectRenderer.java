@@ -95,7 +95,7 @@ public class EffectRenderer {
     }
 
     public void registerParticle(int id, IParticleFactory particleFactory) {
-        this.particleTypes.put(id, particleFactory);
+        this.particleTypes.put(Integer.valueOf(id), particleFactory);
     }
 
     public void emitParticleAtEntity(Entity entityIn, EnumParticleTypes particleTypes) {
@@ -103,7 +103,7 @@ public class EffectRenderer {
     }
 
     public EntityFX spawnEffectParticle(int particleId, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters) {
-        IParticleFactory iparticlefactory = this.particleTypes.get(particleId);
+        IParticleFactory iparticlefactory = this.particleTypes.get(Integer.valueOf(particleId));
 
         if (iparticlefactory != null) {
             EntityFX entityfx = iparticlefactory.getEntityFX(particleId, this.worldObj, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
@@ -161,7 +161,8 @@ public class EffectRenderer {
         long i = System.currentTimeMillis();
         int j = entitiesFX.size();
 
-        for (EntityFX entityfx : entitiesFX) {
+        for (int k = 0; k < entitiesFX.size(); ++k) {
+            EntityFX entityfx = entitiesFX.get(k);
             this.tickParticle(entityfx);
 
             if (entityfx.isDead) {
@@ -195,8 +196,16 @@ public class EffectRenderer {
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Particle");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
             final int i = particle.getFXLayer();
-            crashreportcategory.addCrashSectionCallable("Particle", () -> particle.toString());
-            crashreportcategory.addCrashSectionCallable("Particle Type", () -> i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i)));
+            crashreportcategory.addCrashSectionCallable("Particle", new Callable<String>() {
+                public String call() throws Exception {
+                    return particle.toString();
+                }
+            });
+            crashreportcategory.addCrashSectionCallable("Particle Type", new Callable<String>() {
+                public String call() throws Exception {
+                    return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i));
+                }
+            });
             throw new ReportedException(crashreport);
         }
     }
@@ -255,8 +264,16 @@ public class EffectRenderer {
                         } catch (Throwable throwable) {
                             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
                             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
-                            crashreportcategory.addCrashSectionCallable("Particle", () -> entityfx.toString());
-                            crashreportcategory.addCrashSectionCallable("Particle Type", () -> i_f == 0 ? "MISC_TEXTURE" : (i_f == 1 ? "TERRAIN_TEXTURE" : (i_f == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i_f)));
+                            crashreportcategory.addCrashSectionCallable("Particle", new Callable<String>() {
+                                public String call() throws Exception {
+                                    return entityfx.toString();
+                                }
+                            });
+                            crashreportcategory.addCrashSectionCallable("Particle Type", new Callable<String>() {
+                                public String call() throws Exception {
+                                    return i_f == 0 ? "MISC_TEXTURE" : (i_f == 1 ? "TERRAIN_TEXTURE" : (i_f == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i_f));
+                                }
+                            });
                             throw new ReportedException(crashreport);
                         }
                     }
@@ -286,7 +303,8 @@ public class EffectRenderer {
                 Tessellator tessellator = Tessellator.getInstance();
                 WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 
-                for (EntityFX entityfx : list) {
+                for (int j = 0; j < list.size(); ++j) {
+                    EntityFX entityfx = list.get(j);
                     entityfx.renderParticle(worldrenderer, entityIn, partialTick, f1, f5, f2, f3, f4);
                 }
             }

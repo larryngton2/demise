@@ -10,6 +10,7 @@ import lombok.Setter;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -80,7 +81,7 @@ public class AltRepositoryGUI extends GuiScreen {
     private final Logger logger = LogManager.getLogger();
     @Getter
     @Setter
-    private Alt currentAlt;
+    public static Alt currentAlt;
     private GuiTextField searchField;
 
     private final FilteredArrayList<Alt, Alt> alts = new FilteredArrayList<>(

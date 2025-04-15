@@ -75,6 +75,9 @@ public class ModuleCommand extends Command {
             } else if (value instanceof ModeValue modeValue) {
                 modeValue.set(args[2]);
                 DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + modeValue.get() + ".");
+            } else if (value instanceof TextValue textValue) {
+                textValue.setText(args[2]);
+                DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + textValue.get() + ".");
             }
         }
     }

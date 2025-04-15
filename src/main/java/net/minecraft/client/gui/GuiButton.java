@@ -106,12 +106,6 @@ public class GuiButton extends Gui {
                         interpolatedY = MathUtils.interpolate(interpolatedY, yPosition + 1.5f, interpolation);
                         interpolatedWidth = MathUtils.interpolate(interpolatedWidth, width - 3, interpolation);
                         interpolatedHeight = MathUtils.interpolate(interpolatedHeight, height - 3, interpolation);
-
-                    /*
-                    if (Mouse.isButtonDown(0)) {
-                        clickAction.run();
-                    }
-                    */
                     } else {
                         interpolatedX = MathUtils.interpolate(interpolatedX, xPosition, interpolation);
                         interpolatedY = MathUtils.interpolate(interpolatedY, yPosition, interpolation);

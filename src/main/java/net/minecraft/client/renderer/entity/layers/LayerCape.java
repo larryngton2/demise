@@ -9,8 +9,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Cape;
 import wtf.demise.features.modules.impl.visual.Interface;
-import wtf.demise.features.modules.impl.visual.VisualTweaks;
 
 import java.util.Iterator;
 
@@ -23,7 +23,7 @@ public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
     }
 
     public void doRenderLayer(AbstractClientPlayer entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale) {
-        VisualTweaks visualTweaks = Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class);
+        Cape visualTweaks = Demise.INSTANCE.getModuleManager().getModule(Cape.class);
 
         if (!entitylivingbaseIn.isInvisible() && (entitylivingbaseIn.hasPlayerInfo() && entitylivingbaseIn.isWearing(EnumPlayerModelParts.CAPE) && entitylivingbaseIn.getLocationCape() != null || entitylivingbaseIn.getName().equals(Minecraft.getMinecraft().getSession().getUsername()) && visualTweaks.isEnabled() && !visualTweaks.capeMode.is("Default"))) {
             if (visualTweaks.tint.get()) {

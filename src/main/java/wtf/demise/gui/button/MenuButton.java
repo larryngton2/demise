@@ -80,12 +80,6 @@ public class MenuButton implements Button, InstanceAccess {
                     interpolatedY = MathUtils.interpolate(interpolatedY, y + 1.5f, interpolation);
                     interpolatedWidth = MathUtils.interpolate(interpolatedWidth, width - 3, interpolation);
                     interpolatedHeight = MathUtils.interpolate(interpolatedHeight, height - 3, interpolation);
-
-                    /*
-                    if (Mouse.isButtonDown(0)) {
-                        clickAction.run();
-                    }
-                    */
                 } else {
                     interpolatedX = MathUtils.interpolate(interpolatedX, x, interpolation);
                     interpolatedY = MathUtils.interpolate(interpolatedY, y, interpolation);
@@ -100,7 +94,6 @@ public class MenuButton implements Button, InstanceAccess {
                 }
 
                 Fonts.interRegular.get(15).drawCenteredString(text, interpolatedX + interpolatedWidth / 2f, interpolatedY + Fonts.interRegular.get(15).getMiddleOfBox(interpolatedHeight) + 2, -1);
-
             }
         }
     }
