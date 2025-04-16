@@ -23,6 +23,7 @@ import net.optifine.player.PlayerConfigurations;
 import net.optifine.reflect.Reflector;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.LookEvent;
+import wtf.demise.utils.player.RotationUtils;
 
 public abstract class AbstractClientPlayer extends EntityPlayer {
     private NetworkPlayerInfo playerInfo;
@@ -179,6 +180,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
 
         LookEvent lookEvent = new LookEvent(new float[]{yaw, pitch});
         Demise.INSTANCE.getEventManager().call(lookEvent);
+
         yaw = lookEvent.rotation[0];
         pitch = lookEvent.rotation[1];
 

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
@@ -56,6 +57,12 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed) {
+        hSpeed /= mc.timer.partialTicks;
+        vSpeed /= mc.timer.partialTicks;
+
+        hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
+        vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
+
         if (moduleRotation.silent.get()) {
             RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
         } else {
@@ -72,6 +79,12 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float midpoint) {
+        hSpeed /= mc.timer.partialTicks;
+        vSpeed /= mc.timer.partialTicks;
+
+        hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
+        vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
+
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -125,42 +138,8 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
-    @EventPriority(-100)
-    public void onRotationUpdate(UpdateEvent event) {
-        if (!enabled && currentRotation != null) {
-            double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
-
-            if (distanceToPlayerRotation < 1) {
-                resetRotation();
-                return;
-            }
-
-            if (distanceToPlayerRotation > 0) {
-                RotationUtils.currentRotation =
-                        switch (smoothMode) {
-                            case Linear ->
-                                    smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                            case Lerp ->
-                                    smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                            case Bezier ->
-                                    smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
-                            case Exponential ->
-                                    smoothExpo(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                            default ->
-                                    smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                        };
-            }
-        }
-
-        enabled = false;
-    }
-
-    @EventTarget
     private void onMove(MoveInputEvent e) {
         if (currentCorrection == MovementCorrection.Silent) {
-            /*
-             * Calculating movement fix
-             */
             final float yaw = currentRotation[0];
             MoveUtil.fixMovement(e, yaw);
         }
@@ -207,9 +186,8 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
-    @EventPriority(-100)
-    public void onMotion(MotionEvent event) {
-        if (event.isPost() && currentRotation != null) {
+    public void onGameUpdate(GameEvent e) {
+        if (currentRotation != null) {
             double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
             if (!enabled) {
@@ -219,19 +197,21 @@ public class RotationUtils implements InstanceAccess {
                 }
 
                 if (distanceToPlayerRotation > 0) {
-                    RotationUtils.currentRotation =
-                            switch (smoothMode) {
-                                case Linear ->
-                                        smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                                case Lerp ->
-                                        smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                                case Bezier ->
-                                        smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed, cachedMidpoint);
-                                case Exponential ->
-                                        smoothExpo(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                                default ->
-                                        smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, cachedHSpeed, cachedVSpeed);
-                            };
+                    float finalHSpeed = cachedHSpeed * mc.timer.partialTicks;
+                    float finalVSpeed = cachedVSpeed * mc.timer.partialTicks;
+
+                    RotationUtils.currentRotation = switch (smoothMode) {
+                        case Linear ->
+                                smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
+                        case Lerp ->
+                                smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
+                        case Bezier ->
+                                smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint);
+                        case Exponential ->
+                                smoothExpo(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
+                        default ->
+                                smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
+                    };
                 }
             }
 
