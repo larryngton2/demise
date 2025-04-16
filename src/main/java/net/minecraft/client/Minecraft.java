@@ -71,7 +71,6 @@ import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.stats.AchievementList;
-import net.minecraft.stats.IStatStringFormat;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Timer;
@@ -104,9 +103,8 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.features.modules.impl.visual.VisualTweaks;
+import wtf.demise.features.modules.impl.legit.LeftClicker;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
-import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.render.RenderUtils;
 
 import javax.imageio.ImageIO;

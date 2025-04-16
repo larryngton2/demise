@@ -8,7 +8,7 @@ import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.killaura.KillAura;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;

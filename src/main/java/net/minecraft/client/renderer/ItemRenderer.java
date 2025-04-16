@@ -32,7 +32,7 @@ import net.optifine.reflect.Reflector;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.combat.killaura.KillAura;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.visual.Animations;
 import wtf.demise.features.modules.impl.visual.Camera;
 import wtf.demise.utils.misc.SpoofSlotUtils;

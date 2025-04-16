@@ -5,7 +5,6 @@ import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.killaura.KillAura;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 

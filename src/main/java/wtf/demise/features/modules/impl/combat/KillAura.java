@@ -1,6 +1,7 @@
-package wtf.demise.features.modules.impl.combat.killaura;
+package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
@@ -8,25 +9,21 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.MouseOverEvent;
-import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.AntiBot;
-import wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler;
-import wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler;
+import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -43,10 +40,6 @@ import java.util.Queue;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static wtf.demise.features.modules.impl.combat.killaura.features.AutoBlockHandler.setBlocking;
-import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.lastTargetTime;
-import static wtf.demise.features.modules.impl.combat.killaura.features.ClickHandler.rayTraceFailed;
-
 @ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
 public class KillAura extends Module {
 
@@ -55,17 +48,14 @@ public class KillAura extends Module {
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
 
     // attack
-    public final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
-    public final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
-    public final ModeValue swingMode = new ModeValue("Swing mode", new String[]{"Normal", "Client", "Server"}, "Normal", this, () -> clickMode.is("Packet"));
-    public final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
-    public final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
-    public final SliderValue cpsUpdateDelay = new SliderValue("CPS update delay", 5, 0, 50, 1, this);
-    public final BoolValue extraClicks = new BoolValue("Extra clicks", false, this);
-    public final SliderValue eChance = new SliderValue("Chance", 50, 1, 100, 1, this, extraClicks::get);
-    public final SliderValue eClicks = new SliderValue("Extra click count", 1, 1, 10, 1, this, extraClicks::get);
+    private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
+    private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
+    private final BoolValue ignoreBlocking = new BoolValue("Ignore blocking", true, this);
+    private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
+    private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
+    private final SliderValue cpsUpdateDelay = new SliderValue("CPS update delay", 5, 0, 50, 1, this);
     public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
-    public final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayTrace::get);
+    private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayTrace::get);
     private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
 
     // autoBlock
@@ -75,7 +65,7 @@ public class KillAura extends Module {
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
-    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap", "Derp"}, "Silent", this);
+    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Snap"}, "Silent", this);
     private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Test", "None"}, "Linear", this);
     private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 1, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
     private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 1, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
@@ -138,7 +128,6 @@ public class KillAura extends Module {
     private final TimerUtils lastSwitchTime = new TimerUtils();
     public List<EntityLivingBase> targets = new ArrayList<>();
     private final TimerUtils pauseTimer = new TimerUtils();
-    private int clicks;
     public static EntityLivingBase currentTarget;
     public static boolean isBlocking = false;
     private Vec3 targetVec;
@@ -148,7 +137,6 @@ public class KillAura extends Module {
     private double lastZOffset;
     private boolean pause;
     private float derpYaw;
-    private boolean rotate;
     private double currentXOffset;
     private double currentYOffset;
     private double currentZOffset;
@@ -172,7 +160,6 @@ public class KillAura extends Module {
         currentTarget = null;
         targets.clear();
         positionHistory.clear();
-        clicks = 0;
     }
 
     @EventTarget
@@ -200,7 +187,7 @@ public class KillAura extends Module {
             if (!isTargetInvalid()) {
                 double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
-                if (!ClickHandler.isWithinAttackRange() && isBlocking) {
+                if (distance > autoBlockRange.get() && isBlocking) {
                     setBlocking(false);
                 }
 
@@ -208,15 +195,6 @@ public class KillAura extends Module {
                     switch (rotationMode.get()) {
                         case "Silent":
                             setRotationToTarget(currentTarget);
-                            break;
-                        case "Snap":
-                            if (rotate) {
-                                setRotationToTarget(currentTarget);
-
-                                if ((rayTrace.get() && !rayTraceFailed()) || !rayTrace.get()) {
-                                    rotate = false;
-                                }
-                            }
                             break;
                         case "Derp":
                             MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
@@ -239,8 +217,6 @@ public class KillAura extends Module {
             if (BlinkComponent.blinking) {
                 BlinkComponent.dispatch(true);
             }
-
-            clicks = 0;
         }
 
         if (Objects.equals(clickMode.get(), "Packet")) {
@@ -253,47 +229,6 @@ public class KillAura extends Module {
         }
 
         targets.removeIf(target -> isTargetInvalid());
-    }
-
-    @EventTarget
-    public void onGameUpdate(GameEvent e) {
-        if (mc.thePlayer == null || mc.theWorld == null) {
-            return;
-        }
-
-        if (ClickHandler.isAttackReady() && currentTarget != null && !isTargetInvalid()) {
-            clicks++;
-            lastTargetTime.reset();
-        }
-    }
-
-    @EventTarget
-    public void onPlayerTickEvent(PlayerTickEvent e) {
-        if (mc.thePlayer == null || mc.theWorld == null) {
-            return;
-        }
-
-        if (e.getState() == PlayerTickEvent.State.PRE && currentTarget != null && !isTargetInvalid()) {
-            double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
-
-            if (rayTrace.get() && rayTraceFailed() && rotationMode.is("Snap") && rotate) {
-                return;
-            }
-
-            for (int i = 0; i < clicks; i++) {
-                AutoBlockHandler.preAttack();
-
-                if (!ClickHandler.isWithinAttackRange() && distance < swingRange.get() && failSwing.get()) {
-                    ClickHandler.handleFailSwing();
-                }
-
-                ClickHandler.sendAttack();
-                AutoBlockHandler.postAttack();
-
-                rotate = true;
-                clicks--;
-            }
-        }
     }
 
     private void setRotationToTarget(EntityLivingBase target) {
@@ -439,6 +374,15 @@ public class KillAura extends Module {
     }
 
     @EventTarget
+    public void onGameTick(GameEvent e) {
+        if (currentTarget != null && !isTargetInvalid()) {
+            ClickHandler.ClickMode mode = ClickHandler.ClickMode.valueOf(clickMode.get());
+
+            ClickHandler.initHandler(minCPS.get(), maxCPS.get(), cpsUpdateDelay.get(), rayTrace.get() && rayTrace.canDisplay(), smartClicking.get(), ignoreBlocking.get(), failSwing.get(), attackRange.get(), swingRange.get(), mode, currentTarget);
+        }
+    }
+
+    @EventTarget
     public void onRenderTick(Render3DEvent e) {
         if (mc.thePlayer == null || mc.theWorld == null) {
             return;
@@ -455,8 +399,8 @@ public class KillAura extends Module {
 
     @EventTarget
     public void onAttack(AttackEvent e) {
-        if (AutoBlockHandler.canAutoBlock()) {
-            AutoBlockHandler.onAttack();
+        if (canAutoBlock()) {
+            onAttack();
         }
     }
 
@@ -465,22 +409,126 @@ public class KillAura extends Module {
         e.setRange(attackRange.get());
     }
 
-    @EventTarget
-    public void onSendPacket(PacketEvent e) {
-        if (e.getState() == PacketEvent.State.OUTGOING) {
-            if (swingMode.is("Client") && clickMode.is("Packet")) {
-                if (e.getPacket() instanceof C0APacketAnimation) {
-                    e.setCancelled(true);
-                }
+    public void preAttack() {
+        if (extraCheck() && canAutoBlock()) {
+            switch (autoBlockMode.get()) {
+                case "None":
+                    if (isBlocking) {
+                        setBlocking(false);
+                    }
+                    break;
+                case "Fake", "NCP":
+                    isBlocking = true;
+                    break;
+                case "Vanilla":
+                    setBlocking(true);
+                    break;
+                case "Release":
+                    setBlocking(false);
+                    break;
+                case "VanillaForce":
+                    vanillaReblockAb(currentTarget);
+                    break;
+                case "Blink":
+                    BlinkComponent.blinking = true;
+                    if (isBlocking) {
+                        setBlocking(false);
+                    }
+                    break;
             }
+        } else if (isBlocking) {
+            setBlocking(false);
         }
+    }
+
+    private void onAttack() {
+        if (extraCheck() && canAutoBlock()) {
+            switch (autoBlockMode.get()) {
+                case "NCP":
+                    setBlocking(true);
+                    break;
+            }
+        } else if (isBlocking) {
+            setBlocking(false);
+        }
+    }
+
+    public void postAttack() {
+        if (extraCheck() && canAutoBlock()) {
+            switch (autoBlockMode.get()) {
+                case "Release":
+                    setBlocking(true);
+                    break;
+                case "VanillaForce":
+                    vanillaReblockAb(currentTarget);
+                    break;
+                case "Blink":
+                    //interact();
+                    if (!isBlocking) {
+                        setBlocking(true);
+                    }
+                    BlinkComponent.dispatch(true);
+                    break;
+            }
+        } else if (isBlocking) {
+            setBlocking(false);
+        }
+    }
+
+    private void interact() {
+        MovingObjectPosition ray = mc.objectMouseOver;
+
+        if (ray == null) return;
+
+        if (ray.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            sendPacket(new C02PacketUseEntity(ray.entityHit, ray.hitVec));
+        }
+    }
+
+    private boolean extraCheck() {
+        return !ClickHandler.rayTraceFailed() || !unBlockOnRayCastFail.get() || !rayTrace.get();
+    }
+
+    private void vanillaReblockAb(Entity e) {
+        setBlocking(true);
+        if (!mc.gameSettings.keyBindUseItem.isKeyDown() || !mc.thePlayer.isBlocking()) {
+            setBlocking(true);
+        }
+    }
+
+    private void setBlocking(boolean state) {
+        switch (autoBlockMode.get()) {
+            case "NCP":
+                if (state) {
+                    sendPacket(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, null, 0.0f, 0.0f, 0.0f));
+                } else {
+                    sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                }
+                break;
+            case "Blink":
+                if (state) {
+                    sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                } else {
+                    sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                }
+                break;
+            default:
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), state);
+                break;
+        }
+
+        isBlocking = state;
+    }
+
+    private boolean canAutoBlock() {
+        return isHoldingSword() && autoBlock.get() && PlayerUtils.getDistanceToEntityBox(currentTarget) <= autoBlockRange.get();
     }
 
     public boolean isHoldingSword() {
         return mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
     }
 
-    public float[] calcToEntity(EntityLivingBase entity) {
+    private float[] calcToEntity(EntityLivingBase entity) {
         Vec3 playerPos;
 
         if (predict.get() && !predictProcesses.isEmpty()) {

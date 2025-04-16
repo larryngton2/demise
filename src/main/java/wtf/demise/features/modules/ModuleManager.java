@@ -5,7 +5,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
-import wtf.demise.features.modules.impl.combat.killaura.KillAura;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.*;
 import wtf.demise.features.modules.impl.legit.*;
 import wtf.demise.features.modules.impl.misc.*;
@@ -50,7 +50,7 @@ public class ModuleManager {
                 TimerRange.class,
 
                 // Legit
-                AutoClicker.class,
+                LeftClicker.class,
                 NoHitDelay.class,
                 LegitScaffold.class,
                 BackTrack.class,

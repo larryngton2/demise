@@ -18,7 +18,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.combat.killaura.KillAura;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.player.InvManager;
 import wtf.demise.features.modules.impl.player.Stealer;
 import wtf.demise.gui.font.Fonts;

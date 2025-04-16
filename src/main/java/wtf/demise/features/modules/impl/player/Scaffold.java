@@ -21,7 +21,7 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.killaura.KillAura;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;

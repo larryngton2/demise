@@ -13,6 +13,7 @@ import wtf.demise.features.command.CommandManager;
 import wtf.demise.features.config.ConfigManager;
 import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
+import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
 import wtf.demise.gui.click.dropdown.DropdownGUI;
 import wtf.demise.gui.click.skeet.SkeetUI;
@@ -145,6 +146,7 @@ public class Demise {
         eventManager.register(new BlinkComponent());
         eventManager.register(new SpoofSlotUtils());
         eventManager.register(new CustomWidgets());
+        eventManager.register(new ClickHandler());
 
         LOGGER.info("Event handlers registered.");
     }
