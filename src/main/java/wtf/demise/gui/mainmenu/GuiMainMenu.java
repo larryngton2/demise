@@ -51,99 +51,64 @@ public class GuiMainMenu extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
 
-        if (CurrentUser.USER != null) {
-            float buttonWidth = 120;
+        float buttonWidth = 120;
 
-            float buttonHeight = switch (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).buttonStyle.get()) {
-                case "Vanilla" -> 20;
-                case "Custom" -> 23;
-                default -> 0;
-            };
+        float buttonHeight = switch (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).buttonStyle.get()) {
+            case "Vanilla" -> 20;
+            case "Custom" -> 23;
+            default -> 0;
+        };
 
-            Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
+        Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
 
-            if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
-                MenuButton.shader = true;
-                Blur.startBlur();
-                renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
-                Blur.endBlur(25, 1);
-            }
-
-            if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
-                MenuButton.shader = true;
-                stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
-                stencilFramebuffer.framebufferClear();
-                stencilFramebuffer.bindFramebuffer(true);
-                renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
-                stencilFramebuffer.unbindFramebuffer();
-                Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 100, 1);
-            }
-
-            MenuButton.shader = false;
-            renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
-
-            float x = (width / 2f - buttonWidth / 2f) + buttonWidth / 2 - ((float) Fonts.interBold.get(35).getStringWidth(funny ? "dimaise" : Demise.INSTANCE.getClientName()) / 2);
-            float y = (height / 2f) + 20 - (buttons.size() * buttonHeight) / 2f;
-
-            if (interpolatedX == 0 || interpolatedY == 0) {
-                interpolatedX = x;
-                interpolatedY = y;
-            }
-
-            interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
-            interpolatedY = MathUtils.interpolate(interpolatedY, y, 0.25f);
-
-            Fonts.interBold.get(35).drawStringWithShadow(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, Color.lightGray.getRGB());
-
-            if (fade) {
-                if (CurrentUser.USER != null) {
-                    RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
-                }
-
-                alpha -= 2;
-
-                if (alpha < 0) {
-                    fade = false;
-                }
-            }
-
-            mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
-            mc.fontRendererObj.drawStringWithShadow(HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
-            mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
-        } else {
-            // best security anti hack systems halal allah habibi
-            String string = "Invalid account detected.";
-            String string1 = "Shutting down in 5s.";
-
-            float width = 150;
-            float height = Fonts.interBold.get(20).getHeight() + 23 + Fonts.interMedium.get(18).getHeight();
-            float xx = ((float) sr.getScaledWidth() / 2) - (width / 2);
-            float yy = ((float) sr.getScaledHeight() / 2) - (height / 2);
-
-            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, 0).getRGB());
-
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
+            MenuButton.shader = true;
             Blur.startBlur();
-            RoundedUtils.drawShaderRound(xx, yy, width, height, 7, Color.black);
-            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), Color.black.getRGB());
+            renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
             Blur.endBlur(25, 1);
+        }
 
+        if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
+            MenuButton.shader = true;
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
-            RoundedUtils.drawShaderRound(xx, yy, width, height, 7, Color.black);
+            renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
             stencilFramebuffer.unbindFramebuffer();
-            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 100, 1);
+        }
 
-            RoundedUtils.drawRound(xx, yy, width, height, 7, new Color(0, 0, 0, 100));
+        MenuButton.shader = false;
+        renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
 
-            Fonts.interBold.get(20).drawCenteredStringWithShadow(string, xx + (width / 2), yy + 12, new Color(117, 47, 47).getRGB());
-            Fonts.interMedium.get(15).drawCenteredStringWithShadow(string1, xx + (width / 2), yy + Fonts.interBold.get(20).getHeight() + 15, -1);
+        float x = (width / 2f - buttonWidth / 2f) + buttonWidth / 2 - ((float) Fonts.interBold.get(35).getStringWidth(funny ? "dimaise" : Demise.INSTANCE.getClientName()) / 2);
+        float y = (height / 2f) + 20 - (buttons.size() * buttonHeight) / 2f;
 
-            if (timer.hasTimeElapsed(6000)) {
-                System.out.println("########## Your HWID is: " + HWID.getHWID() + " ##########");
-                mc.shutdown();
+        if (interpolatedX == 0 || interpolatedY == 0) {
+            interpolatedX = x;
+            interpolatedY = y;
+        }
+
+        interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
+        interpolatedY = MathUtils.interpolate(interpolatedY, y, 0.25f);
+
+        Fonts.interBold.get(35).drawStringWithShadow(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, Color.lightGray.getRGB());
+
+        if (fade) {
+            if (CurrentUser.USER != null) {
+                RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
+            }
+
+            alpha -= 2;
+
+            if (alpha < 0) {
+                fade = false;
             }
         }
+
+        mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
+        mc.fontRendererObj.drawStringWithShadow(HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
+        mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }

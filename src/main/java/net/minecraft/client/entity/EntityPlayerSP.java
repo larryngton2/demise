@@ -64,6 +64,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     public float timeInPortal;
     public float prevTimeInPortal;
     public boolean omniSprint;
+    public int reSprint;
 
     public EntityPlayerSP(Minecraft mcIn, World worldIn, NetHandlerPlayClient netHandler, StatFileWriter statFile) {
         super(worldIn, netHandler.getGameProfile());
@@ -138,6 +139,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
             }
 
+            this.reSprint = 1;
             this.serverSprintState = flag;
         }
 
@@ -549,7 +551,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             }
         } else {
             if (this.timeInPortal > 0.0F) {
-                this.timeInPortal -= 0.05F;
+                this.timeInPortal -= 0.05f;
             }
 
             if (this.timeInPortal < 0.0F) {
@@ -573,18 +575,22 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             this.movementInput.moveStrafe *= slowDownEvent.getStrafe();
             this.movementInput.moveForward *= slowDownEvent.getForward();
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), slowDownEvent.isSprinting());
-            if (!slowDownEvent.isSprinting())
-                this.setSprinting(false);
-            if (slowDownEvent.isSprinting())
-                this.setSprinting(MoveUtil.canSprint(true));
+            if (!slowDownEvent.isSprinting()) this.setSprinting(false);
+            if (slowDownEvent.isSprinting()) this.setSprinting(MoveUtil.canSprint(true));
 
             this.sprintToggleTimer = 0;
         }
+
         this.pushOutOfBlocks(this.posX - (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX - (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
         boolean flag3 = (float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
+        final float movef = this.movementInput.moveForward;
+
+        if (this.reSprint == 2) {
+            this.movementInput.moveForward = 0.0F;
+        }
 
         if (this.onGround && !flag1 && !flag2 && (this.omniSprint || this.movementInput.moveForward >= f) && !this.isSprinting() && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
             if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.isKeyDown()) {
@@ -600,6 +606,11 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 
         if (this.isSprinting() && (!this.omniSprint && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3))) {
             this.setSprinting(false);
+        }
+
+        if (this.reSprint == 2) {
+            this.movementInput.moveForward = movef;
+            this.reSprint = 1;
         }
 
         if (this.capabilities.allowFlying) {

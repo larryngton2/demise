@@ -750,12 +750,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         Demise.INSTANCE.getEventManager().call(new GameEvent());
 
-        if ((Display.isCreated() && Display.isCloseRequested()) || (!(this.currentScreen instanceof GuiMainMenu) && CurrentUser.USER == null)) {
+        if (Display.isCreated() && Display.isCloseRequested()) {
             this.shutdown();
-        }
-
-        if (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).isDisabled()) {
-            Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).setEnabled(true);
         }
 
         if (this.isGamePaused && this.theWorld != null) {

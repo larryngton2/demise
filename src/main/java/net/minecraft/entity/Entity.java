@@ -1986,33 +1986,8 @@ public abstract class Entity implements ICommandSender {
         EnchantmentHelper.applyArthropodEnchantments(entityLivingBaseIn, entityIn);
     }
 
-    public float getSmoothDistanceToEntity(Entity entityIn) {
-        float pTicks = Minecraft.getMinecraft().timer.renderPartialTicks;
-        double xposme = this.lastTickPosX + (this.posX - this.lastTickPosX) * (double) pTicks;
-        double yposme = this.lastTickPosY + (this.posY - this.lastTickPosY) * (double) pTicks;
-        double zposme = this.lastTickPosZ + (this.posZ - this.lastTickPosZ) * (double) pTicks;
-        double xposent = 0.0;
-        double yposent = 0.0;
-        double zposent = 0.0;
-        if (entityIn != null) {
-            xposent = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double) pTicks;
-            yposent = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double) pTicks;
-            zposent = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double) pTicks;
-        }
-        float f = (float) (xposme - xposent);
-        float f1 = (float) (yposme - yposent);
-        float f2 = (float) (zposme - zposent);
-        return entityIn != null ? MathHelper.sqrt_double(f * f + f1 * f1 + f2 * f2) : 0.0f;
-    }
-
-    public float getSmoothDistanceToCoord(float x, float y, float z) {
-        float pTicks = Minecraft.getMinecraft().timer.renderPartialTicks;
-        double xposme = this.lastTickPosX + (this.posX - this.lastTickPosX) * (double) pTicks;
-        double yposme = this.lastTickPosY + (this.posY - this.lastTickPosY) * (double) pTicks;
-        double zposme = this.lastTickPosZ + (this.posZ - this.lastTickPosZ) * (double) pTicks;
-        float f = (float) (xposme - (double) x);
-        float f1 = (float) (yposme - (double) y);
-        float f2 = (float) (zposme - (double) z);
-        return MathHelper.sqrt_double(f * f + f1 * f1 + f2 * f2);
+    public AxisAlignedBB getHitbox() {
+        double borderSize = getCollisionBorderSize();
+        return this.getEntityBoundingBox().expand(borderSize, borderSize, borderSize);
     }
 }

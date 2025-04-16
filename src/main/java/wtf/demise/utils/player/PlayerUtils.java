@@ -155,7 +155,7 @@ public class PlayerUtils implements InstanceAccess {
         double xDist = Math.abs(pos.xCoord - eyes.xCoord);
         double yDist = Math.abs(pos.yCoord - eyes.yCoord);
         double zDist = Math.abs(pos.zCoord - eyes.zCoord);
-        return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2) + Math.pow(zDist, 2));
+        return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2) + Math.pow(zDist, 2)) - 0.5657;
     }
 
     public static boolean goodPotion(final int id) {

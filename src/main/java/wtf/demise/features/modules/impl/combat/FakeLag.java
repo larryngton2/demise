@@ -178,7 +178,7 @@ public class FakeLag extends Module {
 
     @EventTarget
     public void onRender3D(Render3DEvent e) {
-        if (realPos.get() && blinking && mc.gameSettings.thirdPersonView != 0) {
+        if (realPos.get()) {
             lerpX = MathUtils.interpolate(lerpX, x);
             lerpY = MathUtils.interpolate(lerpY, y);
             lerpZ = MathUtils.interpolate(lerpZ, z);
@@ -188,7 +188,10 @@ public class FakeLag extends Module {
             double z = lerpZ - mc.getRenderManager().viewerPosZ;
             AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
             AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
-            RenderUtils.drawAxisAlignedBB(axis, true, new Color(255, 255, 255, 150).getRGB());
+
+            if (blinking && mc.gameSettings.thirdPersonView != 0) {
+                RenderUtils.drawAxisAlignedBB(axis, true, new Color(255, 255, 255, 150).getRGB());
+            }
         }
     }
 }

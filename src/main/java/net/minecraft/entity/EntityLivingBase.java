@@ -1652,9 +1652,4 @@ public abstract class EntityLivingBase extends Entity {
     protected void markPotionsDirty() {
         this.potionsNeedUpdate = true;
     }
-
-    public AxisAlignedBB getHitbox() {
-        double borderSize = getCollisionBorderSize();
-        return this.getEntityBoundingBox().expand(borderSize, borderSize, borderSize);
-    }
 }

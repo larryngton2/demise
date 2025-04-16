@@ -5,6 +5,7 @@ import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
@@ -508,7 +509,7 @@ public class RotationUtils implements InstanceAccess {
 
     public static Vec3 getBestHitVec(final Entity entity) {
         final Vec3 positionEyes = mc.thePlayer.getPositionEyes(1);
-        final AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox();
+        final AxisAlignedBB entityBoundingBox = entity.getHitbox();
         final double ex = MathHelper.clamp_double(positionEyes.xCoord, entityBoundingBox.minX, entityBoundingBox.maxX);
         final double ey = MathHelper.clamp_double(positionEyes.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
         final double ez = MathHelper.clamp_double(positionEyes.zCoord, entityBoundingBox.minZ, entityBoundingBox.maxZ);
