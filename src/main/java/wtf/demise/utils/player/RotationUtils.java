@@ -21,6 +21,7 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -85,23 +86,38 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
+        // Store the previous rotation for interpolation
+        float[] previousRotation = currentRotation != null ?
+                new float[] {currentRotation[0], currentRotation[1]} :
+                new float[] {mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
+
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
-                    RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+                    currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
                     break;
                 case Lerp:
-                    RotationUtils.currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
+                    currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
                     break;
                 case Bezier:
-                    RotationUtils.currentRotation = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint);
+                    currentRotation = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint);
                     break;
                 case Exponential:
-                    RotationUtils.currentRotation = smoothExpo(serverRotation, rotation, hSpeed, vSpeed);
+                    currentRotation = smoothExpo(serverRotation, rotation, hSpeed, vSpeed);
                     break;
                 case Test:
-                    RotationUtils.currentRotation = smoothNatural(serverRotation, rotation, hSpeed, vSpeed);
+                    currentRotation = smoothNatural(serverRotation, rotation, hSpeed, vSpeed);
                     break;
+            }
+
+            // Apply interpolation between previous and current rotation
+            if (currentRotation != null && previousRotation != null) {
+                float progress = Math.min(1.0f, mc.timer.renderPartialTicks);
+                float interpolatedYaw = previousRotation[0] + (currentRotation[0] - previousRotation[0]) * progress;
+                float interpolatedPitch = previousRotation[1] + (currentRotation[1] - previousRotation[1]) * progress;
+
+                currentRotation[0] = interpolatedYaw;
+                currentRotation[1] = interpolatedPitch;
             }
         } else {
             switch (smoothMode) {
@@ -124,7 +140,7 @@ public class RotationUtils implements InstanceAccess {
                 case Test:
                     mc.thePlayer.rotationYaw = smoothNatural(serverRotation, rotation, hSpeed, vSpeed)[0];
                     mc.thePlayer.rotationPitch = smoothNatural(serverRotation, rotation, hSpeed, vSpeed)[1];
-                break;
+                    break;
             }
         }
 

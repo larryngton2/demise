@@ -545,7 +545,7 @@ public class KillAura extends Module {
             }
         }
 
-        Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(1 + predictionAmount);
+        Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(predictionAmount);
 
         AxisAlignedBB entityBoundingBox = entity.getHitbox().offset(prediction).contract(0, yTrim.get(), 0);
 

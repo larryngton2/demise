@@ -247,7 +247,6 @@ public abstract class Entity implements ICommandSender {
     }
 
     public void onUpdate() {
-
         if (this.onGround) {
             offGroundTicks = 0;
             onGroundTicks++;
