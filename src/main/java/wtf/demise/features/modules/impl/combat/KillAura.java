@@ -75,7 +75,7 @@ public class KillAura extends Module {
     private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
 
     // aim point
-    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Nearest", "Straight", "Assist"}, "Straight", this);
+    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this);
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final BoolValue slowDown = new BoolValue("Slow down", false, this);
     private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
@@ -95,11 +95,11 @@ public class KillAura extends Module {
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift"}, "None", this);
-    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
-    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
-    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
-    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
-    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && Objects.equals(offsetMode.get(), "Gaussian"));
+    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
     private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this);
     private final SliderValue yOffset = new SliderValue("Static Y offset", 0, -2, 0.4f, 0.01f, this);
     private final BoolValue onlyUpdateOnMiss = new BoolValue("Only update on miss", false, this);
@@ -141,6 +141,10 @@ public class KillAura extends Module {
     private double currentYOffset;
     private double currentZOffset;
     private float currentMissOffset;
+    private boolean shouldRandomize;
+    private Vec3 offsetVec = new Vec3(0, 0, 0);
+    private float randYawSpeed;
+    private float randPitchSpeed;
 
     @Override
     public void onEnable() {
@@ -173,15 +177,8 @@ public class KillAura extends Module {
 
         if (hurtTime < 1) hurtTime = 1;
 
-        hSpeed = MathUtils.randomizeFloat(
-                slowDown.get() ? yawRotationSpeedMin.get() / hurtTime : yawRotationSpeedMin.get(),
-                slowDown.get() ? yawRotationSpeedMax.get() / hurtTime : yawRotationSpeedMax.get()
-        ) * mc.timer.partialTicks;
-
-        vSpeed = MathUtils.randomizeFloat(
-                slowDown.get() ? pitchRotationSpeedMin.get() / hurtTime : pitchRotationSpeedMin.get(),
-                slowDown.get() ? pitchRotationSpeedMax.get() / hurtTime : pitchRotationSpeedMax.get()
-        ) * mc.timer.partialTicks;
+        hSpeed = (slowDown.get() ? randYawSpeed / hurtTime : randYawSpeed) * mc.timer.partialTicks;
+        vSpeed = (slowDown.get() ? randPitchSpeed / hurtTime : randPitchSpeed) * mc.timer.partialTicks;
 
         switch (mode) {
             case Linear:
@@ -334,20 +331,6 @@ public class KillAura extends Module {
                 if (distance > autoBlockRange.get() && isBlocking) {
                     setBlocking(false);
                 }
-
-                if (distance <= searchRange.get()) {
-                    switch (rotationMode.get()) {
-                        case "Silent":
-                            setRotationToTarget(currentTarget);
-                            break;
-                        case "Derp":
-                            MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
-                            derpYaw += MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()) / 6;
-
-                            RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, SmoothMode.Linear, midpoint.get());
-                            break;
-                    }
-                }
             } else {
                 currentTarget = null;
             }
@@ -373,6 +356,35 @@ public class KillAura extends Module {
         }
 
         targets.removeIf(target -> isTargetInvalid());
+    }
+
+    @EventTarget
+    public void onAngle(AngleEvent e) {
+        if (currentTarget != null && !isTargetInvalid()) {
+            double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
+
+            if (distance <= searchRange.get()) {
+                switch (rotationMode.get()) {
+                    case "Silent":
+                        setRotationToTarget(currentTarget);
+                        break;
+                    case "Derp":
+                        MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
+                        derpYaw += MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()) / 6;
+
+                        RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, SmoothMode.Linear, midpoint.get());
+                        break;
+                }
+            }
+        }
+    }
+
+    @EventTarget
+    public void onUpdate(UpdateEvent e) {
+        shouldRandomize = rand.nextInt(100) <= oChance.get();
+
+        randYawSpeed = MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get());
+        randPitchSpeed = MathUtils.randomizeFloat(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get());
     }
 
     @EventTarget
@@ -533,33 +545,50 @@ public class KillAura extends Module {
 
         double predictionAmount;
 
-        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-            predictionAmount = targetOffset.get();
-            currentMissOffset = minMissOffset.get();
-        } else {
+        if (!mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY) || PlayerUtils.getDistanceToEntityBox(entity) > attackRange.get()) {
             if (staticMissOffset.get()) {
                 predictionAmount = missTargetOffset.get();
             } else {
                 currentMissOffset = MathUtils.interpolate(currentMissOffset, maxMissOffset.get(), missOffsetLerp.get());
                 predictionAmount = currentMissOffset;
             }
+        } else {
+            predictionAmount = targetOffset.get();
+            currentMissOffset = minMissOffset.get();
         }
 
         Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(predictionAmount);
 
-        AxisAlignedBB entityBoundingBox = entity.getHitbox().offset(prediction).contract(0, yTrim.get(), 0);
+        AxisAlignedBB intitalBoundingBox = entity.getHitbox().offset(prediction).contract(0, yTrim.get(), 0);
+        AxisAlignedBB bb = entity.getHitbox().offset(prediction).contract(0, yTrim.get(), 0);
 
-        Vec3 entityPos = entityBoundingBox.getCenter();
+        AxisAlignedBB finalBoundingBox = new AxisAlignedBB(bb.minX, bb.minY + entity.height * 0.45, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+
+        Vec3 boxCenter = intitalBoundingBox.getCenter();
+        Vec3 entityPos = new Vec3(boxCenter.xCoord, intitalBoundingBox.minY, boxCenter.zCoord);
         Vec3 vec;
 
         switch (aimPos.get()) {
-            case "Nearest":
+            case "Head": {
+                vec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
+                break;
+            }
+            case "Torso": {
+                vec = entityPos.add(0.0, entity.height * 0.75, 0.0);
+                break;
+            }
+            case "Legs": {
+                vec = entityPos.add(0.0, entity.height * 0.45, 0.0);
+                break;
+            }
+            case "Nearest": {
                 vec = RotationUtils.getBestHitVec(entity);
                 break;
+            }
             case "Straight": {
-                final double ex = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
-                final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
-                final double ez = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
+                final double ex = (finalBoundingBox.maxX + finalBoundingBox.minX) / 2;
+                final double ey = MathHelper.clamp_double(playerPos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
+                final double ez = (finalBoundingBox.maxZ + finalBoundingBox.minZ) / 2;
 
                 vec = new Vec3(ex, ey, ez);
                 break;
@@ -567,9 +596,9 @@ public class KillAura extends Module {
             case "Assist": {
                 final Vec3 pos = playerPos.add(mc.thePlayer.getLookVec());
 
-                final double ex = MathHelper.clamp_double(pos.xCoord, entityBoundingBox.minX, entityBoundingBox.maxX);
-                final double ey = MathHelper.clamp_double(pos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
-                final double ez = MathHelper.clamp_double(pos.zCoord, entityBoundingBox.minZ, entityBoundingBox.maxZ);
+                final double ex = MathHelper.clamp_double(pos.xCoord, finalBoundingBox.minX, finalBoundingBox.maxX);
+                final double ey = MathHelper.clamp_double(pos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
+                final double ez = MathHelper.clamp_double(pos.zCoord, finalBoundingBox.minZ, finalBoundingBox.maxZ);
 
                 vec = new Vec3(ex, ey, ez);
                 break;
@@ -598,54 +627,39 @@ public class KillAura extends Module {
                 double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
                 double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
 
-                if (rand.nextInt(100) <= oChance.get()) {
-                    vec.xCoord += xOffset;
-                    vec.yCoord += yOffset;
-                    vec.zCoord += zOffset;
+                if (shouldRandomize) {
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), mc.timer.partialTicks / 2);
 
                     lastXOffset = (float) xOffset;
                     lastYOffset = (float) yOffset;
                     lastZOffset = (float) zOffset;
                 } else {
-                    vec.xCoord += lastXOffset;
-                    vec.yCoord += lastYOffset;
-                    vec.zCoord += lastZOffset;
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), mc.timer.partialTicks / 2);
                 }
             }
             break;
             case "Noise": {
-                double yawFactor = MathUtils.randomizeDouble(0.7, 1);
-                double pitchFactor = MathUtils.randomizeDouble(0.25, 0.6);
-
                 double minXZ = -0.4;
                 double maxXZ = 0.4;
                 double minY = -2;
                 double maxY = 0.4;
 
+                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
+                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
+
                 double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
                 double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
                 double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
 
-                float targetX = (float) vec.xCoord;
-                float targetY = (float) vec.yCoord;
-                float targetZ = (float) vec.zCoord;
-
-                if (rand.nextInt(100) <= 25) {
-                    targetX += (float) xOffset;
-                    targetY += (float) yOffset;
+                if (shouldRandomize) {
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), mc.timer.partialTicks / 2);
 
                     lastXOffset = (float) xOffset;
                     lastYOffset = (float) yOffset;
                     lastZOffset = (float) zOffset;
                 } else {
-                    targetX += (float) lastXOffset;
-                    targetY += (float) lastYOffset;
-                    targetZ += (float) lastZOffset;
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), mc.timer.partialTicks / 2);
                 }
-
-                vec.xCoord = targetX;
-                vec.yCoord = targetY;
-                vec.zCoord = targetZ;
             }
             break;
             case "Drift":
@@ -677,10 +691,12 @@ public class KillAura extends Module {
                     vec.zCoord += currentZOffset = MathUtils.interpolate(currentZOffset, 0, 0.75f);
                 }
                 break;
+            default:
+                offsetVec = new Vec3(0, 0, 0);
         }
 
         if ((mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY && onlyUpdateOnMiss.get()) || !onlyUpdateOnMiss.get()) {
-            targetVec = new Vec3(vec.xCoord, vec.yCoord, vec.zCoord).add(xOffset.get(), yOffset.get(), xOffset.get());
+            targetVec = new Vec3(vec.xCoord, vec.yCoord, vec.zCoord).add(offsetVec).add(xOffset.get(), yOffset.get(), xOffset.get());
         }
 
         if (delayed.get()) {

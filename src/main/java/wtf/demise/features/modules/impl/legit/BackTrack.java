@@ -1,5 +1,6 @@
 package wtf.demise.features.modules.impl.legit;
 
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.network.play.server.S18PacketEntityTeleport;
@@ -33,7 +34,7 @@ public class BackTrack extends Module {
     private final SliderValue minMS = new SliderValue("Min ms", 50, 0, 5000, 5, this);
     private final SliderValue maxMS = new SliderValue("Max ms", 200, 0, 5000, 5, this);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
-    private final ModeValue esp = new ModeValue("Mode", new String[]{"Off", "Box"}, "Box", this);
+    private final ModeValue esp = new ModeValue("Mode", new String[]{"Off", "Box", "FakePlayer"}, "Box", this);
     private final ColorValue color = new ColorValue("Color", new Color(0, 0, 0, 100), this, () -> esp.is("Box"));
 
     private EntityPlayer target;
@@ -43,6 +44,9 @@ public class BackTrack extends Module {
     private final ContinualAnimation animatedZ = new ContinualAnimation();
     private int ping;
     private boolean shouldLag;
+    private EntityOtherPlayerMP fakePlayer;
+    private boolean addedEntity;
+    private boolean dispatched;
 
     @Override
     public void onDisable() {
@@ -53,6 +57,15 @@ public class BackTrack extends Module {
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         setTag(ping + " ms");
+
+        if (target != null && esp.is("FakePlayer")) {
+            fakePlayer.setPositionAndRotation(realPosition.xCoord, realPosition.yCoord, realPosition.zCoord, target.rotationYaw, target.rotationPitch);
+            fakePlayer.rotationYawHead = target.rotationYawHead;
+            fakePlayer.setSprinting(target.isSprinting());
+            fakePlayer.setInvisible(false);
+            fakePlayer.setSneaking(target.isSneaking());
+            fakePlayer.renderYawOffset = target.renderYawOffset;
+        }
     }
 
     @EventTarget
@@ -69,18 +82,22 @@ public class BackTrack extends Module {
             double realDistance = PlayerUtils.getCustomDistanceToEntityBox(realPosition, mc.thePlayer);
             double clientDistance = PlayerUtils.getDistanceToEntityBox(target);
 
-            boolean onlyNeeded = ((realDistance > clientDistance && realDistance > 3) || (mc.thePlayer.hurtTime < 8 && mc.thePlayer.hurtTime > 3)) && clientDistance < 4.5;
+            boolean onlyNeeded = ((realDistance >= clientDistance && realDistance > 3) || (mc.thePlayer.hurtTime < 8 && mc.thePlayer.hurtTime > 3)) && clientDistance <= 3;
 
-            boolean on = realDistance > clientDistance && realDistance > minRange.get() && realDistance < maxRange.get();
+            boolean on = realDistance >= clientDistance && realDistance > minRange.get() && realDistance < maxRange.get();
 
             shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;
 
             if (shouldLag) {
                 ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
                 PingSpoofComponent.spoof(ping, true, true, true, true, false, false);
+                dispatched = false;
             } else {
-                PingSpoofComponent.disable();
-                PingSpoofComponent.dispatch();
+                if (!dispatched) {
+                    PingSpoofComponent.disable();
+                    PingSpoofComponent.dispatch();
+                    dispatched = true;
+                }
             }
         }
     }
@@ -113,7 +130,7 @@ public class BackTrack extends Module {
     public void onRender3D(Render3DEvent e) {
         if (target != null) {
             switch (esp.get()) {
-                case "Box":
+                case "Box": {
                     double x = realPosition.xCoord - mc.getRenderManager().viewerPosX;
                     double y = realPosition.yCoord - mc.getRenderManager().viewerPosY;
                     double z = realPosition.zCoord - mc.getRenderManager().viewerPosZ;
@@ -128,7 +145,23 @@ public class BackTrack extends Module {
                     if (shouldLag) {
                         RenderUtils.drawAxisAlignedBB(axis, true, color.get().getRGB());
                     }
-                    break;
+                }
+                break;
+                case "FakePlayer": {
+                    if (shouldLag) {
+                        if (!addedEntity) {
+                            fakePlayer = new EntityOtherPlayerMP(mc.theWorld, target.getGameProfile());
+                            mc.theWorld.addEntityToWorld(fakePlayer.getEntityId(), fakePlayer);
+                            addedEntity = true;
+                        }
+                    } else {
+                        if (addedEntity) {
+                            mc.theWorld.removeEntityFromWorld(fakePlayer.getEntityId());
+                            addedEntity = false;
+                        }
+                    }
+                }
+                break;
             }
         }
     }

@@ -2,6 +2,7 @@ package net.minecraft.client.renderer.entity;
 
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -32,9 +33,9 @@ import net.optifine.reflect.Reflector;
 import net.optifine.reflect.ReflectorForge;
 import net.optifine.shaders.Shaders;
 import net.optifine.shaders.ShadersRender;
+import wtf.demise.features.modules.impl.combat.KillAura;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class RenderItem implements IResourceManagerReloadListener {
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
@@ -47,6 +48,7 @@ public class RenderItem implements IResourceManagerReloadListener {
     public ModelManager modelManager = null;
     private boolean renderModelHasEmissive = false;
     private boolean renderModelEmissive = false;
+    private EntityLivingBase lastRender;
 
     public RenderItem(TextureManager textureManager, ModelManager modelManager) {
         this.textureManager = textureManager;
@@ -289,6 +291,7 @@ public class RenderItem implements IResourceManagerReloadListener {
     public void renderItemModelForEntity(ItemStack stack, EntityLivingBase entityToRenderFor, ItemCameraTransforms.TransformType cameraTransformType) {
         if (stack != null && entityToRenderFor != null) {
             IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
+            lastRender = entityToRenderFor;
 
             if (entityToRenderFor instanceof EntityPlayer entityplayer) {
                 Item item = stack.getItem();
@@ -340,6 +343,20 @@ public class RenderItem implements IResourceManagerReloadListener {
             if (this.isThereOneNegativeScale(itemcameratransforms.getTransform(cameraTransformType))) {
                 GlStateManager.cullFace(1028);
             }
+
+            if (cameraTransformType == ItemCameraTransforms.TransformType.THIRD_PERSON && lastRender instanceof EntityPlayer p) {
+                ItemStack heldStack = p.getHeldItem();
+                if (heldStack != null) {
+                    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+                    if (lastRender == player) {
+                        if (heldStack.getItem() instanceof ItemSword && (p.getItemInUseCount() > 0 && KillAura.isBlocking || player.isBlocking())) {
+                            doThirdPersonBlockTransformations();
+                        }
+                    } else if (p.getItemInUseCount() > 0 && heldStack.getItemUseAction() == EnumAction.BLOCK) {
+                        doThirdPersonBlockTransformations();
+                    }
+                }
+            }
         }
 
         this.renderItem(stack, model);
@@ -349,6 +366,12 @@ public class RenderItem implements IResourceManagerReloadListener {
         GlStateManager.disableBlend();
         this.textureManager.bindTexture(TextureMap.locationBlocksTexture);
         this.textureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
+    }
+
+    private void doThirdPersonBlockTransformations() {
+        GlStateManager.translate(-0.15F, -0.2F, 0);
+        GlStateManager.rotate(70, 1, 0, 0);
+        GlStateManager.translate(0.119F, 0.2F, -0.024F);
     }
 
     private boolean isThereOneNegativeScale(ItemTransformVec3f itemTranformVec) {

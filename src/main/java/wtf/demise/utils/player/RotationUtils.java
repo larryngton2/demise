@@ -5,7 +5,6 @@ import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
@@ -21,7 +20,6 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +35,7 @@ public class RotationUtils implements InstanceAccess {
     public static float cachedMidpoint;
     public static SmoothMode smoothMode = SmoothMode.Linear;
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
+    private boolean angleCalled;
 
     public static boolean shouldRotate() {
         return currentRotation != null;
@@ -86,11 +85,6 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-        // Store the previous rotation for interpolation
-        float[] previousRotation = currentRotation != null ?
-                new float[] {currentRotation[0], currentRotation[1]} :
-                new float[] {mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
-
         if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
@@ -108,16 +102,6 @@ public class RotationUtils implements InstanceAccess {
                 case Test:
                     currentRotation = smoothNatural(serverRotation, rotation, hSpeed, vSpeed);
                     break;
-            }
-
-            // Apply interpolation between previous and current rotation
-            if (currentRotation != null && previousRotation != null) {
-                float progress = Math.min(1.0f, mc.timer.renderPartialTicks);
-                float interpolatedYaw = previousRotation[0] + (currentRotation[0] - previousRotation[0]) * progress;
-                float interpolatedPitch = previousRotation[1] + (currentRotation[1] - previousRotation[1]) * progress;
-
-                currentRotation[0] = interpolatedYaw;
-                currentRotation[1] = interpolatedPitch;
             }
         } else {
             switch (smoothMode) {
@@ -180,6 +164,11 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
+    public void onAngle(AngleEvent e) {
+        angleCalled = true;
+    }
+
+    @EventTarget
     @EventPriority(-100)
     public void onPacket(final PacketEvent e) {
         final Packet<?> packet = e.getPacket();
@@ -206,15 +195,15 @@ public class RotationUtils implements InstanceAccess {
         if (currentRotation != null) {
             double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
-            if (!enabled) {
+            if (!enabled && angleCalled) {
                 if (distanceToPlayerRotation < 1) {
                     resetRotation();
                     return;
                 }
 
                 if (distanceToPlayerRotation > 0) {
-                    float finalHSpeed = cachedHSpeed * mc.timer.partialTicks;
-                    float finalVSpeed = cachedVSpeed * mc.timer.partialTicks;
+                    float finalHSpeed = (cachedHSpeed / 2) * mc.timer.partialTicks;
+                    float finalVSpeed = (cachedVSpeed / 2) * mc.timer.partialTicks;
 
                     RotationUtils.currentRotation = switch (smoothMode) {
                         case Linear ->
@@ -232,6 +221,7 @@ public class RotationUtils implements InstanceAccess {
             }
 
             enabled = false;
+            angleCalled = false;
         }
     }
 

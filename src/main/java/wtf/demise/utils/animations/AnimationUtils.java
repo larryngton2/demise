@@ -22,7 +22,7 @@ public class AnimationUtils {
             this.mc = System.currentTimeMillis();
         }
         for (int i = 0; i < count; ++i) {
-            this.anim = MathUtils.lerp(this.anim, this.to, this.speed);
+            this.anim = MathUtils.interpolate(this.anim, this.to, this.speed);
         }
         return this.anim;
     }

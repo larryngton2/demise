@@ -3,6 +3,7 @@ package wtf.demise.features.modules.impl.combat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import org.apache.commons.lang3.Range;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -10,6 +11,7 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -44,6 +46,7 @@ public class FakeLag extends Module {
     public EntityPlayer target;
     private int ms;
     private boolean attacked;
+    private boolean dispatched;
 
     @Override
     public void onEnable() {
@@ -145,10 +148,14 @@ public class FakeLag extends Module {
                         }
 
                         blinking = true;
+                        dispatched = false;
                     }
                 } else {
-                    PingSpoofComponent.disable();
-                    PingSpoofComponent.dispatch();
+                    if (!dispatched) {
+                        PingSpoofComponent.disable();
+                        PingSpoofComponent.dispatch();
+                        dispatched = true;
+                    }
                     x = mc.thePlayer.posX;
                     y = mc.thePlayer.posY;
                     z = mc.thePlayer.posZ;
@@ -178,7 +185,7 @@ public class FakeLag extends Module {
 
     @EventTarget
     public void onRender3D(Render3DEvent e) {
-        if (realPos.get()) {
+        if (realPos.get() && blinking && mc.gameSettings.thirdPersonView != 0) {
             lerpX = MathUtils.interpolate(lerpX, x);
             lerpY = MathUtils.interpolate(lerpY, y);
             lerpZ = MathUtils.interpolate(lerpZ, z);
@@ -188,10 +195,7 @@ public class FakeLag extends Module {
             double z = lerpZ - mc.getRenderManager().viewerPosZ;
             AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
             AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
-
-            if (blinking && mc.gameSettings.thirdPersonView != 0) {
-                RenderUtils.drawAxisAlignedBB(axis, true, new Color(255, 255, 255, 150).getRGB());
-            }
+            RenderUtils.drawAxisAlignedBB(axis, true, false, new Color(getModule(Interface.class).color(1, 150), true).getRGB());
         }
     }
 }

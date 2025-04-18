@@ -18,16 +18,24 @@ public class MathUtils {
         return Math.round(val * one) / one;
     }
 
+    public static double interpolate(double old, double now) {
+        return interpolate(old, now, mc.timer.renderPartialTicks);
+    }
+
     public static double interpolate(double old, double now, float partialTicks) {
         return old + (now - old) * partialTicks;
     }
 
-    public static double interpolate(double oldValue, double newValue, double interpolationValue) {
-        return (oldValue + (newValue - oldValue) * interpolationValue);
+    public static float interpolate(float old, float now) {
+        return interpolate(old, now, mc.timer.renderPartialTicks);
     }
 
     public static float interpolate(float old, float now, float partialTicks) {
         return old + (now - old) * partialTicks;
+    }
+
+    public static Vec3 interpolate(Vec3 old, Vec3 now) {
+        return interpolate(old, now, mc.timer.partialTicks);
     }
 
     public static Vec3 interpolate(Vec3 old, Vec3 now, float multiple) {
@@ -35,10 +43,6 @@ public class MathUtils {
                 (float) interpolate(old.xCoord, now.xCoord, multiple),
                 (float) interpolate(old.yCoord, now.yCoord, multiple),
                 (float) interpolate(old.zCoord, now.zCoord, multiple));
-    }
-
-    public static double interpolate(double old, double now) {
-        return interpolate(old, now, mc.timer.renderPartialTicks);
     }
 
     public static float nextSecureFloat(final double origin, final double bound) {
@@ -54,14 +58,6 @@ public class MathUtils {
         double PI = Math.PI;
         double output = 1.0 / Math.sqrt(2.0 * PI * (sigma * sigma));
         return (float) (output * Math.exp(-(x * x) / (2.0 * (sigma * sigma))));
-    }
-
-    public static double lerp(double pct, double start, double end) {
-        return start + pct * (end - start);
-    }
-
-    public static float lerp(float min, float max, float delta) {
-        return min + (max - min) * delta;
     }
 
     public static int nextInt(int min, int max) {

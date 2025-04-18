@@ -30,15 +30,13 @@ import net.minecraft.util.*;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.*;
-import wtf.demise.features.modules.impl.visual.FreeLook;
+import wtf.demise.events.impl.player.AngleEvent;
 
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 public abstract class Entity implements ICommandSender {
     private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
@@ -63,8 +61,6 @@ public abstract class Entity implements ICommandSender {
     public float rotationPitch;
     public float prevRotationYaw;
     public float prevRotationPitch;
-    public float cameraRotationPitch;
-    public float cameraRotationYaw;
     private AxisAlignedBB boundingBox;
     public boolean onGround;
     public boolean isCollidedHorizontally;
@@ -122,7 +118,6 @@ public abstract class Entity implements ICommandSender {
     private boolean invulnerable;
     protected UUID entityUniqueID;
     private final CommandResultStats cmdResultStats;
-
 
     public int offGroundTicks, onGroundTicks;
 
@@ -229,21 +224,15 @@ public abstract class Entity implements ICommandSender {
     }
 
     public void setAngles(float yaw, float pitch) {
+        Demise.INSTANCE.getEventManager().call(new AngleEvent());
+
         float f = rotationPitch;
         float f1 = rotationYaw;
-        FreeLook freeLook = Demise.INSTANCE.getModuleManager().getModule(FreeLook.class);
-        if (!(freeLook.isEnabled() && Mouse.isButtonDown(2))) {
-            this.rotationYaw = (float) ((double) rotationYaw + (double) yaw * 0.15D);
-            this.rotationPitch = (float) ((double) rotationPitch - (double) pitch * 0.15D);
-            this.rotationPitch = MathHelper.clamp_float(rotationPitch, -90.0F, 90.0F);
-            this.prevRotationPitch += rotationPitch - f;
-            this.prevRotationYaw += rotationYaw - f1;
-            this.cameraRotationYaw = rotationYaw;
-            this.cameraRotationPitch = rotationPitch;
-        }
-        this.cameraRotationPitch = (float) ((double) cameraRotationPitch - (double) pitch * 0.15D);
-        this.cameraRotationPitch = MathHelper.clamp_float(cameraRotationPitch, -90.0F, 90.0F);
-        this.cameraRotationYaw = (float) ((double) cameraRotationYaw + (double) yaw * 0.15D);
+        this.rotationYaw = (float) ((double) rotationYaw + (double) yaw * 0.15D);
+        this.rotationPitch = (float) ((double) rotationPitch - (double) pitch * 0.15D);
+        this.rotationPitch = MathHelper.clamp_float(rotationPitch, -90.0F, 90.0F);
+        this.prevRotationPitch += rotationPitch - f;
+        this.prevRotationYaw += rotationYaw - f1;
     }
 
     public void onUpdate() {

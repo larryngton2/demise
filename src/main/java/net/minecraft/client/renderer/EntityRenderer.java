@@ -77,11 +77,11 @@ import org.lwjglx.opengl.GLContext;
 import org.lwjglx.util.glu.Project;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.MouseOverEvent;
+import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.impl.visual.Atmosphere;
 import wtf.demise.features.modules.impl.visual.Camera;
-import wtf.demise.features.modules.impl.visual.FreeLook;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.render.shader.impl.Sky;
@@ -92,7 +92,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 public class EntityRenderer implements IResourceManagerReloadListener {
     private static final Logger logger = LogManager.getLogger();
@@ -574,7 +573,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     private void orientCamera(float partialTicks) {
         Entity entity = mc.getRenderViewEntity();
         Camera camera = Demise.INSTANCE.getModuleManager().getModule(Camera.class);
-        FreeLook freeLook = Demise.INSTANCE.getModuleManager().getModule(FreeLook.class);
         float f = entity.getEyeHeight();
         double d0 = entity.prevPosX + (entity.posX - entity.prevPosX) * (double) partialTicks;
         double d1 = entity.prevPosY + (entity.posY - entity.prevPosY) * (double) partialTicks + (double) f;
@@ -604,8 +602,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, -1.0F, 0.0F, 0.0F);
             }
         } else if (mc.gameSettings.thirdPersonView > 0) {
-            double d3 = Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() ? Demise.INSTANCE.getModuleManager().getModule(Camera.class).cameraDistance.get() : 4.0;
-
+            double d3 = Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("Third Person Distance") ? Demise.INSTANCE.getModuleManager().getModule(Camera.class).cameraDistance.get() : 4.0;
 
             if (mc.gameSettings.debugCamEnable) {
                 GlStateManager.translate(0.0F, 0.0F, (float) (-d3));
@@ -686,20 +683,12 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 GlStateManager.rotate(f6, 0.0F, 1.0F, 0.0F);
             }
         } else if (!mc.gameSettings.debugCamEnable) {
-            if (freeLook.isEnabled() && Mouse.isButtonDown(2)) {
-                GlStateManager.rotate(entity.cameraRotationPitch, 1.0F, 0.0F, 0.0F);
-            } else {
-                GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F);
-            }
+            GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F);
 
             if (entity instanceof EntityAnimal entityanimal1) {
                 GlStateManager.rotate(entityanimal1.prevRotationYawHead + (entityanimal1.rotationYawHead - entityanimal1.prevRotationYawHead) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F);
             } else {
-                if (freeLook.isEnabled() && Mouse.isButtonDown(2)) {
-                    GlStateManager.rotate(entity.cameraRotationYaw + 180.0F, 0.0F, 1.0F, 0.0F);
-                } else {
-                    GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F);
-                }
+                GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F);
             }
         }
 

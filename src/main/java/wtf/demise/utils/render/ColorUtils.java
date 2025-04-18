@@ -107,10 +107,10 @@ public class ColorUtils {
     }
 
     public static int getOverallColorFrom(int color1, int color2, float percentTo2) {
-        final int finalRed = (int) MathUtils.lerp(color1 >> 16 & 0xFF, color2 >> 16 & 0xFF, percentTo2),
-                finalGreen = (int) MathUtils.lerp(color1 >> 8 & 0xFF, color2 >> 8 & 0xFF, percentTo2),
-                finalBlue = (int) MathUtils.lerp(color1 & 0xFF, color2 & 0xFF, percentTo2),
-                finalAlpha = (int) MathUtils.lerp(color1 >> 24 & 0xFF, color2 >> 24 & 0xFF, percentTo2);
+        final int finalRed = (int) MathUtils.interpolate(color1 >> 16 & 0xFF, color2 >> 16 & 0xFF, percentTo2),
+                finalGreen = (int) MathUtils.interpolate(color1 >> 8 & 0xFF, color2 >> 8 & 0xFF, percentTo2),
+                finalBlue = (int) MathUtils.interpolate(color1 & 0xFF, color2 & 0xFF, percentTo2),
+                finalAlpha = (int) MathUtils.interpolate(color1 >> 24 & 0xFF, color2 >> 24 & 0xFF, percentTo2);
         return new Color(finalRed, finalGreen, finalBlue, finalAlpha).getRGB();
     }
 

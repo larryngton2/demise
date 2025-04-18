@@ -1,6 +1,7 @@
 package net.minecraft.client.model;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -99,7 +100,6 @@ public class ModelBiped extends ModelBase {
         this.bipedHead.rotateAngleX = headPitch / (180F / (float) Math.PI);
         this.bipedRightArm.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 2.0F * limbSwingAmount * 0.5F;
         this.bipedLeftArm.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 2.0F * limbSwingAmount * 0.5F;
-        this.bipedRightArm.rotateAngleZ = 0.0F;
         this.bipedLeftArm.rotateAngleZ = 0.0F;
         this.bipedRightLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
         this.bipedLeftLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI) * 1.4F * limbSwingAmount;
@@ -133,11 +133,6 @@ public class ModelBiped extends ModelBase {
             case 2:
             default:
                 break;
-        }
-
-        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isHoldingSword() && KillAura.isBlocking && entityIn == Minecraft.getMinecraft().thePlayer) {
-            this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5F - ((float) Math.PI / 10F) * 3;
-            this.bipedRightArm.rotateAngleY = -0.5235988F;
         }
 
         this.bipedLeftArm.rotateAngleY = 0.0F;

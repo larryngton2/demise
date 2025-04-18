@@ -14,6 +14,7 @@ import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -99,7 +100,7 @@ public class ClickHandler implements InstanceAccess {
 
             for (int i = 0; i < clicks; i++) {
                 if (rayTrace) {
-                    if (((distance > attackRange && distance <= swingRange) || rayTraceFailed()) && failSwing) {
+                    if (((distance > attackRange || rayTraceFailed()) && distance <= swingRange) && failSwing) {
                         handleFailSwing();
                     }
 
@@ -157,7 +158,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private boolean shouldClick() {
-        return mc.thePlayer.hurtTime >= 5 || mc.thePlayer.fallDistance > 0 || target.hurtTime <= 1;
+        return mc.thePlayer.hurtTime != 0 || mc.thePlayer.fallDistance > 0 || target.hurtTime <= 3;
     }
 
     private void attack() {

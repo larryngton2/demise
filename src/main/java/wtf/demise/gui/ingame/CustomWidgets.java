@@ -83,7 +83,7 @@ public class CustomWidgets implements InstanceAccess {
     private void drawCustomHotbar(int i) {
         if (x == 0) x = i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20;
 
-        x = MathUtils.lerp(x, i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20, 0.25f);
+        x = MathUtils.interpolate(x, i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20, 0.25f);
 
         RoundedUtils.drawRound(i - 90, sr.getScaledHeight() - 26, 181, 21, 7, new Color(getModule(Interface.class).bgColor(), true));
         RoundedUtils.drawRound(x, sr.getScaledHeight() - 26, 21, 21, 7, new Color(getModule(Interface.class).bgColor(), true).darker());
