@@ -2,7 +2,7 @@ package wtf.demise.features.command.impl;
 
 import wtf.demise.features.command.Command;
 import wtf.demise.userinfo.HWID;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 public class HWIDCommand extends Command {
     @Override
@@ -17,6 +17,6 @@ public class HWIDCommand extends Command {
 
     @Override
     public void execute(final String[] arguments) {
-        DebugUtils.sendMessage("Your HWID is: " + HWID.getHWID());
+        ChatUtils.sendMessageClient("Your HWID is: " + HWID.getHWID());
     }
 }

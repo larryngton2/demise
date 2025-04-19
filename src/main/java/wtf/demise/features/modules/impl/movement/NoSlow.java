@@ -26,14 +26,15 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
-
-import java.util.Objects;
+import wtf.demise.utils.misc.ChatUtils;
+import wtf.demise.utils.packet.PacketUtils;
 
 import static net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RELEASE_USE_ITEM;
 
 @ModuleInfo(name = "NoSlow", category = ModuleCategory.Movement)
 public class NoSlow extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "GrimAC", "Intave", "Old Intave", "Watchdog", "NCP", "Prediction"}, "Vanilla", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Grim", "Intave", "Watchdog", "NCP", "Prediction"}, "Vanilla", this);
+    public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Release", "Old", "Test"}, "Release", this, () -> mode.is("Intave"));
     public final SliderValue speed = new SliderValue("Speed", 1, 0, 1, 0.1f, this);
     private final SliderValue amount = new SliderValue("Amount", 2, 2, 5, 1, this, () -> mode.is("Prediction"));
     private final BoolValue sprint = new BoolValue("Sprint", true, this);
@@ -46,21 +47,50 @@ public class NoSlow extends Module {
     private float foodSpeed;
     private boolean send = false;
     private boolean ncpShouldWork = true;
+    private boolean lastUsingItem;
 
     @EventTarget
     public void onMotion(MotionEvent event) {
         setTag(mode.get());
 
+        if (!mc.thePlayer.isUsingItem() && mode.is("Intave") && intaveMode.is("Test")) {
+            lastUsingItem = false;
+        }
+
         if (!check()) return;
 
         switch (mode.get()) {
-            case "Old Intave":
-                if (isUsingConsumable() && event.isPre()) {
-                    sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
-                    sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+            case "Intave": {
+                if (event.isPre()) {
+                    switch (intaveMode.get()) {
+                        case "Release":
+                            if (isUsingConsumable()) {
+                                sendPacketNoEvent(new C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
+                            }
+                            break;
+                        case "Old":
+                            if (isUsingConsumable()) {
+                                sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem % 8 + 1));
+                                sendPacketNoEvent(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                            }
+                            break;
+                        case "Test":
+                            if (isUsingConsumable()) {
+                                if (!lastUsingItem) {
+                                    PacketUtils.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
+                                }
+                            } else {
+                                if (isUsingSword()) {
+                                    PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                                }
+                            }
+
+                            lastUsingItem = true;
+                            break;
+                    }
                 }
                 break;
-
+            }
             case "NCP":
                 if (mc.thePlayer.isUsingItem() && ncpShouldWork) {
                     if (mc.thePlayer.ticksExisted % 3 == 0) {
@@ -68,8 +98,7 @@ public class NoSlow extends Module {
                     }
                 }
                 break;
-
-            case "GrimAC":
+            case "Grim":
                 if (event.isPost()) {
                     if (isUsingSword() || isUsingBow()) {
                         PacketWrapper useItem = PacketWrapper.create(29, null, Via.getManager().getConnectionManager().getConnections().iterator().next());
@@ -118,13 +147,6 @@ public class NoSlow extends Module {
                     }
                 }
                 break;
-
-            case "Intave":
-                if (isUsingConsumable() && event.isPre()) {
-                    sendPacketNoEvent(new C07PacketPlayerDigging(RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.UP));
-                }
-                break;
-
             case "Watchdog":
                 if (isHoldingConsumable()) {
                     if (mc.thePlayer.offGroundTicks == 4 && send) {
@@ -145,11 +167,10 @@ public class NoSlow extends Module {
 
         final Packet<?> packet = event.getPacket();
         switch (mode.get()) {
-            case "NCP": {
+            case "NCP":
                 ncpShouldWork = !(packet instanceof C07PacketPlayerDigging);
-            }
-
-            case "GrimAC":
+                break;
+            case "Grim":
                 if (mc.thePlayer.isUsingItem()) {
                     if (mc.thePlayer.getHeldItem().getItem() instanceof ItemAppleGold) {
                         if (mc.gameSettings.keyBindUseItem.isKeyDown()) {
@@ -178,7 +199,6 @@ public class NoSlow extends Module {
                     }
                 }
                 break;
-
             case "Watchdog":
                 if (event.getState() == PacketEvent.State.OUTGOING)
                     if (packet instanceof C08PacketPlayerBlockPlacement blockPlacement && !mc.thePlayer.isUsingItem()) {
@@ -195,6 +215,7 @@ public class NoSlow extends Module {
     }
 
     private boolean check() {
+        if (mc.thePlayer.getCurrentEquippedItem() == null) return false;
         if (isUsingConsumable() && !consumable.get()) return false;
         if (isUsingBow() && !bow.get()) return false;
         return !isUsingSword() || sword.get();
@@ -204,7 +225,7 @@ public class NoSlow extends Module {
     private void onUpdate(UpdateEvent event) {
         if (!check()) return;
 
-        if (Objects.equals(mode.get(), "GrimAC")) {
+        if (mode.is("Grim")) {
             if (eat) {
                 foodSpeed = 0.2f;
             }
@@ -259,7 +280,7 @@ public class NoSlow extends Module {
         if (!check()) return;
 
         switch (mode.get()) {
-            case "GrimAC":
+            case "Grim":
                 if (isUsingConsumable()) {
                     e.setForward(foodSpeed);
                     e.setStrafe(foodSpeed);

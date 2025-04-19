@@ -38,7 +38,8 @@ public class BackTrack extends Module {
     private final ColorValue color = new ColorValue("Color", new Color(0, 0, 0, 100), this, () -> esp.is("Box"));
 
     private EntityPlayer target;
-    private Vec3 realPosition = new Vec3(0, 0, 0);
+    public static Vec3 realPosition = new Vec3(0, 0, 0);
+    public static Vec3 realLastPos = new Vec3(0, 0, 0);
     private final ContinualAnimation animatedX = new ContinualAnimation();
     private final ContinualAnimation animatedY = new ContinualAnimation();
     private final ContinualAnimation animatedZ = new ContinualAnimation();
@@ -108,6 +109,8 @@ public class BackTrack extends Module {
             if (target == null) {
                 return;
             }
+
+            realLastPos = realPosition;
 
             if (shouldLag) {
                 if (e.getPacket() instanceof S14PacketEntity s14PacketEntity) {

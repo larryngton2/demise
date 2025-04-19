@@ -16,7 +16,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 
 @ModuleInfo(name = "AutoHeal", category = ModuleCategory.Combat)
@@ -72,7 +72,7 @@ public class AutoHeal extends Module {
                     gapTimer.reset();
                 }
 
-                DebugUtils.sendMessage(switchBack + "");
+                ChatUtils.sendMessageClient(switchBack + "");
 
                 switchBack = false;
             }

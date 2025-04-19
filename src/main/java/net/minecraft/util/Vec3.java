@@ -195,6 +195,13 @@ public class Vec3 {
         return MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
     }
 
+    public double getDistanceAtEyeByVec(Entity self) {
+        double d0 = this.xCoord - self.posX;
+        double d1 = this.yCoord - (self.getEyeHeight() + self.posY);
+        double d2 = this.zCoord - self.posZ;
+        return MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+    }
+
     public Vec3 floor() {
         return new Vec3(Math.floor(this.xCoord), Math.floor(this.yCoord), Math.floor(this.zCoord));
     }

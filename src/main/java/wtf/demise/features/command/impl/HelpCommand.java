@@ -2,7 +2,7 @@ package wtf.demise.features.command.impl;
 
 import wtf.demise.Demise;
 import wtf.demise.features.command.Command;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.util.Arrays;
 
@@ -16,7 +16,7 @@ public final class HelpCommand extends Command {
     public void execute(final String[] arguments) {
         for (final Command command : Demise.INSTANCE.getCommandManager().cmd) {
             if (!(command instanceof ModuleCommand))
-                DebugUtils.sendMessage(Arrays.toString(command.getAliases()) + ": " + command.getUsage());
+                ChatUtils.sendMessageClient(Arrays.toString(command.getAliases()) + ": " + command.getUsage());
         }
     }
 

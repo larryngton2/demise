@@ -55,6 +55,6 @@ public class MoveStatus extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent e) {
-        Fonts.interSemiBold.get(15).drawCenteredStringWithShadow((lowercase.get() ? status.toLowerCase() : status) + " " + (lowercase.get() ? status2.toLowerCase() : status2) + " " + status3, (float) e.getScaledResolution().getScaledWidth() / 2, (float) e.getScaledResolution().getScaledHeight() / 2 + 25, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
+        Fonts.interSemiBold.get(15).drawCenteredStringWithShadow((lowercase.get() ? status.toLowerCase() : status) + " " + (lowercase.get() ? status2.toLowerCase() : status2) + " " + status3, (float) e.scaledResolution().getScaledWidth() / 2, (float) e.scaledResolution().getScaledHeight() / 2 + 25, Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
     }
 }

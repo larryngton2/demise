@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
 import org.apache.commons.lang3.Range;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -179,7 +180,7 @@ public class FakeLag extends Module {
 
     private boolean shouldLag() {
         return target != null &&
-                smartRange.get() ? !attacked && PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()) : Range.between(attackRange.get(), alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target)) &&
+                smartRange.get() ? (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !attacked) && PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()) : Range.between(attackRange.get(), alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target)) &&
                 mc.thePlayer.canEntityBeSeen(target);
     }
 

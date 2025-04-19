@@ -103,7 +103,7 @@ public class ChinaHat extends Module {
 
         final double rotations = rotate.get() ? ((mc.thePlayer.prevRenderYawOffset +
                 (mc.thePlayer.renderYawOffset - mc.thePlayer.prevRenderYawOffset
-                ) * event.getPartialTicks()
+                ) * event.partialTicks()
         ) / 60
         ) + 20 : 0;
 

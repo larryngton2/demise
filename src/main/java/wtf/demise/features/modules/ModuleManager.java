@@ -74,6 +74,7 @@ public class ModuleManager {
                 MurderMystery.class,
                 InventorySync.class,
                 AutoQueue.class,
+                Test.class,
 
                 // Movement
                 Freeze.class,
@@ -130,7 +131,7 @@ public class ModuleManager {
                 FreeCam.class,
                 ViewBobbing.class,
                 BreakProgress.class,
-                Dot.class,
+                VisualAimPoint.class,
                 VisualTweaks.class,
                 ItemGlow.class,
                 Cape.class,

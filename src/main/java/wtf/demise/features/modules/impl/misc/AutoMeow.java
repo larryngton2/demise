@@ -6,6 +6,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +46,7 @@ public class AutoMeow extends Module {
             int messagesToSend = ThreadLocalRandom.current().nextInt(minLength, maxLength + 1);
 
             String concatenatedMessage = generateMessages(messagesToSend);
-            mc.thePlayer.sendChatMessage(concatenatedMessage);
+            ChatUtils.sendMessageServer(concatenatedMessage);
 
             lastMessageTime = currentTime;
         }

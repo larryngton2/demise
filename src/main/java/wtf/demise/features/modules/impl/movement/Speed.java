@@ -13,7 +13,7 @@ import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.RotationUtils;
@@ -21,7 +21,6 @@ import wtf.demise.utils.player.RotationUtils;
 @ModuleInfo(name = "Speed", category = ModuleCategory.Movement)
 public class Speed extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC"}, "Strafe Hop", this);
-    private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));
     private final BoolValue air = new BoolValue("Air", true, this, () -> mode.is("Strafe Hop"));
@@ -29,6 +28,7 @@ public class Speed extends Module {
     private final ModeValue verusMode = new ModeValue("Verus mode", new String[]{"Low"}, "Low", this, () -> mode.is("Verus"));
     private final SliderValue speedMulti = new SliderValue("Extra speed multiplier", 0.4f, 0f, 1f, 0.01f, this, () -> ncpMode.is("Old BHop") && ncpMode.canDisplay());
     private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave"));
+    private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.05f, this, minSpeedLimiter::get);
     private final SliderValue minMoveTicks = new SliderValue("Move ticks for limit", 15, 0, 40, 1, this, minSpeedLimiter::get);
@@ -64,7 +64,7 @@ public class Speed extends Module {
         }
 
         if (printAirTicks.get()) {
-            DebugUtils.sendMessage("Air Ticks: " + mc.thePlayer.offGroundTicks);
+            ChatUtils.sendMessageClient("Air Ticks: " + mc.thePlayer.offGroundTicks);
         }
 
         if (MoveUtil.isMoving() && MoveUtil.getSpeed() < minSpeed.get() && movingTicks > minMoveTicks.get() && minSpeedLimiter.get()) {

@@ -5,7 +5,7 @@ import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.impl.misc.AntiCheat;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 public abstract class Check implements InstanceAccess {
     public abstract String getName();
@@ -18,7 +18,7 @@ public abstract class Check implements InstanceAccess {
     }
 
     public void flag(EntityPlayer player, String verbose) {
-        DebugUtils.sendMessage(player.getName() + EnumChatFormatting.WHITE + " detected for " + EnumChatFormatting.GRAY + getName() + EnumChatFormatting.WHITE + ", " + EnumChatFormatting.WHITE + verbose);
+        ChatUtils.sendMessageClient(player.getName() + EnumChatFormatting.WHITE + " detected for " + EnumChatFormatting.GRAY + getName() + EnumChatFormatting.WHITE + ", " + EnumChatFormatting.WHITE + verbose);
         INSTANCE.getModuleManager().getModule(AntiCheat.class).hackers.add(player);
     }
 }

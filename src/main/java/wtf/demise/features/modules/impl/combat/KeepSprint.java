@@ -26,7 +26,7 @@ public class KeepSprint extends Module {
     public void onHitSlowDown(HitSlowDownEvent e) {
         Velocity velocity = getModule(Velocity.class);
 
-        if (velocity.isEnabled() && velocity.mode.isEnabled("Reduce")) return;
+        if (velocity.isEnabled() && velocity.mode.is("Reduce")) return;
 
         switch (mode.get()) {
             case "Normal":

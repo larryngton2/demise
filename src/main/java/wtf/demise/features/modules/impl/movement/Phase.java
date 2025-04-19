@@ -17,7 +17,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.notification.NotificationType;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
@@ -87,8 +87,8 @@ public class Phase extends Module {
 
                 if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK && handle) {
                     switch (mc.objectMouseOver.typeOfHit) {
-                        case ENTITY -> DebugUtils.sendMessage("A fatass is blocking the way, can't phase");
-                        case MISS -> DebugUtils.sendMessage("Stopped");
+                        case ENTITY -> ChatUtils.sendMessageClient("A fatass is blocking the way, can't phase");
+                        case MISS -> ChatUtils.sendMessageClient("Stopped");
                     }
 
                     mc.thePlayer.jump();

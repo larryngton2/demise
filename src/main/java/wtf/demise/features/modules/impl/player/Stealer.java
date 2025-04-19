@@ -164,7 +164,7 @@ public class Stealer extends Module {
             Container container = mc.thePlayer.openContainer;
             int slots = container.inventorySlots.size();
 
-            int scaleFactor = event.getScaledResolution().getScaleFactor();
+            int scaleFactor = event.scaledResolution().getScaleFactor();
 
             if (slots > 0) {
                 float[] projection = calculate(currentContainerPos, scaleFactor);

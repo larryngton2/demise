@@ -6,7 +6,7 @@ import wtf.demise.Demise;
 import wtf.demise.features.command.Command;
 import wtf.demise.features.command.CommandExecutionException;
 import wtf.demise.features.modules.Module;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.StringUtils;
 
 public final class BindCommand extends Command {
@@ -26,14 +26,14 @@ public final class BindCommand extends Command {
                 if (module.getName().equalsIgnoreCase(moduleName)) {
                     module.setKeyBind(Keyboard.getKeyIndex(keyName.toUpperCase()));
                     final String string = "Set " + module.getName() + " to " + StringUtils.upperSnakeCaseToPascal(Keyboard.getKeyName(module.getKeyBind())) + ".";
-                    DebugUtils.sendMessage(string);
+                    ChatUtils.sendMessageClient(string);
                     foundModule = true;
                     break;
                 }
             }
 
             if (!foundModule) {
-                DebugUtils.sendMessage("Cound not find module.");
+                ChatUtils.sendMessageClient("Cound not find module.");
             }
         } else {
             if (arguments.length != 2) {
@@ -43,13 +43,13 @@ public final class BindCommand extends Command {
             if (arguments[1].equalsIgnoreCase("clear")) {
                 for (final Module module2 : Demise.INSTANCE.getModuleManager().getModules()) {
                     module2.setKeyBind(0);
-                    DebugUtils.sendMessage("Cleared all binds.");
+                    ChatUtils.sendMessageClient("Cleared all binds.");
                 }
             } else if (arguments[1].equalsIgnoreCase("list")) {
-                DebugUtils.sendMessage("Binds");
+                ChatUtils.sendMessageClient("Binds");
                 for (final Module module2 : Demise.INSTANCE.getModuleManager().getModules()) {
                     if (module2.getKeyBind() != 0) {
-                        DebugUtils.sendMessage(EnumChatFormatting.GRAY + "- " + EnumChatFormatting.RED + module2.getName() + ": " + Keyboard.getKeyName(module2.getKeyBind()));
+                        ChatUtils.sendMessageClient(EnumChatFormatting.GRAY + "- " + EnumChatFormatting.RED + module2.getName() + ": " + Keyboard.getKeyName(module2.getKeyBind()));
                     }
                 }
             }

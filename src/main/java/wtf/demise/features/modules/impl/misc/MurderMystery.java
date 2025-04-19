@@ -23,6 +23,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.notification.NotificationType;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -99,7 +100,7 @@ public class MurderMystery extends Module {
                             if (player != mc.thePlayer) {
                                 Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "MurderMystery", player.getName() + " is the murderer!", 3);
                                 if (announceMurderer.get()) {
-                                    mc.thePlayer.sendChatMessage(player.getName() + " is the murderer");
+                                    ChatUtils.sendMessageServer(player.getName() + " is the murderer");
                                 }
                             } else {
                                 Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "MurderMystery", "You are the murderer!", 3);
@@ -150,12 +151,12 @@ public class MurderMystery extends Module {
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity instanceof EntityArmorStand e && e.getHeldItem().getItem() instanceof ItemBow) {
-                double interpolatedX = e.lastTickPosX + (entity.posX - e.lastTickPosX) * event.getPartialTicks();
-                double interpolatedY = e.lastTickPosY + (entity.posY - e.lastTickPosY) * event.getPartialTicks();
-                double interpolatedZ = e.lastTickPosZ + (entity.posZ - e.lastTickPosZ) * event.getPartialTicks();
-                double diffX = mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * event.getPartialTicks() - interpolatedX;
-                double diffY = mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * event.getPartialTicks() - interpolatedY;
-                double diffZ = mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * event.getPartialTicks() - interpolatedZ;
+                double interpolatedX = e.lastTickPosX + (entity.posX - e.lastTickPosX) * event.partialTicks();
+                double interpolatedY = e.lastTickPosY + (entity.posY - e.lastTickPosY) * event.partialTicks();
+                double interpolatedZ = e.lastTickPosZ + (entity.posZ - e.lastTickPosZ) * event.partialTicks();
+                double diffX = mc.thePlayer.lastTickPosX + (mc.thePlayer.posX - mc.thePlayer.lastTickPosX) * event.partialTicks() - interpolatedX;
+                double diffY = mc.thePlayer.lastTickPosY + (mc.thePlayer.posY - mc.thePlayer.lastTickPosY) * event.partialTicks() - interpolatedY;
+                double diffZ = mc.thePlayer.lastTickPosZ + (mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ) * event.partialTicks() - interpolatedZ;
 
                 double dist = MathHelper.sqrt_double(diffX * diffX + diffY * diffY + diffZ * diffZ);
 

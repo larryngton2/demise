@@ -142,7 +142,7 @@ public class Interface extends Module {
                 for (ItemStack everything : stuff) {
                     split += 16;
 
-                    RenderUtils.renderItemStack(everything, split + (double) event.getScaledResolution().getScaledWidth() / 2 - 4, event.getScaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
+                    RenderUtils.renderItemStack(everything, split + (double) event.scaledResolution().getScaledWidth() / 2 - 4, event.scaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
                 }
             }
         }
@@ -170,8 +170,8 @@ public class Interface extends Module {
                     type = type + " §7" + Potion.getDurationString(potionEffect);
                 }
                 GlStateManager.pushMatrix();
-                mc.fontRendererObj.drawString(potionName, (float) event.getScaledResolution().getScaledWidth() - mc.fontRendererObj.getStringWidth(type + potionName) - 2.0f, (event.getScaledResolution().getScaledHeight() - 9) + y, new Color(potionType.getLiquidColor()).getRGB(), true);
-                mc.fontRendererObj.drawString(type, (float) event.getScaledResolution().getScaledWidth() - mc.fontRendererObj.getStringWidth(type) - 2.0f, (event.getScaledResolution().getScaledHeight() - 9) + y, new Color(255, 255, 255).getRGB(), true);
+                mc.fontRendererObj.drawString(potionName, (float) event.scaledResolution().getScaledWidth() - mc.fontRendererObj.getStringWidth(type + potionName) - 2.0f, (event.scaledResolution().getScaledHeight() - 9) + y, new Color(potionType.getLiquidColor()).getRGB(), true);
+                mc.fontRendererObj.drawString(type, (float) event.scaledResolution().getScaledWidth() - mc.fontRendererObj.getStringWidth(type) - 2.0f, (event.scaledResolution().getScaledHeight() - 9) + y, new Color(255, 255, 255).getRGB(), true);
 
                 GlStateManager.popMatrix();
                 y -= 9.0f;
@@ -179,7 +179,7 @@ public class Interface extends Module {
         }
 
         if (elements.isEnabled("Session Info") && sessionInfoMode.is("Exhi")) {
-            mc.fontRendererObj.drawStringWithShadow(RenderUtils.sessionTime(), event.getScaledResolution().getScaledWidth() / 2.0f - mc.fontRendererObj.getStringWidth(RenderUtils.sessionTime()) / 2.0f, BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? 47 : 30.0f, -1);
+            mc.fontRendererObj.drawStringWithShadow(RenderUtils.sessionTime(), event.scaledResolution().getScaledWidth() / 2.0f - mc.fontRendererObj.getStringWidth(RenderUtils.sessionTime()) / 2.0f, BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? 47 : 30.0f, -1);
         }
 
         if (elements.isEnabled("Notification")) {

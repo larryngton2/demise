@@ -33,7 +33,9 @@ import net.optifine.reflect.Reflector;
 import net.optifine.reflect.ReflectorForge;
 import net.optifine.shaders.Shaders;
 import net.optifine.shaders.ShadersRender;
+import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.misc.Test;
 
 import java.util.List;
 
@@ -349,7 +351,7 @@ public class RenderItem implements IResourceManagerReloadListener {
                 if (heldStack != null) {
                     EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
                     if (lastRender == player) {
-                        if (heldStack.getItem() instanceof ItemSword && (p.getItemInUseCount() > 0 && KillAura.isBlocking || player.isBlocking())) {
+                        if (heldStack.getItem() instanceof ItemSword && (p.getItemInUseCount() > 0 && KillAura.isBlocking || player.isBlocking() || Demise.INSTANCE.getModuleManager().getModule(Test.class).forceBlock.get())) {
                             doThirdPersonBlockTransformations();
                         }
                     } else if (p.getItemInUseCount() > 0 && heldStack.getItemUseAction() == EnumAction.BLOCK) {
@@ -369,9 +371,15 @@ public class RenderItem implements IResourceManagerReloadListener {
     }
 
     private void doThirdPersonBlockTransformations() {
+        GlStateManager.translate(-0.0457, -0.2, 0.01);
+        GlStateManager.rotate(90, 1, 0, 0);
+        GlStateManager.translate(0.06, 0.17, -0.04);
+
+        /*
         GlStateManager.translate(-0.15F, -0.2F, 0);
         GlStateManager.rotate(70, 1, 0, 0);
         GlStateManager.translate(0.119F, 0.2F, -0.024F);
+        */
     }
 
     private boolean isThereOneNegativeScale(ItemTransformVec3f itemTranformVec) {

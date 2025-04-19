@@ -14,7 +14,6 @@ import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.DebugUtils;
 import wtf.demise.utils.packet.PacketUtils;
 
 import java.util.concurrent.ThreadLocalRandom;

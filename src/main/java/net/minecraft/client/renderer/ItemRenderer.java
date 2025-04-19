@@ -323,13 +323,11 @@ public class ItemRenderer {
                         case NONE:
                             transformFirstPersonItem(f, 0.0F);
                             break;
-
                         case EAT:
                         case DRINK:
                             performDrinking(abstractclientplayer, partialTicks);
                             transformFirstPersonItem(f, animations.isEnabled() && animations.getOld().get() ? f1 : 0);
                             break;
-
                         case BLOCK:
                             if (animations.isEnabled()) {
                                 if (mc.thePlayer.getHeldItem() != null)

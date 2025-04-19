@@ -4,7 +4,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.SendMessageEvent;
 import wtf.demise.features.command.impl.*;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,15 +47,15 @@ public final class CommandManager {
                             try {
                                 command.execute(arguments);
                             } catch (CommandExecutionException e) {
-                                DebugUtils.sendMessage("Invalid commands syntax. Hint: " + e.getMessage());
+                                ChatUtils.sendMessageClient("Invalid commands syntax. Hint: " + e.getMessage());
                             }
                             return;
                         }
                     }
                 }
-                DebugUtils.sendMessage("'" + arguments[0] + "' is not a commands. " + "Try '.help'");
+                ChatUtils.sendMessageClient("'" + arguments[0] + "' is not a commands. " + "Try '.help'");
             } else {
-                DebugUtils.sendMessage("No arguments were supplied. Try '.help'");
+                ChatUtils.sendMessageClient("No arguments were supplied. Try '.help'");
             }
         }
     }

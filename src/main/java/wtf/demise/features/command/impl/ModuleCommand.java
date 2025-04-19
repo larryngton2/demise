@@ -5,7 +5,7 @@ import wtf.demise.features.command.CommandExecutionException;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class ModuleCommand extends Command {
     @Override
     public void execute(String[] args) throws CommandExecutionException {
         if (args.length == 1) {
-            DebugUtils.sendMessage("Usage: " + getUsage());
+            ChatUtils.sendMessageClient("Usage: " + getUsage());
             return;
         }
 
@@ -47,37 +47,37 @@ public class ModuleCommand extends Command {
             boolean newValue = !boolValue.get();
             boolValue.set(newValue);
 
-            DebugUtils.sendMessage(module.getName() + " " + args[1] + " was toggled " + (newValue ? "§8on" : "§8off") + ".");
+            ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was toggled " + (newValue ? "§8on" : "§8off") + ".");
         } else {
             if (args.length < 3) {
                 if (value instanceof SliderValue || value instanceof ColorValue)
-                    DebugUtils.sendMessage(args[1].toLowerCase() + " <value>");
+                    ChatUtils.sendMessageClient(args[1].toLowerCase() + " <value>");
                 else if (value instanceof ModeValue modeValue)
-                    DebugUtils.sendMessage(args[1].toLowerCase() + " <" + Arrays.stream(modeValue.getModes())
+                    ChatUtils.sendMessageClient(args[1].toLowerCase() + " <" + Arrays.stream(modeValue.getModes())
                             .map(String::toLowerCase).reduce((s1, s2) -> s1 + "/" + s2).orElse("") + ">");
                 return;
             }
 
             if (value instanceof ColorValue colorValue) {
                 colorValue.set(new Color(Integer.parseInt(args[2])));
-                DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + colorValue.get() + ".");
+                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + colorValue.get() + ".");
             } else if (value instanceof SliderValue sliderValue) {
                 sliderValue.setValue(Float.parseFloat(args[2]));
-                DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + sliderValue.get() + ".");
+                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + sliderValue.get() + ".");
             } else if (value instanceof MultiBoolValue multiBoolValue) {
                 multiBoolValue.getValues().forEach(boolValue -> {
                     if (Objects.equals(boolValue.getName(), args[2])) {
                         boolean newValue = !boolValue.get();
                         boolValue.set(newValue);
-                        DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + boolValue.get() + ".");
+                        ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + boolValue.get() + ".");
                     }
                 });
             } else if (value instanceof ModeValue modeValue) {
                 modeValue.set(args[2]);
-                DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + modeValue.get() + ".");
+                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + modeValue.get() + ".");
             } else if (value instanceof TextValue textValue) {
                 textValue.setText(args[2]);
-                DebugUtils.sendMessage(module.getName() + " " + args[1] + " was set to " + textValue.get() + ".");
+                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + textValue.get() + ".");
             }
         }
     }

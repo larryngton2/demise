@@ -12,7 +12,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
@@ -64,7 +64,7 @@ public class TimerRange extends Module {
             }
 
             if (debug.get()) {
-                DebugUtils.sendMessage(mc.timer.timerSpeed + " / " + balance + " / " + maxBalance.get() + " / " + mc.timer.elapsedTicks);
+                ChatUtils.sendMessageClient(mc.timer.timerSpeed + " / " + balance + " / " + maxBalance.get() + " / " + mc.timer.elapsedTicks);
             }
         }
     }

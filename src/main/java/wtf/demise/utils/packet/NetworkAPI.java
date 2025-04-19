@@ -8,7 +8,7 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.*;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 import javax.script.ScriptException;
 import java.util.Arrays;
@@ -126,7 +126,7 @@ public class NetworkAPI implements InstanceAccess {
                 packet = (Packet<?>) Arrays.stream(serverbound[id].getConstructors()).filter(x -> x.getParameterCount() == params.length).findFirst().get().newInstance(params);
             }
         } catch (Exception ex) {
-            DebugUtils.sendMessage("Failed to instantiate packet!");
+            ChatUtils.sendMessageClient("Failed to instantiate packet!");
             throw new ScriptException(ex);
         }
         return packet;

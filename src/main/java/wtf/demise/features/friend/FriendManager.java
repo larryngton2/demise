@@ -3,7 +3,7 @@ package wtf.demise.features.friend;
 import joptsimple.internal.Strings;
 import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +51,10 @@ public final class FriendManager {
         for (final Friend friend : this.friends) {
             if (!this.isFriend(name)) {
                 this.friends.add(friend);
-                DebugUtils.sendMessage(name + " friended");
+                ChatUtils.sendMessageClient(name + " friended");
             } else {
                 this.friends.removeIf(friend::equals);
-                DebugUtils.sendMessage(name + " unfriended");
+                ChatUtils.sendMessageClient(name + " unfriended");
             }
         }
     }

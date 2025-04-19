@@ -1053,7 +1053,7 @@ public class RenderUtils implements InstanceAccess {
         });
     }
 
-    public static void renderBreadCrumb(final Vec3 vec3, float scale) {
+    public static void renderBreadCrumb(final Vec3 vec3, float scale, Color color) {
         GlStateManager.disableDepth();
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -1078,7 +1078,7 @@ public class RenderUtils implements InstanceAccess {
             GL11.glRotated(-(mc.getRenderManager()).playerViewY, 0.0D, 1.0D, 0.0D);
             GL11.glRotated((mc.getRenderManager()).playerViewX, 1.0D, 0.0D, 0.0D);
 
-            final Color c = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(0));
+            final Color c = color;
 
             drawFilledCircleNoGL(0, 0, 0.7, c.hashCode(), quality);
 

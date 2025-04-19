@@ -947,7 +947,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
                             this.motionZ *= hitSlowDown.getSlowDown();
                             this.setSprinting(hitSlowDown.isSprint());
 
-                        } else if (velocity.isEnabled() && velocity.mode.isEnabled("Intave") && velocity.intaveMode.is("Reduce") && Minecraft.getMinecraft().thePlayer.hurtTime != 0) {
+                        } else if (velocity.isEnabled() && velocity.mode.is("Intave") && (velocity.intaveMode.is("Reduce") || velocity.intaveMode.is("MoreReduce")) && Minecraft.getMinecraft().thePlayer.hurtTime != 0) {
                             double randMotion = MathUtils.randomizeDouble(velocity.rFactorMin.get(), velocity.rFactorMax.get());
 
                             this.motionX *= randMotion;

@@ -4,7 +4,7 @@ import wtf.demise.Demise;
 import wtf.demise.features.command.Command;
 import wtf.demise.features.command.CommandExecutionException;
 import wtf.demise.features.modules.Module;
-import wtf.demise.utils.misc.DebugUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 public final class ToggleCommand extends Command {
     @Override
@@ -19,7 +19,7 @@ public final class ToggleCommand extends Command {
             for (final Module module : Demise.INSTANCE.getModuleManager().getModules()) {
                 if (module.getName().replaceAll(" ", "").equalsIgnoreCase(moduleName)) {
                     module.toggle();
-                    DebugUtils.sendMessage(module.getName() + " has been " + (module.isEnabled() ? "\u00a7AEnabled\u00a77." : "\u00a7CDisabled\u00a77."));
+                    ChatUtils.sendMessageClient(module.getName() + " has been " + (module.isEnabled() ? "\u00a7AEnabled\u00a77." : "\u00a7CDisabled\u00a77."));
                     return;
                 }
             }

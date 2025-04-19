@@ -18,10 +18,6 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.CustomSkin;
-import wtf.demise.features.modules.impl.visual.VisualTweaks;
-import wtf.demise.gui.altmanager.repository.Alt;
-import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
-import wtf.demise.utils.misc.DebugUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

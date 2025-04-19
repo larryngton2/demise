@@ -11,6 +11,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MoveUtil;
 
@@ -37,7 +38,7 @@ public class Fly extends Module {
     public void onEnable() {
         ticksUntilStart = 0;
         if (mode.is("Miniblox") && autoResync.get()) {
-            mc.thePlayer.sendChatMessage("/resync");
+            ChatUtils.sendMessageServer("/resync");
         }
     }
 
