@@ -136,8 +136,8 @@ public class ModuleManager {
                 ItemGlow.class,
                 Cape.class,
                 CustomSkin.class,
-                CustomBlockHover.class,
-                ForceDinnerbone.class
+                ForceDinnerbone.class,
+                CustomWidgetsModule.class
         );
 
         // Sort modules by name for better organization

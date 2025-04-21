@@ -10,6 +10,7 @@ import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.ChatGUIEvent;
+import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,13 @@ public class GuiChat extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.sentHistoryCursor = mc.ingameGUI.getChatGUI().getSentMessages().size();
-        this.inputField = new GuiTextField(0, this.fontRendererObj, 10, height - 12 - 6, MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()), 12);
+
+        if (Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).chat.get()) {
+            this.inputField = new GuiTextField(0, this.fontRendererObj, 10, height - 12 - 6, MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()), 12);
+        } else {
+            this.inputField = new GuiTextField(0, this.fontRendererObj, 4, height - 12, width - 4, 12);
+        }
+
         this.inputField.setMaxStringLength(256);
         this.inputField.setEnableBackgroundDrawing(false);
         this.inputField.setFocused(true);
@@ -209,7 +216,11 @@ public class GuiChat extends GuiScreen {
             this.handleComponentHover(ichatcomponent, mouseX, mouseY);
         }
 
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        if (Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).chat.get()) {
+            super.drawScreen(mouseX, mouseY, partialTicks);
+        } else {
+            drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
+        }
 
         Demise.INSTANCE.getEventManager().call(new ChatGUIEvent(mouseX, mouseY));
     }

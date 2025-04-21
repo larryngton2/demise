@@ -22,6 +22,7 @@ import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
@@ -49,15 +50,28 @@ public class CustomWidgets implements InstanceAccess {
     private float interpolatedChatY;
     private boolean fade = false;
     private int alpha = 255;
+    private final CustomWidgetsModule customWidgetsModule = Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class);
 
     @EventTarget
     public void onRender2D(Render2DEvent e) {
         int i = sr.getScaledWidth() / 2;
 
-        drawCustomHotbar(i);
-        drawChat(GuiIngame.getUpdateCounter(), false);
-        drawRealSlot(i, false);
-        drawScoreboard(scoreObjective, sr, false);
+        if (!customWidgetsModule.isEnabled()) {
+            return;
+        }
+
+        if (customWidgetsModule.hotbar.get() && customWidgetsModule.isEnabled()) {
+            drawCustomHotbar(i);
+            drawRealSlot(i, false);
+        }
+
+        if (customWidgetsModule.chat.get()) {
+            drawChat(GuiIngame.getUpdateCounter(), false);
+        }
+
+        if (customWidgetsModule.scoreboard.get()) {
+            drawScoreboard(scoreObjective, sr, false);
+        }
 
         if (fade) {
             RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, alpha).getRGB());
@@ -373,27 +387,46 @@ public class CustomWidgets implements InstanceAccess {
 
     @EventTarget
     public void onChatGUI(ChatGUIEvent e) {
-        drawChatScreen(false);
+        if (!customWidgetsModule.isEnabled()) {
+            return;
+        }
+
+        if (customWidgetsModule.chat.get()) {
+            drawChatScreen(false);
+        }
     }
 
     @EventTarget
     public void onShader2D(Shader2DEvent e) {
         int i = sr.getScaledWidth() / 2;
 
-        RoundedUtils.drawShaderRound(i - 90, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
-
-        if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
-            RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
+        if (!customWidgetsModule.isEnabled()) {
+            return;
         }
 
-        drawChat(GuiIngame.getUpdateCounter(), true);
+        if (customWidgetsModule.hotbar.get()) {
+            RoundedUtils.drawShaderRound(i - 90, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
 
-        if (GuiNewChat.getChatOpen()) {
-            drawChatScreen(true);
+            if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
+                RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
+            }
         }
 
-        drawRealSlot(i, true);
-        drawScoreboard(scoreObjective, sr, true);
+        if (customWidgetsModule.chat.get()) {
+            drawChat(GuiIngame.getUpdateCounter(), true);
+
+            if (GuiNewChat.getChatOpen()) {
+                drawChatScreen(true);
+            }
+        }
+
+        if (customWidgetsModule.hotbar.get()) {
+            drawRealSlot(i, true);
+        }
+
+        if (customWidgetsModule.scoreboard.get()) {
+            drawScoreboard(scoreObjective, sr, true);
+        }
     }
 
     public <M extends Module> M getModule(Class<M> clazz) {

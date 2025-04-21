@@ -72,7 +72,7 @@ import org.lwjglx.input.Keyboard;
 import org.lwjglx.util.vector.Vector3f;
 import org.lwjglx.util.vector.Vector4f;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.CustomBlockHover;
+import wtf.demise.features.modules.impl.visual.BlockOverlay;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.math.MathUtils;
 
@@ -2171,7 +2171,7 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
     private AxisAlignedBB interpolatedAxis = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 
     public void drawSelectionBox(EntityPlayer player, MovingObjectPosition movingObjectPositionIn, int execute, float partialTicks) {
-        CustomBlockHover customBlockHover = Demise.INSTANCE.getModuleManager().getModule(CustomBlockHover.class);
+        BlockOverlay blockOverlay = Demise.INSTANCE.getModuleManager().getModule(BlockOverlay.class);
 
         if (execute == 0 && movingObjectPositionIn.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             GlStateManager.enableBlend();
@@ -2179,15 +2179,15 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
 
             Color color;
 
-            if (!customBlockHover.isEnabled()) {
+            if (!blockOverlay.isEnabled()) {
                 color = new Color(0, 0, 0, 0.4f);
                 GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
             } else {
-                if (customBlockHover.syncColor.get()) {
+                if (blockOverlay.syncColor.get()) {
                     color = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color());
                     GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.4f);
                 } else {
-                    color = customBlockHover.color.get();
+                    color = blockOverlay.color.get();
                     GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
                 }
             }
@@ -2216,25 +2216,25 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
                     axisalignedbb = BlockModelUtils.getOffsetBoundingBox(axisalignedbb, block$enumoffsettype, blockpos);
                 }
 
-                if (!customBlockHover.isEnabled()) {
+                if (!blockOverlay.isEnabled()) {
                     drawSelectionBoundingBox(axisalignedbb.expand(f, f, f).offset(-d0, -d1, -d2));
                 } else {
-                    if (!customBlockHover.interpolate.get()) {
-                        if (customBlockHover.outline.get()) {
+                    if (!blockOverlay.interpolate.get()) {
+                        if (blockOverlay.outline.get()) {
                             drawSelectionBoundingBox(axisalignedbb.expand(f, f, f).offset(-d0, -d1, -d2));
                         }
 
-                        if (customBlockHover.filled.get()) {
+                        if (blockOverlay.filled.get()) {
                             drawFilledBoundingBox(axisalignedbb.expand(f, f, f).offset(-d0, -d1, -d2), color);
                         }
                     } else {
-                        interpolatedAxis = MathUtils.interpolate(interpolatedAxis, axisalignedbb, customBlockHover.interpolationAmount.get());
+                        interpolatedAxis = MathUtils.interpolate(interpolatedAxis, axisalignedbb, blockOverlay.interpolationAmount.get());
 
-                        if (customBlockHover.outline.get()) {
+                        if (blockOverlay.outline.get()) {
                             drawSelectionBoundingBox(interpolatedAxis.expand(f, f, f).offset(-d0, -d1, -d2));
                         }
 
-                        if (customBlockHover.filled.get()) {
+                        if (blockOverlay.filled.get()) {
                             drawFilledBoundingBox(interpolatedAxis.expand(f, f, f).offset(-d0, -d1, -d2), color);
                         }
                     }
