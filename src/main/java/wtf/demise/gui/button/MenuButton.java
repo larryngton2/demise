@@ -5,7 +5,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.VisualTweaks;
+import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
@@ -40,7 +40,7 @@ public class MenuButton implements Button, InstanceAccess {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
-        switch (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).buttonStyle.get()) {
+        switch (Demise.INSTANCE.getModuleManager().getModule(MainMenuOptions.class).buttonStyle.get()) {
             case "Vanilla": {
                 FontRenderer fontrenderer = mc.fontRendererObj;
                 mc.getTextureManager().bindTexture(buttonTextures);

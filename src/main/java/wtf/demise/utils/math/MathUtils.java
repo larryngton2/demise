@@ -19,19 +19,19 @@ public class MathUtils {
     }
 
     public static double interpolate(double old, double now) {
-        return interpolate(old, now, mc.timer.renderPartialTicks);
+        return interpolate(old, now, mc.timer.partialTicks);
     }
 
-    public static double interpolate(double old, double now, float partialTicks) {
-        return old + (now - old) * partialTicks;
+    public static double interpolate(double old, double now, float multiple) {
+        return old + (now - old) * multiple;
     }
 
     public static float interpolate(float old, float now) {
-        return interpolate(old, now, mc.timer.renderPartialTicks);
+        return interpolate(old, now, mc.timer.partialTicks);
     }
 
-    public static float interpolate(float old, float now, float partialTicks) {
-        return old + (now - old) * partialTicks;
+    public static float interpolate(float old, float now, float multiple) {
+        return old + (now - old) * multiple;
     }
 
     public static Vec3 interpolate(Vec3 old, Vec3 now) {
@@ -43,6 +43,21 @@ public class MathUtils {
                 (float) interpolate(old.xCoord, now.xCoord, multiple),
                 (float) interpolate(old.yCoord, now.yCoord, multiple),
                 (float) interpolate(old.zCoord, now.zCoord, multiple));
+    }
+
+    public static AxisAlignedBB interpolate(AxisAlignedBB old, AxisAlignedBB now, float multiple) {
+        return new AxisAlignedBB(
+                interpolate(old.minX, now.minX, multiple),
+                interpolate(old.minY, now.minY, multiple),
+                interpolate(old.minZ, now.minZ, multiple),
+                interpolate(old.maxX, now.maxX, multiple),
+                interpolate(old.maxY, now.maxY, multiple),
+                interpolate(old.maxZ, now.maxZ, multiple)
+        );
+    }
+
+    public static AxisAlignedBB interpolate(AxisAlignedBB old, AxisAlignedBB now) {
+        return interpolate(old, now, mc.timer.partialTicks);
     }
 
     public static float nextSecureFloat(final double origin, final double bound) {

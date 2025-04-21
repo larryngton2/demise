@@ -84,6 +84,7 @@ public class InvManager extends Module {
     @EventTarget
     public void onUpdate(UpdateEvent event) {
         setTag(minDelay.get() + " - " + maxDelay.get());
+
         final long delay = (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) * 50L);
         if (this.clientOpen || (mc.currentScreen == null && !Objects.equals(this.mode.get(), "Open Inventory"))) {
             if ((this.timer.hasTimeElapsed(delay) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0)) {

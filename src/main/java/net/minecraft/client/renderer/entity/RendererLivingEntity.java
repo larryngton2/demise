@@ -28,7 +28,8 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.RenderNameTagEvent;
 import wtf.demise.features.modules.impl.visual.Chams;
-import wtf.demise.features.modules.impl.visual.VisualTweaks;
+import wtf.demise.features.modules.impl.visual.ForceDinnerbone;
+import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -492,7 +493,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
         } else {
             String s = EnumChatFormatting.getTextWithoutFormattingCodes(bat.getName());
 
-            if (s != null && (s.equals("Dinnerbone") || s.equals("Grumm") || (Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(VisualTweaks.class).forceDinnerbone.get() && bat == Minecraft.getMinecraft().thePlayer)) && (!(bat instanceof EntityPlayer) || ((EntityPlayer) bat).isWearing(EnumPlayerModelParts.CAPE))) {
+            if (s != null && (s.equals("Dinnerbone") || s.equals("Grumm") || (Demise.INSTANCE.getModuleManager().getModule(ForceDinnerbone.class).isEnabled() && bat == Minecraft.getMinecraft().thePlayer)) && (!(bat instanceof EntityPlayer) || ((EntityPlayer) bat).isWearing(EnumPlayerModelParts.CAPE))) {
                 GlStateManager.translate(0.0F, bat.height + 0.1F, 0.0F);
                 GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
             }

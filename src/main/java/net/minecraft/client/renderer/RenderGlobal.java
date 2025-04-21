@@ -71,10 +71,17 @@ import org.lwjgl.opengl.GL11;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.util.vector.Vector3f;
 import org.lwjglx.util.vector.Vector4f;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.CustomBlockHover;
+import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.utils.math.MathUtils;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.List;
+
+import static wtf.demise.utils.render.RenderUtils.drawFilledBoundingBox;
 
 public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListener {
     private static final Logger logger = LogManager.getLogger();
@@ -2161,11 +2168,30 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
         }
     }
 
+    private AxisAlignedBB interpolatedAxis = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public void drawSelectionBox(EntityPlayer player, MovingObjectPosition movingObjectPositionIn, int execute, float partialTicks) {
+        CustomBlockHover customBlockHover = Demise.INSTANCE.getModuleManager().getModule(CustomBlockHover.class);
+
         if (execute == 0 && movingObjectPositionIn.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            GlStateManager.color(0.0F, 0.0F, 0.0F, 0.4F);
+
+            Color color;
+
+            if (!customBlockHover.isEnabled()) {
+                color = new Color(0, 0, 0, 0.4f);
+                GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+            } else {
+                if (customBlockHover.syncColor.get()) {
+                    color = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color());
+                    GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.4f);
+                } else {
+                    color = customBlockHover.color.get();
+                    GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+                }
+            }
+
             GL11.glLineWidth(2.0F);
             GlStateManager.disableTexture2D();
 
@@ -2174,7 +2200,7 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
             }
 
             GlStateManager.depthMask(false);
-            float f = 0.002F;
+            float f = 0.0002F;
             BlockPos blockpos = movingObjectPositionIn.getBlockPos();
             Block block = this.theWorld.getBlockState(blockpos).getBlock();
 
@@ -2190,7 +2216,29 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
                     axisalignedbb = BlockModelUtils.getOffsetBoundingBox(axisalignedbb, block$enumoffsettype, blockpos);
                 }
 
-                drawSelectionBoundingBox(axisalignedbb.expand(0.0020000000949949026D, 0.0020000000949949026D, 0.0020000000949949026D).offset(-d0, -d1, -d2));
+                if (!customBlockHover.isEnabled()) {
+                    drawSelectionBoundingBox(axisalignedbb.expand(f, f, f).offset(-d0, -d1, -d2));
+                } else {
+                    if (!customBlockHover.interpolate.get()) {
+                        if (customBlockHover.outline.get()) {
+                            drawSelectionBoundingBox(axisalignedbb.expand(f, f, f).offset(-d0, -d1, -d2));
+                        }
+
+                        if (customBlockHover.filled.get()) {
+                            drawFilledBoundingBox(axisalignedbb.expand(f, f, f).offset(-d0, -d1, -d2), color);
+                        }
+                    } else {
+                        interpolatedAxis = MathUtils.interpolate(interpolatedAxis, axisalignedbb, customBlockHover.interpolationAmount.get());
+
+                        if (customBlockHover.outline.get()) {
+                            drawSelectionBoundingBox(interpolatedAxis.expand(f, f, f).offset(-d0, -d1, -d2));
+                        }
+
+                        if (customBlockHover.filled.get()) {
+                            drawFilledBoundingBox(interpolatedAxis.expand(f, f, f).offset(-d0, -d1, -d2), color);
+                        }
+                    }
+                }
             }
 
             GlStateManager.depthMask(true);

@@ -13,6 +13,7 @@ import wtf.demise.features.command.CommandManager;
 import wtf.demise.features.config.ConfigManager;
 import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
+import wtf.demise.gui.widget.impl.BPSCounterWidget;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
 import wtf.demise.gui.click.dropdown.DropdownGUI;

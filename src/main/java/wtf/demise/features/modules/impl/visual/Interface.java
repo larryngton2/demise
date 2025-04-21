@@ -53,7 +53,8 @@ public class Interface extends Module {
             new BoolValue("Potion HUD", true),
             new BoolValue("Target HUD", true),
             new BoolValue("Notification", false),
-            new BoolValue("Session Info", false)
+            new BoolValue("Session Info", false),
+            new BoolValue("BPS counter", false)
     ), this);
 
     public final BoolValue cFont = new BoolValue("C Fonts", true, this, () -> elements.isEnabled("Module List"));
@@ -70,6 +71,7 @@ public class Interface extends Module {
     public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
     public final BoolValue centerNotif = new BoolValue("Center Notification", true, this, () -> notificationMode.is("Exhi"));
     public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
+    public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
     public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));

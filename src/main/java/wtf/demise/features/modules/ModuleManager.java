@@ -132,10 +132,12 @@ public class ModuleManager {
                 ViewBobbing.class,
                 BreakProgress.class,
                 VisualAimPoint.class,
-                VisualTweaks.class,
+                MainMenuOptions.class,
                 ItemGlow.class,
                 Cape.class,
-                CustomSkin.class
+                CustomSkin.class,
+                CustomBlockHover.class,
+                ForceDinnerbone.class
         );
 
         // Sort modules by name for better organization

@@ -150,7 +150,7 @@ public class ClickHandler implements InstanceAccess {
                     AttackOrder.sendConditionalSwing(mc.objectMouseOver);
                     break;
                 case Legit:
-                    mc.clickMouse();
+                    if (mc.currentScreen == null) mc.clickMouse();
                     break;
             }
         }
@@ -164,7 +164,7 @@ public class ClickHandler implements InstanceAccess {
         if (ignoreBlocking || !mc.thePlayer.isUsingItem()) {
             switch (clickMode) {
                 case Legit:
-                    mc.clickMouse();
+                    if (mc.currentScreen == null) mc.clickMouse();
                     break;
                 case Packet:
                     if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {

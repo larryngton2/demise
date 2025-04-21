@@ -27,7 +27,9 @@ public class Speed extends Module {
     private final ModeValue ncpMode = new ModeValue("NCP mode", new String[]{"On tick 4", "On tick 5", "Old BHop"}, "On tick 5", this, () -> mode.is("NCP"));
     private final ModeValue verusMode = new ModeValue("Verus mode", new String[]{"Low"}, "Low", this, () -> mode.is("Verus"));
     private final SliderValue speedMulti = new SliderValue("Extra speed multiplier", 0.4f, 0f, 1f, 0.01f, this, () -> ncpMode.is("Old BHop") && ncpMode.canDisplay());
-    private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave"));
+    private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Safe", "Fast"}, "Safe", this, () -> mode.is("Intave"));
+    private final BoolValue timer = new BoolValue("Timer", false, this, () -> mode.is("Intave") && intaveMode.is("Fast"));
+    private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave") && intaveMode.is("Safe"));
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.05f, this, minSpeedLimiter::get);
@@ -152,9 +154,33 @@ public class Speed extends Module {
                     mc.thePlayer.jump();
                 }
 
-                if (mc.thePlayer.motionY > 0.003 && mc.thePlayer.isSprinting()) {
-                    mc.thePlayer.motionX *= 1f + (0.003 * iBoostMulti.get());
-                    mc.thePlayer.motionX *= 1f + (0.003 * iBoostMulti.get());
+                if (mc.thePlayer.isSprinting()) {
+                    switch (intaveMode.get()) {
+                        case "Safe": {
+                            if (mc.thePlayer.motionY > 0.003) {
+                                mc.thePlayer.motionX *= 1f + (0.003 * iBoostMulti.get());
+                                mc.thePlayer.motionX *= 1f + (0.003 * iBoostMulti.get());
+                            }
+                            break;
+                        }
+                        case "Fast": {
+                            switch (mc.thePlayer.offGroundTicks) {
+                                case 1:
+                                    mc.thePlayer.motionX *= 1.04;
+                                    mc.thePlayer.motionZ *= 1.04;
+                                    break;
+                                case 2, 3, 4:
+                                    mc.thePlayer.motionX *= 1.02;
+                                    mc.thePlayer.motionZ *= 1.02;
+                                    break;
+                            }
+
+                            if (timer.get()) {
+                                mc.timer.timerSpeed = 1.002f;
+                            }
+                            break;
+                        }
+                    }
                 }
                 break;
             case "Vulcan":
