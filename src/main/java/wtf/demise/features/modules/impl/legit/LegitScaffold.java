@@ -16,7 +16,6 @@ import wtf.demise.utils.math.TimerUtils;
 
 @ModuleInfo(name = "LegitScaffold", category = ModuleCategory.Legit)
 public class LegitScaffold extends Module {
-
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 200, 10, this);
     private final BoolValue blockCheck = new BoolValue("Blocks Only", true, this);
     private final BoolValue directionCheck = new BoolValue("Directional Check", true, this);

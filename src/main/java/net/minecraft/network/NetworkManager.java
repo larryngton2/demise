@@ -370,7 +370,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         if (this.channel.isOpen()) {
             Packet<INetHandler> p = (Packet<INetHandler>) p_channelRead0_2_;
             try {
-                if (Demise.INSTANCE.getModuleManager().getModule(Disabler.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).options.isEnabled("GrimAC") && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).grim.isEnabled("Post") && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).getPost() && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).postDelay(p)) {
+                if (Demise.INSTANCE.getModuleManager().getModule(Disabler.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).options.isEnabled("Post") && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).getPost() && Demise.INSTANCE.getModuleManager().getModule(Disabler.class).postDelay(p)) {
                     Minecraft.getMinecraft().addScheduledTask(() -> {
                         Demise.INSTANCE.getModuleManager().getModule(Disabler.class).getStoredPackets().add(p);
                     });

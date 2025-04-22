@@ -1,383 +1,107 @@
 package wtf.demise.features.modules.impl.movement;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.item.ItemFireball;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.network.play.server.S12PacketEntityVelocity;
-import org.apache.commons.lang3.Range;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.player.MotionEvent;
+import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
-import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.player.MoveUtil;
-
-import java.util.Objects;
 
 @ModuleInfo(name = "LongJump", category = ModuleCategory.Movement)
 public class LongJump extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Watchdog Fireball", "Old Matrix", "Miniblox"}, "Watchdog Fireball", this);
-    public final ModeValue wdFBMode = new ModeValue("Fireball Mode", new String[]{"Rise", "Chef", "Chef High"}, "Watchdog Fireball", this);
-    private final SliderValue oMatrixTimer = new SliderValue("Matrix Timer", 0.3f, 0.1f, 1, 0.01f, this, () -> mode.is("Old Matrix"));
-    private final BoolValue boost = new BoolValue("Boost", true, this, () -> mode.is("Watchdog Fireball"));
-    private int lastSlot = -1;
-    //fb
-    private int ticks = -1;
-    private boolean setSpeed;
-    private int ticksSinceVelocity;
-    public static boolean stopModules;
-    private boolean sentPlace;
-    private int initTicks;
-    private boolean thrown;
-    private boolean velo;
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "NCP"}, "Vanilla", this);
+    private final SliderValue jumpOffAmount = new SliderValue("JumpOff amount", 0.2f, 0.01f, 2, 0.01f, this, () -> mode.is("Vanilla"));
 
-    //matrix
-    private boolean mPacket;
-    private int matrixTimer = 0;
+    private final SliderValue groundSpeed = new SliderValue("Ground Speed", 0.4f, 0.1f, 3, 0.1f, this, () -> mode.is("NCP"));
+    private final SliderValue jumpSpeed = new SliderValue("Jump Speed", 1.4f, 0, 3, 0.1f, this, () -> mode.is("NCP"));
+    private final SliderValue glide = new SliderValue("Glide", 0, 0, 3, 0.5f, this, () -> mode.is("NCP"));
+    private final SliderValue timer = new SliderValue("Timer", 1, 0.1f, 10, 0.1f, this, () -> mode.is("NCP"));
+    private final BoolValue autoDisable = new BoolValue("Auto disable", true, this, () -> mode.is("NCP"));
 
-    //miniblox
-    private boolean jumped;
-    private int currentTimer = 0;
-    private int pauseTimes = 0;
-    private int activeTicks = 0;
+    private boolean reset;
+    private double speed;
+    private boolean disable;
 
-    //others
-    private double distance;
+    @EventTarget
+    public void onJump(JumpEvent e) {
+        if (mode.is("Vanilla")) {
+            e.setJumpoff(jumpOffAmount.get());
+        }
+    }
 
-    @Override
-    public void onEnable() {
-        lastSlot = mc.thePlayer.inventory.currentItem;
-        ticks = 0;
-        distance = 0;
-        if (mode.is("Watchdog Fireball")) {
-            int fbSlot = getFBSlot();
-            if (fbSlot == -1) {
-                toggle();
+    @EventTarget
+    public void onStrafe(StrafeEvent e) {
+        if (mode.is("NCP")) {
+            final double base = MoveUtil.getAllowedHorizontalDistance();
+
+            if (MoveUtil.isMoving()) {
+                switch (mc.thePlayer.offGroundTicks) {
+                    case 0:
+                        mc.thePlayer.motionY = MoveUtil.getJumpHeight();
+                        speed = groundSpeed.get();
+                        break;
+
+                    case 1:
+                        speed = jumpSpeed.get();
+                        if (autoDisable.get()) {
+                            disable = true;
+                        }
+                        break;
+
+                    default:
+                        speed -= speed / MoveUtil.BUNNY_FRICTION;
+                        break;
+                }
+
+                mc.timer.timerSpeed = timer.get();
+                reset = false;
+            } else if (!reset) {
+                speed = MoveUtil.getAllowedHorizontalDistance();
+                mc.timer.timerSpeed = 1;
+                reset = true;
             }
 
-            stopModules = true;
-            initTicks = 0;
+            if (mc.thePlayer.fallDistance > 0) {
+                mc.thePlayer.motionY += glide.get() / 100;
+            }
+
+            if (mc.thePlayer.isCollidedHorizontally) {
+                speed = MoveUtil.getAllowedHorizontalDistance();
+            }
+
+            e.setSpeed(Math.max(speed, base), Math.random() / 2000);
+
+            if (disable && mc.thePlayer.onGround) {
+                this.setEnabled(false);
+            }
+        }
+    }
+
+    @EventTarget
+    public void onUpdate(UpdateEvent e) {
+        this.setTag(mode.get());
+    }
+
+    @EventTarget
+    public void onPacket(PacketEvent e) {
+        if (e.getState() == PacketEvent.State.INCOMING && mode.is("NCP")) {
+            if (e.getPacket() instanceof S08PacketPlayerPosLook) {
+                speed = 0;
+            }
         }
     }
 
     @Override
     public void onDisable() {
-        if (Objects.equals(mode.get(), "Watchdog Fireball")) {
-            if (lastSlot != -1) {
-                mc.thePlayer.inventory.currentItem = lastSlot;
-            }
-
-            ticks = lastSlot = -1;
-            setSpeed = stopModules = sentPlace = false;
-            initTicks = 0;
-            ticksSinceVelocity = 0;
-            velo = false;
-        }
-
-        if (Objects.equals(mode.get(), "Old Matrix")) {
-            mPacket = false;
-            matrixTimer = 0;
-            mc.timer.timerSpeed = 1f;
-        }
-
-        if (Objects.equals(mode.get(), "Miniblox")) {
-            jumped = false;
-            currentTimer = 0;
-            pauseTimes = 0;
-            activeTicks = 0;
-            MoveUtil.stop();
-        }
-    }
-
-    @EventTarget
-    public void onUpdate(UpdateEvent event) {
-        setTag(mode.get());
-        if (velo)
-            ticksSinceVelocity++;
-        switch (mode.get()) {
-            case "Old Matrix":
-                if (!mPacket) {
-                    if (mc.thePlayer.onGround)
-                        mc.thePlayer.jump();
-                    sendPacketNoEvent(new C03PacketPlayer(false));
-                    mPacket = true;
-                }
-                if (mPacket) {
-                    mc.timer.timerSpeed = oMatrixTimer.get();
-                    mc.thePlayer.motionX = 1.97 * -Math.sin(MoveUtil.getDirection());
-                    mc.thePlayer.motionZ = 1.97 * Math.cos(MoveUtil.getDirection());
-                    mc.thePlayer.motionY = 0.42;
-                    matrixTimer++;
-
-                    if (matrixTimer >= 3) {
-                        toggle();
-                    }
-                }
-                break;
-            case "Miniblox":
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), false);
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindLeft.getKeyCode(), false);
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindRight.getKeyCode(), false);
-                activeTicks++;
-
-                if (activeTicks <= 10) {
-                    MoveUtil.stop();
-                } else {
-                    if (!jumped) {
-                        if (mc.thePlayer.onGround) {
-                            MoveUtil.stop();
-                            mc.thePlayer.jump();
-                        }
-
-                        jumped = true;
-                    } else {
-                        int maxTimer = 0;
-
-                        switch (pauseTimes) {
-                            case 0:
-                                mc.thePlayer.motionX = 1.9 * -Math.sin(MoveUtil.getDirection());
-                                mc.thePlayer.motionZ = 1.9 * Math.cos(MoveUtil.getDirection());
-                                maxTimer = 10;
-                                break;
-                            case 1:
-                                mc.thePlayer.motionX = 1.285 * -Math.sin(MoveUtil.getDirection());
-                                mc.thePlayer.motionZ = 1.285 * Math.cos(MoveUtil.getDirection());
-                                maxTimer = 15;
-                                break;
-                            case 2:
-                                mc.thePlayer.motionX = 1.1625 * -Math.sin(MoveUtil.getDirection());
-                                mc.thePlayer.motionZ = 1.1625 * Math.cos(MoveUtil.getDirection());
-                                maxTimer = 5;
-                                break;
-                        }
-
-                        mc.thePlayer.motionY = 0.29;
-                        currentTimer++;
-
-                        if (Range.between(4, maxTimer).contains(currentTimer)) {
-                            MoveUtil.stop();
-                        } else if (currentTimer > maxTimer) {
-                            pauseTimes++;
-                            currentTimer = 0;
-                            jumped = false;
-                        }
-                    }
-
-                    if (pauseTimes >= 3) {
-                        MoveUtil.stop();
-                        toggle();
-                    }
-                }
-                break;
-        }
-    }
-
-    @EventTarget
-    public void onMotion(MotionEvent event) {
-
-        if (event.isPost()) {
-            distance += Math.hypot(mc.thePlayer.posX - mc.thePlayer.lastTickPosX, mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ);
-        }
-        switch (mode.get()) {
-            case "Watchdog Fireball":
-                if (event.isPre()) {
-
-                    if (velo && mc.thePlayer.onGround) {
-                        toggle();
-                    }
-
-                    switch (wdFBMode.get()) {
-                        case "Rise":
-                            if (mc.thePlayer.hurtTime == 10) {
-                                mc.thePlayer.motionY = 1.1f;
-                            }
-
-                            if (ticksSinceVelocity <= 80 && ticksSinceVelocity >= 1) {
-                                mc.thePlayer.motionY += 0.028f;
-                            }
-
-                            if (ticksSinceVelocity == 28) {
-                                if (boost.get()) {
-                                    MoveUtil.strafe(0.42);
-                                }
-                                mc.thePlayer.motionY = 0.16f;
-                            }
-                            if (ticksSinceVelocity >= 35 && ticksSinceVelocity <= 50) {
-                                MoveUtil.strafe();
-                                mc.thePlayer.posY = mc.thePlayer.posY + .029f;
-
-                            }
-
-                            if (ticksSinceVelocity >= 3 && ticksSinceVelocity <= 50) {
-                                MoveUtil.strafe();
-                            }
-                            break;
-                        case "Chef":
-                            if (velo) {
-                                if (ticksSinceVelocity >= 1 && ticksSinceVelocity <= 33) {
-                                    mc.thePlayer.motionY = 0.7 - ticksSinceVelocity * 0.015;
-                                }
-                            }
-                            break;
-                        case "Chef high":
-                            if (velo) {
-                                if (ticksSinceVelocity >= 1 && ticksSinceVelocity <= 28) {
-                                    mc.thePlayer.motionY = ticksSinceVelocity * 0.016;
-                                }
-                            }
-                            break;
-                    }
-
-                    if (initTicks == 0) {
-
-                        event.setYaw(mc.thePlayer.rotationYaw - 180);
-                        event.setPitch(89);
-                        int fireballSlot = getFBSlot();
-                        if (fireballSlot != -1 && fireballSlot != mc.thePlayer.inventory.currentItem) {
-                            mc.thePlayer.inventory.currentItem = fireballSlot;
-                        }
-                    }
-                    if (initTicks == 1) {
-
-                        if (!sentPlace) {
-                            sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-                            sentPlace = true;
-
-                        }
-                    } else if (initTicks == 2) {
-
-                        if (lastSlot != -1) {
-                            mc.thePlayer.inventory.currentItem = lastSlot;
-                            lastSlot = -1;
-                        }
-                    }
-                    if (setSpeed) {
-
-                        stopModules = true;
-                        MoveUtil.strafe(1.768f);
-                        ticks++;
-                    }
-                    if (initTicks < 3) {
-                        initTicks++;
-                    }
-
-                    if (setSpeed) {
-                        if (ticks > 1) {
-                            stopModules = setSpeed = false;
-                            ticks = 0;
-                            return;
-                        }
-                        stopModules = true;
-                        ticks++;
-                        MoveUtil.strafe(1.768f);
-                    }
-                }
-
-                break;
-        }
-    }
-
-    @EventTarget
-    public void onStrafe(StrafeEvent event) {
-        switch (mode.get()) {
-
-            case "Watchdog Fireball":
-                if (ticksSinceVelocity <= 70 && ticksSinceVelocity >= 1) {
-                    mc.thePlayer.motionX *= 1.0003;
-                    mc.thePlayer.motionZ *= 1.0003;
-                }
-
-                if (ticksSinceVelocity == 1) {
-                    mc.thePlayer.motionX *= 1.15;
-                    mc.thePlayer.motionZ *= 1.15;
-                }
-
-
-                if (mc.thePlayer.hurtTime == 8) {
-                    mc.thePlayer.motionX *= 1.02;
-                    mc.thePlayer.motionZ *= 1.02;
-                }
-
-                if (mc.thePlayer.hurtTime == 7) {
-                    mc.thePlayer.motionX *= 1.0004;
-                    mc.thePlayer.motionZ *= 1.0004;
-                }
-
-                if (mc.thePlayer.hurtTime == 6) {
-                    mc.thePlayer.motionX *= 1.0004;
-                    mc.thePlayer.motionZ *= 1.0004;
-                }
-
-                if (mc.thePlayer.hurtTime == 5) {
-                    mc.thePlayer.motionX *= 1.0004;
-                    mc.thePlayer.motionZ *= 1.0004;
-                }
-
-                if (mc.thePlayer.hurtTime <= 4 && !(mc.thePlayer.hurtTime == 0)) {
-                    mc.thePlayer.motionX *= 1.0004;
-                    mc.thePlayer.motionZ *= 1.0004;
-                }
-                break;
-        }
-    }
-
-    @EventTarget
-    public void onPacket(PacketEvent event) {
-        Packet<?> packet = event.getPacket();
-
-        if (mode.is("Watchdog Fireball")) {
-            if (packet instanceof C08PacketPlayerBlockPlacement c08PacketPlayerBlockPlacement && c08PacketPlayerBlockPlacement.getStack() != null && c08PacketPlayerBlockPlacement.getStack().getItem() instanceof ItemFireball) {
-                thrown = true;
-                if (mc.thePlayer.onGround) {
-                    mc.thePlayer.jump();
-                }
-            }
-
-            if (packet instanceof S12PacketEntityVelocity s12PacketEntityVelocity) {
-                if (s12PacketEntityVelocity.getEntityID() == mc.thePlayer.getEntityId()) {
-                    if (thrown) {
-                        ticksSinceVelocity = 0;
-                        ticks = 0;
-                        setSpeed = true;
-                        thrown = false;
-                        stopModules = true;
-                        velo = true;
-                    }
-                }
-            }
-        }
-    }
-
-    @EventTarget
-    public void onRender2D(Render2DEvent event) {
-        Fonts.interSemiBold.get(15).drawCenteredString((Math.round(distance * 100.0) / 100.0) + "blocks", (float) event.scaledResolution().getScaledWidth() / 2, (float) event.scaledResolution().getScaledHeight() / 2 - 30, -1);
-    }
-
-    @EventTarget
-    public void onWorld(WorldChangeEvent event) {
-        setEnabled(false);
-    }
-
-    private int getFBSlot() {
-        for (int i = 36; i <= 44; i++) {
-            ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
-            if (stack != null && stack.getItem() instanceof ItemFireball) {
-                return i - 36;
-            }
-        }
-        return -1;
+        MoveUtil.stop();
+        speed = 0;
+        disable = false;
     }
 }

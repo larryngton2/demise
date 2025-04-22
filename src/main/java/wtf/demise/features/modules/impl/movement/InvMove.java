@@ -18,10 +18,8 @@ import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "InvMove", category = ModuleCategory.Movement)
 public class InvMove extends Module {
-    private final BoolValue cancelInventory = new BoolValue("NoInv", false, this);
-    private final BoolValue cancelChest = new BoolValue("No Chest", false, this);
-    private final BoolValue wdChest = new BoolValue("Watchdog Chest", false, this);
-    private final BoolValue wdInv = new BoolValue("Watchdog Inv", false, this);
+    private final BoolValue cancelInventory = new BoolValue("No inv", false, this);
+    private final BoolValue cancelChest = new BoolValue("No chest", false, this);
     private final KeyBinding[] keyBindings = new KeyBinding[]{mc.gameSettings.keyBindForward, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindLeft, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindJump};
 
     @Override
@@ -29,14 +27,6 @@ public class InvMove extends Module {
         for (KeyBinding keyBinding : this.keyBindings) {
             KeyBinding.setKeyBindState(keyBinding.getKeyCode(), false);
         }
-    }
-
-    @EventTarget
-    public void onMoveInput(MoveInputEvent event) {
-        if (wdChest.get() && mc.currentScreen instanceof GuiChest)
-            event.setJumping(false);
-        if (wdInv.get() && mc.currentScreen instanceof GuiInventory)
-            event.setJumping(false);
     }
 
     @EventTarget
@@ -51,13 +41,6 @@ public class InvMove extends Module {
             for (KeyBinding keyBinding : this.keyBindings) {
                 KeyBinding.setKeyBindState(keyBinding.getKeyCode(), GameSettings.isKeyDown(keyBinding));
             }
-
-            if (wdChest.get() && mc.currentScreen instanceof GuiChest)
-                MoveUtil.stopXZ();
-
-            if (wdInv.get() && mc.currentScreen instanceof GuiInventory)
-                MoveUtil.stopXZ();
-
         }
     }
 }

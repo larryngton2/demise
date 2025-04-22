@@ -33,7 +33,7 @@ import static net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RE
 
 @ModuleInfo(name = "NoSlow", category = ModuleCategory.Movement)
 public class NoSlow extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Grim", "Intave", "Watchdog", "NCP", "Prediction"}, "Vanilla", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Grim", "Intave", "NCP", "Prediction"}, "Vanilla", this);
     public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Release", "Old", "Test"}, "Release", this, () -> mode.is("Intave"));
     public final SliderValue speed = new SliderValue("Speed", 1, 0, 1, 0.1f, this);
     private final SliderValue amount = new SliderValue("Amount", 2, 2, 5, 1, this, () -> mode.is("Prediction"));
@@ -45,7 +45,6 @@ public class NoSlow extends Module {
     private boolean eat = true;
     private int lastFoodAmount;
     private float foodSpeed;
-    private boolean send = false;
     private boolean ncpShouldWork = true;
     private boolean lastUsingItem;
 
@@ -147,17 +146,6 @@ public class NoSlow extends Module {
                     }
                 }
                 break;
-            case "Watchdog":
-                if (isHoldingConsumable()) {
-                    if (mc.thePlayer.offGroundTicks == 4 && send) {
-                        send = false;
-                        sendPacketNoEvent(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255, mc.thePlayer.getHeldItem(), 0, 0, 0));
-
-                    } else if (mc.thePlayer.isUsingItem()) {
-                        event.setY(event.getY() + 1E-14);
-                    }
-                }
-                break;
         }
     }
 
@@ -198,18 +186,6 @@ public class NoSlow extends Module {
                         event.setCancelled(true);
                     }
                 }
-                break;
-            case "Watchdog":
-                if (event.getState() == PacketEvent.State.OUTGOING)
-                    if (packet instanceof C08PacketPlayerBlockPlacement blockPlacement && !mc.thePlayer.isUsingItem()) {
-                        if (blockPlacement.getPlacedBlockDirection() == 255 && isHoldingConsumable() && mc.thePlayer.offGroundTicks < 2) {
-                            if (mc.thePlayer.onGround && !mc.gameSettings.keyBindJump.isKeyDown()) {
-                                mc.thePlayer.jump();
-                            }
-                            send = true;
-                            event.setCancelled(true);
-                        }
-                    }
                 break;
         }
     }

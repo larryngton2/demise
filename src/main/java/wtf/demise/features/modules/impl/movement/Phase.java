@@ -41,7 +41,7 @@ public class Phase extends Module {
 
     @Override
     public void onEnable() {
-        if (mode.is("Intave")) {
+        if (mode.is("Intave") && intaveMode.is("Manual")) {
             Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Intave Phase", "Sneak to move forward in blocks.", 10);
             Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Intave Phase", "LMB to start.", 10);
         }

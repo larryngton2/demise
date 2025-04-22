@@ -1,11 +1,12 @@
 package net.minecraft.client.model;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.misc.Test;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.visual.Animations;
 
 public class ModelBiped extends ModelBase {
@@ -120,12 +121,6 @@ public class ModelBiped extends ModelBase {
         this.bipedRightArm.rotateAngleY = 0.0F;
         this.bipedRightArm.rotateAngleZ = 0.0F;
 
-        Test test = Demise.INSTANCE.getModuleManager().getModule(Test.class);
-
-        if (test.forceBlock.get()) {
-            heldItemRight = 3;
-        }
-
         switch (this.heldItemRight) {
             case 1:
                 this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5F - ((float) Math.PI / 10F) * (float) this.heldItemRight;
@@ -136,6 +131,10 @@ public class ModelBiped extends ModelBase {
             case 2:
             default:
                 break;
+        }
+
+        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isHoldingSword() && KillAura.isBlocking && entityIn == Minecraft.getMinecraft().thePlayer) {
+            this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5f - ((float) Math.PI / 10F) * 2;
         }
 
         this.bipedLeftArm.rotateAngleY = 0.0F;

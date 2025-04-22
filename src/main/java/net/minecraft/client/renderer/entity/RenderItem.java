@@ -35,7 +35,6 @@ import net.optifine.shaders.Shaders;
 import net.optifine.shaders.ShadersRender;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.misc.Test;
 
 import java.util.List;
 
@@ -351,7 +350,7 @@ public class RenderItem implements IResourceManagerReloadListener {
                 if (heldStack != null) {
                     EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
                     if (lastRender == player) {
-                        if (heldStack.getItem() instanceof ItemSword && (p.getItemInUseCount() > 0 && KillAura.isBlocking || player.isBlocking() || Demise.INSTANCE.getModuleManager().getModule(Test.class).forceBlock.get())) {
+                        if (heldStack.getItem() instanceof ItemSword && (p.getItemInUseCount() > 0 && KillAura.isBlocking || player.isBlocking())) {
                             doThirdPersonBlockTransformations();
                         }
                     } else if (p.getItemInUseCount() > 0 && heldStack.getItemUseAction() == EnumAction.BLOCK) {

@@ -20,7 +20,9 @@ public class SafeWalk extends Module {
 
     @EventTarget
     public void onSafeWalk(SafeWalkEvent event) {
-        event.setCancelled(true);
+        if (canSafeWalk()) {
+            event.setCancelled(true);
+        }
     }
 
     public boolean canSafeWalk() {

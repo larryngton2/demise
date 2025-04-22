@@ -75,8 +75,7 @@ public class FreeCam extends Module {
 
     @EventTarget
     public void onBlockCollide(BlockAABBEvent event) {
-        if (noClip.get() && fly.get())
-            event.setBoundingBox(null);
+        if (noClip.get() && fly.get()) event.setCancelled(true);
     }
 
     @Override

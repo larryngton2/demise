@@ -16,7 +16,7 @@ public class Sprint extends Module {
     public final BoolValue silent = new BoolValue("Silent", false, this);
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(UpdateEvent e) {
         if (!isEnabled(Scaffold.class)) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
         }

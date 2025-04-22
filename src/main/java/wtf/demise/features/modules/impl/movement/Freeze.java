@@ -1,97 +1,62 @@
 package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import org.joml.Vector2f;
-import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.utils.packet.PacketUtils;
 
 @ModuleInfo(name = "Freeze", category = ModuleCategory.Movement)
 public class Freeze extends Module {
+    private double motionX;
+    private double motionY;
+    private double motionZ;
     private double x;
     private double y;
     private double z;
-    private boolean onGround = false;
-    private Vector2f rotation;
 
     @Override
     public void onEnable() {
-        if (mc.thePlayer == null) {
-            return;
-        }
-        this.onGround = mc.thePlayer.onGround;
-        this.x = mc.thePlayer.posX;
-        this.y = mc.thePlayer.posY;
-        this.z = mc.thePlayer.posZ;
-        this.rotation = new Vector2f(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
-        final float f = mc.gameSettings.mouseSensitivity * 0.6f + 0.2f;
-        final float gcd = f * f * f * 1.2f;
-        final Vector2f rotation = this.rotation;
-        rotation.x -= this.rotation.x % gcd;
-        final Vector2f rotation2 = this.rotation;
-        rotation2.y -= this.rotation.y % gcd;
+        x = mc.thePlayer.posX;
+        y = mc.thePlayer.posY;
+        z = mc.thePlayer.posZ;
+        motionX = mc.thePlayer.motionX;
+        motionY = mc.thePlayer.motionY;
+        motionZ = mc.thePlayer.motionZ;
     }
 
     @EventTarget
-    public void onPacket(final PacketEvent event) {
-        if (event.getPacket() instanceof C08PacketPlayerBlockPlacement) {
-            final Vector2f current = new Vector2f(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
-            final float f = mc.gameSettings.mouseSensitivity * 0.6f + 0.2f;
-            final float gcd = f * f * f * 1.2f;
-            current.x -= current.x % gcd;
-            current.y -= current.y % gcd;
-            if (this.rotation.equals(current)) {
-                return;
-            }
-            this.rotation = current;
-            event.setCancelled(true);
-            sendPacketNoEvent(new C03PacketPlayer.C05PacketPlayerLook(current.x, current.y, this.onGround));
-            sendPacketNoEvent(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-        }
-        if (event.getPacket() instanceof C03PacketPlayer) {
-            event.setCancelled(true);
-        }
-
-        if (event.getPacket() instanceof S08PacketPlayerPosLook) {
-            toggle();
-        }
-    }
-
-    @EventTarget
-    public void onUpdate(final UpdateEvent event) {
+    public void onUpdate(UpdateEvent e) {
         mc.thePlayer.motionX = 0.0;
         mc.thePlayer.motionY = 0.0;
         mc.thePlayer.motionZ = 0.0;
-        mc.thePlayer.setPosition(this.x, this.y, this.z);
+        mc.thePlayer.setPositionAndRotation(x, y, z, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
     }
 
     @EventTarget
-    public void onWorld(WorldChangeEvent event) {
-        setEnabled(false);
+    public void onPacket(PacketEvent e) {
+        if (e.getPacket() instanceof C03PacketPlayer) {
+            e.setCancelled(true);
+        }
+
+        if (e.getPacket() instanceof S08PacketPlayerPosLook s08) {
+            x = s08.getX();
+            y = s08.getY();
+            z = s08.getZ();
+            motionX = 0.0;
+            motionY = 0.0;
+            motionZ = 0.0;
+        }
     }
 
-    public static void throwPearl(final Vector2f current) {
-        if (!Demise.INSTANCE.getModuleManager().getModule(Freeze.class).isEnabled()) {
-            return;
-        }
-        mc.thePlayer.rotationYaw = current.x;
-        mc.thePlayer.rotationPitch = current.y;
-        final float f = mc.gameSettings.mouseSensitivity * 0.6f + 0.2f;
-        final float gcd = f * f * f * 1.2f;
-        current.x -= current.x % gcd;
-        current.y -= current.y % gcd;
-        if (!Demise.INSTANCE.getModuleManager().getModule(Freeze.class).rotation.equals(current)) {
-            PacketUtils.sendPacket(new C03PacketPlayer.C05PacketPlayerLook(current.x, current.y, Demise.INSTANCE.getModuleManager().getModule(Freeze.class).onGround));
-        }
-        Demise.INSTANCE.getModuleManager().getModule(Freeze.class).rotation = current;
-        PacketUtils.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+    @Override
+    public void onDisable() {
+        mc.thePlayer.motionX = motionX;
+        mc.thePlayer.motionY = motionY;
+        mc.thePlayer.motionZ = motionZ;
+        mc.thePlayer.setPositionAndRotation(x, y, z, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
     }
 }

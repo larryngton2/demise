@@ -27,9 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.RenderNameTagEvent;
-import wtf.demise.features.modules.impl.visual.Chams;
 import wtf.demise.features.modules.impl.visual.ForceDinnerbone;
-import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -289,7 +287,6 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
         boolean flag1 = !flag && !entitylivingbaseIn.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer);
 
         if (flag || flag1) {
-            final Chams instance = Demise.INSTANCE.getModuleManager().getModule(Chams.class);
             if (!this.bindEntityTexture(entitylivingbaseIn)) {
                 return;
             }
@@ -303,39 +300,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                 GlStateManager.alphaFunc(516, 0.003921569F);
             }
 
-            if (instance.isEnabled()) {
-                if (entitylivingbaseIn instanceof EntityPlayer) {
-                    boolean visibleFlat = instance.visibleFlatProperty.get();
-                    boolean occludedFlat = instance.occludedFlatProperty.get();
-                    int visibleColor = instance.visibleColorProperty.get().getRGB();
-                    int occludedColor = instance.occludedColorProperty.get().getRGB();
-
-                    boolean isTextureActive = true;
-
-                    final boolean textureVisible = instance.textureVisibleProperty.get();
-                    final boolean textureOccluded = instance.textureOccludedProperty.get();
-
-                    Chams.preRenderOccluded(!textureOccluded, occludedColor, occludedFlat);
-
-                    if (!textureOccluded) {
-                        isTextureActive = false;
-                    }
-
-                    this.mainModel.render(entitylivingbaseIn, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, scaleFactor);
-
-                    Chams.preRenderVisible(!textureVisible && isTextureActive, textureVisible && !isTextureActive, visibleColor, visibleFlat, occludedFlat);
-
-                    isTextureActive = textureVisible;
-
-                    this.mainModel.render(entitylivingbaseIn, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, scaleFactor);
-                    Chams.postRender(!isTextureActive, visibleFlat);
-                } else {
-                    this.mainModel.render(entitylivingbaseIn, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, scaleFactor);
-                }
-            } else {
-                this.mainModel.render(entitylivingbaseIn, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, scaleFactor);
-            }
-
+            this.mainModel.render(entitylivingbaseIn, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, scaleFactor);
 
             if (flag1) {
                 GlStateManager.disableBlend();

@@ -16,7 +16,6 @@ import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "NoFall", category = ModuleCategory.Player)
 public class NoFall extends Module {
-
     public final ModeValue mode = new ModeValue("Mode", new String[]{"NoGround", "Extra", "Blink", "Watchdog"}, "NoGround", this);
     public final SliderValue distance = new SliderValue("Fall distance", 3, 0, 8, 1, this, () -> !mode.is("NoGround"));
 
@@ -58,6 +57,7 @@ public class NoFall extends Module {
         }
 
         if (mc.thePlayer.capabilities.allowFlying) return;
+
         if (isVoid()) {
             if (blinked) {
                 BlinkComponent.dispatch();

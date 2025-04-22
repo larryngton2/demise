@@ -70,11 +70,9 @@ public class ModuleManager {
                 // Misc
                 Twerk.class,
                 AntiCheat.class,
-                AutoMeow.class,
                 MurderMystery.class,
                 InventorySync.class,
                 AutoQueue.class,
-                Test.class,
 
                 // Movement
                 Freeze.class,
@@ -95,7 +93,6 @@ public class ModuleManager {
                 Jesus.class,
 
                 // Player
-                AntiFireball.class,
                 AutoTool.class,
                 FastPlace.class,
                 Manager.class,
@@ -110,10 +107,8 @@ public class ModuleManager {
                 // Visual
                 Atmosphere.class,
                 Animations.class,
-                BedPlates.class,
                 BlockOverlay.class,
                 Camera.class,
-                Chams.class,
                 ChestESP.class,
                 ClickGUI.class,
                 ESP.class,
