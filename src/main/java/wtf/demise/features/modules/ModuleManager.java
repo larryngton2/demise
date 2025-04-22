@@ -98,7 +98,7 @@ public class ModuleManager {
                 AntiFireball.class,
                 AutoTool.class,
                 FastPlace.class,
-                InvManager.class,
+                Manager.class,
                 NoFall.class,
                 Stealer.class,
                 BedNuker.class,

@@ -136,6 +136,10 @@ public class Scaffold extends Module {
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());
 
+        if (addons.isEnabled("Ignore tick cycle")) {
+            return;
+        }
+
         if (getBlockSlot() == -1) {
             return;
         }
@@ -305,30 +309,192 @@ public class Scaffold extends Module {
 
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
             RotationUtils.setRotation(new float[]{yaw, pitch}, addons.isEnabled("Movement Fix") ? MovementCorrection.Silent : MovementCorrection.None, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
-
-            if (!addons.isEnabled("Ignore tick cycle")) {
-                place(data.blockPos, data.facing, getVec3(data));
-            }
+            place(data.blockPos, data.facing, getVec3(data));
         }
     }
 
     @EventTarget
-    public void onGameEvent(GameEvent e) {
+    public void onwtf(GameEvent e) {
+        if (!addons.isEnabled("Ignore tick cycle")) {
+            return;
+        }
+
+        if (getBlockSlot() == -1) {
+            return;
+        }
+
+        mc.thePlayer.inventory.currentItem = getBlockSlot();
+        SpoofSlotUtils.startSpoofing(oldSlot);
+
+        data = null;
+
+        if (mc.thePlayer.onGround) {
+            onGroundY = mc.thePlayer.getEntityBoundingBox().minY;
+        }
+
+        double posY = mc.thePlayer.getEntityBoundingBox().minY;
+
+        if (hoverState != HoverState.DONE || (addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
+            posY = onGroundY;
+        }
+
+        if (towerMoving() || towering()) {
+            onGroundY = posY = mc.thePlayer.getEntityBoundingBox().minY;
+        }
+
+        targetBlock = new BlockPos(mc.thePlayer.posX, posY - 1, mc.thePlayer.posZ);
+
+        if (mode.is("Telly") && mc.thePlayer.onGround) {
+            tellyTicks = MathUtils.randomizeInt((int) minTellyTicks.get(), (int) maxTellyTicks.get());
+        }
+
+        data = findBlock(targetBlock);
+
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 
-        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            if (addons.isEnabled("Ignore tick cycle")) {
-                place(data.blockPos, data.facing, getVec3(data));
+        if (tower.canDisplay() && towering() && tower.is("Watchdog") && !placing) {
+            BlockPos xPos = data.blockPos.add(1, 0, 0), zPos = data.blockPos.add(0, 0, 1);
+            if (!PlayerUtils.isAir(xPos)) {
+                data.blockPos = xPos;
+            } else if (!PlayerUtils.isAir(zPos)) {
+                data.blockPos = zPos;
             }
+        }
+
+        if (mode.is("Telly") && mc.thePlayer.onGround) {
+            tellyTicks = MathUtils.randomizeInt((int) minTellyTicks.get(), (int) maxTellyTicks.get());
+        }
+
+        if (addons.isEnabled("Sprint")) {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
+        } else {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
+            mc.thePlayer.setSprinting(false);
+        }
+
+        if (tower.canDisplay() && (!tower.is("Jump") && towering() || !towerMove.is("Jump") && towerMoving())) {
+            hoverState = HoverState.JUMP;
+            blocksPlaced = 0;
+        }
+
+        switch (hoverState) {
+            case JUMP:
+                if (mc.thePlayer.onGround && !isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown()) {
+                    mc.thePlayer.jump();
+                }
+                hoverState = HoverState.FALL;
+                break;
+            case FALL:
+                if (mc.thePlayer.onGround)
+                    hoverState = HoverState.DONE;
+                break;
+        }
+
+        boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
+        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
+        boolean shouldCorrect = isLeaningOffBlock && nextBlockIsAir;
+
+        mc.entityRenderer.getMouseOver(1);
+
+        if (!mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
+            switch (rotations.get()) {
+                case "Normal": {
+                    this.yaw = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[0];
+                    this.pitch = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[1];
+                }
+                break;
+                case "Center": {
+                    Vec3 hitVec = getVec3(data);
+
+                    this.yaw = RotationUtils.getRotations(hitVec)[0];
+                    this.pitch = RotationUtils.getRotations(hitVec)[1];
+                }
+                break;
+                case "Hypixel": {
+                    this.yaw = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0];
+                    this.pitch = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+
+                    if (MoveUtil.isMovingStraight()) {
+                        if (Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() - 126)) < Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() + 126))) {
+                            this.yaw = MoveUtil.getRawDirection() + (116 - hypixelRandomYaw);
+                        } else {
+                            this.yaw = MoveUtil.getRawDirection() - (116 - hypixelRandomYaw);
+                        }
+                    } else {
+                        if (Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() - 135)) < Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() + 135))) {
+                            this.yaw = MoveUtil.getRawDirection() + (125 + hypixelRandomYaw);
+                        } else {
+                            this.yaw = MoveUtil.getRawDirection() - (125 + hypixelRandomYaw);
+                        }
+                    }
+                }
+
+                if (placing) {
+                    hypixelRandomYaw = MathUtils.randomizeFloat(0, 15);
+                }
+                break;
+                case "GodBridge": {
+                    float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
+
+                    if (mc.thePlayer.onGround) {
+                        isOnRightSide = Math.floor(mc.thePlayer.posX + Math.cos(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posX) ||
+                                Math.floor(mc.thePlayer.posZ + Math.sin(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posZ);
+
+                        if (isLeaningOffBlock && nextBlockIsAir) {
+                            isOnRightSide = !isOnRightSide;
+                        }
+                    }
+
+                    float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
+
+                    this.yaw = Math.round(yaw / 45) * 45;
+                    this.pitch = 75.6f;
+                }
+                break;
+                case "Derp": {
+                    this.yaw += 30;
+                    this.pitch = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                }
+                break;
+                case "Reverse": {
+                    this.yaw = MoveUtil.getYawFromKeybind() - 180;
+                    this.pitch = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                }
+                break;
+            }
+        }
+
+        if (clutch.get()) {
+            if (shouldCorrect) {
+                ambatufall = true;
+            } else if (ambatufall) {
+                clutchTime.reset();
+                ambatufall = false;
+            }
+
+            if (ambatufall || !clutchTime.hasTimeElapsed(200)) {
+                Vec3 hitVec = getVec3(data);
+
+                this.yaw = RotationUtils.getRotations(hitVec)[0];
+                this.pitch = RotationUtils.getRotations(hitVec)[1];
+            }
+        }
+
+        if (tower.canDisplay() && tower.is("Watchdog") && towering()) {
+            yaw = RotationUtils.getRotations(getVec3(data))[0];
+            pitch = RotationUtils.getRotations(getVec3(data))[1];
+        }
+
+        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
+            RotationUtils.setRotation(new float[]{yaw, pitch}, addons.isEnabled("Movement Fix") ? MovementCorrection.Silent : MovementCorrection.None, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
+            place(data.blockPos, data.facing, getVec3(data));
         }
     }
 
     @EventTarget
-    public void onLookEvent(LookEvent event) {
-        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            event.rotation = new float[]{yaw, pitch};
-        }
+    public void onLookEvent(LookEvent e) {
+        e.rotation = new float[]{yaw, pitch};
     }
 
     @EventTarget
@@ -600,13 +766,17 @@ public class Scaffold extends Module {
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
         placing = false;
+
+        mc.entityRenderer.getMouseOver(1);
+
         if (!addons.isEnabled("Ray Trace")) {
             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, facing, hitVec)) {
                 if (addons.isEnabled("Swing")) {
                     mc.thePlayer.swingItem();
                     mc.getItemRenderer().resetEquippedProgress();
-                } else
+                } else {
                     mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
+                }
                 placing = true;
                 blocksPlaced += 1;
                 placed = true;
@@ -614,18 +784,21 @@ public class Scaffold extends Module {
             previousBlock = data.blockPos.offset(data.facing);
         } else {
             MovingObjectPosition ray = RotationUtils.rayTrace(4.5, 1);
+
             if (ray.getBlockPos().equalsBlockPos(pos)) {
                 if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
                     if (addons.isEnabled("Swing")) {
                         mc.thePlayer.swingItem();
                         mc.getItemRenderer().resetEquippedProgress();
-                    } else
+                    } else {
                         mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
+                    }
                     placing = true;
                     blocksPlaced += 1;
                     placed = true;
                 }
             }
+
             previousBlock = ray.getBlockPos().offset(ray.sideHit);
         }
     }

@@ -21,16 +21,25 @@ import wtf.demise.utils.player.InventoryUtils;
 
 import java.util.*;
 
-@ModuleInfo(name = "InvManager", category = ModuleCategory.Player)
-public class InvManager extends Module {
+@ModuleInfo(name = "Manager", category = ModuleCategory.Player)
+public class Manager extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Open Inventory", "Spoof"}, "Open Inventory", this);
-    private final SliderValue minDelay = new SliderValue("Min Delay", 1, 0, 5, 1, this);
-    private final SliderValue maxDelay = new SliderValue("Max Delay", 1, 0, 5, 1, this);
-    private final BoolValue dropItems = new BoolValue("Drop Items", true, this);
-    private final BoolValue sortItems = new BoolValue("Sort Items", true, this);
-    private final BoolValue autoArmor = new BoolValue("Auto Armor", true, this);
+
+    private final BoolValue autoArmor = new BoolValue("Auto armor", true, this);
+    private final SliderValue minArmorDelay = new SliderValue("Min armor delay", 1, 0, 10, 1, this, autoArmor::get);
+    private final SliderValue maxArmorDelay = new SliderValue("Max armor delay", 1, 0, 10, 1, this, autoArmor::get);
+
+    private final BoolValue sortItems = new BoolValue("Sort items", true, this);
+    private final SliderValue minSortDelay = new SliderValue("Min sort delay", 1, 0, 10, 1, this, sortItems::get);
+    private final SliderValue maxSortDelay = new SliderValue("Max sort delay", 1, 0, 10, 1, this, sortItems::get);
+
+    private final BoolValue dropItems = new BoolValue("Drop items", true, this);
+    private final SliderValue minDropDelay = new SliderValue("Min drop delay", 1, 0, 10, 1, this, dropItems::get);
+    private final SliderValue maxDropDelay = new SliderValue("Max drop delay", 1, 0, 10, 1, this, dropItems::get);
+
     private final BoolValue startDelay = new BoolValue("Start Delay", true, this);
     public final BoolValue display = new BoolValue("Display", true, this);
+
     private final TimerUtils timer = new TimerUtils();
     private final int[] bestArmorPieces = new int[4];
     private final List<Integer> trash = new ArrayList<>();
@@ -43,21 +52,23 @@ public class InvManager extends Module {
     private boolean clientOpen;
     private boolean nextTickCloseInventory;
     public int slot;
+    private final TimerUtils armorTimer = new TimerUtils();
+    private int armorWait;
+    private final TimerUtils sortTimer = new TimerUtils();
+    private int sortWait;
+    private final TimerUtils dropTimer = new TimerUtils();
+    private int dropWait;
 
     @EventTarget
     public void onPacketSend(PacketEvent event) {
         final Packet<?> packet = event.getPacket();
-
         if (packet instanceof C16PacketClientStatus clientStatus) {
-
             if (clientStatus.getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
-                if (startDelay.get())
-                    timer.reset();
+                if (startDelay.get()) timer.reset();
                 this.clientOpen = true;
                 this.serverOpen = true;
             }
         } else if (packet instanceof C0DPacketCloseWindow packetCloseWindow) {
-
             if (packetCloseWindow.windowId == mc.thePlayer.inventoryContainer.windowId) {
                 this.clientOpen = false;
                 this.serverOpen = false;
@@ -82,76 +93,82 @@ public class InvManager extends Module {
     }
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
-        setTag(minDelay.get() + " - " + maxDelay.get());
-
-        final long delay = (MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) * 50L);
+    public void onUpdate(UpdateEvent e) {
         if (this.clientOpen || (mc.currentScreen == null && !Objects.equals(this.mode.get(), "Open Inventory"))) {
-            if ((this.timer.hasTimeElapsed(delay) || MathUtils.nextInt((int) minDelay.get(), (int) maxDelay.get()) == 0)) {
-                this.clear();
+            this.clear();
 
-                for (int slot = InventoryUtils.INCLUDE_ARMOR_BEGIN; slot < InventoryUtils.END; slot++) {
-                    final ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(slot).getStack();
+            for (int slot = InventoryUtils.INCLUDE_ARMOR_BEGIN; slot < InventoryUtils.END; slot++) {
+                final ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(slot).getStack();
 
-                    if (stack != null) {
-                        // Find Best Sword
-                        if (stack.getItem() instanceof ItemSword && InventoryUtils.isBestSword(stack)) {
-                            this.bestSwordSlot = slot;
-                        }
-                        //Find Best Bow
-                        else if (stack.getItem() instanceof ItemBow && InventoryUtils.isBestBow(stack)) {
-                            this.bestBowSlot = slot;
-                        }
-                        // Find Best Tools
-                        else if (stack.getItem() instanceof ItemTool && InventoryUtils.isBestTool(mc.thePlayer, stack)) {
-                            final int toolType = InventoryUtils.getToolType(stack);
-                            if (toolType != -1 && slot != this.bestToolSlots[toolType])
-                                this.bestToolSlots[toolType] = slot;
-                        }
-                        // Find Best Armor
-                        else if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(mc.thePlayer, stack)) {
+                if (stack != null) {
+                    if (stack.getItem() instanceof ItemSword && InventoryUtils.isBestSword(stack)) {
+                        this.bestSwordSlot = slot;
+                    } else if (stack.getItem() instanceof ItemBow && InventoryUtils.isBestBow(stack)) {
+                        this.bestBowSlot = slot;
+                    } else if (stack.getItem() instanceof ItemTool && InventoryUtils.isBestTool(mc.thePlayer, stack)) {
+                        final int toolType = InventoryUtils.getToolType(stack);
+                        if (toolType != -1 && slot != this.bestToolSlots[toolType])
+                            this.bestToolSlots[toolType] = slot;
+                    } else if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(mc.thePlayer, stack)) {
+                        final int pieceSlot = this.bestArmorPieces[armor.armorType];
 
-                            final int pieceSlot = this.bestArmorPieces[armor.armorType];
-
-                            if (pieceSlot == -1 || slot != pieceSlot)
-                                this.bestArmorPieces[armor.armorType] = slot;
-                        } else if (stack.getItem() instanceof ItemBlock && slot == InventoryUtils.findBestBlockStack()) {
-                            this.blockSlot.add(slot);
-                        } else if (stack.getItem() instanceof ItemAppleGold) {
-                            this.gappleStackSlots.add(slot);
-                        } else if (!this.trash.contains(slot) && !InventoryUtils.isValidStack(stack)) {
-                            this.trash.add(slot);
-                        }
+                        if (pieceSlot == -1 || slot != pieceSlot)
+                            this.bestArmorPieces[armor.armorType] = slot;
+                    } else if (stack.getItem() instanceof ItemBlock && slot == InventoryUtils.findBestBlockStack()) {
+                        this.blockSlot.add(slot);
+                    } else if (stack.getItem() instanceof ItemAppleGold) {
+                        this.gappleStackSlots.add(slot);
+                    } else if (!this.trash.contains(slot) && !InventoryUtils.isValidStack(stack)) {
+                        this.trash.add(slot);
                     }
                 }
+            }
 
-                final boolean busy = (!this.trash.isEmpty() && this.dropItems.get()) || this.equipArmor(false) || this.sortItems(false);
+            final boolean armorReady = armorTimer.hasTimeElapsed(armorWait * 50L);
+            final boolean sortReady = sortTimer.hasTimeElapsed(sortWait * 50L);
+            final boolean dropReady = dropTimer.hasTimeElapsed(dropWait * 50L);
 
-                if (!busy) {
-                    if (this.nextTickCloseInventory) {
-                        this.close();
-                        this.nextTickCloseInventory = false;
-                    } else {
-                        this.nextTickCloseInventory = true;
-                    }
-                    return;
+            boolean busy = false;
+
+            if (armorReady && this.equipArmor(true)) {
+                busy = true;
+                resetTimings();
+            } else if (sortReady && this.sortItems(true)) {
+                busy = true;
+                resetTimings();
+            } else if (dropReady && this.dropItem(this.trash)) {
+                busy = true;
+                resetTimings();
+            }
+
+            if (!busy) {
+                if (this.nextTickCloseInventory) {
+                    this.close();
+                    this.nextTickCloseInventory = false;
                 } else {
-                    boolean waitUntilNextTick = !this.serverOpen;
-
-                    this.open();
-
-                    if (this.nextTickCloseInventory)
-                        this.nextTickCloseInventory = false;
-
-                    if (waitUntilNextTick) return;
+                    this.nextTickCloseInventory = true;
                 }
+            } else {
+                boolean waitUntilNextTick = !this.serverOpen;
 
-                if (this.equipArmor(true)) return;
-                if (this.dropItem(this.trash)) return;
-                this.sortItems(true);
-                timer.reset();
+                this.open();
+
+                if (this.nextTickCloseInventory)
+                    this.nextTickCloseInventory = false;
+
+                if (waitUntilNextTick) return;
             }
         }
+    }
+
+    private void resetTimings() {
+        armorTimer.reset();
+        sortTimer.reset();
+        dropTimer.reset();
+
+        armorWait = MathUtils.randomizeInt(minArmorDelay.get(), maxArmorDelay.get());
+        sortWait = MathUtils.randomizeInt(minSortDelay.get(), maxSortDelay.get());
+        dropWait = MathUtils.randomizeInt(minDropDelay.get(), maxDropDelay.get());
     }
 
     private boolean sortItems(final boolean moveItems) {

@@ -152,6 +152,6 @@ public class TickBase extends Module {
     }
 
     public boolean shouldStop() {
-        return mc.thePlayer.hurtTime > hurtTimeToStop.get() || !shouldStart();
+        return mc.thePlayer.hurtTime > hurtTimeToStop.get();
     }
 }

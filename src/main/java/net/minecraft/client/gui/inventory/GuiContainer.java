@@ -19,7 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.player.InvManager;
+import wtf.demise.features.modules.impl.player.Manager;
 import wtf.demise.features.modules.impl.player.Stealer;
 import wtf.demise.gui.font.Fonts;
 
@@ -118,13 +118,13 @@ public abstract class GuiContainer extends GuiScreen {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) k, (float) l);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        InvManager invManager = Demise.INSTANCE.getModuleManager().getModule(InvManager.class);
+        Manager manager = Demise.INSTANCE.getModuleManager().getModule(Manager.class);
 
         for (int i1 = 0; i1 < this.inventorySlots.inventorySlots.size(); ++i1) {
             Slot slot = this.inventorySlots.inventorySlots.get(i1);
             this.drawSlot(slot);
 
-            if (this.isMouseOverSlot(slot, mouseX, mouseY) && slot.canBeHovered() || invManager.display.get() && invManager.slot == i1) {
+            if (this.isMouseOverSlot(slot, mouseX, mouseY) && slot.canBeHovered() || manager.display.get() && manager.slot == i1) {
                 this.theSlot = slot;
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepth();
@@ -322,9 +322,9 @@ public abstract class GuiContainer extends GuiScreen {
                             if (killAura.isEnabled()) killAura.toggle();
                             break;
                         case 1002:
-                            final InvManager invManager = Demise.INSTANCE.getModuleManager().getModule(InvManager.class);
+                            final Manager manager = Demise.INSTANCE.getModuleManager().getModule(Manager.class);
 
-                            if (invManager.isEnabled()) invManager.toggle();
+                            if (manager.isEnabled()) manager.toggle();
                             break;
                         case 1003:
                             final Stealer stealer = Demise.INSTANCE.getModuleManager().getModule(Stealer.class);
