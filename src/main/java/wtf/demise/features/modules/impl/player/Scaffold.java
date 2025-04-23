@@ -30,6 +30,7 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
@@ -92,7 +93,6 @@ public class Scaffold extends Module {
     private final TimerUtils clutchTime = new TimerUtils();
     private boolean ambatufall;
 
-    private HoverState hoverState = HoverState.DONE;
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
             Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
             Blocks.coal_ore, Blocks.diamond_ore, Blocks.emerald_ore, Blocks.trapped_chest, Blocks.torch, Blocks.anvil,
@@ -111,12 +111,6 @@ public class Scaffold extends Module {
 
     @Override
     public void onEnable() {
-        if (addons.isEnabled("Hover") && mc.thePlayer.onGround && !isEnabled(Speed.class)) {
-            hoverState = HoverState.JUMP;
-        } else {
-            hoverState = HoverState.DONE;
-        }
-
         oldSlot = mc.thePlayer.inventory.currentItem;
         onGroundY = mc.thePlayer.getEntityBoundingBox().minY;
     }
@@ -155,7 +149,7 @@ public class Scaffold extends Module {
 
         double posY = mc.thePlayer.getEntityBoundingBox().minY;
 
-        if (hoverState != HoverState.DONE || (addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
+        if ((addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
             posY = onGroundY;
         }
 
@@ -195,21 +189,7 @@ public class Scaffold extends Module {
         }
 
         if (tower.canDisplay() && (!tower.is("Jump") && towering() || !towerMove.is("Jump") && towerMoving())) {
-            hoverState = HoverState.JUMP;
             blocksPlaced = 0;
-        }
-
-        switch (hoverState) {
-            case JUMP:
-                if (mc.thePlayer.onGround && !isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown()) {
-                    mc.thePlayer.jump();
-                }
-                hoverState = HoverState.FALL;
-                break;
-            case FALL:
-                if (mc.thePlayer.onGround)
-                    hoverState = HoverState.DONE;
-                break;
         }
 
         boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
@@ -314,7 +294,7 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onwtf(GameEvent e) {
+    public void onWtf(GameEvent e) {
         if (!addons.isEnabled("Ignore tick cycle")) {
             return;
         }
@@ -334,7 +314,7 @@ public class Scaffold extends Module {
 
         double posY = mc.thePlayer.getEntityBoundingBox().minY;
 
-        if (hoverState != HoverState.DONE || (addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
+        if ((addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
             posY = onGroundY;
         }
 
@@ -374,21 +354,7 @@ public class Scaffold extends Module {
         }
 
         if (tower.canDisplay() && (!tower.is("Jump") && towering() || !towerMove.is("Jump") && towerMoving())) {
-            hoverState = HoverState.JUMP;
             blocksPlaced = 0;
-        }
-
-        switch (hoverState) {
-            case JUMP:
-                if (mc.thePlayer.onGround && !isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown()) {
-                    mc.thePlayer.jump();
-                }
-                hoverState = HoverState.FALL;
-                break;
-            case FALL:
-                if (mc.thePlayer.onGround)
-                    hoverState = HoverState.DONE;
-                break;
         }
 
         boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
@@ -938,11 +904,5 @@ public class Scaffold extends Module {
             this.facing = enumFacing;
             this.blockPos = blockPos;
         }
-    }
-
-    enum HoverState {
-        JUMP,
-        FALL,
-        DONE
     }
 }

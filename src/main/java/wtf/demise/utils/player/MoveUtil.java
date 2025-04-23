@@ -121,30 +121,6 @@ public class MoveUtil implements InstanceAccess {
         }
     }
 
-    public static double getDirection(float moveForward, float moveStrafing, float rotationYaw) {
-        if (moveForward < 0) {
-            rotationYaw += 180;
-        }
-
-        float forward = 1;
-
-        if (moveForward < 0) {
-            forward = -0.5F;
-        } else if (moveForward > 0) {
-            forward = 0.5F;
-        }
-
-        if (moveStrafing > 0) {
-            rotationYaw -= 70 * forward;
-        }
-
-        if (moveStrafing < 0) {
-            rotationYaw += 70 * forward;
-        }
-
-        return Math.toRadians(rotationYaw);
-    }
-
     public static float getRawDirectionRotation(float yaw, float pStrafe, float pForward) {
         float rotationYaw = yaw;
 
@@ -311,9 +287,6 @@ public class MoveUtil implements InstanceAccess {
         return predicted;
     }
 
-    /**
-     * Gets the players' movement yaw
-     */
     public static double direction(float rotationYaw, final double moveForward, final double moveStrafing) {
         if (moveForward < 0F) rotationYaw += 180F;
 
@@ -328,16 +301,6 @@ public class MoveUtil implements InstanceAccess {
         return Math.toRadians(rotationYaw);
     }
 
-    public static void boost(double increase) {
-        if (!isMoving()) return;
-        final double yaw = getDirection();
-        mc.thePlayer.motionX += -MathHelper.sin((float) yaw) * increase;
-        mc.thePlayer.motionZ += MathHelper.cos((float) yaw) * increase;
-    }
-
-    /**
-     * Fixes the players movement
-     */
     public static void fixMovement(final MoveInputEvent event, final float yaw) {
         final float forward = event.getForward();
         final float strafe = event.getStrafe();
@@ -410,39 +373,6 @@ public class MoveUtil implements InstanceAccess {
         final double increase = mc.thePlayer.onGround ? groundIncrease : airIncrease;
 
         moveFlying(increase);
-    }
-
-    public static double[] moveFlying(float strafe, float forward, final boolean onGround, final float yaw, final boolean sprinting) {
-        float friction = 0.02f;
-        final float playerWalkSpeed = mc.thePlayer.getAIMoveSpeed();
-        if (onGround) {
-            final float f4 = 0.6f * 0.91f;
-            final float f = 0.16277136F / (f4 * f4 * f4);
-            friction = playerWalkSpeed / 2.0f * f;
-        }
-        if (sprinting) {
-            friction = (float) ((double) friction + ((onGround) ? (playerWalkSpeed / 2.0f) : 0.02f) * 0.3D);
-        }
-        float f = strafe * strafe + forward * forward;
-        if (f >= 1.0E-4F) {
-            f = MathHelper.sqrt_float(f);
-            if (f < 1.0F) {
-                f = 1.0F;
-            }
-            f = friction / f;
-            strafe = strafe * f;
-            forward = forward * f;
-            final float f1 = MathHelper.sin(yaw * (float) (Math.PI * 2) / 180.0F);
-            final float f2 = MathHelper.cos(yaw * (float) (Math.PI * 2) / 180.0F);
-            final double motionX = (strafe * f2 - forward * f1);
-            final double motionZ = (forward * f2 + strafe * f1);
-            return new double[]{motionX, motionZ};
-        }
-        return null;
-    }
-
-    public static double predictedMotion(final double motion) {
-        return (motion - 0.08) * 0.98F;
     }
 
     public static void setSpeed(double speed) {

@@ -66,6 +66,7 @@ public class ModuleManager {
                 TPAura.class,
                 ResetVL.class,
                 ComboOneHit.class,
+                AutoBan.class,
 
                 // Misc
                 Twerk.class,

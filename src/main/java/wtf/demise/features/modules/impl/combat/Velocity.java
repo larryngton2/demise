@@ -99,11 +99,11 @@ public class Velocity extends Module {
 
             if (mode.is("Legit packet") || mode.is("Intave") && intaveMode.is("MoreReduce")) {
                 if (Range.between(3, 9).contains(mc.thePlayer.hurtTime)) {
-                    if (shouldReduce) {
+                    if (shouldReduce && mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY)) {
                         for (int i = 0; i < packets.get(); i++) {
                             AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
 
-                            ChatUtils.sendMessageClient("Reduced (" + (i + 1) + "x)");
+                            ChatUtils.sendMessageClient("Reduced");
                         }
 
                         currentTarget = null;
