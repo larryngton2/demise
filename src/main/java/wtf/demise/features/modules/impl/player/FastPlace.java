@@ -27,18 +27,18 @@ public class FastPlace extends Module {
 
     @EventTarget
     public void onGameEvent(GameEvent e) {
-        if (ignoreTickCycle.get()) {
+        if (ignoreTickCycle.get() && !getModule(Scaffold.class).isEnabled()) {
             MovingObjectPosition ray = mc.objectMouseOver;
 
             if (mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                 if (mc.gameSettings.keyBindUseItem.isKeyDown() && timer.hasTimeElapsed(frameDelay.get()) && mc.objectMouseOver.sideHit != EnumFacing.UP) {
-                    mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec);
-
-                    if (swing.get()) {
-                        mc.thePlayer.swingItem();
-                        mc.getItemRenderer().resetEquippedProgress();
-                    } else {
-                        mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
+                    if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
+                        if (swing.get()) {
+                            mc.thePlayer.swingItem();
+                            mc.getItemRenderer().resetEquippedProgress();
+                        } else {
+                            mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
+                        }
                     }
 
                     timer.reset();

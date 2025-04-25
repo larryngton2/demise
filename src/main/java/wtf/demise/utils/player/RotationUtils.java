@@ -46,13 +46,11 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction) {
-        if (moduleRotation.silent.get()) {
-            RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
-        } else {
-            mc.thePlayer.rotationYaw = applyGCDFix(serverRotation, rotation)[0];
-            mc.thePlayer.rotationPitch = applyGCDFix(serverRotation, rotation)[1];
-        }
+        RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
+
         currentCorrection = correction;
+        cachedHSpeed = 180;
+        cachedVSpeed = 180;
         enabled = true;
     }
 
@@ -63,12 +61,7 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-        if (moduleRotation.silent.get()) {
-            RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
-        } else {
-            mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
-            mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
-        }
+        RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
@@ -85,7 +78,6 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-        if (moduleRotation.silent.get()) {
             switch (smoothMode) {
                 case Linear:
                     currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
@@ -103,30 +95,6 @@ public class RotationUtils implements InstanceAccess {
                     currentRotation = smoothNatural(serverRotation, rotation, hSpeed, vSpeed);
                     break;
             }
-        } else {
-            switch (smoothMode) {
-                case Linear:
-                    mc.thePlayer.rotationYaw = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothLinear(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-                case Lerp:
-                    mc.thePlayer.rotationYaw = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothLerp(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-                case Bezier:
-                    mc.thePlayer.rotationYaw = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint)[0];
-                    mc.thePlayer.rotationPitch = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint)[1];
-                    break;
-                case Exponential:
-                    mc.thePlayer.rotationYaw = smoothExpo(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothExpo(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-                case Test:
-                    mc.thePlayer.rotationYaw = smoothNatural(serverRotation, rotation, hSpeed, vSpeed)[0];
-                    mc.thePlayer.rotationPitch = smoothNatural(serverRotation, rotation, hSpeed, vSpeed)[1];
-                    break;
-            }
-        }
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;

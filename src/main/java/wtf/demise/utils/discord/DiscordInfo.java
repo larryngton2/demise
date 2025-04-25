@@ -41,25 +41,24 @@ public class DiscordInfo implements InstanceAccess {
             }
         }).build();
 
-        DiscordRPC.discordInitialize("1266031153572479107", handlers, true);
+        DiscordRPC.discordInitialize("1365297079034970112", handlers, true);
         new Thread("Discord RPC Callback") {
             @Override
             public void run() {
                 while (running) {
-                    int killed = INSTANCE.getModuleManager().getModule(Interface.class).killed;
-                    int win = INSTANCE.getModuleManager().getModule(Interface.class).won;
                     if (mc.thePlayer != null) {
                         if (mc.isSingleplayer()) {
-                            update("Ig: " + detectUsername(), "is in SinglePlayer", true);
-                            updateSmallImageText(getCount() + "/" + getTotal() + " modules Enabled");
+                            update("Ign: " + detectUsername(), "Playing in SinglePlayer", true);
                         } else if (mc.getCurrentServerData() != null) {
-                            if (ServerUtils.isOnHypixel()) {
-                                update("Ig: " + detectUsername(), "Kills: " + killed + " " + "Wins: " + win, true);
-                                updateSmallImageText("playing on '" + mc.getCurrentServerData().serverIP + "' with " + getCount() + "/" + getTotal() + " modules Enabled");
+                            String srv;
+
+                            if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
+                                srv = "liquidproxy.net";
                             } else {
-                                update("Ig: " + detectUsername(), "is playing on " + mc.getCurrentServerData().serverIP, true);
-                                updateSmallImageText("raping kids | " + getCount() + "/" + getTotal() + " modules Enabled");
+                                srv = mc.getCurrentServerData().serverIP;
                             }
+
+                            update("Ign: " + detectUsername(), "Playing on " + srv, true);
                         } else if (mc.currentScreen instanceof GuiDownloadTerrain) {
                             update("...", "", false);
                         }
@@ -80,6 +79,7 @@ public class DiscordInfo implements InstanceAccess {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
                     DiscordRPC.discordRunCallbacks();
                 }
             }

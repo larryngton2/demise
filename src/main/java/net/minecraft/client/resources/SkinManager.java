@@ -105,9 +105,10 @@ public class SkinManager {
                     metadata.put("model", visualTweaks.slimSkin.get() ? "slim" : "default");
 
                     MinecraftProfileTexture customSkin = new MinecraftProfileTexture(
-                            visualTweaks.skinURL.get(),
+                            visualTweaks.getURL(),
                             metadata
                     );
+
                     map.put(Type.SKIN, customSkin);
                 } else if (map.isEmpty()) {
                     profile.getProperties().clear();

@@ -40,6 +40,7 @@ public class SessionInfoWidget extends Widget {
     @Override
     public void render() {
         String srv;
+
         if (mc.isSingleplayer()) {
             srv = "Singleplayer";
         } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {

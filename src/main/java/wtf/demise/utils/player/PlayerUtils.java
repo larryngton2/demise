@@ -83,6 +83,22 @@ public class PlayerUtils implements InstanceAccess {
         return false;
     }
 
+    public static boolean blockNear(final int range) {
+        for (int x = -range; x <= range; ++x) {
+            for (int y = -range; y <= range; ++y) {
+                for (int z = -range; z <= range; ++z) {
+                    final Block block = blockRelativeToPlayer(x, y, z);
+
+                    if (!(block instanceof BlockAir)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isBlockUnder(final double height, final boolean boundingBox) {
         if (boundingBox) {
             final AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0, -height, 0);
