@@ -49,6 +49,7 @@ public class Scaffold extends Module {
     private final SliderValue minSearch = new SliderValue("Min search", 0.1f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final SliderValue maxSearch = new SliderValue("Max search", 0.9f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final BoolValue clutch = new BoolValue("Clutch", false, this);
+    private final BoolValue sneak = new BoolValue("Sneak", false, this, clutch::get);
     private final ModeValue clutchRotMode = new ModeValue("Clutch rotation mode", new String[]{"Normal", "Center"}, "Center", this, clutch::get);
     private final SliderValue minCSearch = new SliderValue("Min C search", 0.1f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
     private final SliderValue maxCSearch = new SliderValue("Max C search", 0.9f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
@@ -94,6 +95,7 @@ public class Scaffold extends Module {
     private float yaw, pitch;
     private boolean startClutch;
     private final TimerUtils clutchTime = new TimerUtils();
+    private boolean rotate;
 
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
             Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
@@ -130,10 +132,6 @@ public class Scaffold extends Module {
     }
 
     private void handleScaffolding(boolean place) {
-        if (getBlockSlot() == -1) {
-            return;
-        }
-
         mc.thePlayer.inventory.currentItem = getBlockSlot();
         SpoofSlotUtils.startSpoofing(oldSlot);
 
@@ -314,6 +312,12 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onGameUpdate(GameEvent e) {
+        // this is needed because when you rotate onUpdate mc.objectMouseOver breaks
+        // because RotationUtils tries to rotate back to your camera yaw/pitch
+        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
+            RotationUtils.enabled = true;
+        }
+
         if (addons.isEnabled("Ignore tick cycle")) {
             if (addons.isEnabled("Ray Trace")) {
                 if (!(startClutch || !clutchTime.hasTimeElapsed(200))) {
@@ -326,6 +330,7 @@ public class Scaffold extends Module {
         }
     }
 
+    // if it works, don't touch it
     private void placeAlternative() {
         MovingObjectPosition ray = mc.objectMouseOver;
 
@@ -357,11 +362,6 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onLookEvent(LookEvent e) {
-        e.rotation = new float[]{yaw, pitch};
-    }
-
-    @EventTarget
     public void onSafeWalk(SafeWalkEvent event) {
         if (addons.isEnabled("Safe Walk") && mc.thePlayer.onGround || addons.isEnabled("Safe Walk When No Data") && data == null) {
             event.setCancelled(true);
@@ -369,7 +369,7 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onMovementInput(MoveInputEvent event) {
+    public void onMovementInput(MoveInputEvent e) {
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 
@@ -377,27 +377,31 @@ public class Scaffold extends Module {
             final BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.5, mc.thePlayer.posZ);
             if (mc.thePlayer.getHorizontalFacing(mc.thePlayer.rotationYaw + 180) == EnumFacing.EAST) {
                 if (b.getZ() + 0.5 > mc.thePlayer.posZ) {
-                    event.setStrafe(1.0f);
+                    e.setStrafe(1.0f);
                 } else {
-                    event.setStrafe(-1.0f);
+                    e.setStrafe(-1.0f);
                 }
             } else if (mc.thePlayer.getHorizontalFacing(mc.thePlayer.rotationYaw + 180) == EnumFacing.WEST) {
                 if (b.getZ() + 0.5 < mc.thePlayer.posZ) {
-                    event.setStrafe(1.0f);
+                    e.setStrafe(1.0f);
                 } else {
-                    event.setStrafe(-1.0f);
+                    e.setStrafe(-1.0f);
                 }
             } else if (mc.thePlayer.getHorizontalFacing(mc.thePlayer.rotationYaw + 180) == EnumFacing.SOUTH) {
                 if (b.getX() + 0.5 < mc.thePlayer.posX) {
-                    event.setStrafe(1.0f);
+                    e.setStrafe(1.0f);
                 } else {
-                    event.setStrafe(-1.0f);
+                    e.setStrafe(-1.0f);
                 }
             } else if (b.getX() + 0.5 > mc.thePlayer.posX) {
-                event.setStrafe(1.0f);
+                e.setStrafe(1.0f);
             } else {
-                event.setStrafe(-1.0f);
+                e.setStrafe(-1.0f);
             }
+        }
+
+        if (mc.thePlayer.onGround && sneak.get() && (startClutch || !clutchTime.hasTimeElapsed(500))) {
+            e.setSneaking(true);
         }
 
         if (addons.isEnabled("Sneak")) {
@@ -428,8 +432,8 @@ public class Scaffold extends Module {
 
             if (onlySneakOnGround.get() && !mc.thePlayer.onGround) return;
 
-            if (PlayerUtils.isReplaceable(blockPos) || dif < sneakDistance.get() && blocksPlaced == blocksToSneak.get()) {
-                event.setSneaking(true);
+            if (PlayerUtils.isReplaceable(blockPos) && dif < sneakDistance.get() && blocksPlaced == blocksToSneak.get()) {
+                e.setSneaking(true);
             }
         }
     }
@@ -441,6 +445,10 @@ public class Scaffold extends Module {
 
         if (mc.thePlayer.onGround) {
             if ((addons.isEnabled("Auto Jump") || mode.is("Telly")) && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
+                if (mode.is("Telly") && !mc.thePlayer.isSprinting()) {
+                    return;
+                }
+
                 if (MoveUtil.isMoving()) {
                     mc.thePlayer.jump();
                 }
@@ -629,8 +637,6 @@ public class Scaffold extends Module {
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
         placing = false;
-
-        mc.entityRenderer.getMouseOver(1);
 
         if (!addons.isEnabled("Ray Trace")) {
             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, facing, hitVec)) {

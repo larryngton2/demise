@@ -29,12 +29,11 @@ import static java.lang.Math.*;
 public class RotationUtils implements InstanceAccess {
     public static float[] currentRotation = null, serverRotation = new float[]{}, previousRotation = null;
     public static MovementCorrection currentCorrection = MovementCorrection.None;
-    private static boolean enabled;
+    public static boolean enabled;
     public static float cachedHSpeed;
     public static float cachedVSpeed;
     public static float cachedMidpoint;
     public static SmoothMode smoothMode = SmoothMode.Linear;
-    private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
     private boolean angleCalled;
 
     public static boolean shouldRotate() {
