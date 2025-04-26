@@ -103,11 +103,10 @@ public class ClickHandler implements InstanceAccess {
                         handleFailSwing();
                     }
 
-                    if (!rayTraceFailed()) {
+                    if (!rayTraceFailed() && distance <= attackRange) {
                         sendAttack();
                     }
-
-                } else {
+                } else if (distance <= attackRange) {
                     sendAttack();
                 }
 

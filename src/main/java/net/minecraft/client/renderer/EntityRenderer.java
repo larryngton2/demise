@@ -77,7 +77,6 @@ import org.lwjglx.opengl.GLContext;
 import org.lwjglx.util.glu.Project;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.MouseOverEvent;
-import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.impl.visual.Atmosphere;
@@ -371,10 +370,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 blockReachDistance = 6.0D;
                 distance = 6.0D;
             } else if (blockReachDistance > 3.0D) {
-                flag = true;
-            }
-
-            if (reach > 3.0001) {
                 flag = true;
             }
 
@@ -1101,7 +1096,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 mc.mcProfiler.endStartSection("gui");
 
                 if (!mc.gameSettings.hideGUI || mc.currentScreen != null) {
-
                     if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("World Bloom")) {
                         Demise.INSTANCE.getModuleManager().getModule(Camera.class).drawWorldBloom();
                     }
