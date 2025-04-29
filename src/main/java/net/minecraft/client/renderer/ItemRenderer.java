@@ -316,7 +316,7 @@ public class ItemRenderer {
             if (itemToRender != null) {
                 if (itemToRender.getItem() instanceof ItemMap) {
                     renderItemMap(abstractclientplayer, f2, f, f1);
-                } else if (abstractclientplayer.getItemInUseCount() > 0 || (aura.isHoldingSword() && (KillAura.isBlocking || animations.getBlockWhenSwing().get() && mc.thePlayer.isSwingInProgress))) {
+                } else if (abstractclientplayer.getItemInUseCount() > 0 || (aura.isHoldingSword() && KillAura.isBlocking) || (animations.getBlockWhenSwing().get() && mc.thePlayer.isSwingInProgress)) {
                     EnumAction enumaction = itemToRender.getItemUseAction();
 
                     switch (enumaction) {

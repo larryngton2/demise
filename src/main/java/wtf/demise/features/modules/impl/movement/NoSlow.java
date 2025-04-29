@@ -91,9 +91,19 @@ public class NoSlow extends Module {
                 break;
             }
             case "NCP":
-                if (mc.thePlayer.isUsingItem() && ncpShouldWork) {
-                    if (mc.thePlayer.ticksExisted % 3 == 0) {
-                        sendPacketNoEvent(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
+                if (isUsingConsumable()) {
+                    if (mc.thePlayer.isUsingItem() && ncpShouldWork) {
+                        if (mc.thePlayer.ticksExisted % 3 == 0) {
+                            sendPacketNoEvent(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
+                        }
+                    }
+                } else if (isUsingSword()) {
+                    if (event.isPre()) {
+                        sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    }
+
+                    if (event.isPost()) {
+                        sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getCurrentEquippedItem()));
                     }
                 }
                 break;

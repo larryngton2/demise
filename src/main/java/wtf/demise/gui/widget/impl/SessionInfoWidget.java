@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
@@ -39,16 +40,6 @@ public class SessionInfoWidget extends Widget {
 
     @Override
     public void render() {
-        String srv;
-
-        if (mc.isSingleplayer()) {
-            srv = "Singleplayer";
-        } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
-            srv = "liquidproxy.net";
-        } else {
-            srv = mc.getCurrentServerData().serverIP;
-        }
-
         switch (setting.sessionInfoMode.get()) {
             case "Default":
                 this.width = 150;
@@ -104,7 +95,7 @@ public class SessionInfoWidget extends Widget {
                 Fonts.interSemiBold.get(16).drawStringWithShadow(RenderUtils.sessionTime(), renderX + 42, renderY + 107, -1);
                 Fonts.interSemiBold.get(16).drawStringWithShadow(setting.won + " wins", renderX + 42, renderY + 82, -1);
                 Fonts.interSemiBold.get(16).drawStringWithShadow(setting.killed + " kills", renderX + 42, renderY + 57, -1);
-                Fonts.interSemiBold.get(16).drawStringWithShadow(srv, renderX + 42, renderY + 33, -1);
+                Fonts.interSemiBold.get(16).drawStringWithShadow(PlayerUtils.getCurrServer(), renderX + 42, renderY + 33, -1);
                 RoundedUtils.drawRound(renderX + 18, renderY + 50, 20, 20, 5f, new Color(setting.color()));
                 RoundedUtils.drawRound(renderX + 18, renderY + 75, 20, 20, 5f, new Color(setting.color()));
                 RoundedUtils.drawRound(renderX + 18, renderY + 100, 20, 20, 5f, new Color(setting.color()));
@@ -112,8 +103,8 @@ public class SessionInfoWidget extends Widget {
                 Fonts.session.get(24).drawStringWithShadow("D", renderX + 23f, renderY + 81, new Color(setting.color()).darker().darker().darker().getRGB());
                 Fonts.session2.get(24).drawStringWithShadow("1", renderX + 22f, renderY + 57f, new Color(setting.color()).darker().darker().darker().getRGB());
 
-                if (!srv.equals("Singleplayer")) {
-                    mc.getTextureManager().bindTexture(new ResourceLocation(("servers/" + srv + "/icon")));
+                if (!PlayerUtils.getCurrServer().equals("Singleplayer")) {
+                    mc.getTextureManager().bindTexture(new ResourceLocation(("servers/" + PlayerUtils.getCurrServer() + "/icon")));
                     RoundedUtils.drawRoundTextured(renderX + 18, renderY + 25, 20, 20, 5f, 1f);
                 }
 

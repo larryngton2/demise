@@ -20,7 +20,7 @@ public class MainMenu implements InstanceAccess {
             ShaderUtils.drawFixedQuads();
             mainmenu.unload();
         } else {
-            RenderUtils.drawImage(new ResourceLocation("demise/texture/background.png"), 0, 0, sr.getScaledWidth(), sr.getScaledHeight());
+            RenderUtils.drawImage(new ResourceLocation("demise/img/background.png"), 0, 0, sr.getScaledWidth(), sr.getScaledHeight());
         }
     }
 }

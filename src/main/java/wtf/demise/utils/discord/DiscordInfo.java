@@ -11,6 +11,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.misc.ServerUtils;
+import wtf.demise.utils.player.PlayerUtils;
 
 public class DiscordInfo implements InstanceAccess {
     private boolean running = true;
@@ -48,17 +49,9 @@ public class DiscordInfo implements InstanceAccess {
                 while (running) {
                     if (mc.thePlayer != null) {
                         if (mc.isSingleplayer()) {
-                            update("Ign: " + detectUsername(), "Playing in SinglePlayer", true);
+                            update("Ign: " + detectUsername(), "Playing in Singleplayer", true);
                         } else if (mc.getCurrentServerData() != null) {
-                            String srv;
-
-                            if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
-                                srv = "liquidproxy.net";
-                            } else {
-                                srv = mc.getCurrentServerData().serverIP;
-                            }
-
-                            update("Ign: " + detectUsername(), "Playing on " + srv, true);
+                            update("Ign: " + detectUsername(), "Playing on " + PlayerUtils.getCurrServer(), true);
                         } else if (mc.currentScreen instanceof GuiDownloadTerrain) {
                             update("...", "", false);
                         }

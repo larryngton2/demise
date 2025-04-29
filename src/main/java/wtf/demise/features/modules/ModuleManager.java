@@ -92,6 +92,7 @@ public class ModuleManager {
                 MotionModifier.class,
                 AutoWalk.class,
                 Jesus.class,
+                TargetStrafe.class,
 
                 // Player
                 AutoTool.class,
@@ -133,7 +134,8 @@ public class ModuleManager {
                 Cape.class,
                 CustomSkin.class,
                 ForceDinnerbone.class,
-                CustomWidgetsModule.class
+                CustomWidgetsModule.class,
+                ImageESP.class
         );
 
         // Sort modules by name for better organization

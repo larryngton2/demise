@@ -6,9 +6,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
+import wtf.demise.Demise;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
+import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
 
 import java.util.Arrays;
@@ -204,7 +206,7 @@ public class MoveUtil implements InstanceAccess {
     }
 
     public static double getBaseMoveSpeed(EntityPlayer player) {
-        var baseSpeed = 0.2873;
+        double baseSpeed = 0.2873;
         if (player.isPotionActive(Potion.moveSpeed)) {
             int amplifier = player.getActivePotionEffect(Potion.moveSpeed).getAmplifier();
             baseSpeed *= 1.0 + 0.2 * (amplifier + 1);
@@ -431,7 +433,7 @@ public class MoveUtil implements InstanceAccess {
 
     private static float yaw = 0;
 
-    public static float getDirFromKeybind() {
+    public static float getDir() {
         if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindLeft.isKeyDown()) {
             yaw = 45f;
         } else if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindRight.isKeyDown()) {
@@ -454,10 +456,20 @@ public class MoveUtil implements InstanceAccess {
     }
 
     public static float getYawFromKeybind() {
-        return mc.thePlayer.rotationYaw - getDirFromKeybind();
+        return mc.thePlayer.rotationYaw - getDir();
     }
 
     public static float getDirection() {
-        return (float) toRadians(mc.thePlayer.rotationYaw - getDirFromKeybind());
+        float dir;
+
+        TargetStrafe targetStrafe = Demise.INSTANCE.getModuleManager().getModule(TargetStrafe.class);
+
+        if (targetStrafe.isEnabled() && targetStrafe.active && targetStrafe.target != null) {
+            dir = targetStrafe.yaw;
+        } else {
+            dir = mc.thePlayer.rotationYaw - getDir();
+        }
+
+        return (float) toRadians(dir);
     }
 }

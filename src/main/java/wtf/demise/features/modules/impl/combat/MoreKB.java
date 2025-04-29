@@ -36,7 +36,7 @@ public class MoreKB extends Module {
         final float calcYaw = (float) (MathHelper.atan2(mc.thePlayer.posZ - entity.posZ, mc.thePlayer.posX - entity.posX) * 180.0 / 3.141592653589793 - 90.0);
         final float diffY = Math.abs(MathHelper.wrapAngleTo180_float(calcYaw - entity.rotationYawHead));
 
-        if (smart.get() && diffY > 120.0f) {
+        if (smart.get() && (diffY > 120.0f || mc.thePlayer.hurtTime != 0)) {
             return;
         }
 

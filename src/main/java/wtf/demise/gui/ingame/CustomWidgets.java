@@ -28,7 +28,9 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
@@ -49,7 +51,10 @@ public class CustomWidgets implements InstanceAccess {
     private float interpolatedY = sr == null ? 1080 : sr.getScaledHeight() - 80 - 5;
     private float interpolatedChatY;
     private boolean fade = false;
-    private int alpha = 255;
+    private boolean renderText = false;
+    private float alpha = 255;
+    private float tAlpha = 255;
+    private final TimerUtils textTimer = new TimerUtils();
     private final CustomWidgetsModule customWidgetsModule = Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class);
 
     @EventTarget
@@ -74,9 +79,9 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (fade) {
-            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, alpha).getRGB());
+            RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, (int) alpha).getRGB());
 
-            alpha -= 2;
+            alpha -= 0.75f;
 
             if (alpha < 0) {
                 alpha = 255;
@@ -84,6 +89,21 @@ public class CustomWidgets implements InstanceAccess {
             }
         } else {
             alpha = 255;
+        }
+
+        if (renderText) {
+            Fonts.interRegular.get(35).drawCenteredString("Logged in as " + mc.thePlayer.getName() + " on " + PlayerUtils.getCurrServer(), sr.getScaledWidth() / 2, 50, new Color(255, 255, 255, (int) tAlpha).getRGB());
+
+            if (textTimer.hasTimeElapsed(2500)) {
+                tAlpha -= 2;
+            }
+
+            if (tAlpha < 0) {
+                renderText = false;
+            }
+        } else {
+            tAlpha = 255;
+            textTimer.reset();
         }
     }
 
@@ -383,6 +403,7 @@ public class CustomWidgets implements InstanceAccess {
     @EventTarget
     public void onWorldChange(WorldChangeEvent e) {
         fade = true;
+        renderText = true;
     }
 
     @EventTarget

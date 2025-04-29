@@ -347,19 +347,22 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             mc.mcProfiler.startSection("pick");
             mc.pointedEntity = null;
             double blockReachDistance = mc.playerController.getBlockReachDistance();
+
+            double reach = 3.0D;
+            float expand = 0;
+
+            MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand);
+            Demise.INSTANCE.getEventManager().call(mouseOverEvent);
+
+            reach = Math.max(reach, mouseOverEvent.getRange());
+            blockReachDistance = Math.max(blockReachDistance, mouseOverEvent.getRange() + 1.5);
+
             mc.objectMouseOver = entity.rayTrace(blockReachDistance, partialTicks);
             double distance = blockReachDistance;
             final Vec3 vec3 = entity.getPositionEyes(partialTicks);
             boolean flag = false;
-            double reach = 3.0D;
-            float expand = 0;
 
-            MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand, blockReachDistance);
-            Demise.INSTANCE.getEventManager().call(mouseOverEvent);
-
-            reach = mouseOverEvent.getRange();
             expand = mouseOverEvent.getExpand();
-            blockReachDistance = mouseOverEvent.getBlockRange();
 
             if (mouseOverEvent.getMovingObjectPosition() != null) {
                 mc.objectMouseOver = mouseOverEvent.getMovingObjectPosition();

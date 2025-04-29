@@ -526,4 +526,20 @@ public class PlayerUtils implements InstanceAccess {
         }
         return false;
     }
+
+    public static String getCurrServer() {
+        String srv;
+
+        if (!mc.isSingleplayer()) {
+            if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
+                srv = "liquidproxy.net";
+            } else {
+                srv = mc.getCurrentServerData().serverIP;
+            }
+        } else {
+            srv = "Singleplayer";
+        }
+
+        return srv;
+    }
 }

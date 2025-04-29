@@ -34,6 +34,7 @@ import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
@@ -102,18 +103,9 @@ public class Interface extends Module {
                     mc.fontRendererObj.drawStringWithShadow(text, 2.0f, 2.0f, color());
                     break;
                 case "Modern":
-                    String srv;
-                    if (mc.isSingleplayer()) {
-                        srv = "singleplayer";
-                    } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
-                        srv = "liquidproxy.net";
-                    } else {
-                        srv = mc.getCurrentServerData().serverIP;
-                    }
-
                     String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
                             " | " + CurrentUser.FINAL_USER +
-                            " | " + srv;
+                            " | " + PlayerUtils.getCurrServer();
 
                     int x = 7;
                     int y = 7;
@@ -199,18 +191,9 @@ public class Interface extends Module {
                     }
                     break;
                 case "Modern":
-                    String srv;
-                    if (mc.isSingleplayer()) {
-                        srv = "singleplayer";
-                    } else if (mc.getCurrentServerData().serverIP.toLowerCase().contains("liquidproxy.net")) {
-                        srv = "liquidproxy.net";
-                    } else {
-                        srv = mc.getCurrentServerData().serverIP;
-                    }
-
                     String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
                             " | " + CurrentUser.FINAL_USER +
-                            " | " + srv;
+                            " | " + PlayerUtils.getCurrServer();
 
                     int x = 7;
                     int y = 7;

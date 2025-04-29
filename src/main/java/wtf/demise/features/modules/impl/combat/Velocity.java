@@ -98,7 +98,7 @@ public class Velocity extends Module {
             }
 
             if (mode.is("Legit packet") || mode.is("Intave") && intaveMode.is("MoreReduce")) {
-                if (Range.between(3, 9).contains(mc.thePlayer.hurtTime)) {
+                if (Range.between(3, 10).contains(mc.thePlayer.hurtTime)) {
                     if (shouldReduce && mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY)) {
                         for (int i = 0; i < packets.get(); i++) {
                             AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
@@ -174,37 +174,19 @@ public class Velocity extends Module {
 
     @EventTarget
     public void onAttack(AttackEvent e) {
-        switch (mode.get()) {
-            case "Intave":
-                switch (intaveMode.get()) {
-                    case "Tick Reduce":
-                        if (mc.thePlayer.hurtTime == rHurtTime.get()) {
-                            double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
+        if (mode.get().equals("Intave")) {
+            if (intaveMode.get().equals("Tick Reduce")) {
+                if (mc.thePlayer.hurtTime == rHurtTime.get()) {
+                    double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
 
-                            mc.thePlayer.motionX *= factor;
-                            mc.thePlayer.motionZ *= factor;
-                        }
-                        break;
-                    case "MoreReduce":
-                        if (Range.between(3, 9).contains(mc.thePlayer.hurtTime) && !attacked) {
-                            currentTarget = e.getTargetEntity();
-                            shouldReduce = true;
-                            attacked = true;
-                        }
-                        break;
+                    mc.thePlayer.motionX *= factor;
+                    mc.thePlayer.motionZ *= factor;
                 }
-                break;
-            case "Legit packet":
-                if (Range.between(3, 9).contains(mc.thePlayer.hurtTime) && !attacked) {
-                    currentTarget = e.getTargetEntity();
-                    shouldReduce = true;
-                    attacked = true;
-                }
-                break;
+            }
         }
 
         if (mode.is("Legit packet") || mode.is("Intave") && intaveMode.is("MoreReduce")) {
-            if (Range.between(3, 9).contains(mc.thePlayer.hurtTime) && !attacked) {
+            if (Range.between(3, 10).contains(mc.thePlayer.hurtTime) && !attacked) {
                 currentTarget = e.getTargetEntity();
                 shouldReduce = true;
                 attacked = true;

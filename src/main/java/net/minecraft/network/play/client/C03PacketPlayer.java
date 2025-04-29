@@ -17,6 +17,7 @@ public class C03PacketPlayer implements Packet<INetHandlerPlayServer> {
     @Getter
     public float pitch;
     @Getter
+    @Setter
     protected boolean onGround;
     @Getter
     @Setter
