@@ -39,7 +39,7 @@ public class Speed extends Module {
     private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave") && intaveMode.is("Safe"));
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
-    private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.05f, this, minSpeedLimiter::get);
+    private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.01f, this, minSpeedLimiter::get);
     private final SliderValue minMoveTicks = new SliderValue("Move ticks for limit", 15, 0, 40, 1, this, minSpeedLimiter::get);
     private final BoolValue printAirTicks = new BoolValue("Print airTicks", false);
 
@@ -216,8 +216,8 @@ public class Speed extends Module {
                     }
                 }
 
-                if (MoveUtil.getSpeed() <= 0.22) {
-                    MoveUtil.strafe(0.22);
+                if (MoveUtil.getSpeed() <= 0.221) {
+                    MoveUtil.strafe(0.221);
                 }
                 break;
         }

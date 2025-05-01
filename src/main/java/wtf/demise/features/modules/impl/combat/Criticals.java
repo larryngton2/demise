@@ -117,20 +117,6 @@ public class Criticals extends Module {
             if (e.getPacket() instanceof C03PacketPlayer c03PacketPlayer) {
                 c03PacketPlayer.setMoving(false);
                 c03PacketPlayer.setOnGround(false);
-
-                if (mc.thePlayer.isInWater()) {
-                    return;
-                }
-
-                if (!getModule(Fly.class).isEnabled()) {
-                    if (e.getPacket() instanceof C03PacketPlayer.C04PacketPlayerPosition playerPos) {
-                        playerPos.setOnGround(false);
-                    } else if (e.getPacket() instanceof C03PacketPlayer.C05PacketPlayerLook look) {
-                        look.setOnGround(false);
-                    } else if (e.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook posLook) {
-                        posLook.setOnGround(false);
-                    }
-                }
             }
         }
     }

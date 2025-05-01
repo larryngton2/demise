@@ -15,8 +15,8 @@ import java.util.ArrayList;
 public class BPSCounterWidget extends Widget {
     public BPSCounterWidget() {
         super("BPS counter");
-        this.x = 0;
-        this.y = 0;
+        this.x = 0.40520814f;
+        this.y = 0.83316565f;
         this.height = 20;
     }
 

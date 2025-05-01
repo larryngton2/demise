@@ -68,8 +68,8 @@ public class GuiIngame extends Gui {
     private final GuiSpectator spectatorGui;
     private final GuiPlayerTabOverlay overlayPlayerList;
     private int titlesTimer;
-    private String displayedTitle = "";
-    private String displayedSubTitle = "";
+    public static String displayedTitle = "";
+    public static String displayedSubTitle = "";
     private int titleFadeIn;
     private int titleDisplayTime;
     private int titleFadeOut;

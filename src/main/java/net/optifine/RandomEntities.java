@@ -1,5 +1,6 @@
 package net.optifine;
 
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.DataWatcher;
@@ -75,6 +76,10 @@ public class RandomEntities {
 
     public static void worldChanged(World oldWorld, World newWorld) {
         Demise.INSTANCE.getEventManager().call(new WorldChangeEvent());
+
+        GuiIngame.displayedTitle = "";
+        GuiIngame.displayedSubTitle = "";
+
         if (newWorld != null) {
             List list = newWorld.getLoadedEntityList();
 

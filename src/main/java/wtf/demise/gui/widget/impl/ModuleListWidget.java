@@ -20,8 +20,8 @@ public class ModuleListWidget extends Widget {
 
     public ModuleListWidget() {
         super("ModuleList");
-        this.x = 2f;
-        this.y = 0;
+        this.x = 0.89062506f;
+        this.y = 0.009259259f;
     }
 
     @Override

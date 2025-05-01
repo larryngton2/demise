@@ -103,7 +103,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.features.modules.impl.legit.LeftClicker;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -131,8 +130,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     public static byte[] memoryReserve = new byte[10485760];
     private static final List<DisplayMode> macDisplayModes = Lists.newArrayList(new DisplayMode(2560, 1600), new DisplayMode(2880, 1800));
     private final File fileResourcepacks;
-    @Getter
-    private final PropertyMap twitchDetails;
     private final PropertyMap profileProperties;
     @Getter
     private ServerData currentServerData;
@@ -238,7 +235,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.fileAssets = gameConfig.folderInfo.assetsDir;
         this.fileResourcepacks = gameConfig.folderInfo.resourcePacksDir;
         this.launchedVersion = gameConfig.gameInfo.version;
-        this.twitchDetails = gameConfig.userInfo.userProperties;
         this.profileProperties = gameConfig.userInfo.profileProperties;
         this.mcDefaultResourcePack = new DefaultResourcePack((new ResourceIndex(gameConfig.folderInfo.assetsDir, gameConfig.folderInfo.assetIndex)).getResourceMap());
         this.proxy = gameConfig.userInfo.proxy == null ? Proxy.NO_PROXY : gameConfig.userInfo.proxy;

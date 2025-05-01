@@ -35,26 +35,27 @@ public class ModuleManager {
         addModules(
                 // Combat
                 AntiBot.class,
-                AutoWeapon.class,
                 KeepSprint.class,
                 KillAura.class,
-                Reach.class,
                 TickBase.class,
                 Velocity.class,
-                AutoHeal.class,
                 Criticals.class,
                 FakeLag.class,
-                MoreKB.class,
-                HitBox.class,
-                AutoRod.class,
                 TimerRange.class,
+                TPAura.class,
 
                 // Legit
-                LeftClicker.class,
+                AutoClicker.class,
                 NoHitDelay.class,
                 LegitScaffold.class,
                 BackTrack.class,
                 JumpReset.class,
+                AutoRod.class,
+                AutoWeapon.class,
+                AutoHeal.class,
+                MoreKB.class,
+                Reach.class,
+                HitBox.class,
 
                 // Exploit
                 Blink.class,
@@ -63,7 +64,6 @@ public class ModuleManager {
                 Timer.class,
                 NoGuiClose.class,
                 Regen.class,
-                TPAura.class,
                 ResetVL.class,
                 ComboOneHit.class,
                 AutoBan.class,

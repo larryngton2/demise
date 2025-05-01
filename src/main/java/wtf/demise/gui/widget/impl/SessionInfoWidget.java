@@ -14,8 +14,8 @@ import java.awt.*;
 public class SessionInfoWidget extends Widget {
     public SessionInfoWidget() {
         super("Session Info");
-        this.x = 0.1f;
-        this.y = 0.2f;
+        this.x = 0;
+        this.y = 0.10909094f;
     }
 
     @Override

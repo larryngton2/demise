@@ -44,7 +44,7 @@ public class BackTrack extends Module {
     private final ContinualAnimation animatedY = new ContinualAnimation();
     private final ContinualAnimation animatedZ = new ContinualAnimation();
     private int ping;
-    private boolean shouldLag;
+    public static boolean shouldLag;
     private EntityOtherPlayerMP fakePlayer;
     private boolean addedEntity;
     private boolean dispatched;

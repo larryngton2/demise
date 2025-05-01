@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.combat;
+package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.item.ItemSkull;
@@ -16,7 +16,7 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.InventoryUtils;
 
-@ModuleInfo(name = "AutoHeal", category = ModuleCategory.Combat)
+@ModuleInfo(name = "AutoHeal", category = ModuleCategory.Legit)
 public class AutoHeal extends Module {
     private final BoolValue head = new BoolValue("Head", true, this);
     private final SliderValue headHealth = new SliderValue("HeadHealth", 15, 0, 20, 1, this, head::get);

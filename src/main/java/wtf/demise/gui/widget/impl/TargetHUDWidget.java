@@ -26,8 +26,8 @@ import java.text.DecimalFormat;
 public class TargetHUDWidget extends Widget {
     public TargetHUDWidget() {
         super("Target HUD");
-        this.x = 0.5f;
-        this.y = 0.8f;
+        this.x = 0.44270813f;
+        this.y = 0.6333332f;
     }
 
     @Override

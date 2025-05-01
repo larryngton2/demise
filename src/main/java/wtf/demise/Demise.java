@@ -13,7 +13,6 @@ import wtf.demise.features.command.CommandManager;
 import wtf.demise.features.config.ConfigManager;
 import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
-import wtf.demise.gui.widget.impl.BPSCounterWidget;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
 import wtf.demise.gui.click.dropdown.DropdownGUI;
@@ -40,18 +39,11 @@ import java.util.Objects;
 
 @Getter
 public class Demise {
-
-    // Logger instance for logging events and errors
     public static final Logger LOGGER = LogManager.getLogger(Demise.class);
-
-    // Singleton instance of Demise
     public static final Demise INSTANCE = new Demise();
-
-    // Client information
     public final String clientName = "demise";
     public final String version = "alpha";
 
-    // Directory for configuration files and other data
     private final File mainDir = new File(Minecraft.getMinecraft().mcDataDir, clientName);
 
     // Managers and GUI components

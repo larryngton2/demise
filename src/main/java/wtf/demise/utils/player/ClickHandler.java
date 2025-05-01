@@ -12,6 +12,7 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PacketUtils;
@@ -35,6 +36,7 @@ public class ClickHandler implements InstanceAccess {
     private static ClickMode clickMode = ClickMode.PlayerController;
     private int clicks;
     private static float swingRange;
+    private static boolean forceblahblahblah;
 
     public enum ClickMode {
         Legit,
@@ -42,7 +44,7 @@ public class ClickHandler implements InstanceAccess {
         PlayerController
     }
 
-    public static void initHandler(float minCPS, float maxCPS, float CPSUpdateDelay, boolean rayTrace, boolean smartClicking, boolean ignoreBlocking, boolean failSwing, float attackRange, float swingRange, ClickMode clickMode, EntityLivingBase target) {
+    public static void initHandler(float minCPS, float maxCPS, float CPSUpdateDelay, boolean rayTrace, boolean smartClicking, boolean forceClickOnBackTrack, boolean ignoreBlocking, boolean failSwing, float attackRange, float swingRange, ClickMode clickMode, EntityLivingBase target) {
         ClickHandler.minCPS = minCPS;
         ClickHandler.maxCPS = maxCPS;
         ClickHandler.CPSUpdateDelay = CPSUpdateDelay;
@@ -54,6 +56,7 @@ public class ClickHandler implements InstanceAccess {
         ClickHandler.failSwing = failSwing;
         ClickHandler.clickMode = clickMode;
         ClickHandler.swingRange = swingRange;
+        ClickHandler.forceblahblahblah = forceClickOnBackTrack;
 
         initialized = true;
     }
@@ -156,7 +159,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private boolean shouldClick() {
-        return mc.thePlayer.hurtTime != 0 || mc.thePlayer.fallDistance > 0 || target.hurtTime <= 3;
+        return mc.thePlayer.hurtTime != 0 || target.hurtTime <= 3 || (forceblahblahblah && BackTrack.shouldLag);
     }
 
     private void attack() {

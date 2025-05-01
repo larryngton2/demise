@@ -5,6 +5,5 @@ public enum SmoothMode {
     Lerp,
     Bezier,
     Exponential,
-    Test,
     None
 }

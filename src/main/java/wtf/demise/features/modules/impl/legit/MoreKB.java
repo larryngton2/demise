@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.combat;
+package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.MathHelper;
@@ -9,10 +9,11 @@ import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "MoreKB", category = ModuleCategory.Combat)
+@ModuleInfo(name = "MoreKB", category = ModuleCategory.Legit)
 public class MoreKB extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit", "LessPacket", "Packet"}, "Legit", this);
     private final BoolValue smart = new BoolValue("Smart", false, this);

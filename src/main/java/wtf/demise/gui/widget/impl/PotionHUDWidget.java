@@ -15,9 +15,8 @@ import java.util.ArrayList;
 public class PotionHUDWidget extends Widget {
     public PotionHUDWidget() {
         super("Potion HUD");
-
-        this.x = 0;
-        this.y = 0.0f;
+        this.x = 0.008333334f;
+        this.y = 0.05185188f;
     }
 
     private final ContinualAnimation heightAnimation = new ContinualAnimation();

@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.exploit;
+package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,8 +15,6 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.AntiBot;
-import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -34,7 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ModuleInfo(name = "TPAura", category = ModuleCategory.Exploit)
+@ModuleInfo(name = "TPAura", category = ModuleCategory.Combat)
 public class TPAura extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Single", "Multi"}, "Single", this);
     private final SliderValue cps = new SliderValue("CPS", 5, 1, 20, 1, this);
@@ -69,7 +67,6 @@ public class TPAura extends Module {
     @EventTarget
     public void onPreMotion(MotionEvent e) {
         if (e.isPre()) {
-
             if (mc.currentScreen != null && !attackInInterfaces.get()) {
                 target = null;
                 path = null;
@@ -81,7 +78,6 @@ public class TPAura extends Module {
                 path = null;
                 return;
             }
-
 
             if (!timer.hasTimeElapsed((long) (((20 - cps.get()) * 50) - Math.random() * 100))) return;
 

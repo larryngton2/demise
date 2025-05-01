@@ -1,27 +1,20 @@
 package wtf.demise.utils.player;
 
-import com.google.common.base.Predicates;
-import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
-import net.optifine.reflect.Reflector;
 import org.jetbrains.annotations.NotNull;
-import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
-import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
-import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 
-import java.util.List;
 import java.util.Objects;
 
 import static java.lang.Math.*;
@@ -89,9 +82,6 @@ public class RotationUtils implements InstanceAccess {
                     break;
                 case Exponential:
                     currentRotation = smoothExpo(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-                case Test:
-                    currentRotation = smoothNatural(serverRotation, rotation, hSpeed, vSpeed);
                     break;
             }
 
@@ -280,49 +270,6 @@ public class RotationUtils implements InstanceAccess {
         return applyGCDFix(currentRotation, finalTargetRotation);
     }
 
-    public static float[] smoothNatural(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
-        float normHSpeed = hSpeed;
-        float normVSpeed = vSpeed;
-
-        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
-
-        double rotationDistance = hypot(abs(yawDifference), abs(pitchDifference));
-
-        float distanceFactor = (float) Math.log1p(rotationDistance / 45.0) / 2.0f;
-        distanceFactor = Math.min(distanceFactor, 1.0f);
-
-        float yawSign = Math.signum(yawDifference);
-        float pitchSign = Math.signum(pitchDifference);
-
-        float dynamicYawSpeed = calculateDynamicSpeed(abs(yawDifference), normHSpeed, distanceFactor);
-        float dynamicPitchSpeed = calculateDynamicSpeed(abs(pitchDifference), normVSpeed, distanceFactor);
-
-        float newYaw = currentRotation[0] + yawSign * dynamicYawSpeed;
-        float newPitch = currentRotation[1] + pitchSign * dynamicPitchSpeed;
-
-        if (abs(yawDifference) < dynamicYawSpeed) {
-            newYaw = targetRotation[0];
-        }
-        if (abs(pitchDifference) < dynamicPitchSpeed) {
-            newPitch = targetRotation[1];
-        }
-
-        return applyGCDFix(currentRotation, new float[]{newYaw, newPitch});
-    }
-
-    private static float calculateDynamicSpeed(float difference, float baseSpeed, float distanceFactor) {
-        float speed = baseSpeed * (0.7f + 0.3f * distanceFactor);
-
-        if (difference < 5.0f) {
-            return speed * (0.3f + 0.7f * (difference / 5.0f));
-        } else if (difference < 15.0f) {
-            return speed * (0.8f + 0.2f * (difference / 15.0f));
-        } else {
-            return speed;
-        }
-    }
-
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
         final float f = (float) (mc.gameSettings.mouseSensitivity * (1 + Math.random() / 100000) * 0.6F + 0.2F);
         final double gcd = f * f * f * 8.0F * 0.15D;
@@ -336,27 +283,8 @@ public class RotationUtils implements InstanceAccess {
         return MathHelper.wrapAngleTo180_float(a - b);
     }
 
-    public static float[] getAngles(Entity entity) {
-        if (entity == null) return null;
-        final EntityPlayerSP player = mc.thePlayer;
-
-        final double diffX = entity.posX - player.posX,
-                diffY = entity.posY + (entity.getEyeHeight() / 5 * 3) - (player.posY + player.getEyeHeight()),
-                diffZ = entity.posZ - player.posZ, dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
-
-        final float yaw = (float) (Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F,
-                pitch = (float) -(Math.atan2(diffY, dist) * 180.0D / Math.PI);
-
-        return new float[]{player.rotationYaw + MathHelper.wrapAngleTo180_float(
-                yaw - player.rotationYaw), player.rotationPitch + MathHelper.wrapAngleTo180_float(pitch - player.rotationPitch)};
-    }
-
     public static float i(final double n, final double n2) {
         return (float) (Math.atan2(n - mc.thePlayer.posX, n2 - mc.thePlayer.posZ) * 57.295780181884766 * -1.0);
-    }
-
-    public static double distanceFromYaw(final Entity entity) {
-        return abs(MathHelper.wrapAngleTo180_double(i(entity.posX, entity.posZ) - mc.thePlayer.rotationYaw));
     }
 
     public static double getRotationDifference(float[] e) {
@@ -371,12 +299,6 @@ public class RotationUtils implements InstanceAccess {
     public static float getRotationDifference(final Entity entity) {
         float[] target = RotationUtils.getRotations(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
         return (float) hypot(abs(getAngleDifference(target[0], mc.thePlayer.rotationYaw)), abs(target[1] - mc.thePlayer.rotationPitch));
-    }
-
-    public static float getRotationDifference(final Entity entity, final Entity entity2) {
-        float[] target = RotationUtils.getRotations(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
-        float[] target2 = RotationUtils.getRotations(entity2.posX, entity2.posY + entity2.getEyeHeight(), entity2.posZ);
-        return (float) hypot(abs(getAngleDifference(target[0], target2[0])), abs(target[1] - target2[1]));
     }
 
     public static float getRotationDifference(final float[] a, final float[] b) {
@@ -449,17 +371,6 @@ public class RotationUtils implements InstanceAccess {
         return new float[]{yaw, pitch};
     }
 
-    public static float clampTo90(final float n) {
-        return MathHelper.clamp_float(n, -90, 90);
-    }
-
-    public static float calculateYawFromSrcToDst(final float yaw, final double srcX, final double srcZ, final double dstX, final double dstZ) {
-        final double xDist = dstX - srcX;
-        final double zDist = dstZ - srcZ;
-        final float var1 = (float) (StrictMath.atan2(zDist, xDist) * 180.0 / Math.PI) - 90.0F;
-        return yaw + MathHelper.wrapAngleTo180_float(var1 - yaw);
-    }
-
     public static Vec3 getBestHitVec(final Entity entity) {
         final Vec3 positionEyes = mc.thePlayer.getPositionEyes(1);
         final AxisAlignedBB entityBoundingBox = entity.getHitbox();
@@ -520,12 +431,5 @@ public class RotationUtils implements InstanceAccess {
                         velocity * velocity * velocity * velocity - gravityModifier * (gravityModifier * posSqrt * posSqrt + 2 * posY * velocity * velocity)
                 )) / (gravityModifier * posSqrt)))
         };
-    }
-
-    public static float[] faceTrajectory(Entity target, boolean predict, float predictSize) {
-        float gravity = 0.03f;
-        float velocity = 0;
-
-        return faceTrajectory(target, predict, predictSize, gravity, velocity);
     }
 }

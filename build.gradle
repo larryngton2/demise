@@ -1,15 +1,14 @@
 plugins {
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id "java"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "org.openjfx.javafxplugin" version "0.1.0"
 }
 
-group = 'net.example'
-version = '1.8.9'
+group = "net.example"
+version = "1.8.9"
 
-// Centralized version declarations
 ext {
-    gsonVersion = '2.2.4'
+    gsonVersion = "2.8.9"
 }
 
 project.ext.lwjglVersion = "3.3.5"
@@ -60,8 +59,8 @@ dependencies {
 repositories {
     mavenCentral()
     maven {
-        url 'https://repo.marcloud.net/'
-        name 'MarCloud-Repository'
+        url "https://repo.marcloud.net/"
+        name "MarCloud-Repository"
     }
     maven {
         url "https://libraries.minecraft.net/"
@@ -73,28 +72,28 @@ repositories {
 
 javafx {
     modules = [
-            'javafx.controls',
-            'javafx.media',
-            'javafx.base',
-            'javafx.graphics',
-            'javafx.swing'
+            "javafx.controls",
+            "javafx.media",
+            "javafx.base",
+            "javafx.graphics",
+            "javafx.swing"
     ]
-    version = '22'
-    platform = 'windows'
-    configurations = ['implementation', 'testImplementation']
+    version = "22"
+    platform = "windows"
+    configurations = ["implementation", "testImplementation"]
 }
 
 shadowJar {
-    archiveClassifier.set('all')
+    archiveClassifier.set("all")
     configurations = [project.configurations.runtimeClasspath]
 }
 
 compileJava {
-    options.encoding = 'UTF-8'
+    options.encoding = "UTF-8"
 }
 
 dependencies {
-    implementation 'io.netty:netty-all:5.0.0.Alpha2'
+    implementation "io.netty:netty-all:5.0.0.Alpha2"
     implementation "net.sf.jopt-simple:jopt-simple:4.6"
 
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
@@ -110,12 +109,10 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-openal::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 
-    // Lombok
-    implementation 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
-    compileOnly 'org.projectlombok:lombok:1.18.28'
+    implementation "org.projectlombok:lombok:1.18.28"
+    annotationProcessor "org.projectlombok:lombok:1.18.28"
+    compileOnly "org.projectlombok:lombok:1.18.28"
 
-    // Other dependencies
     implementation "net.java.jinput:jinput:2.0.5"
     implementation "com.mojang:icu4j-core-mojang:51.2"
     implementation "org.apache.httpcomponents:httpclient:4.3.3"
@@ -138,19 +135,19 @@ dependencies {
     implementation "com.paulscode.sound:codecwav:20101023"
     implementation "com.paulscode.sound:soundsystem:20120107"
     implementation "com.paulscode.sound:codecjorbis:20101023"
-    implementation 'com.github.javafaker:javafaker:1.0.2'
+    implementation "com.github.javafaker:javafaker:1.0.2"
 
     implementation "com.mojang:authlib:1.5.21"
 
-    implementation 'it.unimi.dsi:fastutil:8.5.13'
-    implementation 'org.json:json:20240303'
-    implementation 'org.joml:joml:1.10.7'
-    implementation 'com.alibaba:fastjson:2.0.52'
-    implementation 'org.jetbrains:annotations:24.1.0'
+    implementation "it.unimi.dsi:fastutil:8.5.13"
+    implementation "org.json:json:20240303"
+    implementation "org.joml:joml:1.10.7"
+    implementation "com.alibaba:fastjson:2.0.52"
+    implementation "org.jetbrains:annotations:24.1.0"
 
-    implementation 'com.madgag:animated-gif-lib:1.4'
+    implementation "com.madgag:animated-gif-lib:1.4"
 
-    implementation fileTree(dir: 'libs', include: '*.jar')
-    compileOnly fileTree(dir: 'libs', include: '*.jar')
-    testCompileOnly fileTree(dir: 'libs', include: '*.jar')
+    implementation fileTree(dir: "libs", include: "*.jar")
+    compileOnly fileTree(dir: "libs", include: "*.jar")
+    testCompileOnly fileTree(dir: "libs", include: "*.jar")
 }
