@@ -4,6 +4,6 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "Jesus", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Jesus", description = "Sorry non-Christian people. Allows you to walk on water.", category = ModuleCategory.Movement)
 public class Jesus extends Module {
 }

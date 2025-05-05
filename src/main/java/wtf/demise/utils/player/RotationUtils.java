@@ -1,5 +1,6 @@
 package wtf.demise.utils.player;
 
+import com.sun.javafx.geom.Vec2f;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
@@ -53,7 +54,7 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-        RotationUtils.currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
+        currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear);
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
@@ -70,20 +71,7 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-            switch (smoothMode) {
-                case Linear:
-                    currentRotation = smoothLinear(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-                case Lerp:
-                    currentRotation = smoothLerp(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-                case Bezier:
-                    currentRotation = smoothBezier(serverRotation, rotation, hSpeed, vSpeed, midpoint);
-                    break;
-                case Exponential:
-                    currentRotation = smoothExpo(serverRotation, rotation, hSpeed, vSpeed);
-                    break;
-            }
+        currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode);
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
@@ -162,18 +150,7 @@ public class RotationUtils implements InstanceAccess {
                     float finalHSpeed = (cachedHSpeed / 2) * mc.timer.partialTicks;
                     float finalVSpeed = (cachedVSpeed / 2) * mc.timer.partialTicks;
 
-                    RotationUtils.currentRotation = switch (smoothMode) {
-                        case Linear ->
-                                smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
-                        case Lerp ->
-                                smoothLerp(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
-                        case Bezier ->
-                                smoothBezier(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint);
-                        case Exponential ->
-                                smoothExpo(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
-                        default ->
-                                smoothLinear(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed);
-                    };
+                    RotationUtils.currentRotation = limitRotations(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint, smoothMode);
                 }
             }
 
@@ -196,7 +173,9 @@ public class RotationUtils implements InstanceAccess {
         currentCorrection = MovementCorrection.None;
     }
 
-    public static float[] smoothLinear(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
+    public static float[] limitRotations(float[] currentRotation, float[] targetRotation, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode) {
+        float[] finalRotation;
+
         float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
         float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
 
@@ -210,64 +189,51 @@ public class RotationUtils implements InstanceAccess {
                 currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
         };
 
-        return applyGCDFix(currentRotation, finalTargetRotation);
-    }
+        switch (smoothMode) {
+            case Linear -> finalRotation = applyGCDFix(currentRotation, finalTargetRotation);
 
-    public static float[] smoothBezier(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed, float midpoint) {
-        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
+            case Bezier -> {
+                float yawDirection = yawDifference / (float) rotationDifference;
+                float pitchDirection = pitchDifference / (float) rotationDifference;
 
-        double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
+                float controlYaw = currentRotation[0] + yawDirection * midpoint * (float) rotationDifference;
+                float controlPitch = currentRotation[1] + pitchDirection * midpoint * (float) rotationDifference;
 
-        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * hSpeed);
-        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * vSpeed);
+                float[] t = new float[]{hSpeed / 180, vSpeed / 180};
 
-        float[] finalTargetRotation = new float[]{
-                currentRotation[0] + Math.max(-straightLineYaw, Math.min(straightLineYaw, yawDifference)),
-                currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
-        };
+                float finalYaw = (1 - t[0]) * (1 - t[0]) * currentRotation[0] + 2 * (1 - t[0]) * t[0] * controlYaw + t[0] * t[0] * finalTargetRotation[0];
+                float finalPitch = (1 - t[1]) * (1 - t[1]) * currentRotation[1] + 2 * (1 - t[1]) * t[1] * controlPitch + t[1] * t[1] * finalTargetRotation[1];
 
-        float yawDirection = yawDifference / (float) rotationDifference;
-        float pitchDirection = pitchDifference / (float) rotationDifference;
+                float[] smoothedRotation = new float[]{finalYaw, finalPitch};
 
-        float controlYaw = currentRotation[0] + yawDirection * midpoint * (float) rotationDifference;
-        float controlPitch = currentRotation[1] + pitchDirection * midpoint * (float) rotationDifference;
+                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
+            }
 
-        float[] t = new float[]{hSpeed / 180, vSpeed / 180};
+            case Lerp -> {
+                float newYaw = currentRotation[0] + (yawDifference * hSpeed / 180);
+                float newPitch = currentRotation[1] + (pitchDifference * vSpeed / 180);
 
-        float finalYaw = (1 - t[0]) * (1 - t[0]) * currentRotation[0] + 2 * (1 - t[0]) * t[0] * controlYaw + t[0] * t[0] * finalTargetRotation[0];
-        float finalPitch = (1 - t[1]) * (1 - t[1]) * currentRotation[1] + 2 * (1 - t[1]) * t[1] * controlPitch + t[1] * t[1] * finalTargetRotation[1];
+                float[] smoothedRotation = new float[]{newYaw, newPitch};
 
-        float[] finalRotation = new float[]{finalYaw, finalPitch};
+                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
+            }
 
-        return applyGCDFix(currentRotation, finalRotation);
-    }
+            case Exponential -> {
+                float smoothedYaw = currentRotation[0] + yawDifference * (1 - (float) Math.exp(-(hSpeed / 180)));
+                float smoothedPitch = currentRotation[1] + pitchDifference * (1 - (float) Math.exp(-(vSpeed / 180)));
 
-    public static float[] smoothLerp(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
-        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
+                float[] smoothedRotation = new float[]{
+                        smoothedYaw,
+                        smoothedPitch
+                };
 
-        float newYaw = currentRotation[0] + (yawDifference * hSpeed / 180);
-        float newPitch = currentRotation[1] + (pitchDifference * vSpeed / 180);
+                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
+            }
 
-        float[] finalTargetRotation = new float[]{newYaw, newPitch};
+            default -> finalRotation = targetRotation;
+        }
 
-        return applyGCDFix(currentRotation, finalTargetRotation);
-    }
-
-    public static float[] smoothExpo(final float[] currentRotation, final float[] targetRotation, float hSpeed, float vSpeed) {
-        float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
-        float pitchDifference = getAngleDifference(targetRotation[1], currentRotation[1]);
-
-        float smoothedYaw = currentRotation[0] + yawDifference * (1 - (float)Math.exp(-(hSpeed / 180)));
-        float smoothedPitch = currentRotation[1] + pitchDifference * (1 - (float)Math.exp(-(vSpeed / 180)));
-
-        float[] finalTargetRotation = new float[] {
-                smoothedYaw,
-                smoothedPitch
-        };
-
-        return applyGCDFix(currentRotation, finalTargetRotation);
+        return finalRotation;
     }
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
@@ -281,10 +247,6 @@ public class RotationUtils implements InstanceAccess {
 
     public static float getAngleDifference(float a, float b) {
         return MathHelper.wrapAngleTo180_float(a - b);
-    }
-
-    public static float i(final double n, final double n2) {
-        return (float) (Math.atan2(n - mc.thePlayer.posX, n2 - mc.thePlayer.posZ) * 57.295780181884766 * -1.0);
     }
 
     public static double getRotationDifference(float[] e) {

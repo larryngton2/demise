@@ -32,7 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ModuleInfo(name = "TPAura", category = ModuleCategory.Combat)
+@ModuleInfo(name = "TPAura", description = "Hits targets from far away by teleporting.", category = ModuleCategory.Combat)
 public class TPAura extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Single", "Multi"}, "Single", this);
     private final SliderValue cps = new SliderValue("CPS", 5, 1, 20, 1, this);

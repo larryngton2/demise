@@ -12,6 +12,7 @@ import wtf.demise.gui.click.dropdown.panel.CategoryPanel;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseOutSine;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.Shadow;

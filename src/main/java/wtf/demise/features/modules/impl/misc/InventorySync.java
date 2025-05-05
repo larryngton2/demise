@@ -8,7 +8,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "Inventory Sync", category = ModuleCategory.Misc)
+@ModuleInfo(name = "InventorySync", description = "Prevents inventory de-syncs.", category = ModuleCategory.Misc)
 public class InventorySync extends Module {
     public short action;
 

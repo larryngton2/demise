@@ -16,7 +16,7 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "FastPlace", category = ModuleCategory.Player)
+@ModuleInfo(name = "FastPlace", description = "Allows you to place blocks faster.", category = ModuleCategory.Player)
 public class FastPlace extends Module {
     public final SliderValue speed = new SliderValue("Right click delay", 1, 0, 4, this);
     private final BoolValue ignoreTickCycle = new BoolValue("Ignore tick cycle", false, this);

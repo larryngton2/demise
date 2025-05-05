@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@ModuleInfo(name = "AntiBot", category = ModuleCategory.Combat)
+@ModuleInfo(name = "AntiBot", description = "Makes Combat-related modules ignore bots.", category = ModuleCategory.Combat)
 public class AntiBot extends Module {
     public final MultiBoolValue options = new MultiBoolValue("Options", Arrays.asList(
             new BoolValue("Tab", false),

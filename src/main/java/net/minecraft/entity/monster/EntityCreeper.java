@@ -15,8 +15,8 @@ import net.minecraft.world.World;
 
 public class EntityCreeper extends EntityMob {
     private int lastActiveTime;
-    private int timeSinceIgnited;
-    private int fuseTime = 30;
+    public int timeSinceIgnited;
+    public int fuseTime = 30;
     private int explosionRadius = 3;
     private int field_175494_bm = 0;
 

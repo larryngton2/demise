@@ -16,7 +16,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "Step", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Step", description = "Allows you to step up blocks.", category = ModuleCategory.Movement)
 public class Step extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"NCP"}, "NCP", this);
     public final SliderValue timer = new SliderValue("Timer", 1, 0.05f, 1, 0.05f, this);

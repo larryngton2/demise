@@ -55,5 +55,4 @@ public class SliderValue extends Value {
     public void setValue(float value) {
         this.value = MathHelper.clamp_float(value, getMin(), getMax());
     }
-
 }

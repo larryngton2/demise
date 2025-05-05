@@ -33,6 +33,7 @@ import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.events.impl.player.SlowDownEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.utils.player.MoveUtil;
@@ -569,7 +570,9 @@ public class EntityPlayerSP extends AbstractClientPlayer {
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding()) {
+        KillAura killAura = Demise.INSTANCE.getModuleManager().getModule(KillAura.class);
+
+        if ((this.isUsingItem() || (killAura.isEnabled() && KillAura.isBlocking && !killAura.autoBlockMode.is("Fake"))) && !this.isRiding()) {
             SlowDownEvent slowDownEvent = new SlowDownEvent(0.2F, 0.2F, true);
             Demise.INSTANCE.getEventManager().call(slowDownEvent);
             this.movementInput.moveStrafe *= slowDownEvent.getStrafe();

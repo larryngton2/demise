@@ -40,7 +40,7 @@ import java.util.Queue;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@ModuleInfo(name = "KillAura", category = ModuleCategory.Combat)
+@ModuleInfo(name = "KillAura", description = "Automatically attack targets.", category = ModuleCategory.Combat)
 public class KillAura extends Module {
 
     // reach

@@ -10,19 +10,19 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "AutoTool", category = ModuleCategory.Player)
+@ModuleInfo(name = "AutoTool", description = "Automatically switches to the best tool when digging.", category = ModuleCategory.Player)
 public class AutoTool extends Module {
+    private final BoolValue spoof = new BoolValue("Spoof", false, this);
+    private final BoolValue switchBack = new BoolValue("Switch Back", true, this, () -> !spoof.get());
 
-    public final BoolValue spoof = new BoolValue("Spoof", false, this);
-    public final BoolValue switchBack = new BoolValue("Switch Back", true, this, () -> !spoof.get());
     private int oldSlot;
-    public boolean wasDigging;
+    private boolean wasDigging;
 
     @Override
     public void onDisable() {
-        if (this.wasDigging) {
-            mc.thePlayer.inventory.currentItem = this.oldSlot;
-            this.wasDigging = false;
+        if (wasDigging) {
+            mc.thePlayer.inventory.currentItem = oldSlot;
+            wasDigging = false;
         }
         SpoofSlotUtils.stopSpoofing();
     }
@@ -30,20 +30,20 @@ public class AutoTool extends Module {
     @EventTarget
     public void onTick(TickEvent e) {
         if (mc.gameSettings.keyBindAttack.isKeyDown() && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && PlayerUtils.findTool(mc.objectMouseOver.getBlockPos()) != -1) {
-            if (!this.wasDigging) {
-                this.oldSlot = mc.thePlayer.inventory.currentItem;
-                if (this.spoof.get()) {
-                    SpoofSlotUtils.startSpoofing(this.oldSlot);
+            if (!wasDigging) {
+                oldSlot = mc.thePlayer.inventory.currentItem;
+                if (spoof.get()) {
+                    SpoofSlotUtils.startSpoofing(oldSlot);
                 }
             }
             mc.thePlayer.inventory.currentItem = PlayerUtils.findTool(mc.objectMouseOver.getBlockPos());
-            this.wasDigging = true;
-        } else if (this.wasDigging && (switchBack.get() || spoof.get())) {
-            mc.thePlayer.inventory.currentItem = this.oldSlot;
+            wasDigging = true;
+        } else if (wasDigging && (switchBack.get() || spoof.get())) {
+            mc.thePlayer.inventory.currentItem = oldSlot;
             SpoofSlotUtils.stopSpoofing();
-            this.wasDigging = false;
+            wasDigging = false;
         } else {
-            this.oldSlot = mc.thePlayer.inventory.currentItem;
+            oldSlot = mc.thePlayer.inventory.currentItem;
         }
     }
 }

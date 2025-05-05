@@ -29,7 +29,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
-@ModuleInfo(name = "Murder Mystery", category = ModuleCategory.Misc)
+@ModuleInfo(name = "Murder Mystery", description = "Utilities for the MurderMystery gamemode.", category = ModuleCategory.Misc)
 public class MurderMystery extends Module {
 
     // murderer

@@ -16,7 +16,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "InvMove", category = ModuleCategory.Movement)
+@ModuleInfo(name = "InvMove", description = "Allows you to move in GUIS.", category = ModuleCategory.Movement)
 public class InvMove extends Module {
     private final BoolValue cancelInventory = new BoolValue("No inv", false, this);
     private final BoolValue cancelChest = new BoolValue("No chest", false, this);

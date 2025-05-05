@@ -12,7 +12,6 @@ import java.util.List;
 public final class FriendManager {
     private final List<Friend> friends = new ArrayList<>();
 
-
     public void add(final String name) {
         this.add(name, name);
     }

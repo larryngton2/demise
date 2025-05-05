@@ -31,7 +31,7 @@ import wtf.demise.utils.packet.PacketUtils;
 
 import static net.minecraft.network.play.client.C07PacketPlayerDigging.Action.RELEASE_USE_ITEM;
 
-@ModuleInfo(name = "NoSlow", category = ModuleCategory.Movement)
+@ModuleInfo(name = "NoSlow", description = "Modifies item-use slowdown.", category = ModuleCategory.Movement)
 public class NoSlow extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Grim", "Intave", "NCP", "Prediction"}, "Vanilla", this);
     public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Release", "Old", "Test"}, "Release", this, () -> mode.is("Intave"));

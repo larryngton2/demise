@@ -103,6 +103,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
+import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -745,7 +746,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         long i = System.nanoTime();
         this.mcProfiler.startSection("root");
 
-        Demise.INSTANCE.getEventManager().call(new GameEvent());
+
+        GameEvent gameEvent = new GameEvent();
+
+        Demise.INSTANCE.getEventManager().call(gameEvent);
+
+        if (gameEvent.isCancelled()) {
+            return;
+        }
 
         if (Display.isCreated() && Display.isCloseRequested()) {
             this.shutdown();

@@ -27,7 +27,7 @@ import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 
-@ModuleInfo(name = "TargetStrafe", category = ModuleCategory.Movement)
+@ModuleInfo(name = "TargetStrafe", description = "Strafes around your target.", category = ModuleCategory.Movement)
 public class TargetStrafe extends Module {
     public final SliderValue range = new SliderValue("Range", 1, 0.1f, 6, 0.1f, this);
     public final BoolValue holdJump = new BoolValue("Hold Jump", false, this);

@@ -10,6 +10,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.world.Explosion;
 import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.BlockAABBEvent;
@@ -31,7 +32,7 @@ import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.Objects;
 
-@ModuleInfo(name = "Velocity", category = ModuleCategory.Combat)
+@ModuleInfo(name = "Velocity", description = "Minimises or removes knockback.", category = ModuleCategory.Combat)
 public class Velocity extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
     public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce", "MoreReduce"}, "Reduce", this, () -> mode.is("Intave"));
@@ -61,7 +62,7 @@ public class Velocity extends Module {
 
             switch (mode.get()) {
                 case "Normal":
-                    if (mc.thePlayer.hurtTime == mc.thePlayer.maxHurtTime) {
+                    if (mc.thePlayer.hurtTime >= mc.thePlayer.maxHurtTime - 1) {
                         if (horizontal.get() != 100.0D) {
                             mc.thePlayer.motionX *= horizontal.get() / 100.0D;
                             mc.thePlayer.motionZ *= horizontal.get() / 100.0D;
@@ -140,10 +141,27 @@ public class Velocity extends Module {
         }
 
         switch (mode.get()) {
+            case "Normal":
+                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
+                    /*
+                    if (horizontal.get() != 100.0D) {
+                        mc.thePlayer.motionX = ((double) packet.getMotionX() / 8000) * horizontal.get() / 100.0;
+                        mc.thePlayer.motionZ = ((double) packet.getMotionZ() / 8000) * horizontal.get() / 100.0;
+                    }
+
+                    if (vertical.get() != 100.0D) {
+                        mc.thePlayer.motionY = ((double) packet.getMotionY() / 8000) * vertical.get() / 100.0;
+                    }
+
+                     */
+
+                    packet.motionX *=horizontal.get() / 100;
+                    packet.motionY *= vertical.get() / 100;
+                    packet.motionZ *= horizontal.get() / 100;
+                }
+                break;
             case "Cancel":
                 if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
-                    if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
-
                         if (horizontal.get() != 100.0D) {
                             mc.thePlayer.motionX = ((double) packet.getMotionX() / 8000) * horizontal.get() / 100.0;
                             mc.thePlayer.motionZ = ((double) packet.getMotionZ() / 8000) * horizontal.get() / 100.0;
@@ -154,7 +172,6 @@ public class Velocity extends Module {
                         }
 
                         e.setCancelled(true);
-                    }
                 }
                 break;
             case "GrimC07":

@@ -26,7 +26,7 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "BackTrack", category = ModuleCategory.Legit)
+@ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach.", category = ModuleCategory.Legit)
 public class BackTrack extends Module {
     private final BoolValue onlyWhenNeeded = new BoolValue("Only when needed", false, this);
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
@@ -48,6 +48,7 @@ public class BackTrack extends Module {
     private EntityOtherPlayerMP fakePlayer;
     private boolean addedEntity;
     private boolean dispatched;
+    private boolean outOfRange;
 
     @Override
     public void onDisable() {
@@ -83,9 +84,17 @@ public class BackTrack extends Module {
             double realDistance = PlayerUtils.getCustomDistanceToEntityBox(realPosition, mc.thePlayer);
             double clientDistance = PlayerUtils.getDistanceToEntityBox(target);
 
-            boolean onlyNeeded = ((realDistance >= clientDistance && realDistance > 3) || (mc.thePlayer.hurtTime < 8 && mc.thePlayer.hurtTime > 3)) && clientDistance <= 3;
+            if (clientDistance > 3 && target.hurtTime != 0) {
+                outOfRange = true;
+            }
 
-            boolean on = realDistance >= clientDistance && realDistance > minRange.get() && realDistance < maxRange.get();
+            if (target.hurtTime == 10) {
+                outOfRange = false;
+            }
+
+            boolean onlyNeeded = ((realDistance > clientDistance && realDistance > 3) || outOfRange) && realDistance < 4.5 && clientDistance <= 3;
+
+            boolean on = realDistance > clientDistance && realDistance > minRange.get() && realDistance < maxRange.get();
 
             shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;
 
@@ -112,19 +121,15 @@ public class BackTrack extends Module {
 
             realLastPos = realPosition;
 
-            if (shouldLag) {
-                if (e.getPacket() instanceof S14PacketEntity s14PacketEntity) {
-                    if (s14PacketEntity.getEntityId() == target.getEntityId()) {
-                        realPosition = realPosition.addVector(s14PacketEntity.getX() / 32.0D, s14PacketEntity.getY() / 32.0D,
-                                s14PacketEntity.getZ() / 32.0D);
-                    }
-                } else if (e.getPacket() instanceof S18PacketEntityTeleport s18PacketEntityTeleport) {
-                    if (s18PacketEntityTeleport.getEntityId() == target.getEntityId()) {
-                        realPosition = new Vec3(s18PacketEntityTeleport.getX() / 32D, s18PacketEntityTeleport.getY() / 32D, s18PacketEntityTeleport.getZ() / 32D);
-                    }
+            if (e.getPacket() instanceof S14PacketEntity s14PacketEntity) {
+                if (s14PacketEntity.getEntityId() == target.getEntityId()) {
+                    realPosition = realPosition.addVector(s14PacketEntity.getX() / 32.0D, s14PacketEntity.getY() / 32.0D,
+                            s14PacketEntity.getZ() / 32.0D);
                 }
-            } else {
-                realPosition = target.getPositionVector();
+            } else if (e.getPacket() instanceof S18PacketEntityTeleport s18PacketEntityTeleport) {
+                if (s18PacketEntityTeleport.getEntityId() == target.getEntityId()) {
+                    realPosition = new Vec3(s18PacketEntityTeleport.getX() / 32D, s18PacketEntityTeleport.getY() / 32D, s18PacketEntityTeleport.getZ() / 32D);
+                }
             }
         }
     }
@@ -146,7 +151,7 @@ public class BackTrack extends Module {
                     AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + animatedX.getOutput(), box.minY - mc.thePlayer.posY + animatedY.getOutput(), box.minZ - mc.thePlayer.posZ + animatedZ.getOutput(), box.maxX - mc.thePlayer.posX + animatedX.getOutput(), box.maxY - mc.thePlayer.posY + animatedY.getOutput(), box.maxZ - mc.thePlayer.posZ + animatedZ.getOutput());
 
                     if (shouldLag) {
-                        RenderUtils.drawAxisAlignedBB(axis, true, color.get().getRGB());
+                        RenderUtils.drawAxisAlignedBB(axis, true, false, color.get().getRGB());
                     }
                 }
                 break;

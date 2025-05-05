@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@ModuleInfo(name = "AntiCheat", category = ModuleCategory.Misc)
+@ModuleInfo(name = "AntiCheat", description = "Attempts to detect cheaters in your match.", category = ModuleCategory.Misc)
 public class AntiCheat extends Module {
     public final MultiBoolValue options = new MultiBoolValue("Detects", Arrays.asList(
             new BoolValue("Angle", false),
@@ -49,7 +49,6 @@ public class AntiCheat extends Module {
                 new ScaffoldCheck(),
                 new VelocityCheck(),
                 new OmniSprintCheck()
-
         );
     }
 

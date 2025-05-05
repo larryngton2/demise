@@ -5,11 +5,11 @@ import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "NoHitDelay", category = ModuleCategory.Legit)
+@ModuleInfo(name = "NoHitDelay", description = "Removes Minecraft's hit delay.", category = ModuleCategory.Legit)
 public class NoHitDelay extends wtf.demise.features.modules.Module {
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(UpdateEvent e) {
         if (mc.theWorld != null && mc.thePlayer != null) {
             if (!mc.inGameHasFocus) return;
 

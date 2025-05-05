@@ -15,9 +15,9 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
+import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
@@ -27,21 +27,25 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleInfo(name = "TickBase", category = ModuleCategory.Combat)
+@ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TickBase extends Module {
+    //public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past", "TimeTravel"}, "Future", this);
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue attackRange = new SliderValue("Attack range", 3f, 0.1f, 7f, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 7f, 0.1f, this);
     private final SliderValue maxTick = new SliderValue("Max ticks", 4, 1, 20, this);
     private final BoolValue renderPredictedTargetPos = new BoolValue("Render predicted target pos", false, this);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
-    private final BoolValue displayPredictPos = new BoolValue("Dislay predicted pos", false, this);
+    private final BoolValue displayPredictPos = new BoolValue("Render predicted self pos", false, this);
     private final BoolValue useBacktrackPos = new BoolValue("Use backtrack pos", false, this);
     private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
+
     private final TimerUtils timer = new TimerUtils();
+    private int skippedTick = 0;
     private long shifted, previousTime;
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
     private EntityPlayer target;
+    private final TimerUtils futureTimer = new TimerUtils();
 
     @Override
     public void onEnable() {
@@ -51,32 +55,99 @@ public class TickBase extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        target = PlayerUtils.getTarget(searchRange.get() * 3, teamCheck.get());
+        //setTag(mode.get());
+        setTag(String.valueOf(maxTick.get()));
 
-        this.setTag(String.valueOf(maxTick.get()));
+        target = PlayerUtils.getTarget(searchRange.get(), teamCheck.get());
     }
 
     @EventTarget
     public void onTimerManipulation(TimerManipulationEvent e) {
-        if (target == null || selfPrediction.isEmpty() || shouldStop()) {
-            return;
-        }
-
-        if (shouldStart() && timer.hasTimeElapsed(delay.get())) {
-            if (target.hurtTime == 10) {
-                ChatUtils.sendMessageClient("HitBug");
+        //if (mode.is("Past")) {
+            if (target == null || selfPrediction.isEmpty() || shouldStop()) {
+                return;
             }
 
-            shifted += e.getTime() - previousTime;
+            if (shouldStart() && timer.hasTimeElapsed(delay.get())) {
+                shifted += e.getTime() - previousTime;
+            }
+
+            if (shifted >= maxTick.get() * 50) {
+                shifted = 0;
+                timer.reset();
+            }
+
+            previousTime = e.getTime();
+            e.setTime(e.getTime() - shifted);
+        //}
+
+        /*
+        if (mode.is("Future")) {
+            e.setTime(e.getTime() - shifted);
+
+            if (target == null || selfPrediction.isEmpty() || shouldStop()) {
+                return;
+            }
+
+            if (shouldStart() && timer.hasTimeElapsed(delay.get())) {
+                shifted += e.getTime() - previousTime;
+            }
+
+            if (shifted >= maxTick.get() * 50) {
+                shifted = 0;
+                timer.reset();
+            }
+
+            previousTime = e.getTime();
         }
 
-        if (shifted >= maxTick.get() * (1000 / 20f)) {
-            shifted = 0;
-            timer.reset();
+        if (mode.is("asdsd")) {
+            if (target == null || selfPrediction.isEmpty() || shouldStop()) {
+                return;
+            }
+
+            previousTime = e.getTime();
+
+            if (!futureTimer.hasTimeElapsed(maxTick.get() * 50)) {
+                shifted += e.getTime() - previousTime;
+
+                timer.reset();
+
+                previousTime = e.getTime();
+                e.setTime(e.getTime() - shifted);
+            }
+
+            if (shouldStart() && timer.hasTimeElapsed(delay.get()) && futureTimer.hasTimeElapsed(maxTick.get() * 50)) {
+                e.setTime(e.getTime() + (long) (maxTick.get() * 50));
+                futureTimer.reset();
+            }
         }
 
-        previousTime = e.getTime();
-        e.setTime(e.getTime() - shifted);
+        //WARNING: THIS SHIT IS ASS
+        if (mode.is("TimeTravel")) {
+            if (target == null || selfPrediction.isEmpty() || shouldStop()) {
+                return;
+            }
+
+            if (shouldStart() && timer.hasTimeElapsed(delay.get()) && futureTimer.hasTimeElapsed(maxTick.get() * 50)) {
+                e.setTime(e.getTime() + (long) (maxTick.get() * 50));
+                futureTimer.reset();
+            }
+
+            if (!futureTimer.hasTimeElapsed(maxTick.get() * 50)) {
+                timer.reset();
+
+                shifted += e.getTime() - previousTime;
+                previousTime = e.getTime();
+                e.setTime(e.getTime() - shifted);
+            }
+
+            if (shifted >= maxTick.get() * 50) {
+                shifted = 0;
+            }
+        }
+
+         */
     }
 
     @EventTarget
@@ -143,7 +214,7 @@ public class TickBase extends Module {
         double predictedSelfDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.get((int) maxTick.get() - 1).position, target);
 
         return predictedSelfDistance < predictedTargetDistance &&
-                predictedSelfDistance <= attackRange.get() &&
+                predictedSelfDistance + 0.5657 * (maxTick.get() / 2) /* (mode.is("Past") ? 0.5657 * (maxTick.get() / 2) : 0) */ <= attackRange.get() &&
                 predictedSelfDistance <= searchRange.get() &&
                 PlayerUtils.getDistanceToEntityBox(target) >= attackRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&

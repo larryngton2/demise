@@ -22,6 +22,8 @@ public abstract class Module implements InstanceAccess {
     @Getter
     private final String name;
     @Getter
+    private final String description;
+    @Getter
     private final ModuleCategory category;
     @Getter
     @Setter
@@ -47,6 +49,7 @@ public abstract class Module implements InstanceAccess {
         this.moduleInfo = this.getClass().getAnnotation(ModuleInfo.class);
         Objects.requireNonNull(moduleInfo, "ModuleInfo annotation is missing on " + getClass().getName());
         this.name = moduleInfo.name();
+        this.description = moduleInfo.description();
         this.category = moduleInfo.category();
         this.keyBind = moduleInfo.key();
     }

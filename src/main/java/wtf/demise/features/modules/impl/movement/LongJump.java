@@ -14,7 +14,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "LongJump", category = ModuleCategory.Movement)
+@ModuleInfo(name = "LongJump", description = "Jump, but longer.", category = ModuleCategory.Movement)
 public class LongJump extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "NCP"}, "Vanilla", this);
     private final SliderValue jumpOffAmount = new SliderValue("JumpOff amount", 0.2f, 0.01f, 2, 0.01f, this, () -> mode.is("Vanilla"));

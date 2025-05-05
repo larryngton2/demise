@@ -8,7 +8,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 
-@ModuleInfo(name = "Twerk", category = ModuleCategory.Misc)
+@ModuleInfo(name = "Twerk", description = "Automatically acts like popular girls at my school.", category = ModuleCategory.Misc)
 public class Twerk extends Module {
     private final SliderValue delay = new SliderValue("Delay", 2, 1, 20, 1, this);
 

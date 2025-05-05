@@ -14,7 +14,7 @@ import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "NoFall", category = ModuleCategory.Player)
+@ModuleInfo(name = "NoFall", description = "Mitigates fall damage.", category = ModuleCategory.Player)
 public class NoFall extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"NoGround", "Extra", "Blink", "Watchdog"}, "NoGround", this);
     public final SliderValue distance = new SliderValue("Fall distance", 3, 0, 8, 1, this, () -> !mode.is("NoGround"));

@@ -9,7 +9,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "Sneak", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Sneak", description = "Sneak.", category = ModuleCategory.Movement)
 public class Sneak extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit", "Packet"}, "Legit", this);
 

@@ -81,6 +81,18 @@ public class CategoryPanel implements IComponent {
                     component.drawScreen(mouseX, mouseY);
                 }
                 componentOffsetY += (float) (component.getHeight() * openAnimation.getOutput());
+
+                float x = component.getX();
+                float y = component.getY();
+                float width = component.getWidth();
+                float height = 19;
+
+                if (MouseUtils.isHovered(x, y, width, height, mouseX, mouseY) && this.isOpened()) {
+                    float strWidth = Fonts.interRegular.get(14).getStringWidth(component.getModule().getDescription()) + 8;
+
+                    RoundedUtils.drawRound(x + width + 5, y + 2, strWidth, height - 4, 5, new Color(0, 0, 0, (int) Math.min(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get() + 50, 255)));
+                    Fonts.interRegular.get(14).drawStringWithShadow(component.getModule().getDescription(), x + width + 9, y + 5 + (height - 5) / 2 - Fonts.interRegular.get(14).getHeight() / 2, -1);
+                }
             }
         } else {
             for (ModuleComponent component : moduleComponents) {
@@ -88,6 +100,17 @@ public class CategoryPanel implements IComponent {
                 component.setY(y + componentOffsetY);
                 component.setWidth(width);
                 componentOffsetY += (float) (component.getHeight() * openAnimation.getOutput());
+
+                float x = component.getX();
+                float y = component.getY();
+                float width = component.getWidth();
+                float height = 19;
+
+                if (MouseUtils.isHovered(x, y, width, height, mouseX, mouseY) && this.isOpened()) {
+                    float strWidth = Fonts.interRegular.get(14).getStringWidth(component.getModule().getDescription()) + 8;
+
+                    RoundedUtils.drawShaderRound(x + width + 5, y + 2, strWidth, height - 4, 5, new Color(0, 0, 0, (int) Math.min(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get() + 50, 255)));
+                }
             }
         }
 

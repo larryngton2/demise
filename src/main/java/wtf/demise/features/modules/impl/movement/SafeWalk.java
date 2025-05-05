@@ -10,7 +10,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 
-@ModuleInfo(name = "SafeWalk", category = ModuleCategory.Movement)
+@ModuleInfo(name = "SafeWalk", description = "Prevents you from falling from blocks.", category = ModuleCategory.Movement)
 public class SafeWalk extends Module {
 
     private final BoolValue heldBlocks = new BoolValue("Held Blocks Check", true, this);
@@ -26,6 +26,6 @@ public class SafeWalk extends Module {
     }
 
     public boolean canSafeWalk() {
-        return mc.thePlayer.onGround && (heldBlocks.get() && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock || !heldBlocks.get()) && (pitchCheck.get() && MathUtils.inBetween(minPitch.getMin(), maxPitch.getMax(), mc.thePlayer.rotationPitch) || !pitchCheck.get());
+        return mc.thePlayer.onGround && (!heldBlocks.get() || mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) && (!pitchCheck.get() || MathUtils.inBetween(minPitch.getMin(), maxPitch.getMax(), mc.thePlayer.rotationPitch));
     }
 }

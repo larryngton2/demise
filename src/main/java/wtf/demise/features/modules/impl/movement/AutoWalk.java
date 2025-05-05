@@ -22,13 +22,14 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.SmoothMode;
 
 import java.util.Arrays;
 
 /**
  * YES, I am using code from KillAura. FUCK YOU
  */
-@ModuleInfo(name = "AutoWalk", category = ModuleCategory.Movement)
+@ModuleInfo(name = "AutoWalk", description = "w a l k", category = ModuleCategory.Movement)
 public class AutoWalk extends Module {
     private final BoolValue target = new BoolValue("Target player", false, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this, target::get);
@@ -50,8 +51,8 @@ public class AutoWalk extends Module {
             EntityLivingBase target = findTarget();
             if (target != null) {
                 if (rotate.get()) {
-                    mc.thePlayer.rotationYaw = RotationUtils.smoothLinear(RotationUtils.serverRotation, calcToEntity(target), 25, 45)[0];
-                    mc.thePlayer.rotationPitch = RotationUtils.smoothLinear(RotationUtils.serverRotation, calcToEntity(target), 25, 45)[1];
+                    mc.thePlayer.rotationYaw = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, SmoothMode.Linear)[0];
+                    mc.thePlayer.rotationPitch = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, SmoothMode.Linear)[1];
                 }
 
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), PlayerUtils.getDistanceToEntityBox(target) > minRange.get());

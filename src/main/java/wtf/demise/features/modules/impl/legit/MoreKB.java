@@ -13,7 +13,7 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "MoreKB", category = ModuleCategory.Legit)
+@ModuleInfo(name = "MoreKB", description = "Deals increased knockback to targets.", category = ModuleCategory.Legit)
 public class MoreKB extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit", "LessPacket", "Packet"}, "Legit", this);
     private final BoolValue smart = new BoolValue("Smart", false, this);

@@ -21,7 +21,7 @@ import wtf.demise.utils.player.InventoryUtils;
 
 import java.util.*;
 
-@ModuleInfo(name = "Manager", category = ModuleCategory.Player)
+@ModuleInfo(name = "Manager", description = "Manages your inventory.", category = ModuleCategory.Player)
 public class Manager extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Open Inventory", "Spoof"}, "Open Inventory", this);
 

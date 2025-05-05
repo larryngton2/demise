@@ -8,7 +8,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 
-@ModuleInfo(name = "JumpDelay", category = ModuleCategory.Movement)
+@ModuleInfo(name = "JumpDelay", description = "Modifies your jump delay.", category = ModuleCategory.Movement)
 public class JumpDelay extends Module {
     private final SliderValue jumpDelay = new SliderValue("Jump delay", 0, 0, 20, 1, this);
     private final TimerUtils delay = new TimerUtils();

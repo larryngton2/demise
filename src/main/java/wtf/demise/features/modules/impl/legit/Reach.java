@@ -9,7 +9,7 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 
-@ModuleInfo(name = "Reach", category = ModuleCategory.Legit)
+@ModuleInfo(name = "Reach", description = "Increases your reach.", category = ModuleCategory.Legit)
 public class Reach extends Module {
     public final SliderValue min = new SliderValue("Min Range", 3.0F, 3, 6F, .1f, this);
     public final SliderValue max = new SliderValue("Max Range", 3.3F, 3, 6F, .1f, this);

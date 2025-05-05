@@ -13,7 +13,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.player.InventoryUtils;
 
-@ModuleInfo(name = "AutoWeapon", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoWeapon", description = "Automatically switches to the best weapon in your hotbar when attacking.", category = ModuleCategory.Legit)
 public class AutoWeapon extends Module {
     private final BoolValue switchBack = new BoolValue("Switch Back", true, this);
 

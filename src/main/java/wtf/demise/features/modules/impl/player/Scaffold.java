@@ -39,7 +39,7 @@ import wtf.demise.utils.render.RenderUtils;
 import java.util.Arrays;
 import java.util.List;
 
-@ModuleInfo(name = "Scaffold", category = ModuleCategory.Player)
+@ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.", category = ModuleCategory.Player)
 public class Scaffold extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly"}, "Normal", this);
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));

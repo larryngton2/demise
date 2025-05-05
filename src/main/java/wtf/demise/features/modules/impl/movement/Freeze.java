@@ -9,7 +9,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "Freeze", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Freeze", description = "Freezes your player's motion.", category = ModuleCategory.Movement)
 public class Freeze extends Module {
     private double motionX;
     private double motionY;

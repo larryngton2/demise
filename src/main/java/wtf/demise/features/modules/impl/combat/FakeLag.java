@@ -24,13 +24,13 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "FakeLag", category = ModuleCategory.Combat)
+@ModuleInfo(name = "FakeLag", description = "Abuses latency in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class FakeLag extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Pulse", "Spoof"}, "Pulse", this);
-    private final BoolValue alwaysSpoof = new BoolValue("Always spoof", false, this);
-    private final SliderValue attackRange = new SliderValue("Attack range", 4, 0, 15, 0.1f, this);
-    private final SliderValue searchRange = new SliderValue("Search range", 6, 1, 15, 0.1f, this);
     private final BoolValue smartRange = new BoolValue("Smart range", true, this);
+    private final SliderValue attackRange = new SliderValue("Attack range", 4, 0, 15, 0.1f, this, () -> !smartRange.get());
+    private final BoolValue alwaysSpoof = new BoolValue("Always spoof", false, this);
+    private final SliderValue searchRange = new SliderValue("Search range", 6, 1, 15, 0.1f, this, () -> !alwaysSpoof.get());
     private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 1, 0, 1000, this);
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
@@ -141,7 +141,7 @@ public class FakeLag extends Module {
                         ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
                         PingSpoofComponent.spoof(ms, true, false, false, false, true, true);
 
-                        if (delay.hasTimeElapsed(ms + 250)) {
+                        if (delay.hasTimeElapsed(ms * 2L)) {
                             x = PingSpoofComponent.getRealPos().xCoord;
                             y = PingSpoofComponent.getRealPos().yCoord;
                             z = PingSpoofComponent.getRealPos().zCoord;
@@ -149,6 +149,8 @@ public class FakeLag extends Module {
 
                         blinking = true;
                         dispatched = false;
+                    } else {
+                        blinking = false;
                     }
                 } else {
                     if (!dispatched) {
@@ -156,13 +158,16 @@ public class FakeLag extends Module {
                         PingSpoofComponent.dispatch();
                         dispatched = true;
                     }
-                    x = mc.thePlayer.posX;
-                    y = mc.thePlayer.posY;
-                    z = mc.thePlayer.posZ;
                     blinking = false;
                     ever.reset();
                     delay.reset();
                     picked = false;
+                }
+
+                if (!blinking) {
+                    x = lerpX = mc.thePlayer.posX;
+                    y = lerpY = mc.thePlayer.posY;
+                    z = lerpZ = mc.thePlayer.posZ;
                 }
                 break;
         }
@@ -179,8 +184,10 @@ public class FakeLag extends Module {
 
     private boolean shouldLag() {
         return target != null &&
-                smartRange.get() ? (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !attacked) && PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()) : Range.between(attackRange.get(), alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target)) &&
-                mc.thePlayer.canEntityBeSeen(target);
+                smartRange.get()
+                ? (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !attacked) && PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get())
+                : Range.between(attackRange.get(), alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target))
+                && mc.thePlayer.canEntityBeSeen(target);
     }
 
     @EventTarget

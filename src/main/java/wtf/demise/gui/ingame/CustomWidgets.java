@@ -22,6 +22,7 @@ import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.impl.combat.TimerRange;
 import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
@@ -56,6 +57,8 @@ public class CustomWidgets implements InstanceAccess {
     private float tAlpha = 255;
     private final TimerUtils textTimer = new TimerUtils();
     private final CustomWidgetsModule customWidgetsModule = Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class);
+    private float interpolatedWidth;
+    private float interpolatedX;
 
     @EventTarget
     public void onRender2D(Render2DEvent e) {
@@ -67,8 +70,9 @@ public class CustomWidgets implements InstanceAccess {
 
         if (customWidgetsModule.hotbar.get() && customWidgetsModule.isEnabled()) {
             drawCustomHotbar(i);
-            drawRealSlot(i, false);
         }
+
+        drawHotbarWidget(i, false);
 
         if (customWidgetsModule.chat.get()) {
             drawChat(GuiIngame.getUpdateCounter(), false);
@@ -271,8 +275,10 @@ public class CustomWidgets implements InstanceAccess {
         }
     }
 
-    private void drawRealSlot(int i, boolean shader) {
-        if (!SpoofSlotUtils.isSpoofing() && interpolatedY >= sr.getScaledHeight() + 19) {
+    private void drawHotbarWidget(int i, boolean shader) {
+        TimerRange timerRange = getModule(TimerRange.class);
+
+        if (!(SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) && interpolatedY >= sr.getScaledHeight() + 19) {
             return;
         }
 
@@ -285,23 +291,31 @@ public class CustomWidgets implements InstanceAccess {
         float totalWidth;
         String text;
 
-        if (heldItem != null) {
-            if (heldItem.getItem() instanceof ItemBlock) {
-                text = "§l" + countStr + "§r block" + (count != 1 ? "s" : "");
+        if (SpoofSlotUtils.isSpoofing()) {
+            if (heldItem != null) {
+                if (heldItem.getItem() instanceof ItemBlock) {
+                    text = "§l" + countStr + "§r block" + (count != 1 ? "s" : "");
+                } else {
+                    text = "";
+                }
+
+                float textWidth = Fonts.interMedium.get(18).getStringWidth(text);
+
+                if (heldItem.getItem() instanceof ItemBlock) {
+                    totalWidth = ((textWidth + blockWH + spacing) + 6);
+                } else {
+                    totalWidth = ((blockWH + spacing) + 3);
+                }
             } else {
                 text = "";
+                totalWidth = ((Fonts.interMedium.get(18).getStringWidth(text) + blockWH + spacing) + 3);
             }
-
-            float textWidth = Fonts.interBold.get(18).getStringWidth(text);
-
-            if (heldItem.getItem() instanceof ItemBlock) {
-                totalWidth = ((textWidth + blockWH + spacing) + 6);
-            } else {
-                totalWidth = ((blockWH + spacing) + 3);
-            }
+        } else if (timerRange.isEnabled() && timerRange.renderBal) {
+            text = timerRange.balanceText;
+            totalWidth = ((Fonts.interMedium.get(18).getStringWidth(text) + spacing) + 6);
         } else {
             text = "";
-            totalWidth = ((Fonts.interBold.get(18).getStringWidth(text) + blockWH + spacing) + 3);
+            totalWidth = ((Fonts.interMedium.get(18).getStringWidth(text) + blockWH + spacing) + 3);
         }
 
         float height = 20;
@@ -309,24 +323,37 @@ public class CustomWidgets implements InstanceAccess {
         float renderX = (i - totalWidth / 2);
         float renderY = (sr.getScaledHeight() - 80 - 5);
 
-        if (SpoofSlotUtils.isSpoofing()) {
+        if (SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) {
             interpolatedY = MathUtils.interpolate(interpolatedY, renderY, 0.05f);
         } else {
             interpolatedY = MathUtils.interpolate(interpolatedY, sr.getScaledHeight() + height, 0.05f);
         }
 
+        interpolatedWidth = MathUtils.interpolate(interpolatedWidth, totalWidth, 0.05f);
+        interpolatedX = MathUtils.interpolate(interpolatedX, renderX, 0.05f);
+
         GL11.glPushMatrix();
 
         if (!shader) {
-            RoundedUtils.drawRound(renderX, interpolatedY, totalWidth, height, 7, new Color(getModule(Interface.class).bgColor(), true));
+            //todo scissor
 
-            Fonts.interBold.get(18).drawString(text, renderX + 3 + blockWH + spacing, interpolatedY + height / 2F - Fonts.interBold.get(18).getHeight() / 2F + 2.5f, -1);
+            //RenderUtils.scissor(interpolatedX + 0.25, interpolatedY + 0.25, interpolatedWidth - 0.5, height);
 
-            RenderHelper.enableGUIStandardItemLighting();
-            mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) renderX + 3, (int) (interpolatedY + 10 - (blockWH / 2)));
-            RenderHelper.disableStandardItemLighting();
+            //RenderUtils.enableScissor();
+
+            RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, height, 7, new Color(getModule(Interface.class).bgColor(), true));
+
+            Fonts.interMedium.get(18).drawString(text, interpolatedX + 3 - (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing() ? 16 : 0) + blockWH + spacing, interpolatedY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, -1);
+
+            if (SpoofSlotUtils.isSpoofing()) {
+                RenderHelper.enableGUIStandardItemLighting();
+                mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) interpolatedX + 3, (int) (interpolatedY + 10 - (blockWH / 2)));
+                RenderHelper.disableStandardItemLighting();
+            }
+
+            //RenderUtils.disableScissor();
         } else {
-            RoundedUtils.drawShaderRound(renderX, interpolatedY, totalWidth, height, 7, Color.black);
+            RoundedUtils.drawShaderRound(interpolatedX, interpolatedY, interpolatedWidth, height, 7, Color.black);
         }
 
         GL11.glPopMatrix();
@@ -442,7 +469,7 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.hotbar.get()) {
-            drawRealSlot(i, true);
+            drawHotbarWidget(i, true);
         }
 
         if (customWidgetsModule.scoreboard.get()) {

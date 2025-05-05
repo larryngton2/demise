@@ -12,7 +12,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.ChatUtils;
 
-@ModuleInfo(name = "Fly", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Fly", description = "Allows you to fly.", category = ModuleCategory.Movement)
 public class Fly extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Intave ladder"}, "Vanilla", this);
     private final SliderValue speed = new SliderValue("Speed", 2, 1, 5, 0.1f, this, () -> mode.is("Vanilla"));

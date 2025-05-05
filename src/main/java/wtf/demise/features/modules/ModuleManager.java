@@ -43,6 +43,7 @@ public class ModuleManager {
                 FakeLag.class,
                 TimerRange.class,
                 TPAura.class,
+                ComboBreaker.class,
 
                 // Legit
                 AutoClicker.class,
@@ -74,6 +75,8 @@ public class ModuleManager {
                 MurderMystery.class,
                 InventorySync.class,
                 AutoQueue.class,
+                AutoRegister.class,
+                ExplosionBlock.class,
 
                 // Movement
                 Freeze.class,
@@ -101,7 +104,6 @@ public class ModuleManager {
                 NoFall.class,
                 Stealer.class,
                 BedNuker.class,
-                NoRot.class,
                 FastUse.class,
                 FastBreak.class,
                 Scaffold.class,

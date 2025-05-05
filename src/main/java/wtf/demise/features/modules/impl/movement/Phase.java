@@ -25,7 +25,7 @@ import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 
-@ModuleInfo(name = "Phase", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Phase", description = "Allows you to phase through blocks.", category = ModuleCategory.Movement)
 public class Phase extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Intave"}, "Vanilla", this);
     private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Manual", "SWAuto"}, "Manual", this, () -> mode.is("Intave"));

@@ -12,7 +12,7 @@ import wtf.demise.utils.math.TimerUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-@ModuleInfo(name = "AutoClicker", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoClicker", description = "Automatically clicks.", category = ModuleCategory.Legit)
 public class AutoClicker extends Module {
     private final BoolValue left = new BoolValue("Left click", true, this);
     private final SliderValue lminCPS = new SliderValue("CPS (left min)", 10, 1, 20, this, left::get);

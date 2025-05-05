@@ -10,9 +10,8 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "MotionModifier", category = ModuleCategory.Movement)
+@ModuleInfo(name = "MotionModifier", description = "Testing module for speeds. Good luck trying to configure this.", category = ModuleCategory.Movement)
 public class MotionModifier extends Module {
-
     private final BoolValue motionMulti = new BoolValue("Motion multi", false, this);
 
     private final BoolValue air = new BoolValue("On air", true, this, motionMulti::get);

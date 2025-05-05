@@ -11,7 +11,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 
-@ModuleInfo(name = "JumpReset", category = ModuleCategory.Legit)
+@ModuleInfo(name = "JumpReset", description = "Automatically jump resets in order to reduce velocity.", category = ModuleCategory.Legit)
 public class JumpReset extends Module {
     private final SliderValue chance = new SliderValue("Chance", 75, 1, 100, 1, this);
     private final SliderValue minHurtTime = new SliderValue("Min hurtTime", 7, 0, 9, 1, this);

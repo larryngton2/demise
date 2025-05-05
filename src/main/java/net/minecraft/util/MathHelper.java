@@ -82,15 +82,15 @@ public class MathHelper {
     }
 
     public static int clamp_int(int num, int min, int max) {
-        return num < min ? min : (num > max ? max : num);
+        return num < min ? min : (Math.min(num, max));
     }
 
     public static float clamp_float(float num, float min, float max) {
-        return num < min ? min : (num > max ? max : num);
+        return num < min ? min : (Math.min(num, max));
     }
 
     public static double clamp_double(double num, double min, double max) {
-        return num < min ? min : (num > max ? max : num);
+        return num < min ? min : (Math.min(num, max));
     }
 
     public static double denormalizeClamp(double lowerBnd, double upperBnd, double slide) {
@@ -106,7 +106,7 @@ public class MathHelper {
             p_76132_2_ = -p_76132_2_;
         }
 
-        return p_76132_0_ > p_76132_2_ ? p_76132_0_ : p_76132_2_;
+        return Math.max(p_76132_0_, p_76132_2_);
     }
 
     public static int bucketInt(int p_76137_0_, int p_76137_1_) {

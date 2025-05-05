@@ -17,7 +17,7 @@ public class Strafe extends Module {
     public final SliderValue airSpeed = new SliderValue("Air speed", 1, 0.01f, 1, 0.01f, this, air::get);
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(UpdateEvent e) {
         if (mc.thePlayer.onGround && ground.get()) MoveUtil.strafe(groundSpeed.get());
         if (!mc.thePlayer.onGround && air.get()) MoveUtil.strafe(airSpeed.get());
     }

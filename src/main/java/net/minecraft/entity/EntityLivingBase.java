@@ -1,6 +1,5 @@
 package net.minecraft.entity;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;

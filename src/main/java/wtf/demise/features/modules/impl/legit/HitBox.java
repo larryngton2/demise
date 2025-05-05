@@ -8,7 +8,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 
-@ModuleInfo(name = "HitBox", category = ModuleCategory.Legit)
+@ModuleInfo(name = "HitBox", description = "Expands your target's hitbox.", category = ModuleCategory.Legit)
 public class HitBox extends Module {
     private final SliderValue expand = new SliderValue("Expand", 0.5f, -0.5f, 1, 0.1f, this);
 

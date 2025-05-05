@@ -25,7 +25,7 @@ import java.math.RoundingMode;
 
 import static wtf.demise.utils.player.MoveUtil.getBaseMoveSpeed;
 
-@ModuleInfo(name = "Speed", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Speed", description = "Makes you go faster.", category = ModuleCategory.Movement)
 public class Speed extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC"}, "Strafe Hop", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));

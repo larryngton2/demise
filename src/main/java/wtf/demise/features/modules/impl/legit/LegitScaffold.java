@@ -14,7 +14,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 
-@ModuleInfo(name = "LegitScaffold", category = ModuleCategory.Legit)
+@ModuleInfo(name = "LegitScaffold", description = "Automatically sneaks at the edge of blocks.", category = ModuleCategory.Legit)
 public class LegitScaffold extends Module {
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 200, 10, this);
     private final BoolValue blockCheck = new BoolValue("Blocks Only", true, this);

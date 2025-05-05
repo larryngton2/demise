@@ -34,7 +34,7 @@ import wtf.demise.utils.render.RoundedUtils;
 import java.awt.*;
 import java.text.DecimalFormat;
 
-@ModuleInfo(name = "BedNuker", category = ModuleCategory.Player)
+@ModuleInfo(name = "BedNuker", description = "Automatically breaks beds around you.", category = ModuleCategory.Player)
 public class BedNuker extends Module {
     public final SliderValue breakRange = new SliderValue("Break Range", 4.5f, 1, 6, 0.1f, this);
     public final BoolValue breakSurroundings = new BoolValue("Break Top", true, this);

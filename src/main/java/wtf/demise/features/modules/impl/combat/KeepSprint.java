@@ -10,7 +10,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 
-@ModuleInfo(name = "KeepSprint", category = ModuleCategory.Combat)
+@ModuleInfo(name = "KeepSprint", description = "Modifies slowdown on hit.", category = ModuleCategory.Combat)
 public class KeepSprint extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Smart"}, "Normal", this);
     private final SliderValue motion = new SliderValue("Motion", 0.6f, 0.6f, 1, 0.01f, this);
