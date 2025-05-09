@@ -15,7 +15,7 @@ import wtf.demise.features.values.impl.ModeValue;
 
 @ModuleInfo(name = "MoreKB", description = "Deals increased knockback to targets.", category = ModuleCategory.Legit)
 public class MoreKB extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit", "LessPacket", "Packet"}, "Legit", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit", "LegitFast", "LessPacket", "Packet"}, "Legit", this);
     private final BoolValue smart = new BoolValue("Smart", false, this);
 
     @EventTarget
@@ -34,40 +34,34 @@ public class MoreKB extends Module {
             return;
         }
 
-        final float calcYaw = (float) (MathHelper.atan2(mc.thePlayer.posZ - entity.posZ, mc.thePlayer.posX - entity.posX) * 180.0 / 3.141592653589793 - 90.0);
-        final float diffY = Math.abs(MathHelper.wrapAngleTo180_float(calcYaw - entity.rotationYawHead));
+        float calcYaw = (float) (MathHelper.atan2(mc.thePlayer.posZ - entity.posZ, mc.thePlayer.posX - entity.posX) * 180.0 / 3.141592653589793 - 90.0);
+        float diffY = Math.abs(MathHelper.wrapAngleTo180_float(calcYaw - entity.rotationYawHead));
 
         if (smart.get() && (diffY > 120.0f || mc.thePlayer.hurtTime != 0)) {
             return;
         }
 
-        switch (mode.get()) {
-            case "Packet": {
-                if (entity.hurtTime == 10) {
+        if (entity.hurtTime == 10) {
+            switch (mode.get()) {
+                case "Legit":
+                    mc.thePlayer.reSprint = 2;
+                    break;
+                case "LegitFast":
+                    mc.thePlayer.sprintingTicksLeft = 0;
+                    break;
+                case "Packet":
                     mc.thePlayer.sendQueue.addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
                     mc.thePlayer.sendQueue.addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
                     mc.thePlayer.serverSprintState = true;
                     break;
-                }
-                break;
-            }
-            case "Legit": {
-                if (entity.hurtTime == 10) {
-                    mc.thePlayer.reSprint = 2;
-                    break;
-                }
-                break;
-            }
-            case "LessPacket": {
-                if (entity.hurtTime == 10) {
+                case "LessPacket":
                     if (mc.thePlayer.isSprinting()) {
                         mc.thePlayer.setSprinting(false);
                     }
                     mc.getNetHandler().addToSendQueue(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
                     mc.thePlayer.serverSprintState = true;
                     break;
-                }
-                break;
+
             }
         }
     }

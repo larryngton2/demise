@@ -181,7 +181,7 @@ public class Phase extends Module {
 
     @EventTarget
     public void onBlockAABB(BlockAABBEvent e) {
-        if (mode.get().equals("Vanilla")) {
+        if (mode.is("Vanilla")) {
             if (e.getBlock() instanceof BlockAir && phasing) {
                 final double x = e.getBlockPos().getX(), y = e.getBlockPos().getY(), z = e.getBlockPos().getZ();
 

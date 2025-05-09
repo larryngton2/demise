@@ -29,7 +29,7 @@ public abstract class Widget implements InstanceAccess {
     private int dragX, dragY;
     public int align;
     protected ScaledResolution sr;
-    protected Interface setting = INSTANCE.getModuleManager().getModule(Interface.class);
+    protected static Interface setting = INSTANCE.getModuleManager().getModule(Interface.class);
 
     public Widget(String name) {
         this.name = name;

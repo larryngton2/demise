@@ -12,6 +12,7 @@ import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 
 import java.util.Arrays;
 
@@ -471,5 +472,59 @@ public class MoveUtil implements InstanceAccess {
         }
 
         return (float) toRadians(dir);
+    }
+
+    public static double getDirection(float moveForward, float moveStrafing, float rotationYaw) {
+        if (moveForward < 0) {
+            rotationYaw += 180;
+        }
+
+        float forward = 1;
+
+        if (moveForward < 0) {
+            forward = -0.5F;
+        } else if (moveForward > 0) {
+            forward = 0.5F;
+        }
+
+        if (moveStrafing > 0) {
+            rotationYaw -= 70 * forward;
+        }
+
+        if (moveStrafing < 0) {
+            rotationYaw += 70 * forward;
+        }
+
+        return Math.toRadians(rotationYaw);
+    }
+
+    public static void holdS(MoveInputEvent e) {
+        final float forward = e.getForward();
+        final float strafe = e.getStrafe();
+
+        final double angle = MathHelper.wrapAngleTo180_double(RotationUtils.currentRotation[0] - 180);
+        if (forward == 0 && strafe == 0) {
+            return;
+        }
+
+        float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
+
+        for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
+            for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
+                if (predictedStrafe == 0 && predictedForward == 0) continue;
+
+                final double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection(predictedForward, predictedStrafe, mc.thePlayer.rotationYaw)));
+                final double difference = MathUtils.wrappedDifference(angle, predictedAngle);
+
+                if (difference < closestDifference) {
+                    closestDifference = (float) difference;
+                    closestForward = predictedForward;
+                    closestStrafe = predictedStrafe;
+                }
+            }
+        }
+
+        e.setForward(closestForward);
+        e.setStrafe(closestStrafe);
     }
 }

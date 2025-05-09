@@ -37,7 +37,6 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public final class SkeetUI extends GuiScreen {
-
     public static final FontRenderer GROUP_BOX_HEADER_RENDERER = new FontRenderer(new Font("Tahoma", Font.BOLD, 11), true);
     public static final FontRenderer ICONS_RENDERER = Fonts.skeet.get(35);
     public static final FontRenderer FONT_RENDERER = new FontRenderer(new Font("Tahoma", Font.PLAIN, 9), false);

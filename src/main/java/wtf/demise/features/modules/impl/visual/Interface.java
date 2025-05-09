@@ -1,20 +1,14 @@
 package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.network.play.server.S45PacketTitle;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -40,13 +34,10 @@ import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.*;
 
 @ModuleInfo(name = "Interface", category = ModuleCategory.Visual)
 public class Interface extends Module {
-    public final TextValue clientName = new TextValue("Client Name", "demise", this);
-
     public final MultiBoolValue elements = new MultiBoolValue("Elements", Arrays.asList(
             new BoolValue("Watermark", true),
             new BoolValue("Module List", true),
@@ -54,24 +45,14 @@ public class Interface extends Module {
             new BoolValue("Potion HUD", true),
             new BoolValue("Target HUD", true),
             new BoolValue("Notification", false),
-            new BoolValue("Session Info", false),
             new BoolValue("BPS counter", false)
     ), this);
 
-    public final BoolValue cFont = new BoolValue("C Fonts", true, this, () -> elements.isEnabled("Module List"));
-    public final ModeValue fontMode = new ModeValue("C Fonts Mode", new String[]{"Bold", "Semi Bold", "Regular", "Tahoma"}, "Regular", this, () -> cFont.canDisplay() && cFont.get());
-    public final SliderValue fontSize = new SliderValue("Font Size", 17, 10, 25, this, cFont::get);
-    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Exhi", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
+    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
-    public final ModeValue potionHudMode = new ModeValue("Potion Mode", new String[]{"Exhi", "Sexy"}, "Sexy", this, () -> elements.isEnabled("Potion HUD"));
-    public final ModeValue targetHudMode = new ModeValue("TargetHUD Mode", new String[]{"Moon", "Demise"}, "Demise", this, () -> elements.isEnabled("Target HUD"));
-    public final BoolValue targetHudParticle = new BoolValue("TargetHUD Particle", true, this, () -> elements.isEnabled("Target HUD"));
-    public final ModeValue notificationMode = new ModeValue("Notification Mode", new String[]{"Default", "Exhi"}, "Default", this, () -> elements.isEnabled("Notification"));
-    public final BoolValue centerNotif = new BoolValue("Center Notification", true, this, () -> notificationMode.is("Exhi"));
-    public final ModeValue sessionInfoMode = new ModeValue("Session Info Mode", new String[]{"Default", "Exhi", "Rise", "Moon"}, "Moon", this, () -> elements.isEnabled("Session Info"));
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
     public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
@@ -82,8 +63,6 @@ public class Interface extends Module {
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
     public final BoolValue healthFix = new BoolValue("Health fix", true, this);
 
-    private final DecimalFormat bpsFormat = new DecimalFormat("0.00");
-    private final DecimalFormat xyzFormat = new DecimalFormat("0");
     public final DecelerateAnimation decelerateAnimation = new DecelerateAnimation(175, 1);
     public EntityLivingBase target;
     public int lost = 0, killed = 0, won = 0;
@@ -94,13 +73,8 @@ public class Interface extends Module {
         if (watemarkMode.canDisplay()) {
             switch (watemarkMode.get()) {
                 case "Text":
-                    Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
-                    break;
-                case "Exhi":
-                    boolean shouldChange = RenderUtils.COLOR_PATTERN.matcher(clientName.get()).find();
-                    String text = shouldChange ? "§r" + clientName.get() : clientName.get().charAt(0) + "§r§f" + clientName.get().substring(1) +
-                            "§7[§f" + Minecraft.getDebugFPS() + " FPS§7]§r ";
-                    mc.fontRendererObj.drawStringWithShadow(text, 2.0f, 2.0f, color());
+                    Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, new Color(255, 255, 255, 208).getRGB());
+                    Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
                     break;
                 case "Modern":
                     String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
@@ -119,7 +93,7 @@ public class Interface extends Module {
         }
 
         if (armorMode.canDisplay()) {
-            if (armorMode.get().equals("Default")) {
+            if (armorMode.is("Default")) {
                 ArrayList<ItemStack> stuff = new ArrayList<>();
                 boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
                 int split = -3;
@@ -141,41 +115,6 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Potion HUD") && potionHudMode.is("Exhi")) {
-            ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
-            potions.sort(Comparator.comparingDouble(effect -> -mc.fontRendererObj.getStringWidth(I18n.format(Potion.potionTypes[effect.getPotionID()].getName()))));
-            float y = mc.currentScreen instanceof GuiChat ? -14.0f : -3.0f;
-            for (PotionEffect potionEffect : potions) {
-                Potion potionType = Potion.potionTypes[potionEffect.getPotionID()];
-                String potionName = I18n.format(potionType.getName());
-                String type = "";
-                if (potionEffect.getAmplifier() == 1) {
-                    potionName = potionName + " II";
-                } else if (potionEffect.getAmplifier() == 2) {
-                    potionName = potionName + " III";
-                } else if (potionEffect.getAmplifier() == 3) {
-                    potionName = potionName + " IV";
-                }
-                if (potionEffect.getDuration() < 600 && potionEffect.getDuration() > 300) {
-                    type = type + " §6" + Potion.getDurationString(potionEffect);
-                } else if (potionEffect.getDuration() < 300) {
-                    type = type + " §c" + Potion.getDurationString(potionEffect);
-                } else if (potionEffect.getDuration() > 600) {
-                    type = type + " §7" + Potion.getDurationString(potionEffect);
-                }
-                GlStateManager.pushMatrix();
-                mc.fontRendererObj.drawString(potionName, (float) event.scaledResolution().getScaledWidth() - mc.fontRendererObj.getStringWidth(type + potionName) - 2.0f, (event.scaledResolution().getScaledHeight() - 9) + y, new Color(potionType.getLiquidColor()).getRGB(), true);
-                mc.fontRendererObj.drawString(type, (float) event.scaledResolution().getScaledWidth() - mc.fontRendererObj.getStringWidth(type) - 2.0f, (event.scaledResolution().getScaledHeight() - 9) + y, new Color(255, 255, 255).getRGB(), true);
-
-                GlStateManager.popMatrix();
-                y -= 9.0f;
-            }
-        }
-
-        if (elements.isEnabled("Session Info") && sessionInfoMode.is("Exhi")) {
-            mc.fontRendererObj.drawStringWithShadow(RenderUtils.sessionTime(), event.scaledResolution().getScaledWidth() / 2.0f - mc.fontRendererObj.getStringWidth(RenderUtils.sessionTime()) / 2.0f, BossStatus.bossName != null && BossStatus.statusBarTime > 0 ? 47 : 30.0f, -1);
-        }
-
         if (elements.isEnabled("Notification")) {
             Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
         }
@@ -186,9 +125,8 @@ public class Interface extends Module {
         if (elements.isEnabled("Watermark")) {
             switch (watemarkMode.get()) {
                 case "Text":
-                    if (event.getShaderType() == Shader2DEvent.ShaderType.SHADOW || event.getShaderType() == Shader2DEvent.ShaderType.GLOW) {
-                        Fonts.interBold.get(30).drawStringWithShadow(clientName.get(), 10, 10, color(0));
-                    }
+                    Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, Color.black.getRGB());
+                    Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, Color.black.getRGB());
                     break;
                 case "Modern":
                     String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
@@ -274,13 +212,7 @@ public class Interface extends Module {
     }
 
     public FontRenderer getFr() {
-        return switch (fontMode.get()) {
-            case "Bold" -> Fonts.interBold.get(fontSize.get());
-            case "Semi Bold" -> Fonts.interSemiBold.get(fontSize.get());
-            case "Regular" -> Fonts.interRegular.get(fontSize.get());
-            case "Tahoma" -> Fonts.Tahoma.get(fontSize.get());
-            default -> null;
-        };
+        return Fonts.interRegular.get(15);
     }
 
     public Color getMainColor() {

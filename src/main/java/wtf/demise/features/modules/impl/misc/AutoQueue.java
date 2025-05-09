@@ -12,6 +12,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.gui.notification.NotificationType;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 
 @ModuleInfo(name = "AutoQueue", description = "Automatically re-queues when a match is over.", category = ModuleCategory.Misc)
@@ -31,7 +32,7 @@ public class AutoQueue extends Module {
                             for (IChatComponent iChatComponent : chat.getChatComponent().getSiblings()) {
                                 for (String value : iChatComponent.toString().split("'")) {
                                     if (value.startsWith("/play") && !value.contains(".")) {
-                                        PacketUtils.sendPacket(new C01PacketChatMessage(value));
+                                        ChatUtils.sendMessageServer(value);
 
                                         Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Auto Queue", "Joined a new game", 5);
                                         break;
@@ -43,14 +44,14 @@ public class AutoQueue extends Module {
                     case "Mineblaze duels":
                         if (chat.isChat()) return;
                         if (chat.getChatComponent().getFormattedText().contains("Новая игра")) {
-                            PacketUtils.sendPacket(new C01PacketChatMessage("/next"));
+                            ChatUtils.sendMessageServer("/next");
                             Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Auto Queue", "Joined a new game", 5);
                         }
                         break;
                     case "Mineberry duels":
                         if (chat.isChat()) return;
                         if (chat.getChatComponent().getFormattedText().contains("New Game")) {
-                            PacketUtils.sendPacket(new C01PacketChatMessage("/next"));
+                            ChatUtils.sendMessageServer("/next");
                             Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Auto Queue", "Joined a new game", 5);
                         }
                         break;

@@ -462,7 +462,7 @@ public class Scaffold extends Module {
             return;
 
         if (tower.canDisplay()) {
-            if (tower.get().equals("Vanilla")) {
+            if (tower.is("Vanilla")) {
                 if (!mc.thePlayer.isPotionActive(Potion.jump)) {
                     if (towering()) {
                         event.setY(mc.thePlayer.motionY = 0.42);
@@ -472,7 +472,7 @@ public class Scaffold extends Module {
         }
 
         if (towerMove.canDisplay()) {
-            if (towerMove.get().equals("Vanilla")) {
+            if (towerMove.is("Vanilla")) {
                 if (MoveUtil.isMoving() && MoveUtil.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
                     if (towerMoving()) {
                         mc.thePlayer.motionY = 0.42f;
@@ -491,7 +491,7 @@ public class Scaffold extends Module {
             return;
 
         if (tower.canDisplay()) {
-            if (tower.get().equals("Watchdog")) {
+            if (tower.is("Watchdog")) {
                 if (!mc.thePlayer.isPotionActive(Potion.jump) && placed) {
                     if (towering()) {
                         MoveUtil.stopXZ();
@@ -521,7 +521,7 @@ public class Scaffold extends Module {
         }
 
         if (towerMove.canDisplay()) {
-            if (towerMove.get().equals("Watchdog")) {
+            if (towerMove.is("Watchdog")) {
                 if (MoveUtil.isMoving() && MoveUtil.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
                     if (towerMoving()) {
                         int valY = (int) Math.round((event.y % 1) * 10000);

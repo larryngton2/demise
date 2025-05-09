@@ -16,7 +16,6 @@ import wtf.demise.events.impl.render.RenderNameTagEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.misc.AntiCheat;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -98,9 +97,8 @@ public class ESP extends Module {
             if (tags.get()) {
                 final FontRenderer fontRenderer = mc.fontRendererObj;
 
-                final String hacker = getModule(AntiCheat.class).isHacker(player) ? EnumChatFormatting.RED + "[Hacker] " + EnumChatFormatting.RESET : "";
                 final String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(PlayerUtils.getActualHealth(player))) + EnumChatFormatting.RED + "❤" : "";
-                final String name = hacker + player.getDisplayName().getFormattedText() + healthString;
+                final String name = player.getDisplayName().getFormattedText() + healthString;
                 float halfWidth = (float) fontRenderer.getStringWidth(name) / 2 * tagsSize.get();
                 final float xDif = x2 - x;
                 final float middle = x + (xDif / 2);

@@ -14,7 +14,6 @@ import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.render.ParticleRenderer;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
@@ -34,8 +33,8 @@ public class TargetHUDWidget extends Widget {
     public void render() {
         if (setting.target != null) {
             this.height = getTHUDHeight();
-            this.width = getTHUDWidth(setting.target);
-            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false, setting.targetHudMode);
+            this.width = getTHUDWidth();
+            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
             targetHUD.render();
         }
     }
@@ -44,26 +43,18 @@ public class TargetHUDWidget extends Widget {
     public void onShader(Shader2DEvent event) {
         if (setting.target != null) {
             this.height = getTHUDHeight();
-            this.width = getTHUDWidth(setting.target);
-            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, true, setting.targetHudMode);
+            this.width = getTHUDWidth();
+            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, true);
             targetHUD.render();
         }
     }
 
-    public float getTHUDWidth(Entity entity) {
-        return switch (setting.targetHudMode.get()) {
-            case "Moon" -> 35 + Fonts.interSemiBold.get(18).getStringWidth(entity.getName()) + 33;
-            case "Demise" -> 120;
-            default -> 0;
-        };
+    public float getTHUDWidth() {
+        return 120;
     }
 
     public float getTHUDHeight() {
-        return switch (setting.targetHudMode.get()) {
-            case "Moon" -> 40.5f;
-            case "Demise" -> 37;
-            default -> 0;
-        };
+        return 37;
     }
 
     @Override
@@ -79,21 +70,19 @@ class TargetHUD implements InstanceAccess {
     private EntityPlayer target;
     private Animation animation;
     private boolean shader;
-    private ModeValue style;
     private Interface setting = INSTANCE.getModuleManager().getModule(Interface.class);
     private final DecimalFormat decimalFormat = new DecimalFormat("0.0");
 
-    public TargetHUD(float x, float y, EntityPlayer target, Animation animation, boolean shader, ModeValue style) {
+    public TargetHUD(float x, float y, EntityPlayer target, Animation animation, boolean shader) {
         this.x = x;
         this.y = y;
         this.target = target;
         this.animation = animation;
         this.shader = shader;
-        this.style = style;
     }
 
     public void render() {
-        setWidth(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).getTHUDWidth(target));
+        setWidth(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).getTHUDWidth());
         setHeight(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).getTHUDHeight());
         GlStateManager.pushMatrix();
 
@@ -101,65 +90,33 @@ class TargetHUD implements InstanceAccess {
         GlStateManager.scale(animation.getOutput(), animation.getOutput(), animation.getOutput());
         GlStateManager.translate(-(x + width / 2F), -(y + height / 2F), 0);
 
-        switch (style.get()) {
-            case "Moon": {
-                float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
-                float space = (width - 48) / 100;
+        float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
+        float space = (width - 42.5f) / 100;
 
-                target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
+        target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 50);
 
-                if (!shader) {
-                    RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.bgColor(), true));
+        if (!shader) {
+            RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
 
-                    RoundedUtils.drawRound(x + 42, y + 26.5f, (100 * space), 8, 4, new Color(0, 0, 0, 150));
-                    String text = String.format("%.1f", PlayerUtils.getActualHealth(target));
+            RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
+            RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
+            String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
+            double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
+            String diff;
 
-                    RoundedUtils.drawRound(x + 42, y + 26.5f, target.healthAnimation.getOutput(), 8.5f, 4, new Color(setting.color(0)));
-                    RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 35, 10, -1);
-                    Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 40, y + 17, -1);
-                    Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 40, y + 6, -1);
-                } else {
-                    RoundedUtils.drawRound(x, y, width, height, 8, new Color(setting.bgColor()));
-                }
-
-                if (setting.targetHudParticle.get()) {
-                    ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f);
-                }
+            if (initialDiff > 0) {
+                diff = "+" + initialDiff;
+            } else if (initialDiff < 0) {
+                diff = String.valueOf(initialDiff);
+            } else {
+                diff = "±" + initialDiff;
             }
-            break;
 
-            case "Demise": {
-                float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
-                float space = (width - 42.5f) / 100;
+            Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
+            Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
+            Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
 
-                target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 30);
-
-                if (!shader) {
-                    RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
-
-                    RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
-                    RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
-                    String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
-                    double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
-                    String diff;
-
-                    if (initialDiff > 0) {
-                        diff = "+" + initialDiff;
-                    } else if (initialDiff < 0) {
-                        diff = String.valueOf(initialDiff);
-                    } else {
-                        diff = "±" + initialDiff;
-                    }
-
-                    Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
-                    Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
-                    Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
-
-                    if (setting.targetHudParticle.get()) {
-                        ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f);
-                    }
-
-                    RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
+            RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
 
                     /*
                     int redAlpha = (int) ((target.hurtTime - 2) * 10 * 2.55f) - 50;
@@ -168,16 +125,10 @@ class TargetHUD implements InstanceAccess {
                         RoundedUtils.drawRound(x + 3.2f, y + 3.2f, 30.5f, 30.5f, 4.8f, new Color(255, 0, 0, redAlpha));
                     }
                     */
-                } else {
-                    RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
-
-                    if (setting.targetHudParticle.get()) {
-                        ParticleRenderer.renderParticle(target, x + 2.5f, y + 2.5f);
-                    }
-                }
-            }
-            break;
+        } else {
+            RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
         }
+
         GlStateManager.popMatrix();
     }
 }

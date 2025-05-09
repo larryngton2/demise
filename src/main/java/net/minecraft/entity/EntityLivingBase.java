@@ -32,6 +32,7 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import wtf.demise.Demise;
+import wtf.demise.events.impl.player.GravityEvent;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveMathEvent;
@@ -1180,6 +1181,9 @@ public abstract class EntityLivingBase extends Entity {
                         this.motionY = 0.2D;
                     }
 
+                    GravityEvent gravityEvent = new GravityEvent(0.08, 0.9800000190734863);
+                    Demise.INSTANCE.getEventManager().call(gravityEvent);
+
                     if (this.worldObj.isRemote && (!this.worldObj.isBlockLoaded(new BlockPos((int) this.posX, 0, (int) this.posZ)) || !this.worldObj.getChunkFromBlockCoords(new BlockPos((int) this.posX, 0, (int) this.posZ)).isLoaded())) {
                         if (this.posY > 0.0D) {
                             this.motionY = -0.1D;
@@ -1187,10 +1191,10 @@ public abstract class EntityLivingBase extends Entity {
                             this.motionY = 0.0D;
                         }
                     } else {
-                        this.motionY -= 0.08D;
+                        this.motionY -= gravityEvent.getGravityDecrement();
                     }
 
-                    this.motionY *= 0.9800000190734863D;
+                    this.motionY *= gravityEvent.getGravityMulti();
                     this.motionX *= f4;
                     this.motionZ *= f4;
                 } else {

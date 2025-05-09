@@ -35,7 +35,7 @@ import java.util.Objects;
 @ModuleInfo(name = "Velocity", description = "Minimises or removes knockback.", category = ModuleCategory.Combat)
 public class Velocity extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
-    public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce", "MoreReduce"}, "Reduce", this, () -> mode.is("Intave"));
+    public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce"}, "Reduce", this, () -> mode.is("Intave"));
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
@@ -96,23 +96,22 @@ public class Velocity extends Module {
                         }
                     }
                     break;
-            }
+                case "Legit packet":
+                    if (Range.between(3, 10).contains(mc.thePlayer.hurtTime)) {
+                        if (shouldReduce && mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY)) {
+                            for (int i = 0; i < packets.get(); i++) {
+                                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
 
-            if (mode.is("Legit packet") || mode.is("Intave") && intaveMode.is("MoreReduce")) {
-                if (Range.between(3, 10).contains(mc.thePlayer.hurtTime)) {
-                    if (shouldReduce && mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY)) {
-                        for (int i = 0; i < packets.get(); i++) {
-                            AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
+                                ChatUtils.sendMessageClient("Reduced");
+                            }
 
-                            ChatUtils.sendMessageClient("Reduced");
+                            currentTarget = null;
+                            shouldReduce = false;
                         }
-
-                        currentTarget = null;
-                        shouldReduce = false;
+                    } else {
+                        attacked = false;
                     }
-                } else {
-                    attacked = false;
-                }
+                    break;
             }
         }
 
@@ -143,7 +142,27 @@ public class Velocity extends Module {
         switch (mode.get()) {
             case "Normal":
                 if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
-                    /*
+                    if (horizontal.get() != 100) {
+                        if (horizontal.get() != 0) {
+                            packet.motionX *= (int) (horizontal.get() / 100);
+                            packet.motionZ *= (int) (horizontal.get() / 100);
+                        } else {
+                            packet.motionX = (int) (mc.thePlayer.motionX * 8000);
+                            packet.motionZ = (int) (mc.thePlayer.motionZ * 8000);
+                        }
+                    }
+
+                    if (vertical.get() != 100 && vertical.get() != 0) {
+                        if (vertical.get() != 0) {
+                            packet.motionY *= (int) (vertical.get() / 100);
+                        } else {
+                            packet.motionY = (int) (mc.thePlayer.motionY * 8000);
+                        }
+                    }
+                }
+                break;
+            case "Cancel":
+                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
                     if (horizontal.get() != 100.0D) {
                         mc.thePlayer.motionX = ((double) packet.getMotionX() / 8000) * horizontal.get() / 100.0;
                         mc.thePlayer.motionZ = ((double) packet.getMotionZ() / 8000) * horizontal.get() / 100.0;
@@ -153,25 +172,7 @@ public class Velocity extends Module {
                         mc.thePlayer.motionY = ((double) packet.getMotionY() / 8000) * vertical.get() / 100.0;
                     }
 
-                     */
-
-                    packet.motionX *=horizontal.get() / 100;
-                    packet.motionY *= vertical.get() / 100;
-                    packet.motionZ *= horizontal.get() / 100;
-                }
-                break;
-            case "Cancel":
-                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
-                        if (horizontal.get() != 100.0D) {
-                            mc.thePlayer.motionX = ((double) packet.getMotionX() / 8000) * horizontal.get() / 100.0;
-                            mc.thePlayer.motionZ = ((double) packet.getMotionZ() / 8000) * horizontal.get() / 100.0;
-                        }
-
-                        if (vertical.get() != 100.0D) {
-                            mc.thePlayer.motionY = ((double) packet.getMotionY() / 8000) * vertical.get() / 100.0;
-                        }
-
-                        e.setCancelled(true);
+                    e.setCancelled(true);
                 }
                 break;
             case "GrimC07":
@@ -191,29 +192,32 @@ public class Velocity extends Module {
 
     @EventTarget
     public void onAttack(AttackEvent e) {
-        if (mode.get().equals("Intave")) {
-            if (intaveMode.get().equals("Tick Reduce")) {
-                if (mc.thePlayer.hurtTime == rHurtTime.get()) {
-                    double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
+        if (mode.is("Intave")) {
+            double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
 
-                    mc.thePlayer.motionX *= factor;
-                    mc.thePlayer.motionZ *= factor;
-                }
-            }
-        }
-
-        if (mode.is("Legit packet") || mode.is("Intave") && intaveMode.is("MoreReduce")) {
-            if (Range.between(3, 10).contains(mc.thePlayer.hurtTime) && !attacked) {
-                currentTarget = e.getTargetEntity();
-                shouldReduce = true;
-                attacked = true;
+            switch (mode.get()) {
+                case "Intave":
+                    if (intaveMode.is("Tick Reduce")) {
+                        if (mc.thePlayer.hurtTime == rHurtTime.get()) {
+                            mc.thePlayer.motionX *= factor;
+                            mc.thePlayer.motionZ *= factor;
+                        }
+                    }
+                    break;
+                case "Legit packet":
+                    if (Range.between(3, 10).contains(mc.thePlayer.hurtTime) && !attacked) {
+                        currentTarget = e.getTargetEntity();
+                        shouldReduce = true;
+                        attacked = true;
+                    }
+                    break;
             }
         }
     }
 
     @EventTarget
     public void onHitSlowDown(HitSlowDownEvent e) {
-        if (mode.get().equals("Reduce")) {
+        if (mode.is("Reduce")) {
             e.setSlowDown(MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get()));
         }
     }

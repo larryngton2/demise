@@ -4,10 +4,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovementInput;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.player.JumpEvent;
-import wtf.demise.events.impl.player.MotionEvent;
-import wtf.demise.events.impl.player.MoveEvent;
-import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
@@ -34,6 +31,7 @@ public class Speed extends Module {
     private final ModeValue ncpMode = new ModeValue("NCP mode", new String[]{"On tick 4", "On tick 5", "Old Hop", "BHop"}, "On tick 5", this, () -> mode.is("NCP"));
     private final ModeValue verusMode = new ModeValue("Verus mode", new String[]{"Low"}, "Low", this, () -> mode.is("Verus"));
     private final SliderValue speedMulti = new SliderValue("Extra speed multiplier", 0.4f, 0f, 1f, 0.01f, this, () -> ncpMode.is("Old Hop") && ncpMode.canDisplay());
+    private final BoolValue customGravity = new BoolValue("Custom gravity", false, this, () -> mode.is("Intave"));
     private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Safe", "Fast"}, "Safe", this, () -> mode.is("Intave"));
     private final BoolValue timer = new BoolValue("Timer", false, this, () -> mode.is("Intave") && intaveMode.is("Fast"));
     private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave") && intaveMode.is("Safe"));
@@ -41,7 +39,7 @@ public class Speed extends Module {
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.01f, this, minSpeedLimiter::get);
     private final SliderValue minMoveTicks = new SliderValue("Move ticks for limit", 15, 0, 40, 1, this, minSpeedLimiter::get);
-    private final BoolValue printAirTicks = new BoolValue("Print airTicks", false);
+    private final BoolValue printAirTicks = new BoolValue("Print airTicks", false, this);
 
     private int movingTicks, stoppedTicks, ticks;
 
@@ -189,6 +187,8 @@ public class Speed extends Module {
                                     break;
                             }
 
+                            mc.thePlayer.motionY *= 0.98;
+
                             if (timer.get()) {
                                 mc.timer.timerSpeed = 1.002f;
                             }
@@ -220,6 +220,13 @@ public class Speed extends Module {
                     MoveUtil.strafe(0.221);
                 }
                 break;
+        }
+    }
+
+    @EventTarget
+    public void onGravity(GravityEvent e) {
+        if (mode.is("Intave") && customGravity.get()) {
+            e.setGravityDecrement(0.081);
         }
     }
 
@@ -321,7 +328,7 @@ public class Speed extends Module {
 
         switch (mode.get()) {
             case "Verus":
-                if (verusMode.get().equals("Low")) {
+                if (verusMode.is("Low")) {
                     if (ticks % 12 == 0 && mc.thePlayer.onGround) {
                         MoveUtil.strafe(0.69);
                         e.setY(0.42F);

@@ -1,6 +1,5 @@
 package wtf.demise.utils.player;
 
-import com.sun.javafx.geom.Vec2f;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
@@ -8,12 +7,14 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
+import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 
 import java.util.Objects;
@@ -29,6 +30,7 @@ public class RotationUtils implements InstanceAccess {
     public static float cachedMidpoint;
     public static SmoothMode smoothMode = SmoothMode.Linear;
     private boolean angleCalled;
+    private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
 
     public static boolean shouldRotate() {
         return currentRotation != null;
@@ -39,7 +41,12 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction) {
-        RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
+        if (moduleRotation.silent.get()) {
+            RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
+        } else {
+            mc.thePlayer.rotationYaw = applyGCDFix(serverRotation, rotation)[0];
+            mc.thePlayer.rotationPitch = applyGCDFix(serverRotation, rotation)[1];
+        }
 
         currentCorrection = correction;
         cachedHSpeed = 180;
@@ -54,7 +61,12 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-        currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear);
+        if (moduleRotation.silent.get()) {
+            currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear);
+        } else {
+            mc.thePlayer.rotationYaw = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear)[0];
+            mc.thePlayer.rotationPitch = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear)[1];
+        }
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
@@ -71,7 +83,12 @@ public class RotationUtils implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
 
-        currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode);
+        if (moduleRotation.silent.get()) {
+            currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode);
+        } else {
+            mc.thePlayer.rotationYaw = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode)[0];
+            mc.thePlayer.rotationPitch = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode)[1];
+        }
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
@@ -260,7 +277,7 @@ public class RotationUtils implements InstanceAccess {
 
     public static float getRotationDifference(final Entity entity) {
         float[] target = RotationUtils.getRotations(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
-        return (float) hypot(abs(getAngleDifference(target[0], mc.thePlayer.rotationYaw)), abs(target[1] - mc.thePlayer.rotationPitch));
+        return (float) hypot(abs(getAngleDifference(target[0], shouldRotate() ? currentRotation[0] : mc.thePlayer.rotationYaw)), abs(target[1] - (shouldRotate() ? currentRotation[1] : mc.thePlayer.rotationYaw)));
     }
 
     public static float getRotationDifference(final float[] a, final float[] b) {

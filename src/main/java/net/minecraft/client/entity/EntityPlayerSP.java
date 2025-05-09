@@ -29,10 +29,7 @@ import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.SendMessageEvent;
-import wtf.demise.events.impl.player.MotionEvent;
-import wtf.demise.events.impl.player.PlayerTickEvent;
-import wtf.demise.events.impl.player.SlowDownEvent;
-import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
@@ -92,9 +89,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 
     public void onUpdate() {
         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ))) {
-
             PlayerTickEvent event = new PlayerTickEvent(PlayerTickEvent.State.PRE);
-
             Demise.INSTANCE.getEventManager().call(event);
 
             if (event.isCancelled())
@@ -226,7 +221,6 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     }
 
     public void sendChatMessage(String message) {
-
         SendMessageEvent event = new SendMessageEvent(message);
         Demise.INSTANCE.getEventManager().call(event);
 
@@ -588,6 +582,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
         this.pushOutOfBlocks(this.posX - (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
+
         boolean flag3 = (float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
         final float movef = this.movementInput.moveForward;
 

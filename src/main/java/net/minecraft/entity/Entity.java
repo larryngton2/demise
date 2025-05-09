@@ -1927,6 +1927,10 @@ public abstract class Entity implements ICommandSender {
         return new Vec3(this.posX, this.posY, this.posZ);
     }
 
+    public Vec3 getPrevPositionVector() {
+        return new Vec3(this.prevPosX, this.prevPosY, this.prevPosZ);
+    }
+
     public World getEntityWorld() {
         return this.worldObj;
     }

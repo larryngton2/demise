@@ -14,7 +14,6 @@ import wtf.demise.utils.math.TimerUtils;
 
 @Getter
 public class Notification implements InstanceAccess {
-
     private final NotificationType notificationType;
     private final String title, description;
     private final float time;
@@ -38,19 +37,10 @@ public class Notification implements InstanceAccess {
     }
 
     public double getWidth() {
-        return switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
-            case "Default" ->
-                    Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 8;
-            case "Exhi" ->
-                    Math.max(100.0f, Math.max(Fonts.interRegular.get(18).getStringWidth(getTitle()) + 2, Fonts.interRegular.get(14).getStringWidth(getDescription())) + 24.0f);
-            default -> 0;
-        };
+        return Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 8;
     }
 
     public double getHeight() {
-        return switch (INSTANCE.getModuleManager().getModule(Interface.class).notificationMode.get()) {
-            case "Default", "Exhi" -> 26;
-            default -> 0;
-        };
+        return 26;
     }
 }

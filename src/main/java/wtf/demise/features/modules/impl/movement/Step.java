@@ -33,7 +33,7 @@ public class Step extends Module {
 
     @EventTarget
     public void onPostStep(PostStepEvent event) {
-        if (mode.get().equals("NCP")) {
+        if (mode.is("NCP")) {
             if (event.getHeight() == 1 && mc.thePlayer.onGround && !PlayerUtils.inLiquid()) {
                 Block block = PlayerUtils.getBlock(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
                 if (block instanceof BlockStairs || block instanceof BlockSlab) return;

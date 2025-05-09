@@ -14,7 +14,7 @@ public class ViewBobbing extends Module {
 
     @EventTarget
     public void onViewBobbing(ViewBobbingEvent e) {
-        if (mode.get().equals("Smooth")) {
+        if (mode.is("Smooth")) {
             if (e.getState() == ViewBobbingEvent.State.CameraTransform || e.getState() == ViewBobbingEvent.State.Hand2) {
                 e.setCancelled(true);
             }

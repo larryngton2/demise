@@ -18,7 +18,6 @@ public class WidgetManager implements InstanceAccess {
         INSTANCE.getEventManager().register(this);
         register(new TargetHUDWidget());
         register(new PotionHUDWidget());
-        register(new SessionInfoWidget());
         register(new ModuleListWidget());
         register(new BPSCounterWidget());
     }

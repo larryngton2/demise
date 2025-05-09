@@ -2,7 +2,6 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
@@ -36,7 +35,7 @@ public class TimerRange extends Module {
 
     private final BoolValue smartRange = new BoolValue("Smart range", false, this, () -> !staticRange.get());
     //todo fix this
-    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this, () -> !(smartRange.get() && smartRange.canDisplay()));
+    private final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this, () -> staticRange.get() ? false : !smartRange.get());
 
     private final BoolValue alwaysGainBal = new BoolValue("Always gain balance", false, this);
     private final SliderValue searchRange = new SliderValue("Search range", 100, 3, 500, 0.1f, this, () -> !alwaysGainBal.get());
@@ -70,7 +69,6 @@ public class TimerRange extends Module {
         renderBal = renderBalance.get();
 
         balancePercentage = (((-balance / maxBalance.get()) * 100) + 100) / 2;
-        balancePercentage = MathHelper.clamp_double(balancePercentage, 0, 100);
 
         if (renderBalance.get()) {
             balanceText = "Balance: " + BigDecimal.valueOf(balancePercentage).setScale(1, RoundingMode.FLOOR) + "%";
@@ -95,8 +93,6 @@ public class TimerRange extends Module {
         if (target != null || alwaysGainBal.get()) {
             balance += mc.timer.timerSpeed - 1;
 
-            balance = MathHelper.clamp_double(balance, -maxBalance.get(), maxBalance.get());
-
             if (debug.get() && currBalance.get()) {
                 ChatUtils.sendMessageClient(mc.timer.timerSpeed + " / " + balance + " / " + maxBalance.get() + " / " + mc.timer.elapsedTicks);
             }
@@ -111,11 +107,11 @@ public class TimerRange extends Module {
             double predictedDistance;
 
             if (!staticRange.get()) {
-                predictedDistance = PlayerUtils.getCustomDistanceToEntityBox(predictProcesses.get((int) (Math.max(attackTimer.get() * 0.65, 1)) - 1).position, target);
+                predictedDistance = PlayerUtils.getCustomDistanceToEntityBox(predictProcesses.get(predictProcesses.size() - 1).position, target);
                 rangeCheck = predictedDistance < PlayerUtils.getDistanceToEntityBox(target) && ((PlayerUtils.getDistanceToEntityBox(target) > attackRange.get() && !smartRange.get()) || (smartRange.get() && !attacked && PlayerUtils.getDistanceToEntityBox(target) > 2));
                 check = (target != null || !alwaysGainBal.get()) && predictedDistance <= attackRange.get() && rangeCheck && mc.thePlayer.canEntityBeSeen(target);
             } else {
-                predictedDistance = PlayerUtils.getCustomDistanceToEntityBox(predictProcesses.get((int) Math.max(attackTimer.get(), 1) - 1).position, target);
+                predictedDistance = PlayerUtils.getCustomDistanceToEntityBox(predictProcesses.get(predictProcesses.size() - 1).position, target);
                 rangeCheck = predictedDistance < PlayerUtils.getDistanceToEntityBox(target) && Range.between(minRange.get(), maxRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target));
                 check = (target != null || !alwaysGainBal.get()) && rangeCheck && mc.thePlayer.canEntityBeSeen(target);
             }
@@ -132,17 +128,19 @@ public class TimerRange extends Module {
                 } else {
                     mc.timer.timerSpeed = balanceLimitTimer.get();
                 }
+
+                if (balancePercentage < 0 && PlayerUtils.getDistanceToEntityBox(target) > 4.5) {
+                    if (debug.get() && lessThan0.get()) {
+                        ChatUtils.sendMessageClient("bal is < 0");
+                    }
+
+                    mc.timer.timerSpeed = 0.5f;
+                }
             } else {
                 mc.timer.timerSpeed = 1;
             }
-        }
-
-        if (balancePercentage < 0) {
-            if (debug.get() && lessThan0.get()) {
-                ChatUtils.sendMessageClient("bal is < 0");
-            }
-
-            //mc.timer.timerSpeed = 0.75f;
+        } else {
+            mc.timer.timerSpeed = 1;
         }
 
         attacked = false;

@@ -28,7 +28,7 @@ public class Criticals extends Module {
 
     private boolean attacked;
     private final TimerUtils timer = new TimerUtils();
-    double[] offsets = {0.06, 0.0, 0.03, 0.0};
+    private final double[] offsets = {0.06, 0.0, 0.03, 0.0};
 
     @Override
     public void onDisable() {

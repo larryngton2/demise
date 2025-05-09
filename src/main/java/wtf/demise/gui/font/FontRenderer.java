@@ -459,6 +459,21 @@ public class FontRenderer {
         }
     }
 
+    public void drawGradient(String text, float x, float y, GradientApplier colorSupplier) {
+        final char[] string = text.toCharArray();
+        int index = 0;
+
+        for (char ch : string) {
+            if (ch == '§') continue;
+
+            ++index;
+            final String character = valueOf(ch);
+
+            drawString(character, x, y, colorSupplier.colour(index).getRGB(), false);
+            x += getStringWidth(character);
+        }
+    }
+
     public String trimStringToWidth(final String p_trimStringToWidth_1_, final int p_trimStringToWidth_2_) {
         return trimStringToWidth(p_trimStringToWidth_1_, p_trimStringToWidth_2_, false);
     }

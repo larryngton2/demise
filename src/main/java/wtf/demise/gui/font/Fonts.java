@@ -13,16 +13,15 @@ public enum Fonts {
     interMedium("inter/Inter_Medium"),
     interRegular("inter/Inter_Regular"),
     interSemiBold("inter/Inter_SemiBold"),
-    psRegular("product-sans/Regular"),
-    psBold("product-sans/Bold"),
     nursultan("others/Nursultan"),
-    Tahoma("others/Exhi"),
     skeet("others/skeet"),
-    noti("others/noti"),
-    noti2("others/noti2"),
     session("others/session"),
     session2("others/session2"),
-    neverlose("others/nlicon");
+    urbanist("urbanist/Urbanist"),
+    sfRegular("sf-pro/regular"),
+    sfMedium("sf-pro/medium"),
+    sfBold("sf-pro/bold");
+
     private final String file;
     private final Float2ObjectMap<FontRenderer> fontMap = new Float2ObjectArrayMap<>();
 

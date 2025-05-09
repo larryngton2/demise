@@ -159,7 +159,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private boolean shouldClick() {
-        return mc.thePlayer.hurtTime != 0 || target.hurtTime <= 3 || (forceblahblahblah && BackTrack.shouldLag);
+        return mc.thePlayer.hurtTime != 0 || target.hurtTime <= 3 || (forceblahblahblah && BackTrack.shouldLag && Demise.INSTANCE.getModuleManager().getModule(BackTrack.class).isEnabled());
     }
 
     private void attack() {

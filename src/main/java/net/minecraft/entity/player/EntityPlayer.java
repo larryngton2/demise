@@ -48,6 +48,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.features.modules.impl.combat.Velocity;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.RotationUtils;
 
 import java.util.Collection;
@@ -935,7 +936,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
                     if (flag2) {
                         Velocity velocity = Demise.INSTANCE.getModuleManager().getModule(Velocity.class);
 
-                        if (i > 0) {
+                        if (i > 0 || (velocity.isEnabled() && velocity.mode.is("Intave") && velocity.intaveMode.is("Reduce") && this == Minecraft.getMinecraft().thePlayer && this.hurtTime != 0)) {
                             float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : this.rotationYaw;
 
                             targetEntity.addVelocity(-MathHelper.sin(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F, 0.1D, MathHelper.cos(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F);
@@ -946,13 +947,6 @@ public abstract class EntityPlayer extends EntityLivingBase {
                             this.motionX *= hitSlowDown.getSlowDown();
                             this.motionZ *= hitSlowDown.getSlowDown();
                             this.setSprinting(hitSlowDown.isSprint());
-
-                        } else if (velocity.isEnabled() && velocity.mode.is("Intave") && (velocity.intaveMode.is("Reduce") || velocity.intaveMode.is("MoreReduce")) && Minecraft.getMinecraft().thePlayer.hurtTime != 0) {
-                            double randMotion = MathUtils.randomizeDouble(velocity.rFactorMin.get(), velocity.rFactorMax.get());
-
-                            this.motionX *= randMotion;
-                            this.motionZ *= randMotion;
-                            this.setSprinting(false);
                         }
 
                         if (targetEntity instanceof EntityPlayerMP && targetEntity.velocityChanged) {

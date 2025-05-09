@@ -181,6 +181,9 @@ public class KillAura extends Module {
         hSpeed = (slowDown.get() ? randYawSpeed / hurtTime : randYawSpeed) * mc.timer.partialTicks;
         vSpeed = (slowDown.get() ? randPitchSpeed / hurtTime : randPitchSpeed) * mc.timer.partialTicks;
 
+        RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, mode, midpoint.get());
+
+        /*
         switch (mode) {
             case Linear:
                 RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, SmoothMode.Linear, midpoint.get());
@@ -198,6 +201,8 @@ public class KillAura extends Module {
                 RotationUtils.setRotation(getRotations(target), correction);
                 break;
         }
+
+         */
     }
 
     private EntityLivingBase findNextTarget() {

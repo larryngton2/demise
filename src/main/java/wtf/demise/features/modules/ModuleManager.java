@@ -43,7 +43,6 @@ public class ModuleManager {
                 FakeLag.class,
                 TimerRange.class,
                 TPAura.class,
-                ComboBreaker.class,
 
                 // Legit
                 AutoClicker.class,
@@ -57,6 +56,7 @@ public class ModuleManager {
                 MoreKB.class,
                 Reach.class,
                 HitBox.class,
+                CombatHelper.class,
 
                 // Exploit
                 Blink.class,
@@ -71,12 +71,12 @@ public class ModuleManager {
 
                 // Misc
                 Twerk.class,
-                AntiCheat.class,
                 MurderMystery.class,
                 InventorySync.class,
                 AutoQueue.class,
                 AutoRegister.class,
                 ExplosionBlock.class,
+                Test.class,
 
                 // Movement
                 Freeze.class,

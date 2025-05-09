@@ -24,48 +24,44 @@ public class PotionHUDWidget extends Widget {
     @Override
     public void onShader(Shader2DEvent event) {
         ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
-        if (setting.potionHudMode.is("Sexy")) {
-            width = 92;
-            height = heightAnimation.getOutput();
+        width = 92;
+        height = heightAnimation.getOutput();
 
-            RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
+        RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
 
-            heightAnimation.animate(20 + potions.size() * 10, 20);
-        }
+        heightAnimation.animate(20 + potions.size() * 10, 50);
     }
 
     @Override
     public void render() {
         ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
 
-        if (setting.potionHudMode.is("Sexy")) {
-            width = 92;
-            height = heightAnimation.getOutput();
+        width = 92;
+        height = heightAnimation.getOutput();
 
-            RoundedUtils.drawRound(renderX, renderY, width, height, 6, new Color(setting.bgColor(), true));
+        RoundedUtils.drawRound(renderX, renderY, width, height, 6, new Color(setting.bgColor(), true));
 
-            Fonts.interSemiBold.get(13).drawString("Potions", renderX + 8, renderY + 7 + 2, -1);
+        Fonts.interSemiBold.get(13).drawString("Potions", renderX + 8, renderY + 7 + 2, -1);
 
-            Fonts.nursultan.get(14).drawString("E", renderX + width - 16, renderY + 9, setting.color(0));
+        Fonts.nursultan.get(14).drawString("E", renderX + width - 16, renderY + 9, setting.color(0));
 
-            float offset = renderY + 21;
-            for (PotionEffect potion : potions) {
+        float offset = renderY + 21;
 
-                String name = I18n.format(Potion.potionTypes[potion.getPotionID()].getName()) + " " + (potion.getAmplifier() > 0 ? I18n.format("enchantment.level." + (potion.getAmplifier() + 1)) : "");
-                String duration = Potion.getDurationString(potion);
+        for (PotionEffect potion : potions) {
+            String name = I18n.format(Potion.potionTypes[potion.getPotionID()].getName()) + " " + (potion.getAmplifier() > 0 ? I18n.format("enchantment.level." + (potion.getAmplifier() + 1)) : "");
+            String duration = Potion.getDurationString(potion);
 
-                Fonts.interRegular.get(11).drawStringWithShadow(name, renderX + 8, offset, -1);
-                Fonts.interRegular.get(11).drawStringWithShadow(duration, renderX + width - 8 - Fonts.interRegular.get(11).getStringWidth(duration), offset, -1);
+            Fonts.interRegular.get(11).drawStringWithShadow(name, renderX + 8, offset, -1);
+            Fonts.interRegular.get(11).drawStringWithShadow(duration, renderX + width - 8 - Fonts.interRegular.get(11).getStringWidth(duration), offset, -1);
 
-                offset += 10;
-            }
-
-            heightAnimation.animate(20 + potions.size() * 10, 20);
+            offset += 10;
         }
+
+        heightAnimation.animate(20 + potions.size() * 10, 150);
     }
 
     @Override
     public boolean shouldRender() {
-        return setting.isEnabled() && setting.elements.isEnabled("Potion HUD") && !setting.potionHudMode.is("Exhi");
+        return setting.isEnabled() && setting.elements.isEnabled("Potion HUD");
     }
 }

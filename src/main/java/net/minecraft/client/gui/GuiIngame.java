@@ -1,6 +1,5 @@
 package net.minecraft.client.gui;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import lombok.Getter;
@@ -944,7 +943,7 @@ public class GuiIngame extends Gui {
         ++updateCounter;
 
         if (this.mc.thePlayer != null) {
-            ItemStack itemstack = this.mc.thePlayer.inventory.getCurrentItem();
+            ItemStack itemstack = mc.thePlayer.inventory.getStackInSlot(SpoofSlotUtils.getSpoofedSlot());
 
             if (itemstack == null) {
                 this.remainingHighlightTicks = 0;

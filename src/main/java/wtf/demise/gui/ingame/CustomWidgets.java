@@ -27,6 +27,8 @@ import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
+import wtf.demise.gui.widget.impl.ModuleListWidget;
+import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
@@ -48,8 +50,8 @@ public class CustomWidgets implements InstanceAccess {
     public static float f;
     private float x;
     public static ScoreObjective scoreObjective;
-    private float interpolatedHeight;
-    private float interpolatedY = sr == null ? 1080 : sr.getScaledHeight() - 80 - 5;
+    private float interpolatedChatHeight;
+    private float interpolatedWidgetY = sr == null ? 1080 : sr.getScaledHeight() - 80 - 5;
     private float interpolatedChatY;
     private boolean fade = false;
     private boolean renderText = false;
@@ -57,8 +59,12 @@ public class CustomWidgets implements InstanceAccess {
     private float tAlpha = 255;
     private final TimerUtils textTimer = new TimerUtils();
     private final CustomWidgetsModule customWidgetsModule = Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class);
-    private float interpolatedWidth;
-    private float interpolatedX;
+    private float interpolatedWidgetWidth;
+    private float interpolatedWidgetX;
+    private float interpolatedScoreY;
+    private float interpolatedScorebgY;
+    private float interpolatedScoreHeight;
+    private float interpolatedScoreWidth;
 
     @EventTarget
     public void onRender2D(Render2DEvent e) {
@@ -195,16 +201,16 @@ public class CustomWidgets implements InstanceAccess {
                 int lineHeight = j * 9;
 
                 if (lineHeight != 0) {
-                    interpolatedHeight = MathUtils.interpolate(interpolatedHeight, lineHeight, 0.1f);
+                    interpolatedChatHeight = MathUtils.interpolate(interpolatedChatHeight, lineHeight, 0.1f);
                 } else {
-                    interpolatedHeight = MathUtils.interpolate(interpolatedHeight, -4, 0.1f);
+                    interpolatedChatHeight = MathUtils.interpolate(interpolatedChatHeight, -4, 0.1f);
                 }
 
                 if (chatBackgroundAlpha > 3) {
                     if (!shader) {
-                        RoundedUtils.drawRound(-2, -interpolatedHeight - 2, l + 4, interpolatedHeight + 4, radius, new Color(getModule(Interface.class).bgColor(), true));
+                        RoundedUtils.drawRound(-2, -interpolatedChatHeight - 2, l + 4, interpolatedChatHeight + 4, radius, new Color(getModule(Interface.class).bgColor(), true));
                     } else {
-                        RoundedUtils.drawShaderRound(-2, -interpolatedHeight - 2, l + 4, interpolatedHeight + 4, radius, Color.black);
+                        RoundedUtils.drawShaderRound(-2, -interpolatedChatHeight - 2, l + 4, interpolatedChatHeight + 4, radius, Color.black);
                     }
                 }
 
@@ -232,6 +238,9 @@ public class CustomWidgets implements InstanceAccess {
                                 int i2 = 0;
                                 int j2 = -i1 * 9;
                                 String s = chatline.getChatComponent().getFormattedText();
+
+                                s = s.replace(mc.thePlayer.getNameClear(), CurrentUser.FINAL_USER);
+
                                 GlStateManager.enableBlend();
                                 mc.fontRendererObj.drawStringWithShadow(s, (float) i2, (float) (j2 - 8), 16777215 + (l1 << 24));
                                 GlStateManager.disableAlpha();
@@ -278,7 +287,7 @@ public class CustomWidgets implements InstanceAccess {
     private void drawHotbarWidget(int i, boolean shader) {
         TimerRange timerRange = getModule(TimerRange.class);
 
-        if (!(SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) && interpolatedY >= sr.getScaledHeight() + 19) {
+        if (!(SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) && interpolatedWidgetY >= sr.getScaledHeight() + 19) {
             return;
         }
 
@@ -294,7 +303,7 @@ public class CustomWidgets implements InstanceAccess {
         if (SpoofSlotUtils.isSpoofing()) {
             if (heldItem != null) {
                 if (heldItem.getItem() instanceof ItemBlock) {
-                    text = "§l" + countStr + "§r block" + (count != 1 ? "s" : "");
+                    text = countStr;
                 } else {
                     text = "";
                 }
@@ -324,13 +333,13 @@ public class CustomWidgets implements InstanceAccess {
         float renderY = (sr.getScaledHeight() - 80 - 5);
 
         if (SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) {
-            interpolatedY = MathUtils.interpolate(interpolatedY, renderY, 0.05f);
+            interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, renderY, 0.05f);
         } else {
-            interpolatedY = MathUtils.interpolate(interpolatedY, sr.getScaledHeight() + height, 0.05f);
+            interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, sr.getScaledHeight() + height, 0.05f);
         }
 
-        interpolatedWidth = MathUtils.interpolate(interpolatedWidth, totalWidth, 0.05f);
-        interpolatedX = MathUtils.interpolate(interpolatedX, renderX, 0.05f);
+        interpolatedWidgetWidth = MathUtils.interpolate(interpolatedWidgetWidth, totalWidth, 0.05f);
+        interpolatedWidgetX = MathUtils.interpolate(interpolatedWidgetX, renderX, 0.05f);
 
         GL11.glPushMatrix();
 
@@ -341,25 +350,25 @@ public class CustomWidgets implements InstanceAccess {
 
             //RenderUtils.enableScissor();
 
-            RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, height, 7, new Color(getModule(Interface.class).bgColor(), true));
+            RoundedUtils.drawRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, new Color(getModule(Interface.class).bgColor(), true));
 
-            Fonts.interMedium.get(18).drawString(text, interpolatedX + 3 - (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing() ? 16 : 0) + blockWH + spacing, interpolatedY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, -1);
+            Fonts.interMedium.get(18).drawString(text, interpolatedWidgetX + 3 - (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing() ? 16 : 0) + blockWH + spacing, interpolatedWidgetY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, -1);
 
             if (SpoofSlotUtils.isSpoofing()) {
                 RenderHelper.enableGUIStandardItemLighting();
-                mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) interpolatedX + 3, (int) (interpolatedY + 10 - (blockWH / 2)));
+                mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) interpolatedWidgetX + 3, (int) (interpolatedWidgetY + 10 - (blockWH / 2)));
                 RenderHelper.disableStandardItemLighting();
             }
 
             //RenderUtils.disableScissor();
         } else {
-            RoundedUtils.drawShaderRound(interpolatedX, interpolatedY, interpolatedWidth, height, 7, Color.black);
+            RoundedUtils.drawShaderRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, Color.black);
         }
 
         GL11.glPopMatrix();
     }
 
-    public static final Pattern LINK_PATTERN = Pattern.compile("(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[A-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&//=]*)");
+    public static final Pattern LINK_PATTERN = Pattern.compile("(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[A-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)");
 
     private void drawScoreboard(ScoreObjective objective, ScaledResolution scaledRes, boolean shader) {
         if (objective == null) {
@@ -376,12 +385,12 @@ public class CustomWidgets implements InstanceAccess {
             collection = list;
         }
 
-        int i = mc.fontRendererObj.getStringWidth(objective.getDisplayName());
+        int i = Fonts.interRegular.get(15).getStringWidth(objective.getDisplayName());
 
         for (Score score : collection) {
             ScorePlayerTeam scoreplayerteam = scoreboard.getPlayersTeam(score.getPlayerName());
             String s = ScorePlayerTeam.formatPlayerName(scoreplayerteam, score.getPlayerName());
-            i = Math.max(i, mc.fontRendererObj.getStringWidth(s));
+            i = Math.max(i, Fonts.interRegular.get(15).getStringWidth(s));
         }
 
         int i1 = collection.size() * mc.fontRendererObj.FONT_HEIGHT;
@@ -394,36 +403,57 @@ public class CustomWidgets implements InstanceAccess {
         int topY = j1 - totalHeight;
 
         float x = l1 - 2;
-        float y = topY - mc.fontRendererObj.FONT_HEIGHT - 1;
+        float y = j1;
 
         float width = (scaledRes.getScaledWidth() - k1 + 2) - (l1 - 2) + 6 - 10;
+        float bgY = y - i1 - Fonts.interRegular.get(15).getHeight() - 7;
+        float height = j1 - (topY - mc.fontRendererObj.FONT_HEIGHT - 1) + 7;
+
+        Interface anInterface = getModule(Interface.class);
+
+        if (anInterface.elements.isEnabled("Module List")) {
+            while (ModuleListWidget.currY + ModuleListWidget.getEnabledModules().size() * ModuleListWidget.getModuleHeight() > bgY - 15 && ModuleListWidget.currX > x - width - 25) {
+                y++;
+                bgY++;
+            }
+        }
+
+        interpolatedScorebgY = MathUtils.interpolate(interpolatedScorebgY, bgY, 0.25f);
+        interpolatedScoreY = MathUtils.interpolate(interpolatedScoreY, y, 0.25f);
+        interpolatedScoreHeight = MathUtils.interpolate(interpolatedScoreHeight, height, 0.25f);
+        interpolatedScoreWidth = MathUtils.interpolate(interpolatedScoreWidth, width, 0.25f);
+
+        y = interpolatedScoreY;
 
         if (!shader) {
-            RoundedUtils.drawRound(x - 3, y - 3, width, j1 - (topY - mc.fontRendererObj.FONT_HEIGHT - 1) + 6, 7, new Color(getModule(Interface.class).bgColor(), true));
+            RoundedUtils.drawRound(x - 3, interpolatedScorebgY, interpolatedScoreWidth, interpolatedScoreHeight, 7, new Color(getModule(Interface.class).bgColor(), true));
 
             for (Score score1 : collection) {
                 ++j;
 
+                y -= mc.fontRendererObj.FONT_HEIGHT;
+
                 ScorePlayerTeam scoreplayerteam1 = scoreboard.getPlayersTeam(score1.getPlayerName());
                 String s1 = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score1.getPlayerName());
 
-                int k = j1 - j * mc.fontRendererObj.FONT_HEIGHT;
+                s1 = s1.replace(mc.thePlayer.getName(), CurrentUser.FINAL_USER);
 
                 final Matcher linkMatcher = LINK_PATTERN.matcher(s1);
-                if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).isEnabled() && linkMatcher.find()) {
+
+                if (linkMatcher.find() || s1.contains("net") || s1.contains("org") || s1.contains("com")) {
                     s1 = "demise.wtf";
-                    mc.fontRendererObj.drawGradientWithShadow(s1, l1, k, (index) -> new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(index)));
+                    Fonts.interRegular.get(15).drawGradientWithShadow(s1, l1, y, (index) -> new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(index)));
                 } else {
-                    mc.fontRendererObj.drawStringWithShadow(s1, l1, k, 553648127);
+                    Fonts.interRegular.get(15).drawStringWithShadow(s1, l1, y, -1);
                 }
 
                 if (j == collection.size()) {
                     String s3 = objective.getDisplayName();
-                    mc.fontRendererObj.drawStringWithShadow(s3, l1 + i / 2 - mc.fontRendererObj.getStringWidth(s3) / 2, k - mc.fontRendererObj.FONT_HEIGHT, 553648127);
+                    Fonts.interRegular.get(15).drawStringWithShadow(s3, l1 + i / 2 - Fonts.interRegular.get(15).getStringWidth(s3) / 2, y - mc.fontRendererObj.FONT_HEIGHT, -1);
                 }
             }
         } else {
-            RoundedUtils.drawShaderRound(x - 3, y - 3, width, j1 - (topY - mc.fontRendererObj.FONT_HEIGHT - 1) + 6, 7, Color.black);
+            RoundedUtils.drawShaderRound(x - 3, interpolatedScorebgY, interpolatedScoreWidth, interpolatedScoreHeight, 7, Color.black);
         }
     }
 

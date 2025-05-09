@@ -746,11 +746,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         long i = System.nanoTime();
         this.mcProfiler.startSection("root");
 
-
         GameEvent gameEvent = new GameEvent();
 
         Demise.INSTANCE.getEventManager().call(gameEvent);
 
+        // cancel game event for free robux
         if (gameEvent.isCancelled()) {
             return;
         }
@@ -779,7 +779,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
 
+        TickBase tickBase = Demise.INSTANCE.getModuleManager().getModule(TickBase.class);
+
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
+            if (tickBase.skipTick()) {
+                continue;
+            }
+
             this.runTick();
         }
 
@@ -802,7 +808,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         this.mcProfiler.endSection();
 
-        if (!this.skipRenderWorld) {
+        if (!this.skipRenderWorld && !tickBase.freezeAnim()) {
             this.mcProfiler.endStartSection("gameRenderer");
             this.entityRenderer.updateCameraAndRender(this.timer.renderPartialTicks, i);
             this.mcProfiler.endSection();

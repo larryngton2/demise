@@ -9,4 +9,5 @@ import wtf.demise.features.values.impl.BoolValue;
 public class Rotation extends Module {
     public final BoolValue body = new BoolValue("Render Body", true, this);
     public final BoolValue realistic = new BoolValue("Realistic", true, this, body::get);
+    public final BoolValue silent = new BoolValue("Silent", true, this);
 }

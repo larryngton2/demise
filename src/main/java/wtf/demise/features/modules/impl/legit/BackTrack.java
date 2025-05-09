@@ -29,8 +29,10 @@ import java.awt.*;
 @ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach.", category = ModuleCategory.Legit)
 public class BackTrack extends Module {
     private final BoolValue onlyWhenNeeded = new BoolValue("Only when needed", false, this);
+    private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this);
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
     private final SliderValue maxRange = new SliderValue("Max range", 6, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
+    private final BoolValue extraCheck = new BoolValue("Extra check", true, this);
     private final SliderValue minMS = new SliderValue("Min ms", 50, 0, 5000, 5, this);
     private final SliderValue maxMS = new SliderValue("Max ms", 200, 0, 5000, 5, this);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
@@ -75,7 +77,7 @@ public class BackTrack extends Module {
         if (e.isPost()) {
             if (mc.thePlayer.isDead) return;
 
-            target = PlayerUtils.getTarget(9, teamCheck.get());
+            target = PlayerUtils.getTarget(8, teamCheck.get());
 
             if (ping == 0) ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
 
@@ -84,7 +86,7 @@ public class BackTrack extends Module {
             double realDistance = PlayerUtils.getCustomDistanceToEntityBox(realPosition, mc.thePlayer);
             double clientDistance = PlayerUtils.getDistanceToEntityBox(target);
 
-            if (clientDistance > 3 && target.hurtTime != 0) {
+            if (clientDistance > attackRange.get() && target.hurtTime != 0) {
                 outOfRange = true;
             }
 
@@ -92,11 +94,10 @@ public class BackTrack extends Module {
                 outOfRange = false;
             }
 
-            boolean onlyNeeded = ((realDistance > clientDistance && realDistance > 3) || outOfRange) && realDistance < 4.5 && clientDistance <= 3;
-
-            boolean on = realDistance > clientDistance && realDistance > minRange.get() && realDistance < maxRange.get();
-
-            shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;
+            boolean distanceCheck = PlayerUtils.getCustomDistanceToEntityBox(target.getPositionVector(), mc.thePlayer) > PlayerUtils.getCustomDistanceToEntityBox(target.getPrevPositionVector(), mc.thePlayer);
+            boolean extraCheck = distanceCheck || !this.extraCheck.get();
+            boolean onlyNeeded = extraCheck && (realDistance > attackRange.get() || outOfRange) && realDistance < attackRange.get() + 1.5 && clientDistance <= attackRange.get();
+            boolean on = extraCheck && realDistance > minRange.get() && realDistance < maxRange.get();
 
             if (shouldLag) {
                 ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
@@ -109,6 +110,8 @@ public class BackTrack extends Module {
                     dispatched = true;
                 }
             }
+
+            shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;
         }
     }
 
@@ -123,12 +126,16 @@ public class BackTrack extends Module {
 
             if (e.getPacket() instanceof S14PacketEntity s14PacketEntity) {
                 if (s14PacketEntity.getEntityId() == target.getEntityId()) {
-                    realPosition = realPosition.addVector(s14PacketEntity.getX() / 32.0D, s14PacketEntity.getY() / 32.0D,
-                            s14PacketEntity.getZ() / 32.0D);
+                    realPosition = realPosition.addVector(s14PacketEntity.getX() / 32.0D, s14PacketEntity.getY() / 32.0D, s14PacketEntity.getZ() / 32.0D);
                 }
             } else if (e.getPacket() instanceof S18PacketEntityTeleport s18PacketEntityTeleport) {
                 if (s18PacketEntityTeleport.getEntityId() == target.getEntityId()) {
                     realPosition = new Vec3(s18PacketEntityTeleport.getX() / 32D, s18PacketEntityTeleport.getY() / 32D, s18PacketEntityTeleport.getZ() / 32D);
+                }
+
+                if (s18PacketEntityTeleport.getEntityId() == mc.thePlayer.getEntityId()) {
+                    dispatched = false;
+                    shouldLag = false;
                 }
             }
         }
