@@ -20,6 +20,8 @@ public class WidgetManager implements InstanceAccess {
         register(new PotionHUDWidget());
         register(new ModuleListWidget());
         register(new BPSCounterWidget());
+        register(new KeystrokeWidget());
+        register(new InfoWidget());
     }
 
     public boolean loaded;

@@ -8,7 +8,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
-import wtf.demise.utils.render.RenderUtils;
+import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -54,25 +54,24 @@ public class NotificationManager implements InstanceAccess {
             if (!animation.finished(Direction.BACKWARDS)) {
                 float x;
                 float y;
-                float actualOffset = 0;
+                float actualOffset;
                 Interface anInterface = INSTANCE.getModuleManager().getModule(Interface.class);
 
-                x = (float) (sr.getScaledWidth() - (width + 5) * animation.getOutput());
-                y = sr.getScaledHeight() - 5 - height - yOffset;
+                x = (float) (10 * animation.getOutput());
+                y = 10 + Fonts.urbanist.get(38).getHeight() + 5 - yOffset;
+
+                notification.getAnimation().setDuration(150);
+                actualOffset = 10;
 
                 if (!shader) {
-                    notification.getAnimation().setDuration(150);
-                    actualOffset = 10;
-
-                    RenderUtils.drawRect(x, y, width, height, anInterface.bgColor());
-                    Fonts.interSemiBold.get(17).drawStringWithShadow(notification.getTitle(), x + 3, y + 5, new Color(255, 255, 255, 255).getRGB());
-                    Fonts.interRegular.get(17).drawStringWithShadow(notification.getDescription(), x + 3, y + 15, new Color(anInterface.color()).brighter().getRGB());
-                    RenderUtils.drawRect(x, y + height - 1, width * Math.min((notification.getTimerUtils().getTime() / notification.getTime()), 1), 1, INSTANCE.getModuleManager().getModule(Interface.class).color());
+                    RoundedUtils.drawRound(x, y, width, height, 7, new Color(anInterface.bgColor(), true));
+                    Fonts.interSemiBold.get(17).drawString(notification.getTitle(), x + 4, y + 5, new Color(255, 255, 255, 255).getRGB());
+                    Fonts.interRegular.get(17).drawString(notification.getDescription(), x + 4, y + 15, new Color(anInterface.color()).brighter().getRGB());
                 } else {
-                    RenderUtils.drawRect(x, y, width, height, Color.black.getRGB());
+                    RoundedUtils.drawShaderRound(x, y, width, height, 7, Color.black);
                 }
 
-                yOffset += (height + actualOffset) * (float) notification.getAnimation().getOutput();
+                yOffset -= (height + actualOffset) * (float) (notification.getAnimation().getOutput());
             }
         }
     }

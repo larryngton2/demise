@@ -3,12 +3,10 @@ package wtf.demise.gui.widget.impl;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
-import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
@@ -112,9 +110,9 @@ class TargetHUD implements InstanceAccess {
                 diff = "±" + initialDiff;
             }
 
-            Fonts.interSemiBold.get(13).drawStringWithShadow(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
-            Fonts.interSemiBold.get(13).drawStringWithShadow(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
-            Fonts.interSemiBold.get(18).drawStringWithShadow(target.getName(), x + 37, y + 6, -1);
+            Fonts.interSemiBold.get(13).drawString(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
+            Fonts.interSemiBold.get(13).drawString(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
+            Fonts.interSemiBold.get(18).drawString(target.getName(), x + 37, y + 6, -1);
 
             RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
 

@@ -20,6 +20,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.packet.BadPacketsComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -74,7 +75,7 @@ public class BackTrack extends Module {
 
     @EventTarget
     public void onMotion(MotionEvent e) {
-        if (e.isPost()) {
+        if (e.isPre()) {
             if (mc.thePlayer.isDead) return;
 
             target = PlayerUtils.getTarget(8, teamCheck.get());

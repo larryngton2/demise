@@ -49,9 +49,6 @@ public class ItemESP extends Module {
             }
 
             final String var3 = (entityItem.getEntityItem().stackSize > 1) ? (EnumChatFormatting.RESET + " x" + entityItem.getEntityItem().stackSize) : "";
-            if (!this.checkItem(entityItem.getEntityItem().getItem())) {
-                continue;
-            }
 
             double interpolatedX = entityItem.lastTickPosX + (entityItem.posX - entityItem.lastTickPosX) * event.partialTicks();
             double interpolatedY = entityItem.lastTickPosY + (entityItem.posY - entityItem.lastTickPosY) * event.partialTicks();
@@ -66,26 +63,6 @@ public class ItemESP extends Module {
             drawText(entityItem.getEntityItem().getDisplayName() + var3 + enhancement, -1, interpolatedX, interpolatedY, interpolatedZ, dist);
             GlStateManager.popMatrix();
         }
-    }
-
-    public boolean checkItem(Item item) {
-        return item instanceof ItemAppleGold ||
-                item instanceof ItemSword ||
-                item instanceof ItemBow ||
-                item instanceof ItemBucketMilk ||
-                item instanceof ItemPotion ||
-                item == Items.diamond ||
-                item == Items.gold_ingot ||
-                item == Items.gold_nugget ||
-                item == Items.iron_ingot ||
-                item instanceof ItemEnchantedBook ||
-                item == Items.apple ||
-                item == Items.skull ||
-                item == Items.diamond_sword ||
-                item == Items.diamond_boots ||
-                item == Items.diamond_helmet ||
-                item == Items.diamond_leggings ||
-                item == Items.iron_leggings;
     }
 
     public static void drawText(String value, int textColor, double posY, double posX, double posZ, double dist) {

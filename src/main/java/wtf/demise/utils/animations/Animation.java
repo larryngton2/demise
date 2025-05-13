@@ -19,9 +19,9 @@ public abstract class Animation {
     }
 
     public Animation(int ms, double endPoint, Direction direction) {
-        this.duration = ms; //Time in milliseconds of how long you want the animation to take.
-        this.endPoint = endPoint; //The desired distance for the animated object to go.
-        this.direction = direction; //Direction in which the graph is going. If backwards, will start from endPoint and go to 0.
+        this.duration = ms;
+        this.endPoint = endPoint;
+        this.direction = direction;
     }
 
     public boolean finished(Direction direction) {

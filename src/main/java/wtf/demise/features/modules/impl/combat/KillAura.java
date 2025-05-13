@@ -521,11 +521,7 @@ public class KillAura extends Module {
     }
 
     private boolean canAutoBlock() {
-        return isHoldingSword() && autoBlock.get() && currentTarget != null && PlayerUtils.getDistanceToEntityBox(currentTarget) <= autoBlockRange.get();
-    }
-
-    public boolean isHoldingSword() {
-        return mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
+        return PlayerUtils.isHoldingSword() && autoBlock.get() && currentTarget != null && PlayerUtils.getDistanceToEntityBox(currentTarget) <= autoBlockRange.get();
     }
 
     private float[] getRotations(EntityLivingBase entity) {

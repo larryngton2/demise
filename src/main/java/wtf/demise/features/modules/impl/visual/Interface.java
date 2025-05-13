@@ -6,15 +6,10 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S02PacketChat;
-import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.events.impl.misc.WorldChangeEvent;
-import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
@@ -44,20 +39,22 @@ public class Interface extends Module {
             new BoolValue("Armor", true),
             new BoolValue("Potion HUD", true),
             new BoolValue("Target HUD", true),
-            new BoolValue("Notification", false),
-            new BoolValue("BPS counter", false)
+            new BoolValue("Notification", true),
+            new BoolValue("BPS counter", true),
+            new BoolValue("Keystrokes", true),
+            new BoolValue("Info", true)
     ), this);
 
-    public final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
+    private final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
-    public final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
+    private final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
-    public final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
+    private final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
-    public final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
+    private final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
     public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
     public final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
@@ -65,8 +62,6 @@ public class Interface extends Module {
 
     public final DecelerateAnimation decelerateAnimation = new DecelerateAnimation(175, 1);
     public EntityLivingBase target;
-    public int lost = 0, killed = 0, won = 0;
-    public int prevMatchKilled = 0, matchKilled = 0, match;
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
@@ -77,10 +72,7 @@ public class Interface extends Module {
                     Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
                     break;
                 case "Modern":
-                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
-                            " | " + CurrentUser.FINAL_USER +
-                            " | " + PlayerUtils.getCurrServer();
-
+                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE + " | " + CurrentUser.FINAL_USER + " | " + PlayerUtils.getCurrServer();
                     int x = 7;
                     int y = 7;
                     int width = Fonts.interSemiBold.get(17).getStringWidth("") + Fonts.interSemiBold.get(17).getStringWidth(name) + 5;
@@ -129,10 +121,7 @@ public class Interface extends Module {
                     Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, Color.black.getRGB());
                     break;
                 case "Modern":
-                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE +
-                            " | " + CurrentUser.FINAL_USER +
-                            " | " + PlayerUtils.getCurrServer();
-
+                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE + " | " + CurrentUser.FINAL_USER + " | " + PlayerUtils.getCurrServer();
                     int x = 7;
                     int y = 7;
                     int width = Fonts.interSemiBold.get(17).getStringWidth("") + Fonts.interSemiBold.get(17).getStringWidth(name) + 5;
@@ -144,7 +133,7 @@ public class Interface extends Module {
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
+            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), true);
         }
     }
 
@@ -170,44 +159,6 @@ public class Interface extends Module {
         } else if (target == null) {
             decelerateAnimation.setDirection(Direction.FORWARDS);
             target = mc.thePlayer;
-        }
-    }
-
-    @EventTarget
-    public void onWorld(WorldChangeEvent event) {
-        prevMatchKilled = matchKilled;
-        matchKilled = 0;
-        match += 1;
-
-        if (match > 6) match = 6;
-    }
-
-    @EventTarget
-    public void onPacket(PacketEvent event) {
-        Packet<?> packet = event.getPacket();
-
-        if (packet instanceof S02PacketChat) {
-            S02PacketChat s02 = (S02PacketChat) event.getPacket();
-            String xd = s02.getChatComponent().getUnformattedText();
-            if (xd.contains("was killed by " + mc.thePlayer.getName())) {
-                ++this.killed;
-                prevMatchKilled = matchKilled;
-                ++matchKilled;
-            }
-
-            if (xd.contains("You Died! Want to play again?")) {
-                ++lost;
-            }
-        }
-
-        if (packet instanceof S45PacketTitle && ((S45PacketTitle) packet).getType().equals(S45PacketTitle.Type.TITLE)) {
-            String unformattedText = ((S45PacketTitle) packet).getMessage().getUnformattedText();
-            if (unformattedText.contains("VICTORY!")) {
-                ++this.won;
-            }
-            if (unformattedText.contains("GAME OVER!") || unformattedText.contains("DEFEAT!") || unformattedText.contains("YOU DIED!")) {
-                ++this.lost;
-            }
         }
     }
 
@@ -269,6 +220,6 @@ public class Interface extends Module {
     }
 
     public int bgColor() {
-        return new Color(0, 0, 0, (int) bgAlpha.get()).getRGB();
+        return new Color(0, 0, 0, background.get () ? (int) bgAlpha.get() : 0).getRGB();
     }
 }

@@ -22,17 +22,6 @@ public class PotionHUDWidget extends Widget {
     private final ContinualAnimation heightAnimation = new ContinualAnimation();
 
     @Override
-    public void onShader(Shader2DEvent event) {
-        ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
-        width = 92;
-        height = heightAnimation.getOutput();
-
-        RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
-
-        heightAnimation.animate(20 + potions.size() * 10, 50);
-    }
-
-    @Override
     public void render() {
         ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
 
@@ -57,7 +46,18 @@ public class PotionHUDWidget extends Widget {
             offset += 10;
         }
 
-        heightAnimation.animate(20 + potions.size() * 10, 150);
+        heightAnimation.animate(20 + potions.size() * 10, 20);
+    }
+
+    @Override
+    public void onShader(Shader2DEvent event) {
+        ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
+        width = 92;
+        height = heightAnimation.getOutput();
+
+        RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
+
+        heightAnimation.animate(20 + potions.size() * 10, 20);
     }
 
     @Override

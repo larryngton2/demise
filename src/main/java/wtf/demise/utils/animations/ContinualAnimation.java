@@ -18,7 +18,6 @@ public class ContinualAnimation {
         }
     }
 
-
     public boolean isDone() {
         return output == endpoint || animation.isDone();
     }

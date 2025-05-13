@@ -1,0 +1,124 @@
+package wtf.demise.gui.widget.impl;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.lwjglx.input.Keyboard;
+import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.gui.font.Fonts;
+import wtf.demise.gui.widget.Widget;
+import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.ChatUtils;
+import wtf.demise.utils.misc.StringUtils;
+import wtf.demise.utils.render.RoundedUtils;
+
+import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+public class KeystrokeWidget extends Widget {
+    private final Key w = new Key(new float[]{20, 0}, mc.gameSettings.keyBindForward.getKeyCode());
+    private final Key a = new Key(new float[]{0, 20}, mc.gameSettings.keyBindLeft.getKeyCode());
+    private final Key s = new Key(new float[]{20, 20}, mc.gameSettings.keyBindBack.getKeyCode());
+    private final Key d = new Key(new float[]{40, 20}, mc.gameSettings.keyBindRight.getKeyCode());
+    private final Key jump = new Key(new float[]{0, 40}, 57, mc.gameSettings.keyBindJump.getKeyCode());
+
+    private final List<Key> keyList = Arrays.asList(w, a, s, d, jump);
+
+    public KeystrokeWidget() {
+        super("Keystrokes");
+
+        this.width = 57;
+        this.height = 57;
+    }
+
+    @Override
+    public void render() {
+        drawKeystrokes(false);
+    }
+
+    @Override
+    public void onShader(Shader2DEvent event) {
+        drawKeystrokes(true);
+    }
+
+    private void drawKeystrokes(boolean shader) {
+        for (Key key : keyList) {
+            key.updateState();
+
+            float x = renderX + key.getPos()[0];
+            float y = renderY + key.getPos()[1];
+            float width = key.getWidth();
+            float height = key.getHeight();
+            //Color color;
+
+            if (key.isPressed()) {
+                x += 0.85f;
+                y += 0.85f;
+                width -= 1.7f;
+                height -= 1.7f;
+                //color = new Color(46, 46, 46, 178);
+            } else {
+                //color = new Color(setting.bgColor(), true);
+            }
+
+            key.setInterpolatedX(MathUtils.interpolate(key.getInterpolatedX(), x, 0.25f));
+            key.setInterpolatedY(MathUtils.interpolate(key.getInterpolatedY(), y, 0.25f));
+            key.setInterpolatedWidth(MathUtils.interpolate(key.getInterpolatedWidth(), width, 0.25f));
+            key.setInterpolatedHeight(MathUtils.interpolate(key.getInterpolatedHeight(), height, 0.25f));
+
+            //key.setColor(ColorUtils.interpolateColorC(key.getColor(), color, 0.25f));
+
+            if (!shader) {
+                //todo interpolate color
+                RoundedUtils.drawRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, new Color(setting.bgColor(), true) /* key.getColor() */);
+                Fonts.interRegular.get(14).drawCenteredString(key.getName(), (key.getInterpolatedX() + key.getInterpolatedWidth() / 2) - 0.5f, (key.getInterpolatedY() + key.getInterpolatedHeight() / 2) - 1, setting.color());
+            } else {
+                RoundedUtils.drawShaderRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, Color.black);
+            }
+        }
+    }
+
+    @Override
+    public boolean shouldRender() {
+        return setting.isEnabled() && setting.elements.isEnabled("Keystrokes");
+    }
+}
+
+@Getter
+@Setter
+class Key {
+    private boolean isPressed;
+    private int keyCode;
+    private String name;
+    private float[] pos;
+    private float width;
+    private float height;
+    private float interpolatedWidth;
+    private float interpolatedHeight;
+    private float interpolatedX;
+    private float interpolatedY;
+    private float renderX;
+    private float renderY;
+    private Color color;
+
+    public Key(float[] pos, int keyCode) {
+        this.pos = pos;
+        this.keyCode = keyCode;
+        this.name = StringUtils.capitalizeWords(Keyboard.getKeyName(keyCode));
+        this.width = 17;
+        this.height = 17;
+    }
+
+    public Key(float[] pos, float width, int keyCode) {
+        this.pos = pos;
+        this.keyCode = keyCode;
+        this.name = StringUtils.capitalizeWords(Keyboard.getKeyName(keyCode));
+        this.width = width;
+        this.height = 17;
+    }
+
+    public void updateState() {
+        isPressed = Keyboard.isKeyDown(keyCode);
+    }
+}

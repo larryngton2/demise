@@ -7,7 +7,6 @@ import net.minecraft.network.play.server.*;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.Vec3;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -59,7 +58,6 @@ public final class PingSpoofComponent implements InstanceAccess {
 
     public static void dispatch() {
         if (!packets.isEmpty()) {
-            // Stops the packets from being called twice
             boolean enabled = PingSpoofComponent.enabled;
             PingSpoofComponent.enabled = false;
             packets.forEach(timedPacket -> PacketUtils.queue(timedPacket.getPacket()));
@@ -84,20 +82,21 @@ public final class PingSpoofComponent implements InstanceAccess {
         if (!(enabled = !enabledTimer.hasTimeElapsed(100) && !(mc.currentScreen instanceof GuiDownloadTerrain))) {
             dispatch();
         } else {
-            // Stops the packets from being called twice
             enabled = false;
 
-            packets.forEach(packet -> {
-                if (packet.getMillis() + amount < System.currentTimeMillis()) {
-                    if (packet.getPacket() instanceof C03PacketPlayer c03PacketPlayer) {
-                        realX = c03PacketPlayer.getPositionX();
-                        realY = c03PacketPlayer.getPositionY();
-                        realZ = c03PacketPlayer.getPositionZ();
+            if (!BadPacketsComponent.bad()) {
+                packets.forEach(packet -> {
+                    if (packet.getMillis() + amount < System.currentTimeMillis()) {
+                        if (packet.getPacket() instanceof C03PacketPlayer c03PacketPlayer) {
+                            realX = c03PacketPlayer.getPositionX();
+                            realY = c03PacketPlayer.getPositionY();
+                            realZ = c03PacketPlayer.getPositionZ();
+                        }
+                        PacketUtils.queue(packet.getPacket());
+                        packets.remove(packet);
                     }
-                    PacketUtils.queue(packet.getPacket());
-                    packets.remove(packet);
-                }
-            });
+                });
+            }
 
             enabled = true;
         }

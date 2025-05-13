@@ -7,6 +7,6 @@ import wtf.demise.features.values.impl.SliderValue;
 
 @ModuleInfo(name = "Test", category = ModuleCategory.Misc)
 public class Test extends Module {
-    public final SliderValue extray = new SliderValue("extray", 5, 1, 20, 1, this);
-    public final SliderValue heiught = new SliderValue("heiught", 4, 1, 20, 1, this);
+    public final SliderValue xpad = new SliderValue("xpad", 7, 1, 20, 1, this);
+    public final SliderValue ypad = new SliderValue("ypad", 5, 1, 20, 1, this);
 }

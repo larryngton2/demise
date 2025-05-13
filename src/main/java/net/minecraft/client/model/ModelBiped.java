@@ -7,7 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.visual.Animations;
+import wtf.demise.utils.player.PlayerUtils;
 
 public class ModelBiped extends ModelBase {
     public ModelRenderer bipedHead;
@@ -133,7 +133,7 @@ public class ModelBiped extends ModelBase {
                 break;
         }
 
-        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isHoldingSword() && KillAura.isBlocking && entityIn == Minecraft.getMinecraft().thePlayer) {
+        if (PlayerUtils.isHoldingSword() && KillAura.isBlocking && entityIn == Minecraft.getMinecraft().thePlayer) {
             this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5f - ((float) Math.PI / 10F) * 2;
         }
 
@@ -198,16 +198,6 @@ public class ModelBiped extends ModelBase {
             this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(ageInTicks * 0.09F) * 0.05F + 0.05F;
             this.bipedRightArm.rotateAngleX += MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
             this.bipedLeftArm.rotateAngleX -= MathHelper.sin(ageInTicks * 0.067F) * 0.05F;
-        }
-
-        Animations animation = Demise.INSTANCE.getModuleManager().getModule(Animations.class);
-
-        if (animation.isEnabled() && animation.getWalking().get() && entityIn instanceof EntityPlayer) {
-            this.bipedRightArm.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + 3.1415927F) * 2.0F * limbSwingAmount * 0.8F;
-            this.bipedRightArm.rotateAngleZ = (MathHelper.cos(limbSwing * 0.2312F) + 1.0F) * 1.0F * limbSwingAmount * 0.8F;
-
-            this.bipedLeftArm.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 2.0F * limbSwingAmount * 0.8F;
-            this.bipedLeftArm.rotateAngleZ = (MathHelper.cos(limbSwing * 0.2812F) - 1.0F) * 1.0F * limbSwingAmount * 0.8F;
         }
 
         copyModelAngles(this.bipedHead, this.bipedHeadwear);

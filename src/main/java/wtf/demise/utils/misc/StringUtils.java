@@ -34,7 +34,8 @@ public class StringUtils {
         return switch (fakerMode) {
             case NORMAL -> faker.name().fullName().replaceAll("[ .\\-,']", "");
             case FUNNY -> faker.funnyName().name().replace(" ", "").replaceAll("[ .\\-,']", "");
-            case IM_FUCKING_BORED -> (faker.country().name() + faker.country().capital()).replace(" ", "").replaceAll("[ .\\-,']", "");
+            case IM_FUCKING_BORED ->
+                    (faker.country().name() + faker.country().capital()).replace(" ", "").replaceAll("[ .\\-,']", "");
         };
     }
 
@@ -42,5 +43,23 @@ public class StringUtils {
         NORMAL,
         FUNNY,
         IM_FUCKING_BORED
+    }
+
+    public static String capitalizeWords(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        String[] words = input.split("\\s");
+
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            result.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1).toLowerCase())
+                    .append(" ");
+        }
+
+        return result.toString().trim();
     }
 }

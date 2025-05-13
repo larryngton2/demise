@@ -35,7 +35,7 @@ public class TickBase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue attackRange = new SliderValue("Attack range", 3f, 0.1f, 7f, 0.1f, this);
-    private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 7f, 0.1f, this);
+    private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 15, 0.1f, this);
     private final SliderValue maxTick = new SliderValue("Max ticks", 4, 1, 20, this);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final SliderValue selfPredictionTicks = new SliderValue("Self prediction ticks", 4, 0, 20, 1, this);

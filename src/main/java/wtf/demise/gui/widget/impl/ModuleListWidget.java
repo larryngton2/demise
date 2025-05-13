@@ -1,8 +1,10 @@
 package wtf.demise.gui.widget.impl;
 
+import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
+import wtf.demise.features.modules.impl.misc.Test;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
@@ -32,6 +34,16 @@ public class ModuleListWidget extends Widget {
 
         currX = renderX;
         currY = renderY;
+
+        /*
+        Test test = Demise.INSTANCE.getModuleManager().getModule(Test.class);
+
+        xPadding = (int) test.xpad.get();
+        yPadding = (int) test.ypad.get();
+
+         */
+
+        this.height = getEnabledModules().size() * getModuleHeight();
 
         int middle = sr.getScaledWidth() / 2;
         List<Module> enabledModules = getEnabledModules();
@@ -105,10 +117,7 @@ public class ModuleListWidget extends Widget {
     }
 
     private void renderModule(Module module, float localX, float localY, float offset, int width, int height, float alphaAnimation, int middle, int index, boolean shader) {
-        if (setting.background.get()) {
-            renderBackground(localX, localY, offset, width, height, middle, shader);
-        }
-
+        renderBackground(localX, localY, offset, width, height, middle, shader);
         renderText(module, localX, localY, offset, width - xPadding, alphaAnimation, middle, index, shader);
     }
 
@@ -136,15 +145,15 @@ public class ModuleListWidget extends Widget {
 
         if (!shader) {
             if (localX < middle) {
-                setting.getFr().drawStringWithShadow(text, localX + (xPadding / 2f), textY, color);
+                setting.getFr().drawString(text, localX + (xPadding / 2f), textY, color);
             } else {
-                setting.getFr().drawStringWithShadow(text, textX, textY, color);
+                setting.getFr().drawString(text, textX, textY, color);
             }
         } else {
             if (localX < middle) {
-                setting.getFr().drawStringWithShadow(text, localX + (xPadding / 2f), textY, Color.black.getRGB());
+                setting.getFr().drawString(text, localX + (xPadding / 2f), textY, Color.black.getRGB());
             } else {
-                setting.getFr().drawStringWithShadow(text, textX, textY, Color.black.getRGB());
+                setting.getFr().drawString(text, textX, textY, Color.black.getRGB());
             }
         }
     }

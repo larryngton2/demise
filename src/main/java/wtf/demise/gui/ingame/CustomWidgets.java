@@ -418,10 +418,10 @@ public class CustomWidgets implements InstanceAccess {
             }
         }
 
-        interpolatedScorebgY = MathUtils.interpolate(interpolatedScorebgY, bgY, 0.25f);
-        interpolatedScoreY = MathUtils.interpolate(interpolatedScoreY, y, 0.25f);
-        interpolatedScoreHeight = MathUtils.interpolate(interpolatedScoreHeight, height, 0.25f);
-        interpolatedScoreWidth = MathUtils.interpolate(interpolatedScoreWidth, width, 0.25f);
+        interpolatedScorebgY = MathUtils.interpolate(interpolatedScorebgY, bgY, 0.15f);
+        interpolatedScoreY = MathUtils.interpolate(interpolatedScoreY, y, 0.15f);
+        interpolatedScoreHeight = MathUtils.interpolate(interpolatedScoreHeight, height, 0.15f);
+        interpolatedScoreWidth = MathUtils.interpolate(interpolatedScoreWidth, width, 0.15f);
 
         y = interpolatedScoreY;
 
@@ -440,7 +440,7 @@ public class CustomWidgets implements InstanceAccess {
 
                 final Matcher linkMatcher = LINK_PATTERN.matcher(s1);
 
-                if (linkMatcher.find() || s1.contains("net") || s1.contains("org") || s1.contains("com")) {
+                if (j <= 2 && (linkMatcher.find() || s1.contains("net") || s1.contains("org") || s1.contains("com"))) {
                     s1 = "demise.wtf";
                     Fonts.interRegular.get(15).drawGradientWithShadow(s1, l1, y, (index) -> new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(index)));
                 } else {

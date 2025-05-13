@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="96.269997"
+   viewBox="0 0 512 96.269998"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.1 (93de688d07, 2025-03-30)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="255.6191"
+     inkscape:cy="19.445436"
+     inkscape:window-width="1920"
+     inkscape:window-height="989"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <defs
+     id="defs1">
+    <rect
+       x="61.405258"
+       y="124.49285"
+       width="641.71985"
+       height="554.13934"
+       id="rect1" />
+  </defs>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:71.6107px;font-family:Urbanist;-inkscape-font-specification:'Urbanist, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#e5e5e5;fill-opacity:0.798343;stroke-width:1.2244"
+     x="337.48425"
+     y="78.372078"
+     id="text2"><tspan
+       sodipodi:role="line"
+       x="337.48425"
+       y="78.372078"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:71.6107px;font-family:Urbanist;-inkscape-font-specification:'Urbanist, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#e5e5e5;fill-opacity:0.798343;stroke-width:1.2244"
+       id="tspan4">alpha</tspan></text>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       id="text1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:85.3333px;font-family:Urbanist;-inkscape-font-specification:'Urbanist, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect1);display:inline;fill:#ffffff;fill-opacity:0.800829"
+       inkscape:label="text1"
+       transform="matrix(1.2243915,0,0,1.2243921,-78.311089,-169.83529)"><tspan
+         x="61.404297"
+         y="202.71438"
+         id="tspan2">demise</tspan></text>
+  </g>
+</svg>

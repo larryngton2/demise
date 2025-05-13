@@ -103,7 +103,9 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
+import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
+import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.render.RenderUtils;
 

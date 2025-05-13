@@ -96,6 +96,7 @@ public class ModuleManager {
                 AutoWalk.class,
                 Jesus.class,
                 TargetStrafe.class,
+                WallClimb.class,
 
                 // Player
                 AutoTool.class,
@@ -110,7 +111,6 @@ public class ModuleManager {
 
                 // Visual
                 Atmosphere.class,
-                Animations.class,
                 BlockOverlay.class,
                 Camera.class,
                 ChestESP.class,
@@ -137,7 +137,9 @@ public class ModuleManager {
                 CustomSkin.class,
                 ForceDinnerbone.class,
                 CustomWidgetsModule.class,
-                ImageESP.class
+                ImageESP.class,
+                NoRenderOffsetReset.class,
+                BlockOnSwing.class
         );
 
         // Sort modules by name for better organization

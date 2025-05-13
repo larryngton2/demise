@@ -142,7 +142,6 @@ public class ShaderUtils implements InstanceAccess {
         glShaderSource(shader, readInputStream(inputStream));
         glCompileShader(shader);
 
-
         if (glGetShaderi(shader, GL_COMPILE_STATUS) == 0) {
             System.out.println(glGetShaderInfoLog(shader, 4096));
             throw new IllegalStateException(String.format("Shader (%s) failed to compile!", shaderType));
@@ -169,23 +168,39 @@ public class ShaderUtils implements InstanceAccess {
     private final String bloom = """
             #version 120
             
-            uniform sampler2D inTexture, textureToCheck;
-            uniform vec2 texelSize, direction;
+            uniform sampler2D inTexture;
+            uniform sampler2D textureToCheck;
+            
+            uniform vec2 texelSize;
+            uniform vec2 direction;
+            
             uniform float radius;
             uniform float weights[256];
             
-            #define offset texelSize * direction
-            
             void main() {
-                if (direction.y > 0 && texture2D(textureToCheck, gl_TexCoord[0].st).a != 0.0) discard;
-                float blr = texture2D(inTexture, gl_TexCoord[0].st).a * weights[0];
+                vec2 uv = gl_TexCoord[0].st;
             
-                for (float f = 1.0; f <= radius; f++) {
-                    blr += texture2D(inTexture, gl_TexCoord[0].st + f * offset).a * (weights[int(abs(f))]);
-                    blr += texture2D(inTexture, gl_TexCoord[0].st - f * offset).a * (weights[int(abs(f))]);
+                if (direction.y > 0.0 && texture2D(textureToCheck, uv).a != 0.0) {
+                    discard;
                 }
             
-                gl_FragColor = vec4(0.0, 0.0, 0.0, blr * 1.3);
+                float alpha = texture2D(inTexture, uv).a * weights[0];
+                float weightSum = weights[0];
+            
+                for (float i = 1.0; i <= radius; i++) {
+                    vec2 offset = texelSize * direction * i;
+            
+                    float w = weights[int(i)];
+                    alpha += texture2D(inTexture, clamp(uv + offset, vec2(0.0), vec2(1.0))).a * w;
+                    alpha += texture2D(inTexture, clamp(uv - offset, vec2(0.0), vec2(1.0))).a * w;
+                    weightSum += 2.0 * w;
+                }
+            
+                alpha /= weightSum;
+            
+                alpha *= 0.85;
+            
+                gl_FragColor = vec4(0.0, 0.0, 0.0, alpha);
             }
             """;
 

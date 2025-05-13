@@ -36,7 +36,7 @@ import wtf.demise.events.impl.player.GravityEvent;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.MoveMathEvent;
-import wtf.demise.features.modules.impl.visual.Animations;
+import wtf.demise.features.modules.impl.visual.NoRenderOffsetReset;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.player.MoveUtil;
@@ -923,11 +923,7 @@ public abstract class EntityLivingBase extends Entity {
     }
 
     private int getArmSwingAnimationEnd() {
-        if (Demise.INSTANCE.getModuleManager().getModule(Animations.class).isEnabled() && this == Minecraft.getMinecraft().thePlayer) {
-            return (int) (6 + Demise.INSTANCE.getModuleManager().getModule(Animations.class).getSlowdown().get());
-        } else {
-            return this.isPotionActive(digSpeed) ? 6 - (1 + this.getActivePotionEffect(digSpeed).getAmplifier()) : this.isPotionActive(digSlowdown) ? 6 + (1 + this.getActivePotionEffect(digSlowdown).getAmplifier()) * 2 : 6;
-        }
+        return this.isPotionActive(digSpeed) ? 6 - (1 + this.getActivePotionEffect(digSpeed).getAmplifier()) : this.isPotionActive(digSlowdown) ? 6 + (1 + this.getActivePotionEffect(digSlowdown).getAmplifier()) * 2 : 6;
     }
 
     public void swingItem() {
@@ -1330,7 +1326,9 @@ public abstract class EntityLivingBase extends Entity {
         }
 
         if (this.swingProgress > 0.0F) {
-            f1 = RotationUtils.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationUtils.currentRotation[0] : this.rotationYaw;
+            if (!Demise.INSTANCE.getModuleManager().getModule(NoRenderOffsetReset.class).isEnabled()) {
+                f1 = RotationUtils.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationUtils.currentRotation[0] : this.rotationYaw;
+            }
         }
 
         if (!this.onGround) {

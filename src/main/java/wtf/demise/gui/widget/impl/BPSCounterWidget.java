@@ -31,6 +31,15 @@ public class BPSCounterWidget extends Widget {
 
     @Override
     public void render() {
+        draw(false);
+    }
+
+    @Override
+    public void onShader(Shader2DEvent event) {
+        draw(true);
+    }
+
+    private void draw(boolean shader) {
         double currBPS = BigDecimal.valueOf(MoveUtil.getBPS()).setScale(2, RoundingMode.FLOOR).doubleValue();
         String finalString;
 
@@ -81,25 +90,21 @@ public class BPSCounterWidget extends Widget {
             finalString = currBPS + "bps";
         }
 
-        this.width = Fonts.interSemiBold.get(18).getStringWidth(finalString) + 10;
+        float x;
+        float width = Fonts.interSemiBold.get(18).getStringWidth(finalString) + 10;
 
-        if (localX < (float) sr.getScaledWidth() / 2) {
-            RoundedUtils.drawRound(localX, localY, width, height, 7, new Color(setting.bgColor(), true));
-
-            Fonts.interSemiBold.get(18).drawCenteredStringWithShadow(finalString, localX + (width / 2), localY + (height / 2) - Fonts.interSemiBold.get(18).getHeight() + 8.5f, -1);
+        if (localX < sr.getScaledWidth() / 2) {
+            x = localX;
         } else {
-            //todo: fix this shit
-            localX -= width;
-
-            RoundedUtils.drawRound(localX, localY, width, height, 7, new Color(setting.bgColor(), true));
-
-            Fonts.interSemiBold.get(18).drawStringWithShadow(finalString, localX + (width / 2) - ((float) Fonts.interSemiBold.get(18).getStringWidth(finalString) / 2), localY + (height / 2) - Fonts.interSemiBold.get(18).getHeight() + 8.5f, -1);
+            x = localX + this.width - width;
         }
-    }
 
-    @Override
-    public void onShader(Shader2DEvent event) {
-        RoundedUtils.drawShaderRound(localX, localY, width, height, 7, new Color(setting.bgColor(), false));
+        if (!shader) {
+            RoundedUtils.drawRound(x, localY, width, height, 7, new Color(setting.bgColor(), true));
+            Fonts.interSemiBold.get(18).drawStringWithShadow(finalString, x + (width / 2) - ((float) Fonts.interSemiBold.get(18).getStringWidth(finalString) / 2), localY + (height / 2) - Fonts.interSemiBold.get(18).getHeight() + 8.5f, -1);
+        } else {
+            RoundedUtils.drawShaderRound(x, localY, width, height, 7, Color.black);
+        }
     }
 
     @Override

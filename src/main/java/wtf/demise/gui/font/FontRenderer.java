@@ -454,7 +454,7 @@ public class FontRenderer {
             ++index;
             final String character = valueOf(ch);
 
-            drawString(character, x, y, colorSupplier.colour(index).getRGB(), true);
+            drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB());
             x += getStringWidth(character);
         }
     }

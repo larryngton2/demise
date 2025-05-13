@@ -169,7 +169,7 @@ public abstract class Module implements InstanceAccess {
         Demise.INSTANCE.getEventManager().register(this);
         try {
             onEnable();
-            Demise.INSTANCE.getNotificationManager().post(NotificationType.OKAY, "Module", "Enabled " + getName());
+            Demise.INSTANCE.getNotificationManager().post(NotificationType.OKAY, "Enabled", "Module " + getName());
             //playClickSound(1.0F);
             SoundUtil.toggleSound(true);
         } catch (Exception e) {
@@ -184,7 +184,7 @@ public abstract class Module implements InstanceAccess {
         Demise.INSTANCE.getEventManager().unregister(this);
         try {
             onDisable();
-            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Module", "Disabled " + getName());
+            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Disabled", "Module " + getName());
             //playClickSound(0.8F);
             SoundUtil.toggleSound(false);
         } catch (Exception e) {

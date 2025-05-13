@@ -6,6 +6,7 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.BlockAABBEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.PostStepEvent;
 import wtf.demise.features.modules.Module;
@@ -18,11 +19,10 @@ import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "Step", description = "Allows you to step up blocks.", category = ModuleCategory.Movement)
 public class Step extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"NCP"}, "NCP", this);
-    public final SliderValue timer = new SliderValue("Timer", 1, 0.05f, 1, 0.05f, this);
-    public final SliderValue delay = new SliderValue("Delay", 1000, 0, 2500, 1, this);
-    public final DoubleList MOTION = DoubleList.of(.42, .75, 1);
-    private final long lastStep = -1;
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"NCP"}, "NCP", this);
+    private final SliderValue timer = new SliderValue("Timer", 1, 0.05f, 1, 0.05f, this);
+    private final SliderValue delay = new SliderValue("Delay", 1000, 0, 2500, 1, this);
+    private final DoubleList MOTION = DoubleList.of(.42, .75, 1);
     private boolean stepped = false;
 
     @Override
@@ -50,13 +50,16 @@ public class Step extends Module {
     }
 
     @EventTarget
-    public void onTick(TickEvent event) {
-        if (stepped) {
-            mc.timer.timerSpeed = 1;
-            stepped = false;
+    public void onTick(TickEvent e) {
+        if (mode.is("NCP")) {
+            if (stepped) {
+                mc.timer.timerSpeed = 1;
+                stepped = false;
+            }
+            long lastStep = -1;
+            if (System.currentTimeMillis() - lastStep > delay.get()) {
+                mc.thePlayer.stepHeight = 1;
+            }
         }
-        if (System.currentTimeMillis() - lastStep > delay.get())
-            mc.thePlayer.stepHeight = 1;
     }
-
 }

@@ -8,6 +8,7 @@ import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
+import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.animations.Translate;
 import wtf.demise.utils.animations.impl.EaseOutSine;
 import wtf.demise.utils.math.TimerUtils;
@@ -37,7 +38,7 @@ public class Notification implements InstanceAccess {
     }
 
     public double getWidth() {
-        return Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 8;
+        return Math.max(Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 8, 120);
     }
 
     public double getHeight() {

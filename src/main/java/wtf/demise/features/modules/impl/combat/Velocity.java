@@ -10,7 +10,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.Explosion;
 import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.BlockAABBEvent;
@@ -39,7 +38,8 @@ public class Velocity extends Module {
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
-    private final SliderValue rHurtTime = new SliderValue("HurtTime", 9, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
+    private final SliderValue mHurtTime = new SliderValue("Min hurtTime", 9, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
+    private final SliderValue mmHurtTime = new SliderValue("Max hurtTime", 10, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
     public final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
     public final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
     private final SliderValue packets = new SliderValue("Packets", 5, 1, 20, 1, this, () -> Objects.equals(mode.get(), "Legit packet"));
@@ -192,26 +192,23 @@ public class Velocity extends Module {
 
     @EventTarget
     public void onAttack(AttackEvent e) {
-        if (mode.is("Intave")) {
-            double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
-
-            switch (mode.get()) {
-                case "Intave":
-                    if (intaveMode.is("Tick Reduce")) {
-                        if (mc.thePlayer.hurtTime == rHurtTime.get()) {
-                            mc.thePlayer.motionX *= factor;
-                            mc.thePlayer.motionZ *= factor;
-                        }
+        switch (mode.get()) {
+            case "Intave":
+                if (intaveMode.is("Tick Reduce")) {
+                    if (Range.between((int) mHurtTime.get(), (int) mmHurtTime.get()).contains(mc.thePlayer.hurtTime)) {
+                        double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
+                        mc.thePlayer.motionX *= factor;
+                        mc.thePlayer.motionZ *= factor;
                     }
-                    break;
-                case "Legit packet":
-                    if (Range.between(3, 10).contains(mc.thePlayer.hurtTime) && !attacked) {
-                        currentTarget = e.getTargetEntity();
-                        shouldReduce = true;
-                        attacked = true;
-                    }
-                    break;
-            }
+                }
+                break;
+            case "Legit packet":
+                if (Range.between(3, 10).contains(mc.thePlayer.hurtTime) && !attacked) {
+                    currentTarget = e.getTargetEntity();
+                    shouldReduce = true;
+                    attacked = true;
+                }
+                break;
         }
     }
 
