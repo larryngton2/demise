@@ -20,11 +20,11 @@ public class C00PacketKeepAlive implements Packet<INetHandlerPlayServer> {
         handler.processKeepAlive(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.key = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.key);
     }
 

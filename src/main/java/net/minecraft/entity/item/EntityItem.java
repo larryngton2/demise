@@ -168,7 +168,7 @@ public class EntityItem extends Entity {
         this.age = 4800;
     }
 
-    public boolean handleWaterMovement() {
+    public void handleWaterMovement() {
         if (this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this)) {
             if (!this.inWater && !this.firstUpdate) {
                 this.resetHeight();
@@ -179,11 +179,10 @@ public class EntityItem extends Entity {
             this.inWater = false;
         }
 
-        return this.inWater;
     }
 
-    protected void dealFireDamage(int amount) {
-        this.attackEntityFrom(DamageSource.inFire, (float) amount);
+    protected void dealFireDamage() {
+        this.attackEntityFrom(DamageSource.inFire, (float) 1);
     }
 
     public boolean attackEntityFrom(DamageSource source, float amount) {
@@ -313,7 +312,7 @@ public class EntityItem extends Entity {
 
         if (itemstack == null) {
             if (this.worldObj != null) {
-                logger.error("Item entity " + this.getEntityId() + " has no item?!");
+                logger.error("Item entity {} has no item?!", this.getEntityId());
             }
 
             return new ItemStack(Blocks.stone);

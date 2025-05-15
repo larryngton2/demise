@@ -80,7 +80,7 @@ public class CustomItemProperties {
             this.damagePercent = s.contains("%");
             s = s.replace("%", "");
             this.damage = this.parseRangeListInt(s);
-            this.damageMask = this.parseInt(props.getProperty("damageMask"), 0);
+            this.damageMask = this.parseInt(props.getProperty("damageMask"));
         }
 
         this.stackSize = this.parseRangeListInt(props.getProperty("stackSize"));
@@ -91,8 +91,8 @@ public class CustomItemProperties {
         this.blend = Blender.parseBlend(props.getProperty("blend"));
         this.speed = this.parseFloat(props.getProperty("speed"), 0.0F);
         this.rotation = this.parseFloat(props.getProperty("rotation"), 0.0F);
-        this.layer = this.parseInt(props.getProperty("layer"), 0);
-        this.weight = this.parseInt(props.getProperty("weight"), 0);
+        this.layer = this.parseInt(props.getProperty("layer"));
+        this.weight = this.parseInt(props.getProperty("weight"));
         this.duration = this.parseFloat(props.getProperty("duration"), 1.0F);
     }
 
@@ -360,16 +360,16 @@ public class CustomItemProperties {
         return modelName;
     }
 
-    private int parseInt(String str, int defVal) {
+    private int parseInt(String str) {
         if (str == null) {
-            return defVal;
+            return 0;
         } else {
             str = str.trim();
             int i = Config.parseInt(str, Integer.MIN_VALUE);
 
             if (i == Integer.MIN_VALUE) {
                 Config.warn("Invalid integer: " + str);
-                return defVal;
+                return 0;
             } else {
                 return i;
             }
@@ -492,8 +492,7 @@ public class CustomItemProperties {
                 list.add(nbttagvalue);
             }
 
-            NbtTagValue[] anbttagvalue = (NbtTagValue[]) list.toArray(new NbtTagValue[0]);
-            return anbttagvalue;
+            return (NbtTagValue[]) list.toArray(new NbtTagValue[0]);
         }
     }
 
@@ -639,8 +638,7 @@ public class CustomItemProperties {
         String s = resLoc.getResourcePath();
         s = StrUtils.removePrefix(s, "textures/");
         s = StrUtils.removeSuffix(s, ".png");
-        ResourceLocation resourcelocation = new ResourceLocation(resLoc.getResourceDomain(), s);
-        return resourcelocation;
+        return new ResourceLocation(resLoc.getResourceDomain(), s);
     }
 
     public void updateModelTexture(TextureMap textureMap, ItemModelGenerator itemModelGenerator) {
@@ -659,7 +657,7 @@ public class CustomItemProperties {
                         IBakedModel ibakedmodel = makeBakedModel(textureMap, itemModelGenerator, astring1, flag);
 
                         if (this.mapBakedModelsTexture == null) {
-                            this.mapBakedModelsTexture = new HashMap();
+                            this.mapBakedModelsTexture = new HashMap<>();
                         }
 
                         this.mapBakedModelsTexture.put(s2, ibakedmodel);
@@ -683,8 +681,7 @@ public class CustomItemProperties {
 
         ModelBlock modelblock = makeModelBlock(astring);
         ModelBlock modelblock1 = itemModelGenerator.makeItemModel(textureMap, modelblock);
-        IBakedModel ibakedmodel = bakeModel(textureMap, modelblock1, useTint);
-        return ibakedmodel;
+        return bakeModel(textureMap, modelblock1, useTint);
     }
 
     private String[] getModelTextures() {
@@ -765,8 +762,7 @@ public class CustomItemProperties {
 
         stringbuffer.append("}}");
         String s1 = stringbuffer.toString();
-        ModelBlock modelblock = ModelBlock.deserialize(s1);
-        return modelblock;
+        return ModelBlock.deserialize(s1);
     }
 
     private static IBakedModel bakeModel(TextureMap textureMap, ModelBlock modelBlockIn, boolean useTint) {
@@ -916,7 +912,7 @@ public class CustomItemProperties {
                         Config.warn("Custom Items: Model not found " + modelresourcelocation1.getResourcePath());
                     } else {
                         if (this.mapBakedModelsFull == null) {
-                            this.mapBakedModelsFull = new HashMap();
+                            this.mapBakedModelsFull = new HashMap<>();
                         }
 
                         this.mapBakedModelsFull.put(s2, ibakedmodel1);

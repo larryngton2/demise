@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class GameRules {
-    private final TreeMap<String, GameRules.Value> theGameRules = new TreeMap();
+    private final TreeMap<String, GameRules.Value> theGameRules = new TreeMap<>();
 
     public GameRules() {
         this.addGameRule("doFireTick", "true", GameRules.ValueType.BOOLEAN_VALUE);
@@ -119,12 +119,12 @@ public class GameRules {
 
             try {
                 this.valueInteger = Integer.parseInt(value);
-            } catch (NumberFormatException var4) {
+            } catch (NumberFormatException ignored) {
             }
 
             try {
                 this.valueDouble = Double.parseDouble(value);
-            } catch (NumberFormatException var3) {
+            } catch (NumberFormatException ignored) {
             }
         }
 

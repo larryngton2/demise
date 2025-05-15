@@ -59,10 +59,10 @@ public class ItemFishFood extends ItemFood {
     }
 
     public enum FishType {
-        COD(0, "cod", 2, 0.1F, 5, 0.6F),
-        SALMON(1, "salmon", 2, 0.1F, 6, 0.8F),
-        CLOWNFISH(2, "clownfish", 1, 0.1F),
-        PUFFERFISH(3, "pufferfish", 1, 0.1F);
+        COD(0, "cod", 5, 0.6F),
+        SALMON(1, "salmon", 6, 0.8F),
+        CLOWNFISH(2, "clownfish"),
+        PUFFERFISH(3, "pufferfish");
 
         private static final Map<Integer, ItemFishFood.FishType> META_LOOKUP = Maps.newHashMap();
         private final int meta;
@@ -73,21 +73,21 @@ public class ItemFishFood extends ItemFood {
         private final float cookedSaturationModifier;
         private boolean cookable = false;
 
-        FishType(int meta, String unlocalizedName, int uncookedHeal, float uncookedSaturation, int cookedHeal, float cookedSaturation) {
+        FishType(int meta, String unlocalizedName, int cookedHeal, float cookedSaturation) {
             this.meta = meta;
             this.unlocalizedName = unlocalizedName;
-            this.uncookedHealAmount = uncookedHeal;
-            this.uncookedSaturationModifier = uncookedSaturation;
+            this.uncookedHealAmount = 2;
+            this.uncookedSaturationModifier = (float) 0.1;
             this.cookedHealAmount = cookedHeal;
             this.cookedSaturationModifier = cookedSaturation;
             this.cookable = true;
         }
 
-        FishType(int meta, String unlocalizedName, int uncookedHeal, float uncookedSaturation) {
+        FishType(int meta, String unlocalizedName) {
             this.meta = meta;
             this.unlocalizedName = unlocalizedName;
-            this.uncookedHealAmount = uncookedHeal;
-            this.uncookedSaturationModifier = uncookedSaturation;
+            this.uncookedHealAmount = 1;
+            this.uncookedSaturationModifier = (float) 0.1;
             this.cookedHealAmount = 0;
             this.cookedSaturationModifier = 0.0F;
             this.cookable = false;

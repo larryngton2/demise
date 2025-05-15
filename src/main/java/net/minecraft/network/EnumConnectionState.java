@@ -161,7 +161,7 @@ public enum EnumConnectionState {
         this.id = protocolId;
     }
 
-    protected EnumConnectionState registerPacket(EnumPacketDirection direction, Class<? extends Packet> packetClass) {
+    protected void registerPacket(EnumPacketDirection direction, Class<? extends Packet> packetClass) {
         BiMap<Integer, Class<? extends Packet>> bimap = this.directionMaps.computeIfAbsent(direction, k -> HashBiMap.create());
 
         if (bimap.containsValue(packetClass)) {
@@ -170,7 +170,6 @@ public enum EnumConnectionState {
             throw new IllegalArgumentException(s);
         } else {
             bimap.put(bimap.size(), packetClass);
-            return this;
         }
     }
 

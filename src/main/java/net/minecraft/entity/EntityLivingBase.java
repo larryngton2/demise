@@ -66,11 +66,11 @@ public abstract class EntityLivingBase extends Entity {
     public float prevLimbSwingAmount;
     public float limbSwingAmount;
     public float limbSwing;
-    public int maxHurtResistantTime = 20;
+    public final int maxHurtResistantTime = 20;
     public float prevCameraPitch;
     public float cameraPitch;
-    public float randomUnused2;
-    public float randomUnused1;
+    public final float randomUnused2;
+    public final float randomUnused1;
     public float renderYawOffset;
     public float prevRenderYawOffset;
     public float rotationYawHead;
@@ -465,7 +465,7 @@ public abstract class EntityLivingBase extends Entity {
                 flag &= this.rand.nextInt(5) == 0;
             }
 
-            if (flag && i > 0) {
+            if (flag) {
                 double d0 = (double) (i >> 16 & 255) / 255.0D;
                 double d1 = (double) (i >> 8 & 255) / 255.0D;
                 double d2 = (double) (i & 255) / 255.0D;
@@ -874,7 +874,7 @@ public abstract class EntityLivingBase extends Entity {
                     k = 20;
                 }
 
-                if (k > 0 && k <= 20) {
+                if (k > 0) {
                     int l = 25 - k;
                     float f1 = damage * (float) l;
                     damage = f1 / 25.0F;
@@ -1497,7 +1497,7 @@ public abstract class EntityLivingBase extends Entity {
     }
 
     protected void collideWithNearbyEntities() {
-        List<Entity> list = this.worldObj.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox().expand(0.20000000298023224D, 0.0D, 0.20000000298023224D), Predicates.and(EntitySelectors.NOT_SPECTATING, p_apply_1_ -> p_apply_1_.canBePushed()));
+        List<Entity> list = this.worldObj.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox().expand(0.20000000298023224D, 0.0D, 0.20000000298023224D), Predicates.and(EntitySelectors.NOT_SPECTATING, Entity::canBePushed));
 
         if (!list.isEmpty()) {
             for (Entity entity : list) {

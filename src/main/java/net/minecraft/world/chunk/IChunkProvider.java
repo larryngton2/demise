@@ -19,7 +19,7 @@ public interface IChunkProvider {
 
     boolean populateChunk(IChunkProvider chunkProvider, Chunk chunkIn, int x, int z);
 
-    boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback);
+    void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback);
 
     boolean unloadQueuedChunks();
 

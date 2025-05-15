@@ -27,9 +27,9 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
     private static final int field_146559_A = AchievementList.maxDisplayColumn * 24 - 77;
     private static final int field_146560_B = AchievementList.maxDisplayRow * 24 - 77;
     private static final ResourceLocation ACHIEVEMENT_BACKGROUND = new ResourceLocation("textures/gui/achievement/achievement_background.png");
-    protected GuiScreen parentScreen;
-    protected int field_146555_f = 256;
-    protected int field_146557_g = 202;
+    protected final GuiScreen parentScreen;
+    protected final int field_146555_f = 256;
+    protected final int field_146557_g = 202;
     protected int field_146563_h;
     protected int field_146564_i;
     protected float field_146570_r = 1.0F;
@@ -48,8 +48,8 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
         this.statFileWriter = statFileWriterIn;
         int i = 141;
         int j = 141;
-        this.field_146569_s = this.field_146567_u = this.field_146565_w = AchievementList.openInventory.displayColumn * 24 - i / 2 - 12;
-        this.field_146568_t = this.field_146566_v = this.field_146573_x = AchievementList.openInventory.displayRow * 24 - j / 2;
+        this.field_146569_s = this.field_146567_u = this.field_146565_w = AchievementList.openInventory.displayColumn * 24 - (double) i / 2 - 12;
+        this.field_146568_t = this.field_146566_v = this.field_146573_x = AchievementList.openInventory.displayRow * 24 - (double) j / 2;
     }
 
     public void initGui() {
@@ -58,7 +58,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
         this.buttonList.add(new GuiOptionButton(1, width / 2 + 24, height / 2 + 74, 80, 20, I18n.format("gui.done")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (!this.loadingAchievements) {
             if (button.id == 1) {
                 mc.displayGuiScreen(this.parentScreen);
@@ -78,8 +78,8 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         if (this.loadingAchievements) {
             this.drawDefaultBackground();
-            drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats"), width / 2, height / 2, 16777215);
-            drawCenteredString(this.fontRendererObj, lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)], width / 2, height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+            drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats"), (float) width / 2, (float) height / 2, 16777215);
+            drawCenteredString(this.fontRendererObj, lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)], (float) width / 2, (float) height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
         } else {
             if (Mouse.isButtonDown(0)) {
                 int i = (width - this.field_146555_f) / 2;

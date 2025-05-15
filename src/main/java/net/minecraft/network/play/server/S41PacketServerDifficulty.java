@@ -23,11 +23,11 @@ public class S41PacketServerDifficulty implements Packet<INetHandlerPlayClient> 
         handler.handleServerDifficulty(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.difficulty = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.difficulty.getDifficultyId());
     }
 

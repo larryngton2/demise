@@ -8,8 +8,8 @@ public class ModelZombie extends ModelBiped {
         this(0.0F, false);
     }
 
-    protected ModelZombie(float modelSize, float p_i1167_2_, int textureWidthIn, int textureHeightIn) {
-        super(modelSize, p_i1167_2_, textureWidthIn, textureHeightIn);
+    protected ModelZombie(float modelSize) {
+        super(modelSize, (float) 0.0, 64, 32);
     }
 
     public ModelZombie(float modelSize, boolean p_i1168_2_) {

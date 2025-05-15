@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class Container {
-    public List<ItemStack> inventoryItemStacks = Lists.newArrayList();
+    public final List<ItemStack> inventoryItemStacks = Lists.newArrayList();
     public List<Slot> inventorySlots = Lists.newArrayList();
     public int windowId;
     public short transactionID;
     private int dragMode = -1;
     private int dragEvent;
     private final Set<Slot> dragSlots = Sets.newHashSet();
-    protected List<ICrafting> crafters = Lists.newArrayList();
+    protected final List<ICrafting> crafters = Lists.newArrayList();
     private final Set<EntityPlayer> playerList = Sets.newHashSet();
 
     protected Slot addSlotToContainer(Slot slotIn) {
@@ -190,7 +190,7 @@ public abstract class Container {
                         itemstack = itemstack8.copy();
 
                         if (slot6.getStack() != null && slot6.getStack().getItem() == item) {
-                            this.retrySlotClick(slotId, clickedButton, true, playerIn);
+                            this.retrySlotClick(slotId, clickedButton, playerIn);
                         }
                     }
                 }
@@ -365,7 +365,7 @@ public abstract class Container {
         return true;
     }
 
-    protected void retrySlotClick(int slotId, int clickedButton, boolean mode, EntityPlayer playerIn) {
+    protected void retrySlotClick(int slotId, int clickedButton, EntityPlayer playerIn) {
         this.slotClick(slotId, clickedButton, 1, playerIn);
     }
 

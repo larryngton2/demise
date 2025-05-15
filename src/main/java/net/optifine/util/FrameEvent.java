@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FrameEvent {
-    private static final Map<String, Integer> mapEventFrames = new HashMap();
+    private static final Map<String, Integer> mapEventFrames = new HashMap<>();
 
     public static boolean isActive(String name, int frameInterval) {
         synchronized (mapEventFrames) {
             int i = Minecraft.getMinecraft().entityRenderer.frameCount;
-            Integer integer = mapEventFrames.computeIfAbsent(name, k -> i);
 
-            int j = integer;
+            int j = mapEventFrames.computeIfAbsent(name, k -> i);
 
             if (i > j && i < j + frameInterval) {
                 return false;

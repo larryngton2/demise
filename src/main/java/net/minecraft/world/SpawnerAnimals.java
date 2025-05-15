@@ -24,14 +24,13 @@ import java.util.*;
 public final class SpawnerAnimals {
     private static final int MOB_COUNT_DIV = (int) Math.pow(17.0D, 2.0D);
     private final Set<ChunkCoordIntPair> eligibleChunksForSpawning = Sets.newHashSet();
-    private final Map<Class, EntityLiving> mapSampleEntitiesByClass = new HashMap();
+    private final Map<Class, EntityLiving> mapSampleEntitiesByClass = new HashMap<>();
     private int lastPlayerChunkX = Integer.MAX_VALUE;
     private int lastPlayerChunkZ = Integer.MAX_VALUE;
     private int countChunkPos;
 
-    public int findChunksForSpawning(WorldServer worldServerIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs, boolean p_77192_4_) {
+    public void findChunksForSpawning(WorldServer worldServerIn, boolean spawnHostileMobs, boolean spawnPeacefulMobs, boolean p_77192_4_) {
         if (!spawnHostileMobs && !spawnPeacefulMobs) {
-            return 0;
         } else {
             boolean flag = true;
             EntityPlayer entityplayer = null;
@@ -147,7 +146,7 @@ public final class SpawnerAnimals {
                                                     }
                                                 } catch (Exception exception1) {
                                                     exception1.printStackTrace();
-                                                    return j4;
+                                                    return;
                                                 }
 
                                                 entityliving.setLocationAndAngles(f, i3, f1, worldServerIn.rand.nextFloat() * 360.0F, 0.0F);
@@ -183,7 +182,6 @@ public final class SpawnerAnimals {
                 }
             }
 
-            return j4;
         }
     }
 

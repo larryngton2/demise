@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
 import java.util.List;
 
 public class EntityAIFindEntityNearest extends EntityAIBase {

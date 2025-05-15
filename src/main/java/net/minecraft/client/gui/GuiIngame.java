@@ -134,7 +134,7 @@ public class GuiIngame extends Gui {
         if (this.showCrosshair()) {
             GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
             GlStateManager.enableAlpha();
-            drawTexturedModalRect(i / 2 - 7, j / 2 - 7, 0, 0, 16, 16);
+            drawTexturedModalRect((float) i / 2 - 7, (float) j / 2 - 7, 0, 0, 16, 16);
         }
 
         GlStateManager.enableAlpha();
@@ -210,7 +210,7 @@ public class GuiIngame extends Gui {
                     l = MathHelper.hsvToRGB(f2 / 50.0F, 0.7F, 0.6F) & 16777215;
                 }
 
-                this.getFontRenderer().drawStringWithShadow(this.recordPlaying, -this.getFontRenderer().getStringWidth(this.recordPlaying) / 2, -4, l + (l1 << 24 & -16777216));
+                this.getFontRenderer().drawStringWithShadow(this.recordPlaying, (float) -this.getFontRenderer().getStringWidth(this.recordPlaying) / 2, -4, l + (l1 << 24 & -16777216));
                 GlStateManager.disableBlend();
                 GlStateManager.popMatrix();
             }
@@ -242,11 +242,11 @@ public class GuiIngame extends Gui {
                 GlStateManager.pushMatrix();
                 GlStateManager.scale(4.0F, 4.0F, 4.0F);
                 int j2 = i2 << 24 & -16777216;
-                this.getFontRenderer().drawStringWithShadow(this.displayedTitle, (float) (-this.getFontRenderer().getStringWidth(this.displayedTitle) / 2), -10.0F, 16777215 | j2);
+                this.getFontRenderer().drawStringWithShadow(displayedTitle, (float) (-this.getFontRenderer().getStringWidth(displayedTitle) / 2), -10.0F, 16777215 | j2);
                 GlStateManager.popMatrix();
                 GlStateManager.pushMatrix();
                 GlStateManager.scale(2.0F, 2.0F, 2.0F);
-                this.getFontRenderer().drawStringWithShadow(this.displayedSubTitle, (float) (-this.getFontRenderer().getStringWidth(this.displayedSubTitle) / 2), 5.0F, 16777215 | j2);
+                this.getFontRenderer().drawStringWithShadow(displayedSubTitle, (float) (-this.getFontRenderer().getStringWidth(displayedSubTitle) / 2), 5.0F, 16777215 | j2);
                 GlStateManager.popMatrix();
                 GlStateManager.disableBlend();
                 GlStateManager.popMatrix();
@@ -283,7 +283,7 @@ public class GuiIngame extends Gui {
         GlStateManager.translate(0.0F, (float) (j - 48), 0.0F);
         this.mc.mcProfiler.startSection("chat");
         if (Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).isDisabled() || !Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).chat.get()) {
-            this.persistantChatGUI.drawChat(this.updateCounter);
+            this.persistantChatGUI.drawChat(updateCounter);
         }
         this.mc.mcProfiler.endSection();
         GlStateManager.popMatrix();
@@ -317,13 +317,13 @@ public class GuiIngame extends Gui {
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     this.mc.getTextureManager().bindTexture(widgetsTexPath);
                     int i = sr.getScaledWidth() / 2;
-                    float f = this.zLevel;
-                    this.zLevel = -90.0F;
+                    float f = zLevel;
+                    zLevel = -90.0F;
 
-                    this.drawTexturedModalRect(i - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
-                    this.drawTexturedModalRect(i - 91 - 1 + SpoofSlotUtils.getSpoofedSlot() * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
+                    drawTexturedModalRect(i - 91, sr.getScaledHeight() - 22, 0, 0, 182, 22);
+                    drawTexturedModalRect(i - 91 - 1 + SpoofSlotUtils.getSpoofedSlot() * 20, sr.getScaledHeight() - 22 - 1, 0, 22, 24, 22);
 
-                    this.zLevel = f;
+                    zLevel = f;
                     GlStateManager.enableRescaleNormal();
                     GlStateManager.enableBlend();
                     GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
@@ -332,7 +332,7 @@ public class GuiIngame extends Gui {
                     for (int j = 0; j < 9; ++j) {
                         int k = sr.getScaledWidth() / 2 - 90 + j * 20 + 2;
                         int l = sr.getScaledHeight() - 16 - 3;
-                        this.renderHotbarItem(j, k, l, mc.timer.partialTicks, entityplayer);
+                        renderHotbarItem(j, k, l, mc.timer.partialTicks, entityplayer);
                     }
 
                     RenderHelper.disableStandardItemLighting();
@@ -395,9 +395,9 @@ public class GuiIngame extends Gui {
                 final short short1 = 182;
                 final int k = (int) (this.mc.thePlayer.experience * (short1 + 1));
                 final int j = scaledRes.getScaledHeight() - 32 + 3;
-                this.drawTexturedModalRect(x, j, 0, 64, short1, 5);
+                drawTexturedModalRect(x, j, 0, 64, short1, 5);
                 if (k > 0) {
-                    this.drawTexturedModalRect(x, j, 0, 69, k, 5);
+                    drawTexturedModalRect(x, j, 0, 69, k, 5);
                 }
             }
             this.mc.mcProfiler.endSection();
@@ -695,22 +695,8 @@ public class GuiIngame extends Gui {
                         j7 = k1 + (this.rand.nextInt(3) - 1);
                     }
 
-                    if (flag1) {
-                        k8 = 1;
-                    }
-
                     int j9 = j1 - k6 * 8 - 9;
                     drawTexturedModalRect(j9, j7, 16 + k8 * 9, 27, 9, 9);
-
-                    if (flag1) {
-                        if (k6 * 2 + 1 < l) {
-                            drawTexturedModalRect(j9, j7, l7 + 54, 27, 9, 9);
-                        }
-
-                        if (k6 * 2 + 1 == l) {
-                            drawTexturedModalRect(j9, j7, l7 + 63, 27, 9, 9);
-                        }
-                    }
 
                     if (k6 * 2 + 1 < k) {
                         drawTexturedModalRect(j9, j7, l7 + 36, 27, 9, 9);
@@ -739,10 +725,6 @@ public class GuiIngame extends Gui {
                     for (int i5 = 0; i5 < l4; ++i5) {
                         int j5 = 52;
                         int k5 = 0;
-
-                        if (flag1) {
-                            k5 = 1;
-                        }
 
                         int l5 = j1 - i5 * 8 - 9;
                         drawTexturedModalRect(l5, i9, j5 + k5 * 9, 9, 9, 9);
@@ -935,8 +917,8 @@ public class GuiIngame extends Gui {
             --this.titlesTimer;
 
             if (this.titlesTimer <= 0) {
-                this.displayedTitle = "";
-                this.displayedSubTitle = "";
+                displayedTitle = "";
+                displayedSubTitle = "";
             }
         }
 
@@ -971,14 +953,14 @@ public class GuiIngame extends Gui {
 
     public void displayTitle(String title, String subTitle, int timeFadeIn, int displayTime, int timeFadeOut) {
         if (title == null && subTitle == null && timeFadeIn < 0 && displayTime < 0 && timeFadeOut < 0) {
-            this.displayedTitle = "";
-            this.displayedSubTitle = "";
+            displayedTitle = "";
+            displayedSubTitle = "";
             this.titlesTimer = 0;
         } else if (title != null) {
-            this.displayedTitle = title;
+            displayedTitle = title;
             this.titlesTimer = this.titleFadeIn + this.titleDisplayTime + this.titleFadeOut;
         } else if (subTitle != null) {
-            this.displayedSubTitle = subTitle;
+            displayedSubTitle = subTitle;
         } else {
             if (timeFadeIn >= 0) {
                 this.titleFadeIn = timeFadeIn;

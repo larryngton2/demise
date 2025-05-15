@@ -43,7 +43,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 
         if (mc.theWorld != null) {
             EnumDifficulty enumdifficulty = mc.theWorld.getDifficulty();
-            this.field_175357_i = new GuiButton(108, width / 2 - 155 + i % 2 * 160, height / 6 - 12 + 24 * (i >> 1), 150, 20, this.func_175355_a(enumdifficulty));
+            this.field_175357_i = new GuiButton(108, (float) width / 2 - 155 + i % 2 * 160, (float) height / 6 - 12 + 24 * (i >> 1), 150, 20, this.func_175355_a(enumdifficulty));
             this.buttonList.add(this.field_175357_i);
 
             if (mc.isSingleplayer() && !mc.theWorld.getWorldInfo().isHardcoreModeEnabled()) {
@@ -61,8 +61,8 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
             this.buttonList.add(guioptionbutton1);
         }
 
-        this.buttonList.add(new GuiButton(110, width / 2 - 155, height / 6 + 48 - 6, 150, 20, I18n.format("options.skinCustomisation")));
-        this.buttonList.add(new GuiButton(8675309, width / 2 + 5, height / 6 + 48 - 6, 150, 20, "Super Secret Settings...") {
+        this.buttonList.add(new GuiButton(110, (float) width / 2 - 155, (float) height / 6 + 48 - 6, 150, 20, I18n.format("options.skinCustomisation")));
+        this.buttonList.add(new GuiButton(8675309, (float) width / 2 + 5, (float) height / 6 + 48 - 6, 150, 20, "Super Secret Settings...") {
             public void playPressSound(SoundHandler soundHandlerIn) {
                 SoundEventAccessorComposite soundeventaccessorcomposite = soundHandlerIn.getRandomSoundFromCategories(SoundCategory.ANIMALS, SoundCategory.BLOCKS, SoundCategory.MOBS, SoundCategory.PLAYERS, SoundCategory.WEATHER);
 
@@ -72,15 +72,15 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
             }
         });
 
-        this.buttonList.add(new GuiButton(106, width / 2 - 155, height / 6 + 72 - 6, 150, 20, I18n.format("options.sounds")));
-        this.buttonList.add(new GuiButton(107, width / 2 + 5, height / 6 + 72 - 6, 150, 20, I18n.format("options.stream")));
-        this.buttonList.add(new GuiButton(101, width / 2 - 155, height / 6 + 96 - 6, 150, 20, I18n.format("options.video")));
-        this.buttonList.add(new GuiButton(100, width / 2 + 5, height / 6 + 96 - 6, 150, 20, I18n.format("options.controls")));
-        this.buttonList.add(new GuiButton(102, width / 2 - 155, height / 6 + 120 - 6, 150, 20, I18n.format("options.language")));
-        this.buttonList.add(new GuiButton(103, width / 2 + 5, height / 6 + 120 - 6, 150, 20, I18n.format("options.chat.title")));
-        this.buttonList.add(new GuiButton(105, width / 2 - 155, height / 6 + 144 - 6, 150, 20, I18n.format("options.resourcepack")));
-        this.buttonList.add(new GuiButton(104, width / 2 + 5, height / 6 + 144 - 6, 150, 20, I18n.format("options.snooper.view")));
-        this.buttonList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(106, (float) width / 2 - 155, (float) height / 6 + 72 - 6, 150, 20, I18n.format("options.sounds")));
+        this.buttonList.add(new GuiButton(107, (float) width / 2 + 5, (float) height / 6 + 72 - 6, 150, 20, I18n.format("options.stream")));
+        this.buttonList.add(new GuiButton(101, (float) width / 2 - 155, (float) height / 6 + 96 - 6, 150, 20, I18n.format("options.video")));
+        this.buttonList.add(new GuiButton(100, (float) width / 2 + 5, (float) height / 6 + 96 - 6, 150, 20, I18n.format("options.controls")));
+        this.buttonList.add(new GuiButton(102, (float) width / 2 - 155, (float) height / 6 + 120 - 6, 150, 20, I18n.format("options.language")));
+        this.buttonList.add(new GuiButton(103, (float) width / 2 + 5, (float) height / 6 + 120 - 6, 150, 20, I18n.format("options.chat.title")));
+        this.buttonList.add(new GuiButton(105, (float) width / 2 - 155, (float) height / 6 + 144 - 6, 150, 20, I18n.format("options.resourcepack")));
+        this.buttonList.add(new GuiButton(104, (float) width / 2 + 5, (float) height / 6 + 144 - 6, 150, 20, I18n.format("options.snooper.view")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 - 100, (float) height / 6 + 168, I18n.format("gui.done")));
     }
 
     public String func_175355_a(EnumDifficulty p_175355_1_) {
@@ -102,7 +102,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id < 100 && button instanceof GuiOptionButton) {
                 GameSettings.Options gamesettings$options = ((GuiOptionButton) button).returnEnumOptions();
@@ -172,7 +172,7 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.field_146442_a, width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_146442_a, (float) width / 2, 15, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

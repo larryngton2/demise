@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShaderOptionResolver implements IExpressionResolver {
-    private final Map<String, ExpressionShaderOptionSwitch> mapOptions = new HashMap();
+    private final Map<String, ExpressionShaderOptionSwitch> mapOptions = new HashMap<>();
 
     public ShaderOptionResolver(ShaderOption[] options) {
         for (ShaderOption shaderoption : options) {
@@ -19,7 +19,6 @@ public class ShaderOptionResolver implements IExpressionResolver {
     }
 
     public IExpression getExpression(String name) {
-        ExpressionShaderOptionSwitch expressionshaderoptionswitch = this.mapOptions.get(name);
-        return expressionshaderoptionswitch;
+        return this.mapOptions.get(name);
     }
 }

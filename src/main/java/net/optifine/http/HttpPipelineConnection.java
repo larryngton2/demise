@@ -39,8 +39,8 @@ public class HttpPipelineConnection {
         this.host = null;
         this.port = 0;
         this.proxy = Proxy.NO_PROXY;
-        this.listRequests = new LinkedList();
-        this.listRequestsSend = new LinkedList();
+        this.listRequests = new LinkedList<>();
+        this.listRequestsSend = new LinkedList<>();
         this.socket = null;
         this.inputStream = null;
         this.outputStream = null;
@@ -92,7 +92,7 @@ public class HttpPipelineConnection {
         }
     }
 
-    public synchronized OutputStream getOutputStream() throws IOException, InterruptedException {
+    public synchronized OutputStream getOutputStream() throws InterruptedException {
         while (this.outputStream == null) {
             this.checkTimeout();
             this.wait(1000L);
@@ -101,7 +101,7 @@ public class HttpPipelineConnection {
         return this.outputStream;
     }
 
-    public synchronized InputStream getInputStream() throws IOException, InterruptedException {
+    public synchronized InputStream getInputStream() throws InterruptedException {
         while (this.inputStream == null) {
             this.checkTimeout();
             this.wait(1000L);
@@ -230,7 +230,7 @@ public class HttpPipelineConnection {
             String[] astring = Config.tokenize(s1, ",;");
 
             for (String s2 : astring) {
-                String[] astring1 = this.split(s2, '=');
+                String[] astring1 = this.split(s2);
 
                 if (astring1.length >= 2) {
                     if (astring1[0].equals("timeout")) {
@@ -253,8 +253,8 @@ public class HttpPipelineConnection {
         }
     }
 
-    private String[] split(String str, char separator) {
-        int i = str.indexOf(separator);
+    private String[] split(String str) {
+        int i = str.indexOf('=');
 
         if (i < 0) {
             return new String[]{str};
@@ -290,7 +290,7 @@ public class HttpPipelineConnection {
                 if (this.socket != null) {
                     this.socket.close();
                 }
-            } catch (IOException var3) {
+            } catch (IOException ignored) {
             }
 
             this.socket = null;

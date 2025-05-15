@@ -10,7 +10,7 @@ import net.optifine.reflect.Reflector;
 
 public class ModelAdapterMinecartTnt extends ModelAdapterMinecart {
     public ModelAdapterMinecartTnt() {
-        super(EntityMinecartTNT.class, "tnt_minecart", 0.5F);
+        super(EntityMinecartTNT.class, "tnt_minecart");
     }
 
     public IEntityRenderer makeEntityRender(ModelBase modelBase, float shadowSize) {

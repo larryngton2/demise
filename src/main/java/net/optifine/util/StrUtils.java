@@ -85,9 +85,7 @@ public class StrUtils {
     private static int indexOfMaskSingle(String str, String mask, int startPos, char wildCharSingle) {
         if (str != null && mask != null) {
             if (startPos >= 0 && startPos <= str.length()) {
-                if (str.length() < startPos + mask.length()) {
-                    return -1;
-                } else {
+                if (str.length() >= startPos + mask.length()) {
                     for (int i = startPos; i + mask.length() <= str.length(); ++i) {
                         String s = str.substring(i, i + mask.length());
 
@@ -96,8 +94,8 @@ public class StrUtils {
                         }
                     }
 
-                    return -1;
                 }
+                return -1;
             } else {
                 return -1;
             }
@@ -367,10 +365,8 @@ public class StrUtils {
                 str = str.substring(prefix.length());
             }
 
-            return str;
-        } else {
-            return str;
         }
+        return str;
     }
 
     public static String removeSuffix(String str, String suffix) {
@@ -379,10 +375,8 @@ public class StrUtils {
                 str = str.substring(0, str.length() - suffix.length());
             }
 
-            return str;
-        } else {
-            return str;
         }
+        return str;
     }
 
     public static String replaceSuffix(String str, String suffix, String suffixNew) {
@@ -429,10 +423,8 @@ public class StrUtils {
                 }
             }
 
-            return -1;
-        } else {
-            return -1;
         }
+        return -1;
     }
 
     public static int findSuffix(String[] strs, String suffix) {
@@ -445,10 +437,8 @@ public class StrUtils {
                 }
             }
 
-            return -1;
-        } else {
-            return -1;
         }
+        return -1;
     }
 
     public static String[] remove(String[] strs, int start, int end) {
@@ -458,7 +448,7 @@ public class StrUtils {
             if (start >= end) {
                 return strs;
             } else {
-                List<String> list = new ArrayList(strs.length);
+                List<String> list = new ArrayList<>(strs.length);
 
                 for (int i = 0; i < strs.length; ++i) {
                     String s = strs[i];
@@ -468,8 +458,7 @@ public class StrUtils {
                     }
                 }
 
-                String[] astring = list.toArray(new String[0]);
-                return astring;
+                return list.toArray(new String[0]);
             }
         } else {
             return strs;
@@ -488,10 +477,8 @@ public class StrUtils {
                 }
             }
 
-            return str;
-        } else {
-            return str;
         }
+        return str;
     }
 
     public static String removePrefix(String str, String[] prefixes) {
@@ -506,10 +493,8 @@ public class StrUtils {
                 }
             }
 
-            return str;
-        } else {
-            return str;
         }
+        return str;
     }
 
     public static String removePrefixSuffix(String str, String[] prefixes, String[] suffixes) {
@@ -549,10 +534,8 @@ public class StrUtils {
         if (str != null && chars != null) {
             str = trimLeading(str, chars);
             str = trimTrailing(str, chars);
-            return str;
-        } else {
-            return str;
         }
+        return str;
     }
 
     public static String trimLeading(String str, String chars) {

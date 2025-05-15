@@ -23,8 +23,8 @@ public class GuiScreenServerList extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.format("selectServer.select")));
-        this.buttonList.add(new GuiButton(1, width / 2 - 100, height / 4 + 120 + 12, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 - 100, (float) height / 4 + 96 + 12, I18n.format("selectServer.select")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 100, (float) height / 4 + 120 + 12, I18n.format("gui.cancel")));
         this.field_146302_g = new GuiTextField(2, this.fontRendererObj, width / 2 - 100, 116, 200, 20);
         this.field_146302_g.setMaxStringLength(128);
         this.field_146302_g.setFocused(true);
@@ -38,7 +38,7 @@ public class GuiScreenServerList extends GuiScreen {
         mc.gameSettings.saveOptions();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 1) {
                 this.field_146303_a.confirmClicked(false, 0);
@@ -64,7 +64,7 @@ public class GuiScreenServerList extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, I18n.format("selectServer.direct"), width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("selectServer.direct"), (float) width / 2, 20, 16777215);
         this.drawString(this.fontRendererObj, I18n.format("addServer.enterIp"), width / 2 - 100, 100, 10526880);
         this.field_146302_g.drawTextBox();
         super.drawScreen(mouseX, mouseY, partialTicks);

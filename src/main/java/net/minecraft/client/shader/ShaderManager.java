@@ -222,7 +222,7 @@ public class ShaderManager {
             int k = OpenGlHelper.glGetUniformLocation(this.program, s);
 
             if (k == -1) {
-                logger.warn("Shader " + this.programFilename + "could not find sampler named " + s + " in the specified shader program.");
+                logger.warn("Shader {}could not find sampler named {} in the specified shader program.", this.programFilename, s);
                 this.shaderSamplers.remove(s);
                 this.samplerNames.remove(j);
                 --j;
@@ -238,7 +238,7 @@ public class ShaderManager {
             int l = OpenGlHelper.glGetUniformLocation(this.program, s1);
 
             if (l == -1) {
-                logger.warn("Could not find uniform named " + s1 + " in the specified" + " shader program.");
+                logger.warn("Could not find uniform named {} in the specified shader program.", s1);
             } else {
                 this.shaderUniformLocations.add(l);
                 shaderuniform.setUniformLocation(l);
@@ -247,7 +247,7 @@ public class ShaderManager {
         }
     }
 
-    private void parseSampler(JsonElement p_147996_1_) throws JsonException {
+    private void parseSampler(JsonElement p_147996_1_) {
         JsonObject jsonobject = JsonUtils.getJsonObject(p_147996_1_, "sampler");
         String s = JsonUtils.getString(jsonobject, "name");
 

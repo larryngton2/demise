@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 
 public class ContainerPlayer extends Container {
-    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
-    public IInventory craftResult = new InventoryCraftResult();
-    public boolean isLocalWorld;
+    public final InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
+    public final IInventory craftResult = new InventoryCraftResult();
+    public final boolean isLocalWorld;
     private final EntityPlayer thePlayer;
 
     public ContainerPlayer(final InventoryPlayer playerInventory, boolean localWorld, EntityPlayer player) {
@@ -92,11 +92,11 @@ public class ContainerPlayer extends Container {
                 }
 
                 slot.onSlotChange(itemstack1, itemstack);
-            } else if (index >= 1 && index < 5) {
+            } else if (index < 5) {
                 if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
                     return null;
                 }
-            } else if (index >= 5 && index < 9) {
+            } else if (index < 9) {
                 if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
                     return null;
                 }
@@ -106,11 +106,11 @@ public class ContainerPlayer extends Container {
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
                     return null;
                 }
-            } else if (index >= 9 && index < 36) {
+            } else if (index < 36) {
                 if (!this.mergeItemStack(itemstack1, 36, 45, false)) {
                     return null;
                 }
-            } else if (index >= 36 && index < 45) {
+            } else if (index < 45) {
                 if (!this.mergeItemStack(itemstack1, 9, 36, false)) {
                     return null;
                 }

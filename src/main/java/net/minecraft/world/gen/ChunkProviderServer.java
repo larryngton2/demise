@@ -28,12 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunkProviderServer implements IChunkProvider {
     private static final Logger logger = LogManager.getLogger();
-    private final Set<Long> droppedChunksSet = Collections.<Long>newSetFromMap(new ConcurrentHashMap());
+    private final Set<Long> droppedChunksSet = Collections.<Long>newSetFromMap(new ConcurrentHashMap<>());
     private final Chunk dummyChunk;
     private final IChunkProvider serverChunkGenerator;
     private final IChunkLoader chunkLoader;
-    public boolean chunkLoadOverride = true;
-    private final LongHashMap<Chunk> id2ChunkMap = new LongHashMap();
+    public final boolean chunkLoadOverride = true;
+    private final LongHashMap<Chunk> id2ChunkMap = new LongHashMap<>();
     private final List<Chunk> loadedChunks = Lists.newArrayList();
     private final WorldServer worldObj;
 
@@ -145,8 +145,6 @@ public class ChunkProviderServer implements IChunkProvider {
             try {
                 chunkIn.setLastSaveTime(this.worldObj.getTotalWorldTime());
                 this.chunkLoader.saveChunk(this.worldObj, chunkIn);
-            } catch (IOException ioexception) {
-                logger.error("Couldn't save chunk", ioexception);
             } catch (MinecraftException minecraftexception) {
                 logger.error("Couldn't save chunk; already in use by another instance of Minecraft?", minecraftexception);
             }
@@ -176,7 +174,7 @@ public class ChunkProviderServer implements IChunkProvider {
         }
     }
 
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
+    public void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
         int i = 0;
         List<Chunk> list = Lists.newArrayList(this.loadedChunks);
 
@@ -191,12 +189,11 @@ public class ChunkProviderServer implements IChunkProvider {
                 ++i;
 
                 if (i == 24 && !saveAllChunks) {
-                    return false;
+                    return;
                 }
             }
         }
 
-        return true;
     }
 
     public void saveExtraData() {

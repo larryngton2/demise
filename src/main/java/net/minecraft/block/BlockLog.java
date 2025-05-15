@@ -14,7 +14,7 @@ public abstract class BlockLog extends BlockRotatedPillar {
     public static final PropertyEnum<BlockLog.EnumAxis> LOG_AXIS = PropertyEnum.create("axis", BlockLog.EnumAxis.class);
 
     public BlockLog() {
-        super(Material.wood);
+        super();
         this.setCreativeTab(CreativeTabs.tabBlock);
         this.setHardness(2.0F);
         this.setStepSound(soundTypeWood);

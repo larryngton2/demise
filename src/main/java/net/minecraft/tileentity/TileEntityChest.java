@@ -113,7 +113,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
             NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
             int j = nbttagcompound.getByte("Slot") & 255;
 
-            if (j >= 0 && j < this.chestContents.length) {
+            if (j < this.chestContents.length) {
                 this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }

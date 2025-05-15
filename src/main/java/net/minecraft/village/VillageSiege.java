@@ -127,11 +127,10 @@ public class VillageSiege {
         return true;
     }
 
-    private boolean spawnZombie() {
+    private void spawnZombie() {
         Vec3 vec3 = this.func_179867_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i));
 
         if (vec3 == null) {
-            return false;
         } else {
             EntityZombie entityzombie;
 
@@ -141,14 +140,13 @@ public class VillageSiege {
                 entityzombie.setVillager(false);
             } catch (Exception exception) {
                 exception.printStackTrace();
-                return false;
+                return;
             }
 
             entityzombie.setLocationAndAngles(vec3.xCoord, vec3.yCoord, vec3.zCoord, this.worldObj.rand.nextFloat() * 360.0F, 0.0F);
             this.worldObj.spawnEntityInWorld(entityzombie);
             BlockPos blockpos = this.theVillage.getCenter();
             entityzombie.setHomePosAndDistance(blockpos, this.theVillage.getVillageRadius());
-            return true;
         }
     }
 

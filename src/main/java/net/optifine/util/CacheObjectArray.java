@@ -7,7 +7,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayDeque;
 
 public class CacheObjectArray {
-    private static final ArrayDeque<int[]> arrays = new ArrayDeque();
+    private static final ArrayDeque<int[]> arrays = new ArrayDeque<>();
     private static final int maxCacheSize = 10;
 
     private static synchronized int[] allocateArray(int size) {
@@ -26,19 +26,19 @@ public class CacheObjectArray {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         int i = 4096;
         int j = 500000;
         testNew(i, j);
         testClone(i, j);
         testNewObj(i, j);
         testCloneObj(i, j);
-        testNewObjDyn(IBlockState.class, i, j);
+        testNewObjDyn(i, j);
         long k = testNew(i, j);
         long l = testClone(i, j);
         long i1 = testNewObj(i, j);
         long j1 = testCloneObj(i, j);
-        long k1 = testNewObjDyn(IBlockState.class, i, j);
+        long k1 = testNewObjDyn(i, j);
         Config.dbg("New: " + k);
         Config.dbg("Clone: " + l);
         Config.dbg("NewObj: " + i1);
@@ -92,11 +92,11 @@ public class CacheObjectArray {
         return k - i;
     }
 
-    private static long testNewObjDyn(Class cls, int size, int count) {
+    private static long testNewObjDyn(int size, int count) {
         long i = System.currentTimeMillis();
 
         for (int j = 0; j < count; ++j) {
-            Object[] aobject = (Object[]) Array.newInstance(cls, size);
+            Object[] aobject = (Object[]) Array.newInstance(IBlockState.class, size);
         }
 
         long k = System.currentTimeMillis();

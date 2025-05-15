@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.util.List;
 
 public class GuiYesNo extends GuiScreen {
-    protected GuiYesNoCallback parentScreen;
-    protected String messageLine1;
+    protected final GuiYesNoCallback parentScreen;
+    protected final String messageLine1;
     private final String messageLine2;
     private final List<String> field_175298_s = Lists.newArrayList();
     protected String confirmButtonText;
     protected String cancelButtonText;
-    protected int parentButtonClickedId;
+    protected final int parentButtonClickedId;
     private int ticksUntilEnable;
 
     public GuiYesNo(GuiYesNoCallback p_i1082_1_, String p_i1082_2_, String p_i1082_3_, int p_i1082_4_) {
@@ -41,17 +41,17 @@ public class GuiYesNo extends GuiScreen {
         this.field_175298_s.addAll(this.fontRendererObj.listFormattedStringToWidth(this.messageLine2, width - 50));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         this.parentScreen.confirmClicked(button.id == 0, this.parentButtonClickedId);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.messageLine1, width / 2, 70, 16777215);
+        drawCenteredString(this.fontRendererObj, this.messageLine1, (float) width / 2, 70, 16777215);
         int i = 90;
 
         for (String s : this.field_175298_s) {
-            drawCenteredString(this.fontRendererObj, s, width / 2, i, 16777215);
+            drawCenteredString(this.fontRendererObj, s, (float) width / 2, i, 16777215);
             i += this.fontRendererObj.FONT_HEIGHT;
         }
 

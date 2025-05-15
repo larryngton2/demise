@@ -14,7 +14,7 @@ public class CommandStop extends CommandBase {
         return "commands.stop.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) {
         if (MinecraftServer.getServer().worldServers != null) {
             notifyOperators(sender, this, "commands.stop.start");
         }

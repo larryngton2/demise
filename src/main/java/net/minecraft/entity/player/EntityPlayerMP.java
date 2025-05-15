@@ -800,10 +800,6 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
         this.playerNetServerHandler.sendPacket(new S48PacketResourcePackSend(url, hash));
     }
 
-    public BlockPos getPosition() {
-        return new BlockPos(this.posX, this.posY + 0.5D, this.posZ);
-    }
-
     public void markPlayerActive() {
         this.playerLastActiveTime = MinecraftServer.getCurrentTimeMillis();
     }

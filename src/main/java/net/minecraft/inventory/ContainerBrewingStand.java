@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 
 public class ContainerBrewingStand extends Container {
-    public IInventory tileBrewingStand;
+    public final IInventory tileBrewingStand;
     private final Slot theSlot;
     private int brewTime;
 
@@ -16,7 +16,7 @@ public class ContainerBrewingStand extends Container {
         this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, tileBrewingStandIn, 0, 56, 46));
         this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, tileBrewingStandIn, 1, 79, 53));
         this.addSlotToContainer(new ContainerBrewingStand.Potion(playerInventory.player, tileBrewingStandIn, 2, 102, 46));
-        this.theSlot = this.addSlotToContainer(new ContainerBrewingStand.Ingredient(tileBrewingStandIn, 3, 79, 17));
+        this.theSlot = this.addSlotToContainer(new Ingredient(tileBrewingStandIn, 3, 79, 17));
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
@@ -62,7 +62,7 @@ public class ContainerBrewingStand extends Container {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if ((index < 0 || index > 2) && index != 3) {
+            if (index > 2 && index != 3) {
                 if (!this.theSlot.getHasStack() && this.theSlot.isItemValid(itemstack1)) {
                     if (!this.mergeItemStack(itemstack1, 3, 4, false)) {
                         return null;
@@ -71,11 +71,11 @@ public class ContainerBrewingStand extends Container {
                     if (!this.mergeItemStack(itemstack1, 0, 3, false)) {
                         return null;
                     }
-                } else if (index >= 4 && index < 31) {
+                } else if (index < 31) {
                     if (!this.mergeItemStack(itemstack1, 31, 40, false)) {
                         return null;
                     }
-                } else if (index >= 31 && index < 40) {
+                } else if (index < 40) {
                     if (!this.mergeItemStack(itemstack1, 4, 31, false)) {
                         return null;
                     }
@@ -106,7 +106,7 @@ public class ContainerBrewingStand extends Container {
         return itemstack;
     }
 
-    class Ingredient extends Slot {
+    static class Ingredient extends Slot {
         public Ingredient(IInventory inventoryIn, int index, int xPosition, int yPosition) {
             super(inventoryIn, index, xPosition, yPosition);
         }

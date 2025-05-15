@@ -15,7 +15,7 @@ public class GuiScreenAddServer extends GuiScreen {
     private GuiTextField serverNameField;
     private GuiButton serverResourcePacks;
     private final Predicate<String> field_181032_r = p_apply_1_ -> {
-        if (p_apply_1_.length() == 0) {
+        if (p_apply_1_.isEmpty()) {
             return true;
         } else {
             String[] astring = p_apply_1_.split(":");
@@ -46,9 +46,9 @@ public class GuiScreenAddServer extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 18, I18n.format("addServer.add")));
-        this.buttonList.add(new GuiButton(1, width / 2 - 100, height / 4 + 120 + 18, I18n.format("gui.cancel")));
-        this.buttonList.add(this.serverResourcePacks = new GuiButton(2, width / 2 - 100, height / 4 + 72, I18n.format("addServer.resourcePack") + ": " + this.serverData.getResourceMode().getMotd().getFormattedText()));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 - 100, (float) height / 4 + 96 + 18, I18n.format("addServer.add")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 100, (float) height / 4 + 120 + 18, I18n.format("gui.cancel")));
+        this.buttonList.add(this.serverResourcePacks = new GuiButton(2, (float) width / 2 - 100, (float) height / 4 + 72, I18n.format("addServer.resourcePack") + ": " + this.serverData.getResourceMode().getMotd().getFormattedText()));
         this.serverNameField = new GuiTextField(0, this.fontRendererObj, width / 2 - 100, 66, 200, 20);
         this.serverNameField.setFocused(true);
         this.serverNameField.setText(this.serverData.serverName);
@@ -63,7 +63,7 @@ public class GuiScreenAddServer extends GuiScreen {
         Keyboard.enableRepeatEvents(false);
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 2) {
                 this.serverData.setResourceMode(ServerData.ServerResourceMode.values()[(this.serverData.getResourceMode().ordinal() + 1) % ServerData.ServerResourceMode.values().length]);
@@ -102,7 +102,7 @@ public class GuiScreenAddServer extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, I18n.format("addServer.title"), width / 2, 17, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("addServer.title"), (float) width / 2, 17, 16777215);
         this.drawString(this.fontRendererObj, I18n.format("addServer.enterName"), width / 2 - 100, 53, 10526880);
         this.drawString(this.fontRendererObj, I18n.format("addServer.enterIp"), width / 2 - 100, 94, 10526880);
         this.serverNameField.drawTextBox();

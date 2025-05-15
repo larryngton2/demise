@@ -51,7 +51,7 @@ public abstract class BiomeGenBase {
     public static final BiomeGenBase extremeHills = (new BiomeGenHills(3, false)).setColor(6316128).setBiomeName("Extreme Hills").setHeight(height_MidHills).setTemperatureRainfall(0.2F, 0.3F);
     public static final BiomeGenBase forest = (new BiomeGenForest(4, 0)).setColor(353825).setBiomeName("Forest");
     public static final BiomeGenBase taiga = (new BiomeGenTaiga(5, 0)).setColor(747097).setBiomeName("Taiga").setFillerBlockMetadata(5159473).setTemperatureRainfall(0.25F, 0.8F).setHeight(height_MidPlains);
-    public static final BiomeGenBase swampland = (new BiomeGenSwamp(6)).setColor(522674).setBiomeName("Swampland").setFillerBlockMetadata(9154376).setHeight(height_PartiallySubmerged).setTemperatureRainfall(0.8F, 0.9F);
+    public static final BiomeGenBase swampland = (new BiomeGenSwamp()).setColor(522674).setBiomeName("Swampland").setFillerBlockMetadata(9154376).setHeight(height_PartiallySubmerged).setTemperatureRainfall(0.8F, 0.9F);
     public static final BiomeGenBase river = (new BiomeGenRiver(7)).setColor(255).setBiomeName("River").setHeight(height_ShallowWaters);
     public static final BiomeGenBase hell = (new BiomeGenHell(8)).setColor(16711680).setBiomeName("Hell").setDisableRain().setTemperatureRainfall(2.0F, 0.0F);
     public static final BiomeGenBase sky = (new BiomeGenEnd(9)).setColor(8421631).setBiomeName("The End").setDisableRain();
@@ -75,8 +75,8 @@ public abstract class BiomeGenBase {
     public static final BiomeGenBase birchForest = (new BiomeGenForest(27, 2)).setBiomeName("Birch Forest").setColor(3175492);
     public static final BiomeGenBase birchForestHills = (new BiomeGenForest(28, 2)).setBiomeName("Birch Forest Hills").setColor(2055986).setHeight(height_LowHills);
     public static final BiomeGenBase roofedForest = (new BiomeGenForest(29, 3)).setColor(4215066).setBiomeName("Roofed Forest");
-    public static final BiomeGenBase coldTaiga = (new BiomeGenTaiga(30, 0)).setColor(3233098).setBiomeName("Cold Taiga").setFillerBlockMetadata(5159473).setEnableSnow().setTemperatureRainfall(-0.5F, 0.4F).setHeight(height_MidPlains).func_150563_c(16777215);
-    public static final BiomeGenBase coldTaigaHills = (new BiomeGenTaiga(31, 0)).setColor(2375478).setBiomeName("Cold Taiga Hills").setFillerBlockMetadata(5159473).setEnableSnow().setTemperatureRainfall(-0.5F, 0.4F).setHeight(height_LowHills).func_150563_c(16777215);
+    public static final BiomeGenBase coldTaiga = (new BiomeGenTaiga(30, 0)).setColor(3233098).setBiomeName("Cold Taiga").setFillerBlockMetadata(5159473).setEnableSnow().setTemperatureRainfall(-0.5F, 0.4F).setHeight(height_MidPlains).func_150563_c();
+    public static final BiomeGenBase coldTaigaHills = (new BiomeGenTaiga(31, 0)).setColor(2375478).setBiomeName("Cold Taiga Hills").setFillerBlockMetadata(5159473).setEnableSnow().setTemperatureRainfall(-0.5F, 0.4F).setHeight(height_LowHills).func_150563_c();
     public static final BiomeGenBase megaTaiga = (new BiomeGenTaiga(32, 1)).setColor(5858897).setBiomeName("Mega Taiga").setFillerBlockMetadata(5159473).setTemperatureRainfall(0.3F, 0.8F).setHeight(height_MidPlains);
     public static final BiomeGenBase megaTaigaHills = (new BiomeGenTaiga(33, 1)).setColor(4542270).setBiomeName("Mega Taiga Hills").setFillerBlockMetadata(5159473).setTemperatureRainfall(0.3F, 0.8F).setHeight(height_LowHills);
     public static final BiomeGenBase extremeHillsPlus = (new BiomeGenHills(34, true)).setColor(5271632).setBiomeName("Extreme Hills+").setHeight(height_MidHills).setTemperatureRainfall(0.2F, 0.3F);
@@ -202,8 +202,8 @@ public abstract class BiomeGenBase {
         return this;
     }
 
-    protected BiomeGenBase func_150563_c(int p_150563_1_) {
-        this.field_150609_ah = p_150563_1_;
+    protected BiomeGenBase func_150563_c() {
+        this.field_150609_ah = 16777215;
         return this;
     }
 
@@ -353,8 +353,8 @@ public abstract class BiomeGenBase {
         }
     }
 
-    protected BiomeGenBase createMutation() {
-        return this.createMutatedBiome(this.biomeID + 128);
+    protected void createMutation() {
+        this.createMutatedBiome(this.biomeID + 128);
     }
 
     protected BiomeGenBase createMutatedBiome(int p_180277_1_) {
@@ -386,7 +386,7 @@ public abstract class BiomeGenBase {
             BiomeGenBase biomegenbase = biomeList[biomeId];
             return biomegenbase == null ? biome : biomegenbase;
         } else {
-            logger.warn("Biome ID is out of bounds: " + biomeId + ", defaulting to 0 (Ocean)");
+            logger.warn("Biome ID is out of bounds: {}, defaulting to 0 (Ocean)", biomeId);
             return ocean;
         }
     }
@@ -438,8 +438,8 @@ public abstract class BiomeGenBase {
     }
 
     public static class Height {
-        public float rootHeight;
-        public float variation;
+        public final float rootHeight;
+        public final float variation;
 
         public Height(float rootHeightIn, float variationIn) {
             this.rootHeight = rootHeightIn;
@@ -452,9 +452,9 @@ public abstract class BiomeGenBase {
     }
 
     public static class SpawnListEntry extends WeightedRandom.Item {
-        public Class<? extends EntityLiving> entityClass;
-        public int minGroupCount;
-        public int maxGroupCount;
+        public final Class<? extends EntityLiving> entityClass;
+        public final int minGroupCount;
+        public final int maxGroupCount;
 
         public SpawnListEntry(Class<? extends EntityLiving> entityclassIn, int weight, int groupCountMin, int groupCountMax) {
             super(weight);

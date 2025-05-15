@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,7 +13,7 @@ import net.minecraft.world.World;
 
 public class BlockHay extends BlockRotatedPillar {
     public BlockHay() {
-        super(Material.grass, MapColor.yellowColor);
+        super(MapColor.yellowColor);
         this.setDefaultState(this.blockState.getBaseState().withProperty(AXIS, EnumFacing.Axis.Y));
         this.setCreativeTab(CreativeTabs.tabBlock);
     }

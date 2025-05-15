@@ -35,7 +35,7 @@ public class S30PacketWindowItems implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.windowId);
         buf.writeShort(this.itemStacks.length);
 

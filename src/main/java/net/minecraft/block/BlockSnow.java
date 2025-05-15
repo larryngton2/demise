@@ -74,13 +74,11 @@ public class BlockSnow extends Block {
         this.checkAndDropBlock(worldIn, pos, state);
     }
 
-    private boolean checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state) {
+    private void checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state) {
         if (!this.canPlaceBlockAt(worldIn, pos)) {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
-            return false;
         } else {
-            return true;
         }
     }
 

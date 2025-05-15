@@ -22,12 +22,11 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjglx.input.Mouse;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class GuiStats extends GuiScreen implements IProgressMeter {
-    protected GuiScreen parentScreen;
+    protected final GuiScreen parentScreen;
     protected String screenTitle = "Select world";
     private GuiStats.StatsGeneral generalStats;
     private GuiStats.StatsItem itemStats;
@@ -68,14 +67,14 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
     }
 
     public void createButtons() {
-        this.buttonList.add(new GuiButton(0, width / 2 + 4, height - 28, 150, 20, I18n.format("gui.done")));
-        this.buttonList.add(new GuiButton(1, width / 2 - 160, height - 52, 80, 20, I18n.format("stat.generalButton")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 + 4, height - 28, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 160, height - 52, 80, 20, I18n.format("stat.generalButton")));
         GuiButton guibutton;
-        this.buttonList.add(guibutton = new GuiButton(2, width / 2 - 80, height - 52, 80, 20, I18n.format("stat.blocksButton")));
+        this.buttonList.add(guibutton = new GuiButton(2, (float) width / 2 - 80, height - 52, 80, 20, I18n.format("stat.blocksButton")));
         GuiButton guibutton1;
-        this.buttonList.add(guibutton1 = new GuiButton(3, width / 2, height - 52, 80, 20, I18n.format("stat.itemsButton")));
+        this.buttonList.add(guibutton1 = new GuiButton(3, (float) width / 2, height - 52, 80, 20, I18n.format("stat.itemsButton")));
         GuiButton guibutton2;
-        this.buttonList.add(guibutton2 = new GuiButton(4, width / 2 + 80, height - 52, 80, 20, I18n.format("stat.mobsButton")));
+        this.buttonList.add(guibutton2 = new GuiButton(4, (float) width / 2 + 80, height - 52, 80, 20, I18n.format("stat.mobsButton")));
 
         if (this.blockStats.getSize() == 0) {
             guibutton.enabled = false;
@@ -90,7 +89,7 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
         }
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 0) {
                 mc.displayGuiScreen(this.parentScreen);
@@ -111,11 +110,11 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         if (this.doesGuiPauseGame) {
             this.drawDefaultBackground();
-            drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats"), width / 2, height / 2, 16777215);
-            drawCenteredString(this.fontRendererObj, lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)], width / 2, height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
+            drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingStats"), (float) width / 2, (float) height / 2, 16777215);
+            drawCenteredString(this.fontRendererObj, lanSearchStates[(int) (Minecraft.getSystemTime() / 150L % (long) lanSearchStates.length)], (float) width / 2, (float) height / 2 + this.fontRendererObj.FONT_HEIGHT * 2, 16777215);
         } else {
             this.displaySlot.drawScreen(mouseX, mouseY, partialTicks);
-            drawCenteredString(this.fontRendererObj, this.screenTitle, width / 2, 20, 16777215);
+            drawCenteredString(this.fontRendererObj, this.screenTitle, (float) width / 2, 20, 16777215);
             super.drawScreen(mouseX, mouseY, partialTicks);
         }
     }
@@ -173,7 +172,7 @@ public class GuiStats extends GuiScreen implements IProgressMeter {
         protected Stats(Minecraft mcIn) {
             super(mcIn, GuiScreen.width, GuiScreen.height, 32, GuiScreen.height - 64, 20);
             this.setShowSelectionBox(false);
-            this.setHasListHeader(true, 20);
+            this.setHasListHeader(20);
         }
 
         protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) {

@@ -49,7 +49,7 @@ public class RenderManager {
     public double renderPosX;
     public double renderPosY;
     public double renderPosZ;
-    public TextureManager renderEngine;
+    public final TextureManager renderEngine;
     public World worldObj;
     public Entity livingPlayer;
     public Entity pointedEntity;
@@ -217,8 +217,8 @@ public class RenderManager {
         return this.debugBoundingBox;
     }
 
-    public boolean renderEntitySimple(Entity entityIn, float partialTicks) {
-        return this.renderEntityStatic(entityIn, partialTicks, false);
+    public void renderEntitySimple(Entity entityIn, float partialTicks) {
+        this.renderEntityStatic(entityIn, partialTicks, false);
     }
 
     public boolean shouldRender(Entity entityIn, ICamera camera, double camX, double camY, double camZ) {
@@ -240,7 +240,7 @@ public class RenderManager {
 
         int j = i % 65536;
         int k = i / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j / 1.0F, (float) k / 1.0F);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.doRenderEntityNoShadow(entity, d0 - this.renderPosX, d1 - this.renderPosY, d2 - this.renderPosZ, f, partialTicks, p_147936_3_);
     }
@@ -285,7 +285,7 @@ public class RenderManager {
         }
     }
 
-    public boolean doRenderEntityNoShadow(Entity entity, double x, double y, double z, float entityYaw, float partialTicks, boolean hideDebugBox) {
+    public void doRenderEntityNoShadow(Entity entity, double x, double y, double z, float entityYaw, float partialTicks, boolean hideDebugBox) {
         Render<Entity> render = null;
 
         try {
@@ -316,11 +316,8 @@ public class RenderManager {
                         throw new ReportedException(CrashReport.makeCrashReport(throwable, "Rendering entity hitbox in world"));
                     }
                 }
-            } else if (this.renderEngine != null) {
-                return false;
             }
 
-            return true;
         } catch (Throwable throwable3) {
             CrashReport crashreport = CrashReport.makeCrashReport(throwable3, "Rendering entity in world");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity being rendered");

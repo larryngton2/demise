@@ -70,12 +70,12 @@ public class VboRegion {
             this.unbindBuffer();
 
             if (this.positionTop > this.sizeUsed * 11 / 10) {
-                this.compactRanges(1);
+                this.compactRanges();
             }
         }
     }
 
-    private void compactRanges(int countMax) {
+    private void compactRanges() {
         if (!this.rangeList.isEmpty()) {
             VboRange vborange = this.compactRangeLast;
 
@@ -94,7 +94,7 @@ public class VboRegion {
 
             int j = 0;
 
-            while (vborange != null && j < countMax) {
+            while (vborange != null && j < 1) {
                 ++j;
 
                 if (vborange.getPosition() == i) {
@@ -232,7 +232,7 @@ public class VboRegion {
         this.bufferCountVertex.limit(this.bufferCountVertex.capacity());
 
         if (this.positionTop > this.sizeUsed * 11 / 10) {
-            this.compactRanges(1);
+            this.compactRanges();
         }
     }
 

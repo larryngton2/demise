@@ -9,11 +9,11 @@ import java.io.IOException;
 public class S46PacketSetCompressionLevel implements Packet<INetHandlerPlayClient> {
     private int threshold;
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.threshold = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.threshold);
     }
 

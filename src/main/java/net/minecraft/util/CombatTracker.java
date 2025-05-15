@@ -153,8 +153,6 @@ public class CombatTracker {
 
         if (f > 5.0F && combatentry != null) {
             return combatentry;
-        } else if (i > 5 && combatentry1 != null) {
-            return combatentry1;
         } else {
             return null;
         }

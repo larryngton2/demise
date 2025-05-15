@@ -1,6 +1,7 @@
 package net.minecraft.server.management;
 
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -47,15 +48,15 @@ public class LowerStringMap<V> implements Map<String, V> {
         this.internalMap.clear();
     }
 
-    public Set<String> keySet() {
+    public @NotNull Set<String> keySet() {
         return this.internalMap.keySet();
     }
 
-    public Collection<V> values() {
+    public @NotNull Collection<V> values() {
         return this.internalMap.values();
     }
 
-    public Set<Entry<String, V>> entrySet() {
+    public @NotNull Set<Entry<String, V>> entrySet() {
         return this.internalMap.entrySet();
     }
 }

@@ -38,8 +38,8 @@ public class TextureUtil {
         GlStateManager.deleteTexture(textureId);
     }
 
-    public static int uploadTextureImage(int p_110987_0_, BufferedImage p_110987_1_) {
-        return uploadTextureImageAllocate(p_110987_0_, p_110987_1_, false, false);
+    public static void uploadTextureImage(int p_110987_0_, BufferedImage p_110987_1_) {
+        uploadTextureImageAllocate(p_110987_0_, p_110987_1_, false, false);
     }
 
     public static void uploadTexture(int textureId, int[] p_110988_1_, int p_110988_2_, int p_110988_3_) {

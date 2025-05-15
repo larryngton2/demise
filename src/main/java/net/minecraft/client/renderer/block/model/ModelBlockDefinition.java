@@ -38,7 +38,7 @@ public class ModelBlockDefinition {
         ModelBlockDefinition.Variants modelblockdefinition$variants = this.mapVariants.get(p_178330_1_);
 
         if (modelblockdefinition$variants == null) {
-            throw new ModelBlockDefinition.MissingVariantException();
+            throw new MissingVariantException();
         } else {
             return modelblockdefinition$variants;
         }
@@ -93,7 +93,7 @@ public class ModelBlockDefinition {
         }
     }
 
-    public class MissingVariantException extends RuntimeException {
+    public static class MissingVariantException extends RuntimeException {
     }
 
     public static class Variant {

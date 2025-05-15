@@ -25,7 +25,7 @@ public class BlockModelUtils {
     public static IBakedModel makeModelCube(TextureAtlasSprite sprite, int tintIndex) {
         List list = new ArrayList();
         EnumFacing[] aenumfacing = EnumFacing.VALUES;
-        List<List<BakedQuad>> list1 = new ArrayList();
+        List<List<BakedQuad>> list1 = new ArrayList<>();
 
         for (EnumFacing enumfacing : aenumfacing) {
             List list2 = new ArrayList();
@@ -33,12 +33,11 @@ public class BlockModelUtils {
             list1.add(list2);
         }
 
-        IBakedModel ibakedmodel = new SimpleBakedModel(list, list1, true, true, sprite, ItemCameraTransforms.DEFAULT);
-        return ibakedmodel;
+        return new SimpleBakedModel(list, list1, true, true, sprite, ItemCameraTransforms.DEFAULT);
     }
 
     public static IBakedModel joinModelsCube(IBakedModel modelBase, IBakedModel modelAdd) {
-        List<BakedQuad> list = new ArrayList();
+        List<BakedQuad> list = new ArrayList<>();
         list.addAll(modelBase.getGeneralQuads());
         list.addAll(modelAdd.getGeneralQuads());
         EnumFacing[] aenumfacing = EnumFacing.VALUES;
@@ -55,8 +54,7 @@ public class BlockModelUtils {
         boolean flag1 = modelBase.isBuiltInRenderer();
         TextureAtlasSprite textureatlassprite = modelBase.getParticleTexture();
         ItemCameraTransforms itemcameratransforms = modelBase.getItemCameraTransforms();
-        IBakedModel ibakedmodel = new SimpleBakedModel(list, list1, flag, flag1, textureatlassprite, itemcameratransforms);
-        return ibakedmodel;
+        return new SimpleBakedModel(list, list1, flag, flag1, textureatlassprite, itemcameratransforms);
     }
 
     public static BakedQuad makeBakedQuad(EnumFacing facing, TextureAtlasSprite sprite, int tintIndex) {
@@ -69,8 +67,7 @@ public class BlockModelUtils {
         boolean flag = false;
         boolean flag1 = true;
         FaceBakery facebakery = new FaceBakery();
-        BakedQuad bakedquad = facebakery.makeBakedQuad(vector3f, vector3f1, blockpartface, sprite, facing, modelrotation, blockpartrotation, flag, flag1);
-        return bakedquad;
+        return facebakery.makeBakedQuad(vector3f, vector3f1, blockpartface, sprite, facing, modelrotation, blockpartrotation, flag, flag1);
     }
 
     public static IBakedModel makeModel(String modelName, String spriteOldName, String spriteNewName) {
@@ -112,7 +109,7 @@ public class BlockModelUtils {
     }
 
     private static void replaceTexture(List<BakedQuad> quads, TextureAtlasSprite spriteOld, TextureAtlasSprite spriteNew) {
-        List<BakedQuad> list = new ArrayList();
+        List<BakedQuad> list = new ArrayList<>();
 
         for (BakedQuad bakedquad : quads) {
             if (bakedquad.getSprite() == spriteOld) {

@@ -46,7 +46,7 @@ public class GuiConnecting extends GuiScreen {
     }
 
     private void connect(final String ip, final int port) {
-        logger.info("Connecting to " + ip + ", " + port);
+        logger.info("Connecting to {}, {}", ip, port);
         (new Thread("Server Connector #" + CONNECTION_ID.incrementAndGet()) {
             public void run() {
                 InetAddress inetaddress = null;
@@ -97,15 +97,15 @@ public class GuiConnecting extends GuiScreen {
         }
     }
 
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) {
     }
 
     public void initGui() {
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, width / 2 - 75, height / 2, 150, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 - 75, (float) height / 2, 150, 20, I18n.format("gui.cancel")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.id == 0) {
             this.cancel = true;
 
@@ -123,9 +123,9 @@ public class GuiConnecting extends GuiScreen {
         String finalIP = address.getIP().toLowerCase().contains("liquidproxy.net") ? "liquidproxy.net" : address.getIP();
 
         if (this.networkManager == null) {
-            drawCenteredString(this.fontRendererObj, "Establishing connection with " + finalIP + ":" + address.getPort(), width / 2, height / 2 - 27, 16777215);
+            drawCenteredString(this.fontRendererObj, "Establishing connection with " + finalIP + ":" + address.getPort(), (float) width / 2, (float) height / 2 - 27, 16777215);
         } else {
-            drawCenteredString(this.fontRendererObj, "Logging in to " + finalIP + ":" + address.getPort(), width / 2, height / 2 - 27, 16777215);
+            drawCenteredString(this.fontRendererObj, "Logging in to " + finalIP + ":" + address.getPort(), (float) width / 2, (float) height / 2 - 27, 16777215);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

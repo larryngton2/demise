@@ -28,17 +28,15 @@ public class BlockAliases {
         } else if (blockId >= 0 && blockId < blockAliases.length) {
             BlockAlias[] ablockalias = blockAliases[blockId];
 
-            if (ablockalias == null) {
-                return blockId;
-            } else {
+            if (ablockalias != null) {
                 for (BlockAlias blockalias : ablockalias) {
                     if (blockalias.matches(blockId, metadata)) {
                         return blockalias.getBlockAliasId();
                     }
                 }
 
-                return blockId;
             }
+            return blockId;
         } else {
             return blockId;
         }
@@ -59,7 +57,7 @@ public class BlockAliases {
                 Config.dbg("[Shaders] Delayed loading of block mappings after resources are loaded");
                 updateOnResourcesReloaded = true;
             } else {
-                List<List<BlockAlias>> list = new ArrayList();
+                List<List<BlockAlias>> list = new ArrayList<>();
                 String s = "/shaders/block.properties";
                 InputStream inputstream = shaderPack.getResourceAsStream(s);
 
@@ -84,7 +82,7 @@ public class BlockAliases {
                 ResourceLocation resourcelocation = new ResourceLocation(s, "shaders/block.properties");
                 InputStream inputstream = Config.getResourceStream(resourcelocation);
                 loadBlockAliases(inputstream, resourcelocation.toString(), listBlockAliases);
-            } catch (IOException var6) {
+            } catch (IOException ignored) {
             }
         }
     }
@@ -150,7 +148,7 @@ public class BlockAliases {
             List<BlockAlias> list = blocksAliases.get(j);
 
             if (list == null) {
-                list = new ArrayList();
+                list = new ArrayList<>();
                 blocksAliases.set(j, list);
             }
 

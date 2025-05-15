@@ -12,8 +12,8 @@ import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import java.util.Random;
 
 public class BiomeGenSwamp extends BiomeGenBase {
-    protected BiomeGenSwamp(int id) {
-        super(id);
+    protected BiomeGenSwamp() {
+        super(6);
         this.theBiomeDecorator.treesPerChunk = 2;
         this.theBiomeDecorator.flowersPerChunk = 1;
         this.theBiomeDecorator.deadBushPerChunk = 1;

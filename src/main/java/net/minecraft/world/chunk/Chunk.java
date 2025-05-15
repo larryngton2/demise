@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Chunk {
@@ -71,7 +70,7 @@ public class Chunk {
         this.heightMap = new int[256];
 
         for (int i = 0; i < this.entityLists.length; ++i) {
-            this.entityLists[i] = new ClassInheritanceMultiMap(Entity.class);
+            this.entityLists[i] = new ClassInheritanceMultiMap<>(Entity.class);
         }
 
         Arrays.fill(this.precipitationHeightMap, -999);
@@ -180,7 +179,7 @@ public class Chunk {
                     int k1 = 15;
                     int i1 = i + 16 - 1;
 
-                    while (true) {
+                    do {
                         int j1 = this.getBlockLightOpacity(j, i1, k);
 
                         if (j1 == 0 && k1 != 15) {
@@ -200,10 +199,7 @@ public class Chunk {
 
                         --i1;
 
-                        if (i1 <= 0 || k1 <= 0) {
-                            break;
-                        }
-                    }
+                    } while (i1 > 0 && k1 > 0);
                 }
             }
         }
@@ -607,7 +603,7 @@ public class Chunk {
         int j = MathHelper.floor_double(entityIn.posZ / 16.0D);
 
         if (i != this.xPosition || j != this.zPosition) {
-            logger.warn("Wrong location! (" + i + ", " + j + ") should be (" + this.xPosition + ", " + this.zPosition + "), " + entityIn, entityIn);
+            logger.warn("Wrong location! ({}, {}) should be ({}, {}), {}", i, j, this.xPosition, this.zPosition, entityIn, entityIn);
             entityIn.setDead();
         }
 
@@ -930,7 +926,7 @@ public class Chunk {
 
     public void setStorageArrays(ExtendedBlockStorage[] newStorageArrays) {
         if (this.storageArrays.length != newStorageArrays.length) {
-            logger.warn("Could not set level chunk sections, array length is " + newStorageArrays.length + " instead of " + this.storageArrays.length);
+            logger.warn("Could not set level chunk sections, array length is {} instead of {}", newStorageArrays.length, this.storageArrays.length);
         } else {
             System.arraycopy(newStorageArrays, 0, this.storageArrays, 0, this.storageArrays.length);
         }
@@ -1016,7 +1012,7 @@ public class Chunk {
 
     public void setBiomeArray(byte[] biomeArray) {
         if (this.blockBiomeArray.length != biomeArray.length) {
-            logger.warn("Could not set level chunk biomes, array length is " + biomeArray.length + " instead of " + this.blockBiomeArray.length);
+            logger.warn("Could not set level chunk biomes, array length is {} instead of {}", biomeArray.length, this.blockBiomeArray.length);
         } else {
             System.arraycopy(biomeArray, 0, this.blockBiomeArray, 0, this.blockBiomeArray.length);
         }
@@ -1170,7 +1166,7 @@ public class Chunk {
 
     public void setHeightMap(int[] newHeightMap) {
         if (this.heightMap.length != newHeightMap.length) {
-            logger.warn("Could not set level chunk heightmap, array length is " + newHeightMap.length + " instead of " + this.heightMap.length);
+            logger.warn("Could not set level chunk heightmap, array length is {} instead of {}", newHeightMap.length, this.heightMap.length);
         } else {
             System.arraycopy(newHeightMap, 0, this.heightMap, 0, this.heightMap.length);
         }

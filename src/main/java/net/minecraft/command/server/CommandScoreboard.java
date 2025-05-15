@@ -76,7 +76,7 @@ public class CommandScoreboard extends CommandBase {
                             throw new WrongUsageException("commands.scoreboard.players.list.usage");
                         }
 
-                        this.listPlayers(sender, args, 2);
+                        this.listPlayers(sender, args);
                     } else if (args[1].equalsIgnoreCase("add")) {
                         if (args.length < 5) {
                             throw new WrongUsageException("commands.scoreboard.players.add.usage");
@@ -138,7 +138,7 @@ public class CommandScoreboard extends CommandBase {
                             throw new WrongUsageException("commands.scoreboard.teams.list.usage");
                         }
 
-                        this.listTeams(sender, args, 2);
+                        this.listTeams(sender, args);
                     } else if (args[1].equalsIgnoreCase("add")) {
                         if (args.length < 3) {
                             throw new WrongUsageException("commands.scoreboard.teams.add.usage");
@@ -150,13 +150,13 @@ public class CommandScoreboard extends CommandBase {
                             throw new WrongUsageException("commands.scoreboard.teams.remove.usage");
                         }
 
-                        this.removeTeam(sender, args, 2);
+                        this.removeTeam(sender, args);
                     } else if (args[1].equalsIgnoreCase("empty")) {
                         if (args.length != 3) {
                             throw new WrongUsageException("commands.scoreboard.teams.empty.usage");
                         }
 
-                        this.emptyTeam(sender, args, 2);
+                        this.emptyTeam(sender, args);
                     } else if (args[1].equalsIgnoreCase("join")) {
                         if (args.length < 4 && (args.length != 3 || !(sender instanceof EntityPlayer))) {
                             throw new WrongUsageException("commands.scoreboard.teams.join.usage");
@@ -391,9 +391,9 @@ public class CommandScoreboard extends CommandBase {
         }
     }
 
-    protected void removeTeam(ICommandSender p_147194_1_, String[] p_147194_2_, int p_147194_3_) throws CommandException {
+    protected void removeTeam(ICommandSender p_147194_1_, String[] p_147194_2_) throws CommandException {
         Scoreboard scoreboard = this.getScoreboard();
-        ScorePlayerTeam scoreplayerteam = this.getTeam(p_147194_2_[p_147194_3_]);
+        ScorePlayerTeam scoreplayerteam = this.getTeam(p_147194_2_[2]);
 
         if (scoreplayerteam != null) {
             scoreboard.removeTeam(scoreplayerteam);
@@ -401,11 +401,11 @@ public class CommandScoreboard extends CommandBase {
         }
     }
 
-    protected void listTeams(ICommandSender p_147186_1_, String[] p_147186_2_, int p_147186_3_) throws CommandException {
+    protected void listTeams(ICommandSender p_147186_1_, String[] p_147186_2_) throws CommandException {
         Scoreboard scoreboard = this.getScoreboard();
 
-        if (p_147186_2_.length > p_147186_3_) {
-            ScorePlayerTeam scoreplayerteam = this.getTeam(p_147186_2_[p_147186_3_]);
+        if (p_147186_2_.length > 2) {
+            ScorePlayerTeam scoreplayerteam = this.getTeam(p_147186_2_[2]);
 
             if (scoreplayerteam == null) {
                 return;
@@ -539,9 +539,9 @@ public class CommandScoreboard extends CommandBase {
         }
     }
 
-    protected void emptyTeam(ICommandSender p_147188_1_, String[] p_147188_2_, int p_147188_3_) throws CommandException {
+    protected void emptyTeam(ICommandSender p_147188_1_, String[] p_147188_2_) throws CommandException {
         Scoreboard scoreboard = this.getScoreboard();
-        ScorePlayerTeam scoreplayerteam = this.getTeam(p_147188_2_[p_147188_3_]);
+        ScorePlayerTeam scoreplayerteam = this.getTeam(p_147188_2_[2]);
 
         if (scoreplayerteam != null) {
             Collection<String> collection = Lists.newArrayList(scoreplayerteam.getMembershipCollection());
@@ -606,11 +606,11 @@ public class CommandScoreboard extends CommandBase {
         }
     }
 
-    protected void listPlayers(ICommandSender p_147195_1_, String[] p_147195_2_, int p_147195_3_) throws CommandException {
+    protected void listPlayers(ICommandSender p_147195_1_, String[] p_147195_2_) throws CommandException {
         Scoreboard scoreboard = this.getScoreboard();
 
-        if (p_147195_2_.length > p_147195_3_) {
-            String s = getEntityName(p_147195_1_, p_147195_2_[p_147195_3_]);
+        if (p_147195_2_.length > 2) {
+            String s = getEntityName(p_147195_1_, p_147195_2_[2]);
             Map<ScoreObjective, Score> map = scoreboard.getObjectivesForEntity(s);
             p_147195_1_.setCommandStat(CommandResultStats.Type.QUERY_RESULT, map.size());
 
@@ -885,9 +885,7 @@ public class CommandScoreboard extends CommandBase {
                         return getListOfStringsMatchingLastWord(args, this.getScoreboard().getTeamNames());
                     }
 
-                    if (args.length >= 4) {
-                        return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
-                    }
+                    return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
                 } else {
                     if (args[1].equalsIgnoreCase("leave")) {
                         return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());

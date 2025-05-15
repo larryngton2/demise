@@ -37,8 +37,8 @@ public class GuiScreenCustomizePresets extends GuiScreen {
         this.field_175311_g = new GuiScreenCustomizePresets.ListPreset();
         this.field_175317_i.setMaxStringLength(2000);
         this.field_175317_i.setText(this.field_175314_r.func_175323_a());
-        this.buttonList.add(this.field_175316_h = new GuiButton(0, width / 2 - 102, height - 27, 100, 20, I18n.format("createWorld.customize.presets.select")));
-        this.buttonList.add(new GuiButton(1, width / 2 + 3, height - 27, 100, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(this.field_175316_h = new GuiButton(0, (float) width / 2 - 102, height - 27, 100, 20, I18n.format("createWorld.customize.presets.select")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 + 3, height - 27, 100, 20, I18n.format("gui.cancel")));
         this.func_175304_a();
     }
 
@@ -62,7 +62,7 @@ public class GuiScreenCustomizePresets extends GuiScreen {
         }
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         switch (button.id) {
             case 0:
                 this.field_175314_r.func_175324_a(this.field_175317_i.getText());
@@ -77,7 +77,7 @@ public class GuiScreenCustomizePresets extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.field_175311_g.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, this.field_175315_a, width / 2, 8, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_175315_a, (float) width / 2, 8, 16777215);
         this.drawString(this.fontRendererObj, this.field_175313_s, 50, 30, 10526880);
         this.drawString(this.fontRendererObj, this.field_175312_t, 50, 70, 10526880);
         this.field_175317_i.drawTextBox();
@@ -122,9 +122,9 @@ public class GuiScreenCustomizePresets extends GuiScreen {
     }
 
     static class Info {
-        public String field_178955_a;
-        public ResourceLocation field_178953_b;
-        public ChunkProviderSettings.Factory field_178954_c;
+        public final String field_178955_a;
+        public final ResourceLocation field_178953_b;
+        public final ChunkProviderSettings.Factory field_178954_c;
 
         public Info(String p_i45523_1_, ResourceLocation p_i45523_2_, ChunkProviderSettings.Factory p_i45523_3_) {
             this.field_178955_a = p_i45523_1_;

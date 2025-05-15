@@ -35,14 +35,14 @@ public class ShaderLinkHelper {
         }
     }
 
-    public void linkProgram(ShaderManager manager) throws IOException {
+    public void linkProgram(ShaderManager manager) {
         manager.getFragmentShaderLoader().attachShader(manager);
         manager.getVertexShaderLoader().attachShader(manager);
         OpenGlHelper.glLinkProgram(manager.getProgram());
         int i = OpenGlHelper.glGetProgrami(manager.getProgram(), OpenGlHelper.GL_LINK_STATUS);
 
         if (i == 0) {
-            logger.warn("Error encountered when linking program containing VS " + manager.getVertexShaderLoader().getShaderFilename() + " and FS " + manager.getFragmentShaderLoader().getShaderFilename() + ". Log output:");
+            logger.warn("Error encountered when linking program containing VS {} and FS {}. Log output:", manager.getVertexShaderLoader().getShaderFilename(), manager.getFragmentShaderLoader().getShaderFilename());
             logger.warn(OpenGlHelper.glGetProgramInfoLog(manager.getProgram(), 32768));
         }
     }

@@ -3,9 +3,8 @@ package net.optifine.util;
 public class LockCounter {
     private int lockCount;
 
-    public boolean lock() {
+    public void lock() {
         ++this.lockCount;
-        return this.lockCount == 1;
     }
 
     public boolean unlock() {

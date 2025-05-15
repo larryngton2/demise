@@ -183,8 +183,7 @@ public class ChunkProviderFlat implements IChunkProvider {
         return false;
     }
 
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
-        return true;
+    public void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
     }
 
     public void saveExtraData() {

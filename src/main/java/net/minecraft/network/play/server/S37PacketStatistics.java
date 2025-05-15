@@ -25,7 +25,7 @@ public class S37PacketStatistics implements Packet<INetHandlerPlayClient> {
         handler.handleStatistics(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         int i = buf.readVarIntFromBuffer();
         this.field_148976_a = Maps.newHashMap();
 
@@ -39,7 +39,7 @@ public class S37PacketStatistics implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.field_148976_a.size());
 
         for (Entry<StatBase, Integer> entry : this.field_148976_a.entrySet()) {

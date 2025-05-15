@@ -25,7 +25,7 @@ public class DynamicLight {
     private int lastLightLevel = 0;
     private boolean underwater = false;
     private long timeCheckMs = 0L;
-    private Set<BlockPos> setLitChunkPos = new HashSet();
+    private Set<BlockPos> setLitChunkPos = new HashSet<>();
     private final BlockPos.MutableBlockPos blockPosMutable = new BlockPos.MutableBlockPos();
 
     public DynamicLight(Entity entity) {
@@ -68,7 +68,7 @@ public class DynamicLight {
                 this.underwater = block == Blocks.water;
             }
 
-            Set<BlockPos> set = new HashSet();
+            Set<BlockPos> set = new HashSet<>();
 
             if (j > 0) {
                 EnumFacing enumfacing2 = (MathHelper.floor_double(d6) & 15) >= 8 ? EnumFacing.EAST : EnumFacing.WEST;

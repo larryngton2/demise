@@ -252,7 +252,7 @@ public class ItemInWorldManager {
             int j = stack.getMetadata();
             ItemStack itemstack = stack.useItemRightClick(worldIn, player);
 
-            if (itemstack != stack || itemstack != null && (itemstack.stackSize != i || itemstack.getMaxItemUseDuration() > 0 || itemstack.getMetadata() != j)) {
+            if (itemstack != stack || itemstack.stackSize != i || itemstack.getMaxItemUseDuration() > 0 || itemstack.getMetadata() != j) {
                 player.inventory.mainInventory[player.inventory.currentItem] = itemstack;
 
                 if (this.isCreative()) {

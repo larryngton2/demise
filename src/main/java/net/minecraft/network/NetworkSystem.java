@@ -13,8 +13,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.client.network.NetHandlerHandshakeMemory;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -31,7 +29,6 @@ import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
 public class NetworkSystem {
@@ -61,7 +58,7 @@ public class NetworkSystem {
         this.isAlive = true;
     }
 
-    public void addLanEndpoint(InetAddress address, int port) throws IOException {
+    public void addLanEndpoint(InetAddress address, int port) {
         synchronized (this.endpoints) {
             Class<? extends ServerSocketChannel> oclass;
             LazyLoadBase<? extends EventLoopGroup> lazyloadbase;
@@ -77,10 +74,10 @@ public class NetworkSystem {
             }
 
             this.endpoints.add((new ServerBootstrap()).channel(oclass).childHandler(new ChannelInitializer<>() {
-                protected void initChannel(Channel p_initChannel_1_) throws Exception {
+                protected void initChannel(Channel p_initChannel_1_) {
                     try {
                         p_initChannel_1_.config().setOption(ChannelOption.TCP_NODELAY, Boolean.TRUE);
-                    } catch (ChannelException var3) {
+                    } catch (ChannelException ignored) {
                     }
 
                     p_initChannel_1_.pipeline().addLast("timeout", new ReadTimeoutHandler(30)).addLast("legacy_query", new PingResponseHandler(NetworkSystem.this)).addLast("splitter", new MessageDeserializer2()).addLast("decoder", new MessageDeserializer(EnumPacketDirection.SERVERBOUND)).addLast("prepender", new MessageSerializer2()).addLast("encoder", new MessageSerializer(EnumPacketDirection.CLIENTBOUND));
@@ -98,7 +95,7 @@ public class NetworkSystem {
 
         synchronized (this.endpoints) {
             channelfuture = (new ServerBootstrap()).channel(LocalServerChannel.class).childHandler(new ChannelInitializer<>() {
-                protected void initChannel(Channel p_initChannel_1_) throws Exception {
+                protected void initChannel(Channel p_initChannel_1_) {
                     NetworkManager networkmanager = new NetworkManager(EnumPacketDirection.SERVERBOUND);
                     networkmanager.setNetHandler(new NetHandlerHandshakeMemory(NetworkSystem.this.mcServer, networkmanager));
                     NetworkSystem.this.networkManagers.add(networkmanager);
@@ -141,11 +138,11 @@ public class NetworkSystem {
                             if (networkmanager.isLocalChannel()) {
                                 CrashReport crashreport = CrashReport.makeCrashReport(exception, "Ticking memory connection");
                                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Ticking connection");
-                                crashreportcategory.addCrashSectionCallable("Connection", () -> networkmanager.toString());
+                                crashreportcategory.addCrashSectionCallable("Connection", networkmanager::toString);
                                 throw new ReportedException(crashreport);
                             }
 
-                            logger.warn("Failed to handle packet for " + networkmanager.getRemoteAddress(), exception);
+                            logger.warn("Failed to handle packet for {}", networkmanager.getRemoteAddress(), exception);
                             final ChatComponentText chatcomponenttext = new ChatComponentText("Internal server error");
                             networkmanager.sendPacket(new S40PacketDisconnect(chatcomponenttext), p_operationComplete_1_ -> networkmanager.closeChannel(chatcomponenttext));
                             networkmanager.disableAutoRead();

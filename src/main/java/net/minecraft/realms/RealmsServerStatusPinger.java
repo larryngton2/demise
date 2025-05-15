@@ -76,7 +76,7 @@ public class RealmsServerStatusPinger {
 
                 public void onDisconnect(IChatComponent reason) {
                     if (!this.field_154345_e) {
-                        RealmsServerStatusPinger.LOGGER.error("Can't ping " + p_pingServer_1_ + ": " + reason.getUnformattedText());
+                        RealmsServerStatusPinger.LOGGER.error("Can't ping {}: {}", p_pingServer_1_, reason.getUnformattedText());
                     }
                 }
             });

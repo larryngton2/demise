@@ -22,13 +22,13 @@ public class C07PacketPlayerDigging implements Packet<INetHandlerPlayServer> {
         this.facing = facingIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.status = buf.readEnumValue(Action.class);
         this.position = buf.readBlockPos();
         this.facing = EnumFacing.getFront(buf.readUnsignedByte());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeEnumValue(this.status);
         buf.writeBlockPos(this.position);
         buf.writeByte(this.facing.getIndex());

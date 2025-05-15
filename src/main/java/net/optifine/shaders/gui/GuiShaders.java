@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 
 public class GuiShaders extends GuiScreenOF {
-    protected GuiScreen parentGui;
+    protected final GuiScreen parentGui;
     protected String screenTitle = "Shaders";
     private final TooltipManager tooltipManager = new TooltipManager(this, new TooltipProviderEnumShaderOptions());
     private int updateTimer = -1;
@@ -70,7 +70,7 @@ public class GuiShaders extends GuiScreenOF {
         int i2 = height - 25;
         this.buttonList.add(new GuiButton(201, l1, i2, k1 - 22 + 1, j, Lang.get("of.options.shaders.shadersFolder")));
         this.buttonList.add(new GuiButtonDownloadShaders(210, l1 + k1 - 22 - 1, i2));
-        this.buttonList.add(new GuiButton(202, j1 / 4 * 3 - k1 / 2, height - 25, k1, j, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(202, (float) j1 / 4 * 3 - (float) k1 / 2, height - 25, k1, j, I18n.format("gui.done")));
         this.buttonList.add(new GuiButton(203, k, height - 25, i, j, Lang.get("of.options.shaders.shaderOptions")));
         this.updateButtons();
     }
@@ -302,12 +302,12 @@ public class GuiShaders extends GuiScreenOF {
             this.updateTimer += 20;
         }
 
-        drawCenteredString(this.fontRendererObj, this.screenTitle + " ", width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.screenTitle + " ", (float) width / 2, 15, 16777215);
         String s = "OpenGL: " + Shaders.glVersionString + ", " + Shaders.glVendorString + ", " + Shaders.glRendererString;
         int i = this.fontRendererObj.getStringWidth(s);
 
         if (i < width - 5) {
-            drawCenteredString(this.fontRendererObj, s, width / 2, height - 40, 8421504);
+            drawCenteredString(this.fontRendererObj, s, (float) width / 2, height - 40, 8421504);
         } else {
             this.drawString(this.fontRendererObj, s, 5, height - 40, 8421504);
         }

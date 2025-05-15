@@ -9,7 +9,7 @@ import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import java.util.Random;
 
 public class BiomeGenMutated extends BiomeGenBase {
-    protected BiomeGenBase baseBiome;
+    protected final BiomeGenBase baseBiome;
 
     public BiomeGenMutated(int id, BiomeGenBase biome) {
         super(id);

@@ -141,8 +141,8 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
     public boolean displayListEntitiesDirty = true;
     private final CloudRenderer cloudRenderer;
     public Entity renderedEntity;
-    public Set chunksToResortTransparency = new LinkedHashSet();
-    public Set chunksToUpdateForced = new LinkedHashSet();
+    public final Set chunksToResortTransparency = new LinkedHashSet();
+    public final Set chunksToUpdateForced = new LinkedHashSet();
     private final Deque visibilityDeque = new ArrayDeque();
     private List renderInfosEntities = new ArrayList(1024);
     private List renderInfosTileEntities = new ArrayList(1024);
@@ -217,7 +217,7 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
                 this.entityOutlineShader.createBindFramebuffers(this.mc.displayWidth, this.mc.displayHeight);
                 this.entityOutlineFramebuffer = this.entityOutlineShader.getFramebufferRaw("final");
             } catch (IOException | JsonSyntaxException ioexception) {
-                logger.warn("Failed to load shader: " + resourcelocation, ioexception);
+                logger.warn("Failed to load shader: {}", resourcelocation, ioexception);
                 this.entityOutlineShader = null;
                 this.entityOutlineFramebuffer = null;
             }
@@ -1152,7 +1152,7 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
         return new Vector3f(f3 * f4, f5, f2 * f4);
     }
 
-    public int renderBlockLayer(EnumWorldBlockLayer blockLayerIn, double partialTicks, int pass, Entity entityIn) {
+    public void renderBlockLayer(EnumWorldBlockLayer blockLayerIn, double partialTicks, int pass, Entity entityIn) {
         RenderHelper.disableStandardItemLighting();
 
         if (blockLayerIn == EnumWorldBlockLayer.TRANSLUCENT && !Shaders.isShadowPass) {
@@ -1194,19 +1194,15 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
             }
         }
 
-        if (l == 0) {
-            this.mc.mcProfiler.endSection();
-            return l;
-        } else {
+        if (l != 0) {
             if (Config.isFogOff() && this.mc.entityRenderer.fogStandard) {
                 GlStateManager.disableFog();
             }
 
             this.mc.mcProfiler.endStartSection("render_" + blockLayerIn);
             this.renderBlockLayer(blockLayerIn);
-            this.mc.mcProfiler.endSection();
-            return l;
         }
+        this.mc.mcProfiler.endSection();
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -2792,7 +2788,7 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
 
     private void clearRenderInfos() {
         if (renderEntitiesCounter > 0) {
-            this.renderInfos = new ArrayList(this.renderInfos.size() + 16);
+            this.renderInfos = new ArrayList<>(this.renderInfos.size() + 16);
             this.renderInfosEntities = new ArrayList(this.renderInfosEntities.size() + 16);
             this.renderInfosTileEntities = new ArrayList(this.renderInfosTileEntities.size() + 16);
         } else {
@@ -2810,15 +2806,11 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
     }
 
     public void pauseChunkUpdates() {
-        if (this.renderDispatcher != null) {
-            this.renderDispatcher.pauseChunkUpdates();
-        }
+        this.renderDispatcher.pauseChunkUpdates();
     }
 
     public void resumeChunkUpdates() {
-        if (this.renderDispatcher != null) {
-            this.renderDispatcher.resumeChunkUpdates();
-        }
+        this.renderDispatcher.resumeChunkUpdates();
     }
 
     public void updateTileEntities(Collection<TileEntity> tileEntitiesToRemove, Collection<TileEntity> tileEntitiesToAdd) {

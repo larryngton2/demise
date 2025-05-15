@@ -32,7 +32,7 @@ public class GuiQualitySettingsOF extends GuiScreen {
             }
         }
 
-        this.buttonList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168 + 11, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 - 100, (float) height / 6 + 168 + 11, I18n.format("gui.done")));
     }
 
     protected void actionPerformed(GuiButton guibutton) {
@@ -56,7 +56,7 @@ public class GuiQualitySettingsOF extends GuiScreen {
 
     public void drawScreen(int x, int y, float f) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.title, width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.title, (float) width / 2, 15, 16777215);
         super.drawScreen(x, y, f);
         this.tooltipManager.drawTooltips(x, y, this.buttonList);
     }

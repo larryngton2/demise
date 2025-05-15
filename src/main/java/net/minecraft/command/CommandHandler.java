@@ -86,13 +86,13 @@ public class CommandHandler implements ICommandManager {
             ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("commands.generic.exception");
             chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.RED);
             sender.addChatMessage(chatcomponenttranslation);
-            logger.warn("Couldn't process command: '" + input + "'");
+            logger.warn("Couldn't process command: '{}'", input);
         }
 
         return false;
     }
 
-    public ICommand registerCommand(ICommand command) {
+    public void registerCommand(ICommand command) {
         this.commandMap.put(command.getCommandName(), command);
         this.commandSet.add(command);
 
@@ -104,7 +104,6 @@ public class CommandHandler implements ICommandManager {
             }
         }
 
-        return command;
     }
 
     private static String[] dropFirstString(String[] input) {
@@ -128,12 +127,10 @@ public class CommandHandler implements ICommandManager {
 
             return list;
         } else {
-            if (astring.length > 1) {
-                ICommand icommand = this.commandMap.get(s);
+            ICommand icommand = this.commandMap.get(s);
 
-                if (icommand != null && icommand.canCommandSenderUseCommand(sender)) {
-                    return icommand.addTabCompletionOptions(sender, dropFirstString(astring), pos);
-                }
+            if (icommand != null && icommand.canCommandSenderUseCommand(sender)) {
+                return icommand.addTabCompletionOptions(sender, dropFirstString(astring), pos);
             }
 
             return null;
@@ -157,16 +154,14 @@ public class CommandHandler implements ICommandManager {
     }
 
     private int getUsernameIndex(ICommand command, String[] args) {
-        if (command == null) {
-            return -1;
-        } else {
+        if (command != null) {
             for (int i = 0; i < args.length; ++i) {
                 if (command.isUsernameIndex(args, i) && PlayerSelector.matchesMultiplePlayers(args[i])) {
                     return i;
                 }
             }
 
-            return -1;
         }
+        return -1;
     }
 }

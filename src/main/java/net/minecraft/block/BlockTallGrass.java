@@ -35,10 +35,6 @@ public class BlockTallGrass extends BlockBush implements IGrowable {
         return ColorizerGrass.getGrassColor(0.5D, 1.0D);
     }
 
-    public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state) {
-        return this.canPlaceBlockOn(worldIn.getBlockState(pos.down()).getBlock());
-    }
-
     public boolean isReplaceable(World worldIn, BlockPos pos) {
         return true;
     }

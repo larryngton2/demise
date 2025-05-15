@@ -114,7 +114,7 @@ public class BiomeGenForest extends BiomeGenBase {
                 DOUBLE_PLANT_GENERATOR.setPlantType(BlockDoublePlant.EnumPlantType.SYRINGA);
             } else if (l1 == 1) {
                 DOUBLE_PLANT_GENERATOR.setPlantType(BlockDoublePlant.EnumPlantType.ROSE);
-            } else if (l1 == 2) {
+            } else {
                 DOUBLE_PLANT_GENERATOR.setPlantType(BlockDoublePlant.EnumPlantType.PAEONIA);
             }
 

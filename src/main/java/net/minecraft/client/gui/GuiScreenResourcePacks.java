@@ -81,7 +81,7 @@ public class GuiScreenResourcePacks extends GuiScreen {
         return this.selectedResourcePacks;
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 2) {
                 File file1 = mc.getResourcePackRepository().getDirResourcepacks();
@@ -167,8 +167,8 @@ public class GuiScreenResourcePacks extends GuiScreen {
         MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
         this.availableResourcePacksList.drawScreen(mouseX, mouseY, partialTicks);
         this.selectedResourcePacksList.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.title"), width / 2, 16, 16777215);
-        drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.folderInfo"), width / 2 - 77, height - 26, 8421504);
+        drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.title"), (float) width / 2, 16, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.folderInfo"), (float) width / 2 - 77, height - 26, 8421504);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

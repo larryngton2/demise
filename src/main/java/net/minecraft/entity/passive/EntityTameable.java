@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import java.util.UUID;
 
 public abstract class EntityTameable extends EntityAnimal implements IEntityOwnable {
-    protected EntityAISit aiSit = new EntityAISit(this);
+    protected final EntityAISit aiSit = new EntityAISit(this);
 
     public EntityTameable(World worldIn) {
         super(worldIn);
@@ -128,7 +128,7 @@ public abstract class EntityTameable extends EntityAnimal implements IEntityOwna
     public EntityLivingBase getOwner() {
         try {
             UUID uuid = UUID.fromString(this.getOwnerId());
-            return uuid == null ? null : this.worldObj.getPlayerEntityByUUID(uuid);
+            return this.worldObj.getPlayerEntityByUUID(uuid);
         } catch (IllegalArgumentException var2) {
             return null;
         }

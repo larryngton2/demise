@@ -79,8 +79,7 @@ public class ConnectedTextures {
                 return renderEnv.getArrayQuadsCtm(quad);
             } else {
                 EnumFacing enumfacing = quad.getFace();
-                BakedQuad[] abakedquad = getConnectedTextureMultiPass(blockAccess, blockState, blockPos, enumfacing, quad, renderEnv);
-                return abakedquad;
+                return getConnectedTextureMultiPass(blockAccess, blockState, blockPos, enumfacing, quad, renderEnv);
             }
         }
     }
@@ -151,8 +150,7 @@ public class ConnectedTextures {
             return renderEnv.getArrayQuadsCtm(quadIn);
         } else {
             BakedQuad bakedquad = getQuad(sprite, quadIn);
-            BakedQuad[] abakedquad = renderEnv.getArrayQuadsCtm(bakedquad);
-            return abakedquad;
+            return renderEnv.getArrayQuadsCtm(bakedquad);
         }
     }
 
@@ -223,8 +221,7 @@ public class ConnectedTextures {
             fixVertex(aint, i, textureatlassprite, sprite);
         }
 
-        BakedQuad bakedquad = new BakedQuad(aint, quad.getTintIndex(), quad.getFace(), sprite);
-        return bakedquad;
+        return new BakedQuad(aint, quad.getTintIndex(), quad.getFace(), sprite);
     }
 
     private static void fixVertex(int[] data, int vertex, TextureAtlasSprite spriteFrom, TextureAtlasSprite spriteTo) {
@@ -249,8 +246,7 @@ public class ConnectedTextures {
             List<BakedQuad> list = renderEnv.getListQuadsCtmMultipass(abakedquad);
 
             for (int i = 0; i < list.size(); ++i) {
-                BakedQuad bakedquad = list.get(i);
-                BakedQuad bakedquad1 = bakedquad;
+                BakedQuad bakedquad1 = list.get(i);
 
                 for (int j = 0; j < 3; ++j) {
                     BakedQuad[] abakedquad1 = getConnectedTextureSingle(blockAccess, blockState, blockPos, side, bakedquad1, false, j + 1, renderEnv);
@@ -485,9 +481,9 @@ public class ConnectedTextures {
             case 2 -> switch (side) {
                 case 0 -> 4;
                 case 1 -> 5;
-                default -> side;
                 case 4 -> 1;
                 case 5 -> 0;
+                default -> side;
             };
             default -> side;
         };
@@ -1193,19 +1189,19 @@ public class ConnectedTextures {
                 i = 18;
             } else if (i == 14 && !aboolean[0] && aboolean[1]) {
                 i = 31;
-            } else if (i == 25 && aboolean[0] && !aboolean[2]) {
+            } else if (i == 25 && aboolean[0]) {
                 i = 30;
             } else if (i == 27 && !aboolean[3] && aboolean[1]) {
                 i = 41;
-            } else if (i == 38 && aboolean[3] && !aboolean[2]) {
+            } else if (i == 38 && aboolean[3]) {
                 i = 40;
-            } else if (i == 14 && aboolean[0] && !aboolean[1]) {
+            } else if (i == 14 && aboolean[0]) {
                 i = 29;
-            } else if (i == 25 && !aboolean[0] && aboolean[2]) {
+            } else if (i == 25 && aboolean[2]) {
                 i = 28;
-            } else if (i == 27 && aboolean[3] && !aboolean[1]) {
+            } else if (i == 27 && aboolean[3]) {
                 i = 43;
-            } else if (i == 38 && !aboolean[3] && aboolean[2]) {
+            } else if (i == 38 && aboolean[2]) {
                 i = 42;
             } else if (i == 26 && aboolean[0] && aboolean[1] && aboolean[2] && aboolean[3]) {
                 i = 46;
@@ -1215,27 +1211,27 @@ public class ConnectedTextures {
                 i = 21;
             } else if (i == 26 && aboolean[0] && aboolean[1] && !aboolean[2] && aboolean[3]) {
                 i = 8;
-            } else if (i == 26 && aboolean[0] && aboolean[1] && aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && aboolean[0] && aboolean[1] && aboolean[2]) {
                 i = 20;
-            } else if (i == 26 && aboolean[0] && aboolean[1] && !aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && aboolean[0] && aboolean[1]) {
                 i = 11;
             } else if (i == 26 && !aboolean[0] && !aboolean[1] && aboolean[2] && aboolean[3]) {
                 i = 22;
             } else if (i == 26 && !aboolean[0] && aboolean[1] && !aboolean[2] && aboolean[3]) {
                 i = 23;
-            } else if (i == 26 && aboolean[0] && !aboolean[1] && aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && aboolean[0] && aboolean[2]) {
                 i = 10;
-            } else if (i == 26 && aboolean[0] && !aboolean[1] && !aboolean[2] && aboolean[3]) {
+            } else if (i == 26 && aboolean[0] && aboolean[3]) {
                 i = 34;
-            } else if (i == 26 && !aboolean[0] && aboolean[1] && aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && !aboolean[0] && aboolean[1] && aboolean[2]) {
                 i = 35;
-            } else if (i == 26 && aboolean[0] && !aboolean[1] && !aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && aboolean[0]) {
                 i = 32;
-            } else if (i == 26 && !aboolean[0] && aboolean[1] && !aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && aboolean[1]) {
                 i = 33;
-            } else if (i == 26 && !aboolean[0] && !aboolean[1] && aboolean[2] && !aboolean[3]) {
+            } else if (i == 26 && aboolean[2]) {
                 i = 44;
-            } else if (i == 26 && !aboolean[0] && !aboolean[1] && !aboolean[2] && aboolean[3]) {
+            } else if (i == 26 && aboolean[3]) {
                 i = 45;
             }
 
@@ -1366,9 +1362,7 @@ public class ConnectedTextures {
                 } else {
                     List list1 = ibakedmodel.getGeneralQuads();
 
-                    if (list1 == null) {
-                        return null;
-                    } else {
+                    if (list1 != null) {
                         for (Object o : list1) {
                             BakedQuad bakedquad = (BakedQuad) o;
 
@@ -1377,8 +1371,8 @@ public class ConnectedTextures {
                             }
                         }
 
-                        return null;
                     }
+                    return null;
                 }
             }
         }
@@ -1488,7 +1482,7 @@ public class ConnectedTextures {
                         flag = isNeighbour(cp, blockAccess, blockState, blockPos.north(), side, icon, metadata);
                         yield isNeighbour(cp, blockAccess, blockState, blockPos.south(), side, icon, metadata);
                     }
-                    default -> flag1;
+                    default -> false;
                 };
         }
 
@@ -1848,7 +1842,6 @@ public class ConnectedTextures {
             }
         }
 
-        String[] astring1 = (String[]) list.toArray(new String[0]);
-        return astring1;
+        return (String[]) list.toArray(new String[0]);
     }
 }

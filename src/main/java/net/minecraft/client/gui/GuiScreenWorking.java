@@ -46,8 +46,8 @@ public class GuiScreenWorking extends GuiScreen implements IProgressUpdate {
             }
 
             if (this.progress > 0) {
-                drawCenteredString(this.fontRendererObj, this.field_146591_a, width / 2, 70, 16777215);
-                drawCenteredString(this.fontRendererObj, this.field_146589_f + " " + this.progress + "%", width / 2, 90, 16777215);
+                drawCenteredString(this.fontRendererObj, this.field_146591_a, (float) width / 2, 70, 16777215);
+                drawCenteredString(this.fontRendererObj, this.field_146589_f + " " + this.progress + "%", (float) width / 2, 90, 16777215);
             }
 
             super.drawScreen(mouseX, mouseY, partialTicks);

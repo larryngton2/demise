@@ -81,7 +81,7 @@ public class BlockSilverfish extends Block {
     }
 
     public enum EnumType implements IStringSerializable {
-        STONE(0, "stone") {
+        STONE() {
             public IBlockState getModelBlock() {
                 return Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.STONE);
             }
@@ -117,8 +117,8 @@ public class BlockSilverfish extends Block {
         private final String name;
         private final String unlocalizedName;
 
-        EnumType(int meta, String name) {
-            this(meta, name, name);
+        EnumType() {
+            this(0, "stone", "stone");
         }
 
         EnumType(int meta, String name, String unlocalizedName) {

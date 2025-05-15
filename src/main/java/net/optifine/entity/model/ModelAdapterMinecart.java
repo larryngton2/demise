@@ -15,8 +15,8 @@ public class ModelAdapterMinecart extends ModelAdapter {
         super(EntityMinecart.class, "minecart", 0.5F);
     }
 
-    protected ModelAdapterMinecart(Class entityClass, String name, float shadow) {
-        super(entityClass, name, shadow);
+    protected ModelAdapterMinecart(Class entityClass, String name) {
+        super(entityClass, name, (float) 0.5);
     }
 
     public ModelBase makeModel() {

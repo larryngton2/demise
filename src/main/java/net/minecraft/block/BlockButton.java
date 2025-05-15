@@ -244,8 +244,8 @@ public abstract class BlockButton extends Block {
             case WEST -> 2;
             case SOUTH -> 3;
             case NORTH -> 4;
-            default -> 5;
             case DOWN -> 0;
+            default -> 5;
         };
 
         if (state.getValue(POWERED)) {

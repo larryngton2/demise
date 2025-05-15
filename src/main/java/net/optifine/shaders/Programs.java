@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Programs {
-    private final List<Program> programs = new ArrayList();
-    private final Program programNone = this.make("", ProgramStage.NONE, true);
+    private final List<Program> programs = new ArrayList<>();
+    private final Program programNone = this.make("");
 
     public Program make(String name, ProgramStage programStage, Program backupProgram) {
         int i = this.programs.size();
@@ -14,9 +14,9 @@ public class Programs {
         return program;
     }
 
-    private Program make(String name, ProgramStage programStage, boolean ownBackup) {
+    private Program make(String name) {
         int i = this.programs.size();
-        Program program = new Program(i, name, programStage, ownBackup);
+        Program program = new Program(i, name, ProgramStage.NONE, true);
         this.programs.add(program);
         return program;
     }
@@ -38,7 +38,7 @@ public class Programs {
     }
 
     public Program makeVirtual(String name) {
-        return this.make(name, ProgramStage.NONE, true);
+        return this.make(name);
     }
 
     public Program[] makeComposites(String prefix, int count) {
@@ -72,9 +72,7 @@ public class Programs {
     }
 
     public Program getProgram(String name) {
-        if (name == null) {
-            return null;
-        } else {
+        if (name != null) {
             for (Program program : this.programs) {
                 String s = program.getName();
 
@@ -83,8 +81,8 @@ public class Programs {
                 }
             }
 
-            return null;
         }
+        return null;
     }
 
     public String[] getProgramNames() {
@@ -98,8 +96,7 @@ public class Programs {
     }
 
     public Program[] getPrograms() {
-        Program[] aprogram = this.programs.toArray(new Program[0]);
-        return aprogram;
+        return this.programs.toArray(new Program[0]);
     }
 
     public Program[] getPrograms(Program programFrom, Program programTo) {

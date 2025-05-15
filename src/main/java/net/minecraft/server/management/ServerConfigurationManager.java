@@ -60,7 +60,7 @@ public abstract class ServerConfigurationManager {
     private final Map<UUID, StatisticsFile> playerStatFiles;
     private IPlayerFileData playerNBTManagerObj;
     private boolean whiteListEnforced;
-    protected int maxPlayers;
+    protected final int maxPlayers;
     private int viewDistance;
     private WorldSettings.GameType gameType;
     private boolean commandsAllowedForAll;
@@ -93,7 +93,7 @@ public abstract class ServerConfigurationManager {
             s1 = netManager.getRemoteAddress().toString();
         }
 
-        logger.info(playerIn.getName() + "[" + s1 + "] logged in with entity id " + playerIn.getEntityId() + " at (" + playerIn.posX + ", " + playerIn.posY + ", " + playerIn.posZ + ")");
+        logger.info("{}[{}] logged in with entity id {} at ({}, {}, {})", playerIn.getName(), s1, playerIn.getEntityId(), playerIn.posX, playerIn.posY, playerIn.posZ);
         WorldServer worldserver = this.mcServer.worldServerForDimension(playerIn.dimension);
         WorldInfo worldinfo = worldserver.getWorldInfo();
         BlockPos blockpos = worldserver.getSpawnPoint();
@@ -522,22 +522,22 @@ public abstract class ServerConfigurationManager {
     }
 
     public String func_181058_b(boolean p_181058_1_) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         List<EntityPlayerMP> list = Lists.newArrayList(this.playerEntityList);
 
         for (int i = 0; i < list.size(); ++i) {
             if (i > 0) {
-                s = s + ", ";
+                s.append(", ");
             }
 
-            s = s + list.get(i).getName();
+            s.append(list.get(i).getName());
 
             if (p_181058_1_) {
-                s = s + " (" + list.get(i).getUniqueID().toString() + ")";
+                s.append(" (").append(list.get(i).getUniqueID().toString()).append(")");
             }
         }
 
-        return s;
+        return s.toString();
     }
 
     public String[] getAllUsernames() {

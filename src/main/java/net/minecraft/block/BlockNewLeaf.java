@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import com.google.common.base.Predicate;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;

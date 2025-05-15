@@ -25,7 +25,7 @@ public class C15PacketClientSettings implements Packet<INetHandlerPlayServer> {
         this.modelPartFlags = modelPartFlagsIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.lang = buf.readStringFromBuffer(7);
         this.view = buf.readByte();
         this.chatVisibility = EntityPlayer.EnumChatVisibility.getEnumChatVisibility(buf.readByte());
@@ -33,7 +33,7 @@ public class C15PacketClientSettings implements Packet<INetHandlerPlayServer> {
         this.modelPartFlags = buf.readUnsignedByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeString(this.lang);
         buf.writeByte(this.view);
         buf.writeByte(this.chatVisibility.getChatVisibility());

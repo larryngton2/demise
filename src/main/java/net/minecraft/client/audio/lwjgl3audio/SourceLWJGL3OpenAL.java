@@ -358,7 +358,7 @@ public class SourceLWJGL3OpenAL extends Source {
             return false;
         } else {
             this.codec.initialize(this.filenameURL.getURL());
-            LinkedList<byte[]> preLoadBuffers = new LinkedList();
+            LinkedList<byte[]> preLoadBuffers = new LinkedList<>();
 
             for (int i = 0; i < SoundSystemConfig.getNumberStreamingBuffers(); ++i) {
                 this.soundBuffer = this.codec.read();
@@ -417,33 +417,29 @@ public class SourceLWJGL3OpenAL extends Source {
 
     }
 
-    private boolean checkALError() {
-        return switch (AL10.alGetError()) {
-            case 0 -> false;
+    private void checkALError() {
+        AL10.alGetError();
+        switch (AL10.alGetError()) {
+            case 0 -> {
+            }
             case 40961 -> {
                 this.errorMessage("Invalid name parameter.");
-                yield true;
             }
             case 40962 -> {
                 this.errorMessage("Invalid parameter.");
-                yield true;
             }
             case 40963 -> {
                 this.errorMessage("Invalid enumerated parameter value.");
-                yield true;
             }
             case 40964 -> {
                 this.errorMessage("Illegal call.");
-                yield true;
             }
             case 40965 -> {
                 this.errorMessage("Unable to allocate memory.");
-                yield true;
             }
             default -> {
                 this.errorMessage("An unrecognized error occurred.");
-                yield true;
             }
-        };
+        }
     }
 }

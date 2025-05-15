@@ -57,9 +57,7 @@ public class WorldGenIceSpike extends WorldGenerator {
 
             int k1 = j - 1;
 
-            if (k1 < 0) {
-                k1 = 0;
-            } else if (k1 > 1) {
+            if (k1 > 1) {
                 k1 = 1;
             }
 

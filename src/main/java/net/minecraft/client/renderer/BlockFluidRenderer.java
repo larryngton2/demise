@@ -241,8 +241,7 @@ public class BlockFluidRenderer {
                 }
 
                 worldRendererIn.setSprite(null);
-                boolean flag3 = flag2;
-                return flag3;
+                return flag2;
             }
 
             flag2 = false;
@@ -252,7 +251,7 @@ public class BlockFluidRenderer {
             }
         }
 
-        return flag2;
+        return false;
     }
 
     private float getFluidHeight(IBlockAccess blockAccess, BlockPos blockPosIn, Material blockMaterial) {

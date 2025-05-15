@@ -50,7 +50,7 @@ public class PotionEffect {
         } else if (other.amplifier == this.amplifier && this.duration < other.duration) {
             this.duration = other.duration;
         } else if (!other.isAmbient && this.isAmbient) {
-            this.isAmbient = other.isAmbient;
+            this.isAmbient = false;
         }
 
         this.showParticles = other.showParticles;
@@ -92,8 +92,8 @@ public class PotionEffect {
         return this.duration > 0;
     }
 
-    private int deincrementDuration() {
-        return --this.duration;
+    private void deincrementDuration() {
+        --this.duration;
     }
 
     public void performEffect(EntityLivingBase entityIn) {

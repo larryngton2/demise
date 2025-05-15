@@ -19,17 +19,17 @@ public class GuiDisconnected extends GuiScreen {
         this.message = chatComp;
     }
 
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) {
     }
 
     public void initGui() {
         this.buttonList.clear();
         this.multilineMessage = this.fontRendererObj.listFormattedStringToWidth(this.message.getFormattedText(), width - 50);
         this.field_175353_i = this.multilineMessage.size() * this.fontRendererObj.FONT_HEIGHT;
-        this.buttonList.add(new GuiButton(0, width / 2 - 100, height / 2 + this.field_175353_i / 2 + this.fontRendererObj.FONT_HEIGHT, I18n.format("gui.toMenu")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 - 100, (float) height / 2 + (float) this.field_175353_i / 2 + this.fontRendererObj.FONT_HEIGHT, I18n.format("gui.toMenu")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.id == 0) {
             mc.displayGuiScreen(this.parentScreen);
         }
@@ -37,12 +37,12 @@ public class GuiDisconnected extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.reason, width / 2, height / 2 - this.field_175353_i / 2 - this.fontRendererObj.FONT_HEIGHT * 2, 11184810);
+        drawCenteredString(this.fontRendererObj, this.reason, (float) width / 2, (float) height / 2 - (float) this.field_175353_i / 2 - this.fontRendererObj.FONT_HEIGHT * 2, 11184810);
         int i = height / 2 - this.field_175353_i / 2;
 
         if (this.multilineMessage != null) {
             for (String s : this.multilineMessage) {
-                drawCenteredString(this.fontRendererObj, s, width / 2, i, 16777215);
+                drawCenteredString(this.fontRendererObj, s, (float) width / 2, i, 16777215);
                 i += this.fontRendererObj.FONT_HEIGHT;
             }
         }

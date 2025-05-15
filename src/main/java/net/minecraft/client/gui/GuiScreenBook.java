@@ -84,12 +84,12 @@ public class GuiScreenBook extends GuiScreen {
         Keyboard.enableRepeatEvents(true);
 
         if (this.bookIsUnsigned) {
-            this.buttonList.add(this.buttonSign = new GuiButton(3, width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.signButton")));
-            this.buttonList.add(this.buttonDone = new GuiButton(0, width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.done")));
-            this.buttonList.add(this.buttonFinalize = new GuiButton(5, width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.finalizeButton")));
-            this.buttonList.add(this.buttonCancel = new GuiButton(4, width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.cancel")));
+            this.buttonList.add(this.buttonSign = new GuiButton(3, (float) width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.signButton")));
+            this.buttonList.add(this.buttonDone = new GuiButton(0, (float) width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.done")));
+            this.buttonList.add(this.buttonFinalize = new GuiButton(5, (float) width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.finalizeButton")));
+            this.buttonList.add(this.buttonCancel = new GuiButton(4, (float) width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.cancel")));
         } else {
-            this.buttonList.add(this.buttonDone = new GuiButton(0, width / 2 - 100, 4 + this.bookImageHeight, 200, 20, I18n.format("gui.done")));
+            this.buttonList.add(this.buttonDone = new GuiButton(0, (float) width / 2 - 100, 4 + this.bookImageHeight, 200, 20, I18n.format("gui.done")));
         }
 
         int i = (width - this.bookImageWidth) / 2;
@@ -116,7 +116,7 @@ public class GuiScreenBook extends GuiScreen {
         }
     }
 
-    private void sendBookToServer(boolean publish) throws IOException {
+    private void sendBookToServer(boolean publish) {
         if (this.bookIsUnsigned && this.bookIsModified) {
             if (this.bookPages != null) {
                 while (this.bookPages.tagCount() > 1) {
@@ -400,7 +400,7 @@ public class GuiScreenBook extends GuiScreen {
                     this.updateButtons();
                     return true;
                 }
-            } catch (Throwable var5) {
+            } catch (Throwable ignored) {
             }
 
             return false;
@@ -443,10 +443,8 @@ public class GuiScreenBook extends GuiScreen {
                         }
                     }
 
-                    return null;
-                } else {
-                    return null;
                 }
+                return null;
             } else {
                 return null;
             }

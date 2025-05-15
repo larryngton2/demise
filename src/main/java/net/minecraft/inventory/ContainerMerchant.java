@@ -51,9 +51,6 @@ public class ContainerMerchant extends Container {
         this.merchantInventory.setCurrentRecipeIndex(currentRecipeIndex);
     }
 
-    public void updateProgressBar(int id, int data) {
-    }
-
     public boolean canInteractWith(EntityPlayer playerIn) {
         return this.theMerchant.getCustomer() == playerIn;
     }
@@ -73,11 +70,11 @@ public class ContainerMerchant extends Container {
 
                 slot.onSlotChange(itemstack1, itemstack);
             } else if (index != 0 && index != 1) {
-                if (index >= 3 && index < 30) {
+                if (index < 30) {
                     if (!this.mergeItemStack(itemstack1, 30, 39, false)) {
                         return null;
                     }
-                } else if (index >= 30 && index < 39 && !this.mergeItemStack(itemstack1, 3, 30, false)) {
+                } else if (index < 39 && !this.mergeItemStack(itemstack1, 3, 30, false)) {
                     return null;
                 }
             } else if (!this.mergeItemStack(itemstack1, 3, 39, false)) {

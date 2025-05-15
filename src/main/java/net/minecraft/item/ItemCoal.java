@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ItemCoal extends Item {
     public ItemCoal() {
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
         this.setMaxDamage(0);
         this.setCreativeTab(CreativeTabs.tabMaterials);
     }

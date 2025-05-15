@@ -192,15 +192,13 @@ public class GuiEnchantment extends GuiContainer {
             if (this.isPointInRegion(60, 14 + 19 * j, 108, 17, mouseX, mouseY) && k > 0 && l >= 0) {
                 List<String> list = Lists.newArrayList();
 
-                if (l >= 0 && Enchantment.getEnchantmentById(l & 255) != null) {
+                if (Enchantment.getEnchantmentById(l & 255) != null) {
                     String s = Enchantment.getEnchantmentById(l & 255).getTranslatedName((l & 65280) >> 8);
                     list.add(EnumChatFormatting.WHITE.toString() + EnumChatFormatting.ITALIC + I18n.format("container.enchant.clue", s));
                 }
 
                 if (!flag) {
-                    if (l >= 0) {
-                        list.add("");
-                    }
+                    list.add("");
 
                     if (mc.thePlayer.experienceLevel < k) {
                         list.add(EnumChatFormatting.RED + "Level Requirement: " + this.container.enchantLevels[j]);
@@ -241,13 +239,10 @@ public class GuiEnchantment extends GuiContainer {
         if (!ItemStack.areItemStacksEqual(itemstack, this.field_147077_B)) {
             this.field_147077_B = itemstack;
 
-            while (true) {
+            do {
                 this.field_147082_x += (float) (this.random.nextInt(4) - this.random.nextInt(4));
 
-                if (this.field_147071_v > this.field_147082_x + 1.0F || this.field_147071_v < this.field_147082_x - 1.0F) {
-                    break;
-                }
-            }
+            } while (!(this.field_147071_v > this.field_147082_x + 1.0F) && !(this.field_147071_v < this.field_147082_x - 1.0F));
         }
 
         ++this.field_147073_u;

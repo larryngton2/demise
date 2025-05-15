@@ -38,25 +38,25 @@ public class GuiNewChat extends Gui {
 
     public void drawChat(int updateCounter) {
         if (this.mc.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN) {
-            int i = this.getLineCount();
+            int i = getLineCount();
             boolean flag = false;
             int j = 0;
-            int k = this.drawnChatLines.size();
+            int k = drawnChatLines.size();
             float f = this.mc.gameSettings.chatOpacity * 0.9F + 0.1F;
 
             if (k > 0) {
-                if (this.getChatOpen()) {
+                if (getChatOpen()) {
                     flag = true;
                 }
 
-                float f1 = this.getChatScale();
-                int l = MathHelper.ceiling_float_int((float) this.getChatWidth() / f1);
+                float f1 = getChatScale();
+                int l = MathHelper.ceiling_float_int((float) getChatWidth() / f1);
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(2.0F, 20.0F, 0.0F);
                 GlStateManager.scale(f1, f1, 1.0F);
 
-                for (int i1 = 0; i1 + this.scrollPos < this.drawnChatLines.size() && i1 < i; ++i1) {
-                    ChatLine chatline = this.drawnChatLines.get(i1 + this.scrollPos);
+                for (int i1 = 0; i1 + scrollPos < drawnChatLines.size() && i1 < i; ++i1) {
+                    ChatLine chatline = drawnChatLines.get(i1 + scrollPos);
 
                     if (chatline != null) {
                         int j1 = updateCounter - chatline.getUpdatedCounter();
@@ -95,12 +95,12 @@ public class GuiNewChat extends Gui {
                     GlStateManager.translate(-3.0F, 0.0F, 0.0F);
                     int l2 = k * k2 + k;
                     int i3 = j * k2 + j;
-                    int j3 = this.scrollPos * i3 / k;
+                    int j3 = scrollPos * i3 / k;
                     int k1 = i3 * i3 / l2;
 
                     if (l2 != i3) {
                         int k3 = j3 > 0 ? 170 : 96;
-                        int l3 = this.isScrolled ? 13382451 : 3355562;
+                        int l3 = isScrolled ? 13382451 : 3355562;
                         drawRect(0, -j3, 2, -j3 - k1, l3 + (k3 << 24));
                         drawRect(2, -j3, 1, -j3 - k1, 13421772 + (k3 << 24));
                     }
@@ -160,7 +160,7 @@ public class GuiNewChat extends Gui {
 
     public void printChatMessageWithOptionalDeletion(IChatComponent chatComponent, int chatLineId) {
         this.setChatLine(chatComponent, chatLineId, GuiIngame.getUpdateCounter(), false);
-        logger.info("[CHAT] " + chatComponent.getUnformattedText());
+        logger.info("[CHAT] {}", chatComponent.getUnformattedText());
     }
 
     private void setChatLine(IChatComponent chatComponent, int chatLineId, int updateCounter, boolean displayOnly) {

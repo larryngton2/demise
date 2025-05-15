@@ -65,7 +65,7 @@ public class CustomGuiProperties {
         this.fileName = connectedparser.parseName(path);
         this.basePath = connectedparser.parseBasePath(path);
         this.container = (CustomGuiProperties.EnumContainer) connectedparser.parseEnum(props.getProperty("container"), CustomGuiProperties.EnumContainer.values(), "container");
-        this.textureLocations = parseTextureLocations(props, "texture", this.container, "textures/gui/", this.basePath);
+        this.textureLocations = parseTextureLocations(props, this.container, this.basePath);
         this.nbtName = connectedparser.parseNbtTagValue("name", props.getProperty("name"));
         this.biomes = connectedparser.parseBiomes(props.getProperty("biomes"));
         this.heights = connectedparser.parseRangeListInt(props.getProperty("heights"));
@@ -109,9 +109,7 @@ public class CustomGuiProperties {
     }
 
     private static EnumDyeColor parseEnumDyeColor(String str) {
-        if (str == null) {
-            return null;
-        } else {
+        if (str != null) {
             EnumDyeColor[] aenumdyecolor = EnumDyeColor.values();
 
             for (EnumDyeColor enumdyecolor : aenumdyecolor) {
@@ -124,8 +122,8 @@ public class CustomGuiProperties {
                 }
             }
 
-            return null;
         }
+        return null;
     }
 
     private static ResourceLocation parseTextureLocation(String str, String basePath) {
@@ -143,9 +141,9 @@ public class CustomGuiProperties {
         }
     }
 
-    private static Map<ResourceLocation, ResourceLocation> parseTextureLocations(Properties props, String property, CustomGuiProperties.EnumContainer container, String pathPrefix, String basePath) {
-        Map<ResourceLocation, ResourceLocation> map = new HashMap();
-        String s = props.getProperty(property);
+    private static Map<ResourceLocation, ResourceLocation> parseTextureLocations(Properties props, EnumContainer container, String basePath) {
+        Map<ResourceLocation, ResourceLocation> map = new HashMap<>();
+        String s = props.getProperty("texture");
 
         if (s != null) {
             ResourceLocation resourcelocation = getGuiTextureLocation(container);
@@ -156,7 +154,7 @@ public class CustomGuiProperties {
             }
         }
 
-        String s5 = property + ".";
+        String s5 = "texture" + ".";
 
         for (Object o : props.keySet()) {
             String s1 = (String) o;
@@ -164,7 +162,7 @@ public class CustomGuiProperties {
                 String s2 = s1.substring(s5.length());
                 s2 = s2.replace('\\', '/');
                 s2 = StrUtils.removePrefixSuffix(s2, "/", ".png");
-                String s3 = pathPrefix + s2 + ".png";
+                String s3 = "textures/gui/" + s2 + ".png";
                 String s4 = props.getProperty(s1);
                 ResourceLocation resourcelocation2 = new ResourceLocation(s3);
                 ResourceLocation resourcelocation3 = parseTextureLocation(s4, basePath);

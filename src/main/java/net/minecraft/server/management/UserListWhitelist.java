@@ -10,7 +10,7 @@ public class UserListWhitelist extends UserList<GameProfile, UserListWhitelistEn
         super(p_i1132_1_);
     }
 
-    protected UserListEntry<GameProfile> createEntry(JsonObject entryData) {
+    protected UserListEntry createEntry(JsonObject entryData) {
         return new UserListWhitelistEntry(entryData);
     }
 

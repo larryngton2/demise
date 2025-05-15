@@ -219,7 +219,7 @@ public class GuiChat extends GuiScreen {
         if (Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).chat.get()) {
             super.drawScreen(mouseX, mouseY, partialTicks);
         } else {
-            drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
+            drawRect(2, height - 14, width - 2, height - 2, Integer.MIN_VALUE);
         }
 
         Demise.INSTANCE.getEventManager().call(new ChatGUIEvent(mouseX, mouseY));

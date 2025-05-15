@@ -3,8 +3,8 @@ package net.minecraft.enchantment;
 import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentKnockback extends Enchantment {
-    protected EnchantmentKnockback(int p_i45768_1_, ResourceLocation p_i45768_2_, int p_i45768_3_) {
-        super(p_i45768_1_, p_i45768_2_, p_i45768_3_, EnumEnchantmentType.WEAPON);
+    protected EnchantmentKnockback(ResourceLocation p_i45768_2_) {
+        super(19, p_i45768_2_, 5, EnumEnchantmentType.WEAPON);
         this.setName("knockback");
     }
 

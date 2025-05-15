@@ -36,7 +36,7 @@ public class S42PacketCombatEvent implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.eventType = buf.readEnumValue(Event.class);
 
         if (this.eventType == S42PacketCombatEvent.Event.END_COMBAT) {
@@ -49,7 +49,7 @@ public class S42PacketCombatEvent implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeEnumValue(this.eventType);
 
         if (this.eventType == S42PacketCombatEvent.Event.END_COMBAT) {

@@ -11,7 +11,7 @@ public class HttpRequest {
     private String method = null;
     private String file = null;
     private String http = null;
-    private Map<String, String> headers = new LinkedHashMap();
+    private Map<String, String> headers = new LinkedHashMap<>();
     private byte[] body = null;
     private int redirects = 0;
     public static final String METHOD_GET = "GET";

@@ -7,9 +7,9 @@ import net.minecraft.entity.EntityLiving;
 import java.util.List;
 
 public class EntitySenses {
-    EntityLiving entityObj;
-    List<Entity> seenEntities = Lists.newArrayList();
-    List<Entity> unseenEntities = Lists.newArrayList();
+    final EntityLiving entityObj;
+    final List<Entity> seenEntities = Lists.newArrayList();
+    final List<Entity> unseenEntities = Lists.newArrayList();
 
     public EntitySenses(EntityLiving entityObjIn) {
         this.entityObj = entityObjIn;

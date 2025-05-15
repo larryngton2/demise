@@ -24,8 +24,8 @@ public class GuiControls extends GuiScreen {
 
     public void initGui() {
         this.keyBindingList = new GuiKeyBindingList(this, mc);
-        this.buttonList.add(new GuiButton(200, width / 2 - 155, height - 29, 150, 20, I18n.format("gui.done")));
-        this.buttonList.add(this.buttonReset = new GuiButton(201, width / 2 - 155 + 160, height - 29, 150, 20, I18n.format("controls.resetAll")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 - 155, height - 29, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.buttonReset = new GuiButton(201, (float) width / 2 - 155 + 160, height - 29, 150, 20, I18n.format("controls.resetAll")));
         this.screenTitle = I18n.format("controls.title");
         int i = 0;
 
@@ -45,7 +45,7 @@ public class GuiControls extends GuiScreen {
         this.keyBindingList.handleMouseInput();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.id == 200) {
             mc.displayGuiScreen(this.parentScreen);
         } else if (button.id == 201) {
@@ -97,7 +97,7 @@ public class GuiControls extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.keyBindingList.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, this.screenTitle, width / 2, 8, 16777215);
+        drawCenteredString(this.fontRendererObj, this.screenTitle, (float) width / 2, 8, 16777215);
         boolean flag = true;
 
         for (KeyBinding keybinding : this.options.keyBindings) {

@@ -9,7 +9,7 @@ import java.io.IOException;
 public class GuiSleepMP extends GuiChat {
     public void initGui() {
         super.initGui();
-        this.buttonList.add(new GuiButton(1, width / 2 - 100, height - 40, I18n.format("multiplayer.stopSleeping")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 100, height - 40, I18n.format("multiplayer.stopSleeping")));
     }
 
     protected void keyTyped(char typedChar, int keyCode) throws IOException {

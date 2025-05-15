@@ -29,7 +29,7 @@ public class C02PacketUseEntity implements Packet<INetHandlerPlayServer> {
         this.hitVec = hitVec;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readVarIntFromBuffer();
         this.action = buf.readEnumValue(Action.class);
 
@@ -38,7 +38,7 @@ public class C02PacketUseEntity implements Packet<INetHandlerPlayServer> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityId);
         buf.writeEnumValue(this.action);
 

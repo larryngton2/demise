@@ -33,8 +33,8 @@ public class GuiSnooper extends GuiScreen {
         this.field_146607_r = list.toArray(new String[0]);
         this.field_146604_g.clear();
         this.field_146609_h.clear();
-        this.buttonList.add(this.field_146605_t = new GuiButton(1, width / 2 - 152, height - 30, 150, 20, this.game_settings_2.getKeyBinding(GameSettings.Options.SNOOPER_ENABLED)));
-        this.buttonList.add(new GuiButton(2, width / 2 + 2, height - 30, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.field_146605_t = new GuiButton(1, (float) width / 2 - 152, height - 30, 150, 20, this.game_settings_2.getKeyBinding(GameSettings.Options.SNOOPER_ENABLED)));
+        this.buttonList.add(new GuiButton(2, (float) width / 2 + 2, height - 30, 150, 20, I18n.format("gui.done")));
         boolean flag = mc.getIntegratedServer() != null && mc.getIntegratedServer().getPlayerUsageSnooper() != null;
 
         for (Entry<String, String> entry : (new TreeMap<>(mc.getPlayerUsageSnooper().getCurrentStats())).entrySet()) {
@@ -57,7 +57,7 @@ public class GuiSnooper extends GuiScreen {
         this.field_146606_s.handleMouseInput();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 2) {
                 this.game_settings_2.saveOptions();
@@ -75,11 +75,11 @@ public class GuiSnooper extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.field_146606_s.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, this.field_146610_i, width / 2, 8, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_146610_i, (float) width / 2, 8, 16777215);
         int i = 22;
 
         for (String s : this.field_146607_r) {
-            drawCenteredString(this.fontRendererObj, s, width / 2, i, 8421504);
+            drawCenteredString(this.fontRendererObj, s, (float) width / 2, i, 8421504);
             i += this.fontRendererObj.FONT_HEIGHT;
         }
 

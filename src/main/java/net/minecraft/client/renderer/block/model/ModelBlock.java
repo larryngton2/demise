@@ -27,7 +27,7 @@ public class ModelBlock {
     public String name;
     protected final Map<String, String> textures;
     protected ModelBlock parent;
-    protected ResourceLocation parentLocation;
+    protected final ResourceLocation parentLocation;
 
     public static ModelBlock deserialize(Reader readerIn) {
         return SERIALIZER.fromJson(readerIn, ModelBlock.class);
@@ -41,8 +41,8 @@ public class ModelBlock {
         this(null, elementsIn, texturesIn, ambientOcclusionIn, gui3dIn, cameraTransformsIn);
     }
 
-    protected ModelBlock(ResourceLocation parentLocationIn, Map<String, String> texturesIn, boolean ambientOcclusionIn, boolean gui3dIn, ItemCameraTransforms cameraTransformsIn) {
-        this(parentLocationIn, Collections.emptyList(), texturesIn, ambientOcclusionIn, gui3dIn, cameraTransformsIn);
+    protected ModelBlock(ResourceLocation parentLocationIn, Map<String, String> texturesIn, boolean ambientOcclusionIn, ItemCameraTransforms cameraTransformsIn) {
+        this(parentLocationIn, Collections.emptyList(), texturesIn, ambientOcclusionIn, true, cameraTransformsIn);
     }
 
     private ModelBlock(ResourceLocation parentLocationIn, List<BlockPart> elementsIn, Map<String, String> texturesIn, boolean ambientOcclusionIn, boolean gui3dIn, ItemCameraTransforms cameraTransformsIn) {
@@ -96,7 +96,7 @@ public class ModelBlock {
     private String resolveTextureName(String textureName, ModelBlock.Bookkeep p_178302_2_) {
         if (this.startsWithHash(textureName)) {
             if (this == p_178302_2_.modelExt) {
-                LOGGER.warn("Unable to resolve texture due to upward reference: " + textureName + " in " + this.name);
+                LOGGER.warn("Unable to resolve texture due to upward reference: {} in {}", textureName, this.name);
                 return "missingno";
             } else {
                 String s = this.textures.get(textureName.substring(1));
@@ -154,7 +154,7 @@ public class ModelBlock {
                 }
 
                 throw new ModelBlock.LoopException();
-            } catch (NullPointerException var5) {
+            } catch (NullPointerException ignored) {
             }
         }
     }
@@ -190,7 +190,7 @@ public class ModelBlock {
                     itemcameratransforms = p_deserialize_3_.deserialize(jsonobject1, ItemCameraTransforms.class);
                 }
 
-                return flag1 ? new ModelBlock(new ResourceLocation(s), map, flag2, true, itemcameratransforms) : new ModelBlock(list, map, flag2, true, itemcameratransforms);
+                return flag1 ? new ModelBlock(new ResourceLocation(s), map, flag2, itemcameratransforms) : new ModelBlock(list, map, flag2, true, itemcameratransforms);
             }
         }
 

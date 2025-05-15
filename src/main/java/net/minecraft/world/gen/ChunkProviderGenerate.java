@@ -28,9 +28,9 @@ public class ChunkProviderGenerate implements IChunkProvider {
     private final NoiseGeneratorOctaves field_147432_k;
     private final NoiseGeneratorOctaves field_147429_l;
     private final NoiseGeneratorPerlin field_147430_m;
-    public NoiseGeneratorOctaves noiseGen5;
-    public NoiseGeneratorOctaves noiseGen6;
-    public NoiseGeneratorOctaves mobSpawnerNoise;
+    public final NoiseGeneratorOctaves noiseGen5;
+    public final NoiseGeneratorOctaves noiseGen6;
+    public final NoiseGeneratorOctaves mobSpawnerNoise;
     private final World worldObj;
     private final boolean mapFeaturesEnabled;
     private final WorldType field_177475_o;
@@ -83,7 +83,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
 
     public void setBlocksInChunk(int x, int z, ChunkPrimer primer) {
         this.biomesForGeneration = this.worldObj.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration, x * 4 - 2, z * 4 - 2, 10, 10);
-        this.func_147423_a(x * 4, 0, z * 4);
+        this.func_147423_a(x * 4, z * 4);
 
         for (int i = 0; i < 4; ++i) {
             int j = i * 5;
@@ -198,13 +198,13 @@ public class ChunkProviderGenerate implements IChunkProvider {
         return chunk;
     }
 
-    private void func_147423_a(int x, int y, int z) {
+    private void func_147423_a(int x, int z) {
         this.depthNoiseArray = this.noiseGen6.generateNoiseOctaves(this.depthNoiseArray, x, z, 5, 5, this.settings.depthNoiseScaleX, this.settings.depthNoiseScaleZ, this.settings.depthNoiseScaleExponent);
         float f = this.settings.coordinateScale;
         float f1 = this.settings.heightScale;
-        this.mainNoiseArray = this.field_147429_l.generateNoiseOctaves(this.mainNoiseArray, x, y, z, 5, 33, 5, f / this.settings.mainNoiseScaleX, f1 / this.settings.mainNoiseScaleY, f / this.settings.mainNoiseScaleZ);
-        this.lowerLimitNoiseArray = this.field_147431_j.generateNoiseOctaves(this.lowerLimitNoiseArray, x, y, z, 5, 33, 5, f, f1, f);
-        this.upperLimitNoiseArray = this.field_147432_k.generateNoiseOctaves(this.upperLimitNoiseArray, x, y, z, 5, 33, 5, f, f1, f);
+        this.mainNoiseArray = this.field_147429_l.generateNoiseOctaves(this.mainNoiseArray, x, 0, z, 5, 33, 5, f / this.settings.mainNoiseScaleX, f1 / this.settings.mainNoiseScaleY, f / this.settings.mainNoiseScaleZ);
+        this.lowerLimitNoiseArray = this.field_147431_j.generateNoiseOctaves(this.lowerLimitNoiseArray, x, 0, z, 5, 33, 5, f, f1, f);
+        this.upperLimitNoiseArray = this.field_147432_k.generateNoiseOctaves(this.upperLimitNoiseArray, x, 0, z, 5, 33, 5, f, f1, f);
         z = 0;
         x = 0;
         int i = 0;
@@ -396,8 +396,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
         return flag;
     }
 
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
-        return true;
+    public void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
     }
 
     public void saveExtraData() {
@@ -432,7 +431,7 @@ public class ChunkProviderGenerate implements IChunkProvider {
     }
 
     public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position) {
-        return "Stronghold".equals(structureName) && this.strongholdGenerator != null ? this.strongholdGenerator.getClosestStrongholdPos(worldIn, position) : null;
+        return "Stronghold".equals(structureName) ? this.strongholdGenerator.getClosestStrongholdPos(worldIn, position) : null;
     }
 
     public int getLoadedChunkCount() {

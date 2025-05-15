@@ -3,9 +3,7 @@ package net.minecraft.client.model;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
-import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.utils.player.PlayerUtils;
 
@@ -71,25 +69,19 @@ public class ModelBiped extends ModelBase {
             GlStateManager.pushMatrix();
             GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
             GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
-            this.bipedBody.render(scale);
-            this.bipedRightArm.render(scale);
-            this.bipedLeftArm.render(scale);
-            this.bipedRightLeg.render(scale);
-            this.bipedLeftLeg.render(scale);
-            this.bipedHeadwear.render(scale);
         } else {
             if (entityIn.isSneaking()) {
                 GlStateManager.translate(0.0F, 0.2F, 0.0F);
             }
 
             this.bipedHead.render(scale);
-            this.bipedBody.render(scale);
-            this.bipedRightArm.render(scale);
-            this.bipedLeftArm.render(scale);
-            this.bipedRightLeg.render(scale);
-            this.bipedLeftLeg.render(scale);
-            this.bipedHeadwear.render(scale);
         }
+        this.bipedBody.render(scale);
+        this.bipedRightArm.render(scale);
+        this.bipedLeftArm.render(scale);
+        this.bipedRightLeg.render(scale);
+        this.bipedLeftLeg.render(scale);
+        this.bipedHeadwear.render(scale);
 
         GlStateManager.popMatrix();
     }
@@ -106,8 +98,8 @@ public class ModelBiped extends ModelBase {
         this.bipedLeftLeg.rotateAngleY = 0.0F;
 
         if (this.isRiding) {
-            this.bipedRightArm.rotateAngleX += -((float) Math.PI / 5F);
-            this.bipedLeftArm.rotateAngleX += -((float) Math.PI / 5F);
+            this.bipedRightArm.rotateAngleX -= ((float) Math.PI / 5F);
+            this.bipedLeftArm.rotateAngleX -= ((float) Math.PI / 5F);
             this.bipedRightLeg.rotateAngleX = -((float) Math.PI * 2F / 5F);
             this.bipedLeftLeg.rotateAngleX = -((float) Math.PI * 2F / 5F);
             this.bipedRightLeg.rotateAngleY = ((float) Math.PI / 10F);

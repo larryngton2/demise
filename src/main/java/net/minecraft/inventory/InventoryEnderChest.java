@@ -26,7 +26,7 @@ public class InventoryEnderChest extends InventoryBasic {
             NBTTagCompound nbttagcompound = p_70486_1_.getCompoundTagAt(k);
             int j = nbttagcompound.getByte("Slot") & 255;
 
-            if (j >= 0 && j < this.getSizeInventory()) {
+            if (j < this.getSizeInventory()) {
                 this.setInventorySlotContents(j, ItemStack.loadItemStackFromNBT(nbttagcompound));
             }
         }

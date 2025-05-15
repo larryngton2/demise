@@ -172,9 +172,6 @@ public class Bootstrap {
                 return stack;
             }
 
-            protected void playDispenseSound(IBlockSource source) {
-                source.getWorld().playAuxSFX(1000, source.getBlockPos(), 0);
-            }
         });
         IBehaviorDispenseItem ibehaviordispenseitem = new BehaviorDefaultDispenseItem() {
             private final BehaviorDefaultDispenseItem field_150841_b = new BehaviorDefaultDispenseItem();

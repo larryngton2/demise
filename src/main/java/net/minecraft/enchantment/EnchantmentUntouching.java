@@ -5,8 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentUntouching extends Enchantment {
-    protected EnchantmentUntouching(int p_i45763_1_, ResourceLocation p_i45763_2_, int p_i45763_3_) {
-        super(p_i45763_1_, p_i45763_2_, p_i45763_3_, EnumEnchantmentType.DIGGER);
+    protected EnchantmentUntouching(ResourceLocation p_i45763_2_) {
+        super(33, p_i45763_2_, 1, EnumEnchantmentType.DIGGER);
         this.setName("untouching");
     }
 
@@ -16,10 +16,6 @@ public class EnchantmentUntouching extends Enchantment {
 
     public int getMaxEnchantability(int enchantmentLevel) {
         return super.getMinEnchantability(enchantmentLevel) + 50;
-    }
-
-    public int getMaxLevel() {
-        return 1;
     }
 
     public boolean canApplyTogether(Enchantment ench) {

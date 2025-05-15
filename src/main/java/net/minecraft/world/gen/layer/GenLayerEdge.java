@@ -11,9 +11,9 @@ public class GenLayerEdge extends GenLayer {
 
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight) {
         return switch (this.field_151627_c) {
-            default -> this.getIntsCoolWarm(areaX, areaY, areaWidth, areaHeight);
             case HEAT_ICE -> this.getIntsHeatIce(areaX, areaY, areaWidth, areaHeight);
             case SPECIAL -> this.getIntsSpecial(areaX, areaY, areaWidth, areaHeight);
+            default -> this.getIntsCoolWarm(areaX, areaY, areaWidth, areaHeight);
         };
     }
 

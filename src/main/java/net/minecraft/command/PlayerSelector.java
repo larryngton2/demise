@@ -206,7 +206,7 @@ public class PlayerSelector {
         List<Predicate<Entity>> list = Lists.newArrayList();
         final Map<String, Integer> map = func_96560_a(p_179657_0_);
 
-        if (map != null && !map.isEmpty()) {
+        if (!map.isEmpty()) {
             list.add(p_apply_1_ -> {
                 Scoreboard scoreboard = MinecraftServer.getServer().worldServerForDimension(0).getScoreboard();
 
@@ -472,9 +472,7 @@ public class PlayerSelector {
     private static Map<String, String> getArgumentMap(String argumentString) {
         Map<String, String> map = Maps.newHashMap();
 
-        if (argumentString == null) {
-            return map;
-        } else {
+        if (argumentString != null) {
             int i = 0;
             int j = -1;
 
@@ -500,7 +498,7 @@ public class PlayerSelector {
                 }
             }
 
-            return map;
         }
+        return map;
     }
 }

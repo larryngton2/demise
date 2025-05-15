@@ -23,14 +23,14 @@ public class S28PacketEffect implements Packet<INetHandlerPlayClient> {
         this.serverWide = serverWideIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.soundType = buf.readInt();
         this.soundPos = buf.readBlockPos();
         this.soundData = buf.readInt();
         this.serverWide = buf.readBoolean();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeInt(this.soundType);
         buf.writeBlockPos(this.soundPos);
         buf.writeInt(this.soundData);

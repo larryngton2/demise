@@ -9,9 +9,9 @@ import java.io.IOException;
 public interface IChunkLoader {
     Chunk loadChunk(World worldIn, int x, int z) throws IOException;
 
-    void saveChunk(World worldIn, Chunk chunkIn) throws MinecraftException, IOException;
+    void saveChunk(World worldIn, Chunk chunkIn) throws MinecraftException;
 
-    void saveExtraChunkData(World worldIn, Chunk chunkIn) throws IOException;
+    void saveExtraChunkData(World worldIn, Chunk chunkIn);
 
     void chunkTick();
 

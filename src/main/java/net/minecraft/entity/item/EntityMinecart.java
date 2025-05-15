@@ -72,10 +72,6 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
         return entityIn.canBePushed() ? entityIn.getEntityBoundingBox() : null;
     }
 
-    public AxisAlignedBB getCollisionBoundingBox() {
-        return null;
-    }
-
     public boolean canBePushed() {
         return true;
     }
@@ -501,15 +497,6 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable {
             this.motionY *= 0.0D;
             this.motionZ *= 0.9599999785423279D;
         }
-    }
-
-    public void setPosition(double x, double y, double z) {
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
-        float f = this.width / 2.0F;
-        float f1 = this.height;
-        this.setEntityBoundingBox(new AxisAlignedBB(x - (double) f, y, z - (double) f, x + (double) f, y + (double) f1, z + (double) f));
     }
 
     public Vec3 func_70495_a(double p_70495_1_, double p_70495_3_, double p_70495_5_, double p_70495_7_) {

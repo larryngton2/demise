@@ -157,7 +157,7 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
         }
     }
 
-    public boolean updateHopper() {
+    public void updateHopper() {
         if (this.worldObj != null && !this.worldObj.isRemote) {
             if (!this.isOnTransferCooldown() && BlockHopper.isEnabled(this.getBlockMetadata())) {
                 boolean flag = false;
@@ -173,13 +173,9 @@ public class TileEntityHopper extends TileEntityLockable implements IHopper, ITi
                 if (flag) {
                     this.setTransferCooldown(8);
                     this.markDirty();
-                    return true;
                 }
             }
 
-            return false;
-        } else {
-            return false;
         }
     }
 

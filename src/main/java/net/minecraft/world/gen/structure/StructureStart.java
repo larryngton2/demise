@@ -5,12 +5,11 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
 public abstract class StructureStart {
-    protected LinkedList<StructureComponent> components = new LinkedList();
+    protected final LinkedList<StructureComponent> components = new LinkedList<>();
     protected StructureBoundingBox boundingBox;
     private int chunkPosX;
     private int chunkPosZ;
@@ -84,8 +83,8 @@ public abstract class StructureStart {
     public void readFromNBT(NBTTagCompound tagCompound) {
     }
 
-    protected void markAvailableHeight(World worldIn, Random rand, int p_75067_3_) {
-        int i = worldIn.getSeaLevel() - p_75067_3_;
+    protected void markAvailableHeight(World worldIn, Random rand) {
+        int i = worldIn.getSeaLevel() - 10;
         int j = this.boundingBox.getYSize() + 1;
 
         if (j < i) {
@@ -100,14 +99,14 @@ public abstract class StructureStart {
         }
     }
 
-    protected void setRandomHeight(World worldIn, Random rand, int p_75070_3_, int p_75070_4_) {
-        int i = p_75070_4_ - p_75070_3_ + 1 - this.boundingBox.getYSize();
+    protected void setRandomHeight(World worldIn, Random rand) {
+        int i = 70 - 48 + 1 - this.boundingBox.getYSize();
         int j = 1;
 
         if (i > 1) {
-            j = p_75070_3_ + rand.nextInt(i);
+            j = 48 + rand.nextInt(i);
         } else {
-            j = p_75070_3_;
+            j = 48;
         }
 
         int k = j - this.boundingBox.minY;

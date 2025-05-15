@@ -31,7 +31,7 @@ public class SoundEngine extends Library {
     long device;
 
     public SoundEngine() throws SoundSystemException {
-        this.ALBufferMap = new HashMap();
+        this.ALBufferMap = new HashMap<>();
         this.reverseByteOrder = true;
     }
 
@@ -108,8 +108,7 @@ public class SoundEngine extends Library {
         if (AL10.alGetError() != 0) {
             return null;
         } else {
-            ChannelLWJGL3OpenAL channel = new ChannelLWJGL3OpenAL(type, ALSource);
-            return channel;
+            return new ChannelLWJGL3OpenAL(type, ALSource);
         }
     }
 
@@ -136,12 +135,12 @@ public class SoundEngine extends Library {
 
     public boolean loadSound(FilenameURL filenameURL) {
         if (this.bufferMap == null) {
-            this.bufferMap = new HashMap();
+            this.bufferMap = new HashMap<>();
             this.importantMessage("Buffer Map was null in method 'loadSound'");
         }
 
         if (this.ALBufferMap == null) {
-            this.ALBufferMap = new HashMap();
+            this.ALBufferMap = new HashMap<>();
             this.importantMessage("Open AL Buffer Map was null in method'loadSound'");
         }
 
@@ -204,7 +203,7 @@ public class SoundEngine extends Library {
                             return false;
                         } else {
                             AL10.alBufferData(intBuffer.get(0), soundFormat, BufferUtils.createByteBuffer(buffer.audioData.length).put(buffer.audioData).flip(), (int) audioFormat.getSampleRate());
-                            if (this.errorCheck(AL10.alGetError() != 0, "alBufferData error when loading " + filenameURL.getFilename()) && this.errorCheck(intBuffer == null, "Sound buffer was not created for " + filenameURL.getFilename())) {
+                            if (this.errorCheck(AL10.alGetError() != 0, "alBufferData error when loading " + filenameURL.getFilename()) && this.errorCheck(false, "Sound buffer was not created for " + filenameURL.getFilename())) {
                                 return false;
                             } else {
                                 this.ALBufferMap.put(filenameURL.getFilename(), intBuffer);
@@ -219,12 +218,12 @@ public class SoundEngine extends Library {
 
     public boolean loadSound(SoundBuffer buffer, String identifier) {
         if (this.bufferMap == null) {
-            this.bufferMap = new HashMap();
+            this.bufferMap = new HashMap<>();
             this.importantMessage("Buffer Map was null in method 'loadSound'");
         }
 
         if (this.ALBufferMap == null) {
-            this.ALBufferMap = new HashMap();
+            this.ALBufferMap = new HashMap<>();
             this.importantMessage("Open AL Buffer Map was null in method'loadSound'");
         }
 
@@ -273,7 +272,7 @@ public class SoundEngine extends Library {
                 return false;
             } else {
                 AL10.alBufferData(intBuffer.get(0), soundFormat, BufferUtils.createByteBuffer(buffer.audioData.length).put(buffer.audioData).flip(), (int) audioFormat.getSampleRate());
-                if (this.errorCheck(AL10.alGetError() != 0, "alBufferData error when saving " + identifier) && this.errorCheck(intBuffer == null, "Sound buffer was not created for " + identifier)) {
+                if (this.errorCheck(AL10.alGetError() != 0, "alBufferData error when saving " + identifier) && this.errorCheck(false, "Sound buffer was not created for " + identifier)) {
                     return false;
                 } else {
                     this.ALBufferMap.put(identifier, intBuffer);
@@ -376,12 +375,12 @@ public class SoundEngine extends Library {
             Set<String> keys = srcMap.keySet();
             Iterator<String> iter = keys.iterator();
             if (this.bufferMap == null) {
-                this.bufferMap = new HashMap();
+                this.bufferMap = new HashMap<>();
                 this.importantMessage("Buffer Map was null in method 'copySources'");
             }
 
             if (this.ALBufferMap == null) {
-                this.ALBufferMap = new HashMap();
+                this.ALBufferMap = new HashMap<>();
                 this.importantMessage("Open AL Buffer Map was null in method'copySources'");
             }
 

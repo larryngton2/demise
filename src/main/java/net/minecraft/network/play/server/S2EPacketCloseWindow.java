@@ -20,11 +20,11 @@ public class S2EPacketCloseWindow implements Packet<INetHandlerPlayClient> {
         handler.handleCloseWindow(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.windowId = buf.readUnsignedByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.windowId);
     }
 }

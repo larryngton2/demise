@@ -100,10 +100,6 @@ public class RealmsScreen {
     public static void bindFace(String p_bindFace_0_, String p_bindFace_1_) {
         ResourceLocation resourcelocation = AbstractClientPlayer.getLocationSkin(p_bindFace_1_);
 
-        if (resourcelocation == null) {
-            resourcelocation = DefaultPlayerSkin.getDefaultSkin(UUIDTypeAdapter.fromString(p_bindFace_0_));
-        }
-
         AbstractClientPlayer.getDownloadImageSkin(resourcelocation, p_bindFace_1_);
         Minecraft.getMinecraft().getTextureManager().bindTexture(resourcelocation);
     }

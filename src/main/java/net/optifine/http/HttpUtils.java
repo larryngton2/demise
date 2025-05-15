@@ -37,7 +37,7 @@ public class HttpUtils {
             byte[] abyte = new byte[httpurlconnection.getContentLength()];
             int i = 0;
 
-            while (true) {
+            do {
                 int j = inputstream.read(abyte, i, abyte.length - i);
 
                 if (j < 0) {
@@ -46,10 +46,7 @@ public class HttpUtils {
 
                 i += j;
 
-                if (i >= abyte.length) {
-                    break;
-                }
-            }
+            } while (i < abyte.length);
 
             abyte1 = abyte;
         } finally {
@@ -61,7 +58,7 @@ public class HttpUtils {
         return abyte1;
     }
 
-    public static String post(String urlStr, Map headers, byte[] content) throws IOException {
+    public static void post(String urlStr, Map headers, byte[] content) throws IOException {
         HttpURLConnection httpurlconnection = null;
         String s3;
 
@@ -106,7 +103,6 @@ public class HttpUtils {
             }
         }
 
-        return s3;
     }
 
     public static synchronized String getPlayerItemsUrl() {

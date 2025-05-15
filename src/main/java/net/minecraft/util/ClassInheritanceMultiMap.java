@@ -5,12 +5,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.optifine.util.IteratorCache;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
-    private static final Set<Class<?>> field_181158_a = Collections.<Class<?>>newSetFromMap(new ConcurrentHashMap());
+    private static final Set<Class<?>> field_181158_a = Collections.<Class<?>>newSetFromMap(new ConcurrentHashMap<>());
     private final Map<Class<?>, List<T>> map = Maps.newHashMap();
     private final Set<Class<?>> knownKeys = Sets.newIdentityHashSet();
     private final Class<T> baseClass;
@@ -112,7 +113,7 @@ public class ClassInheritanceMultiMap<T> extends AbstractSet<T> {
         };
     }
 
-    public Iterator<T> iterator() {
+    public @NotNull Iterator<T> iterator() {
         return (Iterator<T>) (this.values.isEmpty() ? Iterators.emptyIterator() : IteratorCache.getReadOnly(this.values));
     }
 

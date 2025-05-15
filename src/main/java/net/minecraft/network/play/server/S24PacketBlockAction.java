@@ -24,14 +24,14 @@ public class S24PacketBlockAction implements Packet<INetHandlerPlayClient> {
         this.block = blockIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.blockPosition = buf.readBlockPos();
         this.instrument = buf.readUnsignedByte();
         this.pitch = buf.readUnsignedByte();
         this.block = Block.getBlockById(buf.readVarIntFromBuffer() & 4095);
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeBlockPos(this.blockPosition);
         buf.writeByte(this.instrument);
         buf.writeByte(this.pitch);

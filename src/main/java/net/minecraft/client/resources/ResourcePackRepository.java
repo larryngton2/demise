@@ -48,7 +48,7 @@ public class ResourcePackRepository {
     private final ReentrantLock lock = new ReentrantLock();
     private ListenableFuture<Object> downloadingPacks;
     private List<ResourcePackRepository.Entry> repositoryEntriesAll = Lists.newArrayList();
-    public List<ResourcePackRepository.Entry> repositoryEntries = Lists.newArrayList();
+    public final List<ResourcePackRepository.Entry> repositoryEntries = Lists.newArrayList();
 
     public ResourcePackRepository(File dirResourcepacksIn, File dirServerResourcepacksIn, IResourcePack rprDefaultResourcePackIn, IMetadataSerializer rprMetadataSerializerIn, GameSettings settings) {
         this.dirResourcepacks = dirResourcepacksIn;
@@ -79,10 +79,10 @@ public class ResourcePackRepository {
     private void fixDirResourcepacks() {
         if (this.dirResourcepacks.exists()) {
             if (!this.dirResourcepacks.isDirectory() && (!this.dirResourcepacks.delete() || !this.dirResourcepacks.mkdirs())) {
-                logger.warn("Unable to recreate resourcepack folder, it exists but is not a directory: " + this.dirResourcepacks);
+                logger.warn("Unable to recreate resourcepack folder, it exists but is not a directory: {}", this.dirResourcepacks);
             }
         } else if (!this.dirResourcepacks.mkdirs()) {
-            logger.warn("Unable to create resourcepack folder: " + this.dirResourcepacks);
+            logger.warn("Unable to create resourcepack folder: {}", this.dirResourcepacks);
         }
     }
 
@@ -138,7 +138,7 @@ public class ResourcePackRepository {
         return this.dirResourcepacks;
     }
 
-    public ListenableFuture<Object> downloadResourcePack(String url, String hash) {
+    public ListenableFuture downloadResourcePack(String url, String hash) {
         String s;
 
         if (hash.matches("^[a-f0-9]{40}$")) {
@@ -158,15 +158,13 @@ public class ResourcePackRepository {
                     String s1 = Hashing.sha1().hashBytes(Files.toByteArray(file1)).toString();
 
                     if (s1.equals(hash)) {
-                        ListenableFuture listenablefuture2 = this.setResourcePackInstance(file1);
-                        ListenableFuture listenablefuture3 = listenablefuture2;
-                        return listenablefuture3;
+                        return this.setResourcePackInstance(file1);
                     }
 
-                    logger.warn("File " + file1 + " had wrong hash (expected " + hash + ", found " + s1 + "). Deleting it.");
+                    logger.warn("File {} had wrong hash (expected {}, found {}). Deleting it.", file1, hash, s1);
                     FileUtils.deleteQuietly(file1);
                 } catch (IOException ioexception) {
-                    logger.warn("File " + file1 + " couldn't be hashed. Deleting it.", ioexception);
+                    logger.warn("File {} couldn't be hashed. Deleting it.", file1, ioexception);
                     FileUtils.deleteQuietly(file1);
                 }
             }
@@ -188,9 +186,7 @@ public class ResourcePackRepository {
                     settablefuture.setException(p_onFailure_1_);
                 }
             });
-            ListenableFuture listenablefuture = this.downloadingPacks;
-            ListenableFuture listenablefuture11 = listenablefuture;
-            return listenablefuture11;
+            return this.downloadingPacks;
         } finally {
             this.lock.unlock();
         }
@@ -203,7 +199,7 @@ public class ResourcePackRepository {
 
         for (File file1 : list) {
             if (i++ >= 10) {
-                logger.info("Deleting old server resource pack " + file1.getName());
+                logger.info("Deleting old server resource pack {}", file1.getName());
                 FileUtils.deleteQuietly(file1);
             }
         }
@@ -254,7 +250,7 @@ public class ResourcePackRepository {
 
             try {
                 this.texturePackIcon = this.reResourcePack.getPackImage();
-            } catch (IOException var2) {
+            } catch (IOException ignored) {
             }
 
             if (this.texturePackIcon == null) {

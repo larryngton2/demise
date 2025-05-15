@@ -58,9 +58,9 @@ public class EntityZombie extends EntityMob {
         this.tasks.addTask(4, new EntityAIAttackOnCollide(this, EntityIronGolem.class, 1.0D, true));
         this.tasks.addTask(6, new EntityAIMoveThroughVillage(this, 1.0D, false));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, EntityPigZombie.class));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityVillager.class, false));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityIronGolem.class, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityVillager.class, false));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityIronGolem.class, true));
     }
 
     protected void applyEntityAttributes() {
@@ -377,7 +377,7 @@ public class EntityZombie extends EntityMob {
         this.setCanPickUpLoot(this.rand.nextFloat() < 0.55F * f);
 
         if (livingdata == null) {
-            livingdata = new EntityZombie.GroupData(this.worldObj.rand.nextFloat() < 0.05F, this.worldObj.rand.nextFloat() < 0.05F);
+            livingdata = new GroupData(this.worldObj.rand.nextFloat() < 0.05F, this.worldObj.rand.nextFloat() < 0.05F);
         }
 
         if (livingdata instanceof GroupData entityzombie$groupdata) {
@@ -566,7 +566,7 @@ public class EntityZombie extends EntityMob {
         }
     }
 
-    class GroupData implements IEntityLivingData {
+    static class GroupData implements IEntityLivingData {
         public boolean isChild;
         public boolean isVillager;
 

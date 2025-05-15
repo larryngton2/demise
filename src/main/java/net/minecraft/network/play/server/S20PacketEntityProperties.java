@@ -23,11 +23,11 @@ public class S20PacketEntityProperties implements Packet<INetHandlerPlayClient> 
         this.entityId = entityIdIn;
 
         for (IAttributeInstance iattributeinstance : p_i45236_2_) {
-            this.field_149444_b.add(new S20PacketEntityProperties.Snapshot(iattributeinstance.getAttribute().getAttributeUnlocalizedName(), iattributeinstance.getBaseValue(), iattributeinstance.func_111122_c()));
+            this.field_149444_b.add(new Snapshot(iattributeinstance.getAttribute().getAttributeUnlocalizedName(), iattributeinstance.getBaseValue(), iattributeinstance.func_111122_c()));
         }
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readVarIntFromBuffer();
         int i = buf.readInt();
 
@@ -42,11 +42,11 @@ public class S20PacketEntityProperties implements Packet<INetHandlerPlayClient> 
                 list.add(new AttributeModifier(uuid, "Unknown synced attribute modifier", buf.readDouble(), buf.readByte()));
             }
 
-            this.field_149444_b.add(new S20PacketEntityProperties.Snapshot(s, d0, list));
+            this.field_149444_b.add(new Snapshot(s, d0, list));
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityId);
         buf.writeInt(this.field_149444_b.size());
 
@@ -75,7 +75,7 @@ public class S20PacketEntityProperties implements Packet<INetHandlerPlayClient> 
         return this.field_149444_b;
     }
 
-    public class Snapshot {
+    public static class Snapshot {
         private final String field_151412_b;
         private final double field_151413_c;
         private final Collection<AttributeModifier> field_151411_d;

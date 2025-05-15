@@ -245,7 +245,7 @@ public class TextureUtils {
         IResourceManager iresourcemanager = Config.getResourceManager();
 
         if (iresourcemanager instanceof IReloadableResourceManager ireloadableresourcemanager) {
-            IResourceManagerReloadListener iresourcemanagerreloadlistener = var1 -> TextureUtils.resourcesReloaded(var1);
+            IResourceManagerReloadListener iresourcemanagerreloadlistener = TextureUtils::resourcesReloaded;
             ireloadableresourcemanager.registerReloadListener(iresourcemanagerreloadlistener);
         }
 
@@ -254,7 +254,7 @@ public class TextureUtils {
                 TextureAnimations.updateAnimations();
             }
 
-            public void loadTexture(IResourceManager var1) throws IOException {
+            public void loadTexture(IResourceManager var1) {
             }
 
             public int getGlTextureId() {
@@ -276,9 +276,7 @@ public class TextureUtils {
     }
 
     public static ResourceLocation fixResourceLocation(ResourceLocation loc, String basePath) {
-        if (!loc.getResourceDomain().equals("minecraft")) {
-            return loc;
-        } else {
+        if (loc.getResourceDomain().equals("minecraft")) {
             String s = loc.getResourcePath();
             String s1 = fixResourcePath(s, basePath);
 
@@ -286,8 +284,8 @@ public class TextureUtils {
                 loc = new ResourceLocation(loc.getResourceDomain(), s1);
             }
 
-            return loc;
         }
+        return loc;
     }
 
     public static String fixResourcePath(String path, String basePath) {
@@ -475,7 +473,7 @@ public class TextureUtils {
         int j = tas.getIconHeight();
 
         if (tas.getFrameCount() < 1) {
-            List<int[][]> list = new ArrayList();
+            List<int[][]> list = new ArrayList<>();
             int[][] aint = new int[mipmaps + 1][];
             int[] aint1 = new int[i * j];
             aint[0] = aint1;
@@ -483,7 +481,7 @@ public class TextureUtils {
             tas.setFramesTextureData(list);
         }
 
-        List<int[][]> list1 = new ArrayList();
+        List<int[][]> list1 = new ArrayList<>();
         int l = tas.getFrameCount();
 
         for (int i1 = 0; i1 < l; ++i1) {
@@ -527,8 +525,7 @@ public class TextureUtils {
             int[][] aint = list.get(frame);
 
             if (aint != null && aint.length > level) {
-                int[] aint1 = aint[level];
-                return aint1;
+                return aint[level];
             } else {
                 return null;
             }

@@ -16,7 +16,4 @@ public class EnchantmentArrowFire extends Enchantment {
         return 50;
     }
 
-    public int getMaxLevel() {
-        return 1;
-    }
 }

@@ -393,7 +393,7 @@ public class EntitySlime extends EntityLiving implements IMob {
         }
 
         public void onUpdateMoveHelper() {
-            this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, this.field_179922_g, 30.0F);
+            this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, this.field_179922_g);
             this.entity.rotationYawHead = this.entity.rotationYaw;
             this.entity.renderYawOffset = this.entity.rotationYaw;
 

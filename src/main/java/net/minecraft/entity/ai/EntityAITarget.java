@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class EntityAITarget extends EntityAIBase {
     protected final EntityCreature taskOwner;
-    protected boolean shouldCheckSight;
+    protected final boolean shouldCheckSight;
     private final boolean nearbyOnly;
     private int targetSearchStatus;
     private int targetSearchDelay;
@@ -109,8 +109,8 @@ public abstract class EntityAITarget extends EntityAIBase {
         }
     }
 
-    protected boolean isSuitableTarget(EntityLivingBase target, boolean includeInvincibles) {
-        if (!isSuitableTarget(this.taskOwner, target, includeInvincibles, this.shouldCheckSight)) {
+    protected boolean isSuitableTarget(EntityLivingBase target) {
+        if (!isSuitableTarget(this.taskOwner, target, false, this.shouldCheckSight)) {
             return false;
         } else if (!this.taskOwner.isWithinHomeDistanceFromPosition(new BlockPos(target))) {
             return false;

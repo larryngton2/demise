@@ -22,13 +22,13 @@ public class S01PacketEncryptionRequest implements Packet<INetHandlerLoginClient
         this.verifyToken = verifyToken;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.hashedServerId = buf.readStringFromBuffer(20);
         this.publicKey = CryptManager.decodePublicKey(buf.readByteArray());
         this.verifyToken = buf.readByteArray();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeString(this.hashedServerId);
         buf.writeByteArray(this.publicKey.getEncoded());
         buf.writeByteArray(this.verifyToken);

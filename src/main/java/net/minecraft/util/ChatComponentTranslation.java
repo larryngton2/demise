@@ -2,6 +2,7 @@ package net.minecraft.util;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.IllegalFormatException;
@@ -15,7 +16,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
     private final Object[] formatArgs;
     private final Object syncLock = new Object();
     private long lastTranslationUpdateTimeInMilliseconds = -1L;
-    List<IChatComponent> children = Lists.newArrayList();
+    final List<IChatComponent> children = Lists.newArrayList();
     public static final Pattern stringVariablePattern = Pattern.compile("%(?:(\\d+)\\$)?([A-Za-z%]|$)");
 
     public ChatComponentTranslation(String translationKey, Object... args) {
@@ -122,7 +123,7 @@ public class ChatComponentTranslation extends ChatComponentStyle {
         }
     }
 
-    public IChatComponent setChatStyle(ChatStyle style) {
+    public void setChatStyle(ChatStyle style) {
         super.setChatStyle(style);
 
         for (Object object : this.formatArgs) {
@@ -137,10 +138,9 @@ public class ChatComponentTranslation extends ChatComponentStyle {
             }
         }
 
-        return this;
     }
 
-    public Iterator<IChatComponent> iterator() {
+    public @NotNull Iterator<IChatComponent> iterator() {
         this.ensureInitialized();
         return Iterators.concat(createDeepCopyIterator(this.children), createDeepCopyIterator(this.siblings));
     }

@@ -18,7 +18,7 @@ import java.util.Random;
 public class Teleporter {
     private final WorldServer worldServerInstance;
     private final Random random;
-    private final LongHashMap<Teleporter.PortalPosition> destinationCoordinateCache = new LongHashMap();
+    private final LongHashMap<Teleporter.PortalPosition> destinationCoordinateCache = new LongHashMap<>();
     private final List<Long> destinationCoordinateKeys = Lists.newArrayList();
 
     public Teleporter(WorldServer worldIn) {
@@ -100,7 +100,7 @@ public class Teleporter {
 
         if (d0 >= 0.0D) {
             if (flag) {
-                this.destinationCoordinateCache.add(l, new Teleporter.PortalPosition(blockpos, this.worldServerInstance.getTotalWorldTime()));
+                this.destinationCoordinateCache.add(l, new PortalPosition(blockpos, this.worldServerInstance.getTotalWorldTime()));
                 this.destinationCoordinateKeys.add(l);
             }
 
@@ -153,7 +153,7 @@ public class Teleporter {
         }
     }
 
-    public boolean makePortal(Entity entityIn) {
+    public void makePortal(Entity entityIn) {
         int i = 16;
         double d0 = -1.0D;
         int j = MathHelper.floor_double(entityIn.posX);
@@ -319,7 +319,6 @@ public class Teleporter {
             }
         }
 
-        return true;
     }
 
     public void removeStalePortalLocations(long worldTime) {
@@ -339,7 +338,7 @@ public class Teleporter {
         }
     }
 
-    public class PortalPosition extends BlockPos {
+    public static class PortalPosition extends BlockPos {
         public long lastUpdateTime;
 
         public PortalPosition(BlockPos pos, long lastUpdate) {

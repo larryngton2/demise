@@ -137,7 +137,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
         return new ServerCommandManager();
     }
 
-    protected abstract boolean startServer() throws IOException;
+    protected abstract boolean startServer();
 
     protected void convertMapIfNeeded(String worldNameIn) {
         if (this.getActiveAnvilConverter().isOldMapFormat(worldNameIn)) {
@@ -155,7 +155,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
                 public void setLoadingProgress(int progress) {
                     if (System.currentTimeMillis() - this.startTime >= 1000L) {
                         this.startTime = System.currentTimeMillis();
-                        MinecraftServer.logger.info("Converting... " + progress + "%");
+                        MinecraftServer.logger.info("Converting... {}%", progress);
                     }
                 }
 
@@ -247,7 +247,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
         int i1 = 0;
         this.setUserMessage("menu.generatingTerrain");
         int j1 = 0;
-        logger.info("Preparing start region for level " + j1);
+        logger.info("Preparing start region for level {}", j1);
         WorldServer worldserver = this.worldServers[j1];
         BlockPos blockpos = worldserver.getSpawnPoint();
         long k1 = getCurrentTimeMillis();
@@ -257,7 +257,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
                 long j2 = getCurrentTimeMillis();
 
                 if (j2 - k1 > 1000L) {
-                    this.outputPercentRemaining("Preparing spawn area", i1 * 100 / 625);
+                    this.outputPercentRemaining(i1 * 100 / 625);
                     k1 = j2;
                 }
 
@@ -291,10 +291,10 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
 
     public abstract boolean shouldBroadcastConsoleToOps();
 
-    protected void outputPercentRemaining(String message, int percent) {
-        this.currentTask = message;
+    protected void outputPercentRemaining(int percent) {
+        this.currentTask = "Preparing spawn area";
         this.percentDone = percent;
-        logger.info(message + ": " + percent + "%");
+        logger.info("Preparing spawn area: {}%", percent);
     }
 
     protected void clearCurrentTask() {
@@ -307,7 +307,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
             for (WorldServer worldserver : this.worldServers) {
                 if (worldserver != null) {
                     if (!dontLog) {
-                        logger.info("Saving chunks for level '" + worldserver.getWorldInfo().getWorldName() + "'/" + worldserver.provider.getDimensionName());
+                        logger.info("Saving chunks for level '{}'/{}", worldserver.getWorldInfo().getWorldName(), worldserver.provider.getDimensionName());
                     }
 
                     try {
@@ -417,7 +417,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
             File file1 = new File(new File(this.getDataDirectory(), "crash-reports"), "crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-server.txt");
 
             if (crashreport.saveToFile(file1)) {
-                logger.error("This crash report has been saved to: " + file1.getAbsolutePath());
+                logger.error("This crash report has been saved to: {}", file1.getAbsolutePath());
             } else {
                 logger.error("We were unable to save this crash report to disk.");
             }
@@ -655,7 +655,6 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
                 }
             }
 
-            return list;
         } else {
             String[] astring = input.split(" ", -1);
             String s = astring[astring.length - 1];
@@ -666,8 +665,8 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
                 }
             }
 
-            return list;
         }
+        return list;
     }
 
     public static MinecraftServer getServer() {
@@ -813,16 +812,15 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
         if (this.worldServers != null) {
             for (WorldServer worldServer : this.worldServers) {
                 if (worldServer != null) {
-                    WorldServer worldserver = worldServer;
-                    WorldInfo worldinfo = worldserver.getWorldInfo();
-                    playerSnooper.addClientStat("world[" + i + "][dimension]", worldserver.provider.getDimensionId());
+                    WorldInfo worldinfo = worldServer.getWorldInfo();
+                    playerSnooper.addClientStat("world[" + i + "][dimension]", worldServer.provider.getDimensionId());
                     playerSnooper.addClientStat("world[" + i + "][mode]", worldinfo.getGameType());
-                    playerSnooper.addClientStat("world[" + i + "][difficulty]", worldserver.getDifficulty());
+                    playerSnooper.addClientStat("world[" + i + "][difficulty]", worldServer.getDifficulty());
                     playerSnooper.addClientStat("world[" + i + "][hardcore]", worldinfo.isHardcoreModeEnabled());
                     playerSnooper.addClientStat("world[" + i + "][generator_name]", worldinfo.getTerrainType().getWorldTypeName());
                     playerSnooper.addClientStat("world[" + i + "][generator_version]", worldinfo.getTerrainType().getGeneratorVersion());
                     playerSnooper.addClientStat("world[" + i + "][height]", this.buildLimit);
-                    playerSnooper.addClientStat("world[" + i + "][chunks_loaded]", worldserver.getChunkProvider().getLoadedChunkCount());
+                    playerSnooper.addClientStat("world[" + i + "][chunks_loaded]", worldServer.getChunkProvider().getLoadedChunkCount());
                     ++i;
                 }
             }

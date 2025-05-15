@@ -45,7 +45,7 @@ public class WorldServerMulti extends WorldServer {
         });
     }
 
-    protected void saveLevel() throws MinecraftException {
+    protected void saveLevel() {
     }
 
     public World init() {

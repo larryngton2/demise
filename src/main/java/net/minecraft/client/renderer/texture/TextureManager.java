@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 public class TextureManager implements ITickable, IResourceManagerReloadListener {
     private static final Logger logger = LogManager.getLogger();
@@ -67,12 +66,10 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
         this.boundTextureLocation = resource;
     }
 
-    public boolean loadTickableTexture(ResourceLocation textureLocation, ITickableTextureObject textureObj) {
+    public void loadTickableTexture(ResourceLocation textureLocation, ITickableTextureObject textureObj) {
         if (this.loadTexture(textureLocation, textureObj)) {
             this.listTickables.add(textureObj);
-            return true;
         } else {
-            return false;
         }
     }
 
@@ -82,7 +79,7 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
         try {
             textureObj.loadTexture(this.theResourceManager);
         } catch (IOException ioexception) {
-            logger.warn("Failed to load texture: " + textureLocation, ioexception);
+            logger.warn("Failed to load texture: {}", textureLocation, ioexception);
             textureObj = TextureUtil.missingTexture;
             this.mapTextureObjects.put(textureLocation, textureObj);
             flag = false;

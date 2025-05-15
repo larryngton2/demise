@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import org.lwjglx.opengl.Display;
@@ -44,11 +45,11 @@ public class GameSettings {
     private static final Logger logger = LogManager.getLogger();
     private static final Gson gson = new Gson();
     private static final ParameterizedType typeListString = new ParameterizedType() {
-        public Type[] getActualTypeArguments() {
+        public Type @NotNull [] getActualTypeArguments() {
             return new Type[]{String.class};
         }
 
-        public Type getRawType() {
+        public @NotNull Type getRawType() {
             return List.class;
         }
 
@@ -116,31 +117,31 @@ public class GameSettings {
     public boolean useNativeTransport = false;
     public boolean entityShadows = true;
     public boolean realmsNotifications = true;
-    public KeyBinding keyBindForward = new KeyBinding("key.forward", 17, "key.categories.movement");
-    public KeyBinding keyBindLeft = new KeyBinding("key.left", 30, "key.categories.movement");
-    public KeyBinding keyBindBack = new KeyBinding("key.back", 31, "key.categories.movement");
-    public KeyBinding keyBindRight = new KeyBinding("key.right", 32, "key.categories.movement");
-    public KeyBinding keyBindJump = new KeyBinding("key.jump", 57, "key.categories.movement");
-    public KeyBinding keyBindSneak = new KeyBinding("key.sneak", 42, "key.categories.movement");
-    public KeyBinding keyBindSprint = new KeyBinding("key.sprint", 29, "key.categories.movement");
-    public KeyBinding keyBindInventory = new KeyBinding("key.inventory", 18, "key.categories.inventory");
-    public KeyBinding keyBindUseItem = new KeyBinding("key.use", -99, "key.categories.gameplay");
-    public KeyBinding keyBindDrop = new KeyBinding("key.drop", 16, "key.categories.gameplay");
-    public KeyBinding keyBindAttack = new KeyBinding("key.attack", -100, "key.categories.gameplay");
-    public KeyBinding keyBindPickBlock = new KeyBinding("key.pickItem", -98, "key.categories.gameplay");
-    public KeyBinding keyBindChat = new KeyBinding("key.chat", 20, "key.categories.multiplayer");
-    public KeyBinding keyBindPlayerList = new KeyBinding("key.playerlist", 15, "key.categories.multiplayer");
-    public KeyBinding keyBindCommand = new KeyBinding("key.command", 53, "key.categories.multiplayer");
-    public KeyBinding keyBindScreenshot = new KeyBinding("key.screenshot", 60, "key.categories.misc");
-    public KeyBinding keyBindTogglePerspective = new KeyBinding("key.togglePerspective", 63, "key.categories.misc");
-    public KeyBinding keyBindSmoothCamera = new KeyBinding("key.smoothCamera", 0, "key.categories.misc");
-    public KeyBinding keyBindFullscreen = new KeyBinding("key.fullscreen", 87, "key.categories.misc");
-    public KeyBinding keyBindSpectatorOutlines = new KeyBinding("key.spectatorOutlines", 0, "key.categories.misc");
-    public KeyBinding keyBindStreamStartStop = new KeyBinding("key.streamStartStop", 64, "key.categories.stream");
-    public KeyBinding keyBindStreamPauseUnpause = new KeyBinding("key.streamPauseUnpause", 65, "key.categories.stream");
-    public KeyBinding keyBindStreamCommercials = new KeyBinding("key.streamCommercial", 0, "key.categories.stream");
-    public KeyBinding keyBindStreamToggleMic = new KeyBinding("key.streamToggleMic", 0, "key.categories.stream");
-    public KeyBinding[] keyBindsHotbar = new KeyBinding[]{new KeyBinding("key.hotbar.1", 2, "key.categories.inventory"), new KeyBinding("key.hotbar.2", 3, "key.categories.inventory"), new KeyBinding("key.hotbar.3", 4, "key.categories.inventory"), new KeyBinding("key.hotbar.4", 5, "key.categories.inventory"), new KeyBinding("key.hotbar.5", 6, "key.categories.inventory"), new KeyBinding("key.hotbar.6", 7, "key.categories.inventory"), new KeyBinding("key.hotbar.7", 8, "key.categories.inventory"), new KeyBinding("key.hotbar.8", 9, "key.categories.inventory"), new KeyBinding("key.hotbar.9", 10, "key.categories.inventory")};
+    public final KeyBinding keyBindForward = new KeyBinding("key.forward", 17, "key.categories.movement");
+    public final KeyBinding keyBindLeft = new KeyBinding("key.left", 30, "key.categories.movement");
+    public final KeyBinding keyBindBack = new KeyBinding("key.back", 31, "key.categories.movement");
+    public final KeyBinding keyBindRight = new KeyBinding("key.right", 32, "key.categories.movement");
+    public final KeyBinding keyBindJump = new KeyBinding("key.jump", 57, "key.categories.movement");
+    public final KeyBinding keyBindSneak = new KeyBinding("key.sneak", 42, "key.categories.movement");
+    public final KeyBinding keyBindSprint = new KeyBinding("key.sprint", 29, "key.categories.movement");
+    public final KeyBinding keyBindInventory = new KeyBinding("key.inventory", 18, "key.categories.inventory");
+    public final KeyBinding keyBindUseItem = new KeyBinding("key.use", -99, "key.categories.gameplay");
+    public final KeyBinding keyBindDrop = new KeyBinding("key.drop", 16, "key.categories.gameplay");
+    public final KeyBinding keyBindAttack = new KeyBinding("key.attack", -100, "key.categories.gameplay");
+    public final KeyBinding keyBindPickBlock = new KeyBinding("key.pickItem", -98, "key.categories.gameplay");
+    public final KeyBinding keyBindChat = new KeyBinding("key.chat", 20, "key.categories.multiplayer");
+    public final KeyBinding keyBindPlayerList = new KeyBinding("key.playerlist", 15, "key.categories.multiplayer");
+    public final KeyBinding keyBindCommand = new KeyBinding("key.command", 53, "key.categories.multiplayer");
+    public final KeyBinding keyBindScreenshot = new KeyBinding("key.screenshot", 60, "key.categories.misc");
+    public final KeyBinding keyBindTogglePerspective = new KeyBinding("key.togglePerspective", 63, "key.categories.misc");
+    public final KeyBinding keyBindSmoothCamera = new KeyBinding("key.smoothCamera", 0, "key.categories.misc");
+    public final KeyBinding keyBindFullscreen = new KeyBinding("key.fullscreen", 87, "key.categories.misc");
+    public final KeyBinding keyBindSpectatorOutlines = new KeyBinding("key.spectatorOutlines", 0, "key.categories.misc");
+    public final KeyBinding keyBindStreamStartStop = new KeyBinding("key.streamStartStop", 64, "key.categories.stream");
+    public final KeyBinding keyBindStreamPauseUnpause = new KeyBinding("key.streamPauseUnpause", 65, "key.categories.stream");
+    public final KeyBinding keyBindStreamCommercials = new KeyBinding("key.streamCommercial", 0, "key.categories.stream");
+    public final KeyBinding keyBindStreamToggleMic = new KeyBinding("key.streamToggleMic", 0, "key.categories.stream");
+    public final KeyBinding[] keyBindsHotbar = new KeyBinding[]{new KeyBinding("key.hotbar.1", 2, "key.categories.inventory"), new KeyBinding("key.hotbar.2", 3, "key.categories.inventory"), new KeyBinding("key.hotbar.3", 4, "key.categories.inventory"), new KeyBinding("key.hotbar.4", 5, "key.categories.inventory"), new KeyBinding("key.hotbar.5", 6, "key.categories.inventory"), new KeyBinding("key.hotbar.6", 7, "key.categories.inventory"), new KeyBinding("key.hotbar.7", 8, "key.categories.inventory"), new KeyBinding("key.hotbar.8", 9, "key.categories.inventory"), new KeyBinding("key.hotbar.9", 10, "key.categories.inventory")};
     public KeyBinding[] keyBindings;
     protected Minecraft mc;
     private File optionsFile;
@@ -939,7 +940,7 @@ public class GameSettings {
                                 }
                             }
                         } catch (Exception exception) {
-                            logger.warn("Skipping bad option: " + s);
+                            logger.warn("Skipping bad option: {}", s);
                             exception.printStackTrace();
                         }
                     }
@@ -1626,10 +1627,6 @@ public class GameSettings {
     private String getKeyBindingOF(GameSettings.Options p_getKeyBindingOF_1_) {
         String s = I18n.format(p_getKeyBindingOF_1_.getEnumString()) + ": ";
 
-        if (s == null) {
-            s = p_getKeyBindingOF_1_.getEnumString();
-        }
-
         if (p_getKeyBindingOF_1_ == GameSettings.Options.RENDER_DISTANCE) {
             int i1 = (int) this.getOptionFloatValue(p_getKeyBindingOF_1_);
             String s1 = I18n.format("options.renderDistance.tiny");
@@ -1705,8 +1702,8 @@ public class GameSettings {
             return switch (this.ofTrees) {
                 case 1 -> s + Lang.getFast();
                 case 2 -> s + Lang.getFancy();
-                default -> s + Lang.getDefault();
                 case 4 -> s + Lang.get("of.general.smart");
+                default -> s + Lang.getDefault();
             };
         } else if (p_getKeyBindingOF_1_ == GameSettings.Options.DROPPED_ITEMS) {
             return switch (this.ofDroppedItems) {

@@ -93,11 +93,11 @@ public class ContainerFurnace extends Container {
                     if (!this.mergeItemStack(itemstack1, 1, 2, false)) {
                         return null;
                     }
-                } else if (index >= 3 && index < 30) {
+                } else if (index < 30) {
                     if (!this.mergeItemStack(itemstack1, 30, 39, false)) {
                         return null;
                     }
-                } else if (index >= 30 && index < 39 && !this.mergeItemStack(itemstack1, 3, 30, false)) {
+                } else if (index < 39 && !this.mergeItemStack(itemstack1, 3, 30, false)) {
                     return null;
                 }
             } else if (!this.mergeItemStack(itemstack1, 3, 39, false)) {

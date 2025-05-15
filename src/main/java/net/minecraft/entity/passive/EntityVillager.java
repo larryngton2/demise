@@ -64,7 +64,7 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
         ((PathNavigateGround) this.getNavigator()).setBreakDoors(true);
         ((PathNavigateGround) this.getNavigator()).setAvoidsWater(true);
         this.tasks.addTask(0, new EntityAISwimming(this));
-        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityZombie.class, 8.0F, 0.6D, 0.6D));
+        this.tasks.addTask(1, new EntityAIAvoidEntity<>(this, EntityZombie.class, 8.0F, 0.6D, 0.6D));
         this.tasks.addTask(1, new EntityAITradePlayer(this));
         this.tasks.addTask(1, new EntityAILookAtTradePlayer(this));
         this.tasks.addTask(2, new EntityAIMoveIndoors(this));
@@ -653,8 +653,8 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
     }
 
     static class EmeraldForItems implements EntityVillager.ITradeList {
-        public Item sellItem;
-        public EntityVillager.PriceInfo price;
+        public final Item sellItem;
+        public final EntityVillager.PriceInfo price;
 
         public EmeraldForItems(Item itemIn, EntityVillager.PriceInfo priceIn) {
             this.sellItem = itemIn;
@@ -677,10 +677,10 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
     }
 
     static class ItemAndEmeraldToItem implements EntityVillager.ITradeList {
-        public ItemStack buyingItemStack;
-        public EntityVillager.PriceInfo buyingPriceInfo;
-        public ItemStack sellingItemstack;
-        public EntityVillager.PriceInfo field_179408_d;
+        public final ItemStack buyingItemStack;
+        public final EntityVillager.PriceInfo buyingPriceInfo;
+        public final ItemStack sellingItemstack;
+        public final EntityVillager.PriceInfo field_179408_d;
 
         public ItemAndEmeraldToItem(Item p_i45813_1_, EntityVillager.PriceInfo p_i45813_2_, Item p_i45813_3_, EntityVillager.PriceInfo p_i45813_4_) {
             this.buyingItemStack = new ItemStack(p_i45813_1_);
@@ -722,8 +722,8 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
     }
 
     static class ListEnchantedItemForEmeralds implements EntityVillager.ITradeList {
-        public ItemStack enchantedItemStack;
-        public EntityVillager.PriceInfo priceInfo;
+        public final ItemStack enchantedItemStack;
+        public final EntityVillager.PriceInfo priceInfo;
 
         public ListEnchantedItemForEmeralds(Item p_i45814_1_, EntityVillager.PriceInfo p_i45814_2_) {
             this.enchantedItemStack = new ItemStack(p_i45814_1_);
@@ -745,8 +745,8 @@ public class EntityVillager extends EntityAgeable implements IMerchant, INpc {
     }
 
     static class ListItemForEmeralds implements EntityVillager.ITradeList {
-        public ItemStack itemToBuy;
-        public EntityVillager.PriceInfo priceInfo;
+        public final ItemStack itemToBuy;
+        public final EntityVillager.PriceInfo priceInfo;
 
         public ListItemForEmeralds(Item par1Item, EntityVillager.PriceInfo priceInfo) {
             this.itemToBuy = new ItemStack(par1Item);

@@ -12,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class ItemHoe extends Item {
-    protected Item.ToolMaterial theToolMaterial;
+    protected final Item.ToolMaterial theToolMaterial;
 
     public ItemHoe(Item.ToolMaterial material) {
         this.theToolMaterial = material;
@@ -52,13 +52,11 @@ public class ItemHoe extends Item {
     protected boolean useHoe(ItemStack stack, EntityPlayer player, World worldIn, BlockPos target, IBlockState newState) {
         worldIn.playSoundEffect((float) target.getX() + 0.5F, (float) target.getY() + 0.5F, (float) target.getZ() + 0.5F, newState.getBlock().stepSound.getStepSound(), (newState.getBlock().stepSound.getVolume() + 1.0F) / 2.0F, newState.getBlock().stepSound.getFrequency() * 0.8F);
 
-        if (worldIn.isRemote) {
-            return true;
-        } else {
+        if (!worldIn.isRemote) {
             worldIn.setBlockState(target, newState);
             stack.damageItem(1, player);
-            return true;
         }
+        return true;
     }
 
     public boolean isFull3D() {

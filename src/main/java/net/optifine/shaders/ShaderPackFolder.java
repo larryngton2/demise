@@ -8,7 +8,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class ShaderPackFolder implements IShaderPack {
-    protected File packFile;
+    protected final File packFile;
 
     public ShaderPackFolder(String name, File file) {
         this.packFile = file;

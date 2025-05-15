@@ -11,14 +11,13 @@ public class TokenParser {
     public static Token[] parse(String str) throws IOException, ParseException {
         Reader reader = new StringReader(str);
         PushbackReader pushbackreader = new PushbackReader(reader);
-        List<Token> list = new ArrayList();
+        List<Token> list = new ArrayList<>();
 
         while (true) {
             int i = pushbackreader.read();
 
             if (i < 0) {
-                Token[] atoken = list.toArray(new Token[0]);
-                return atoken;
+                return list.toArray(new Token[0]);
             }
 
             char c0 = (char) i;

@@ -69,9 +69,9 @@ public class CustomSkyLayer {
         this.startFadeOut = this.parseTime(props.getProperty("startFadeOut"));
         this.endFadeOut = this.parseTime(props.getProperty("endFadeOut"));
         this.blend = Blender.parseBlend(props.getProperty("blend"));
-        this.rotate = this.parseBoolean(props.getProperty("rotate"), true);
-        this.speed = this.parseFloat(props.getProperty("speed"), 1.0F);
-        this.axis = this.parseAxis(props.getProperty("axis"), DEFAULT_AXIS);
+        this.rotate = this.parseBoolean(props.getProperty("rotate"));
+        this.speed = this.parseFloat(props.getProperty("speed"));
+        this.axis = this.parseAxis(props.getProperty("axis"));
         this.days = connectedparser.parseRangeListInt(props.getProperty("days"));
         this.daysLoop = connectedparser.parseInt(props.getProperty("daysLoop"), 8);
         List<String> list = this.parseWeatherList(props.getProperty("weather", "clear"));
@@ -80,12 +80,12 @@ public class CustomSkyLayer {
         this.weatherThunder = list.contains("thunder");
         this.biomes = connectedparser.parseBiomes(props.getProperty("biomes"));
         this.heights = connectedparser.parseRangeListInt(props.getProperty("heights"));
-        this.transition = this.parseFloat(props.getProperty("transition"), 1.0F);
+        this.transition = this.parseFloat(props.getProperty("transition"));
     }
 
     private List<String> parseWeatherList(String str) {
         List<String> list = Arrays.asList("clear", "rain", "thunder");
-        List<String> list1 = new ArrayList();
+        List<String> list1 = new ArrayList<>();
         String[] astring = Config.tokenize(str, " ");
 
         for (String s : astring) {
@@ -121,8 +121,7 @@ public class CustomSkyLayer {
                         i += 24;
                     }
 
-                    int k = i * 1000 + (int) ((double) j / 60.0D * 1000.0D);
-                    return k;
+                    return i * 1000 + (int) ((double) j / 60.0D * 1000.0D);
                 } else {
                     Config.warn("Invalid time: " + str);
                     return -1;
@@ -131,43 +130,43 @@ public class CustomSkyLayer {
         }
     }
 
-    private boolean parseBoolean(String str, boolean defVal) {
+    private boolean parseBoolean(String str) {
         if (str == null) {
-            return defVal;
+            return true;
         } else if (str.equalsIgnoreCase("true")) {
             return true;
         } else if (str.equalsIgnoreCase("false")) {
             return false;
         } else {
             Config.warn("Unknown boolean: " + str);
-            return defVal;
+            return true;
         }
     }
 
-    private float parseFloat(String str, float defVal) {
+    private float parseFloat(String str) {
         if (str == null) {
-            return defVal;
+            return (float) 1.0;
         } else {
             float f = Config.parseFloat(str, Float.MIN_VALUE);
 
             if (f == Float.MIN_VALUE) {
                 Config.warn("Invalid value: " + str);
-                return defVal;
+                return (float) 1.0;
             } else {
                 return f;
             }
         }
     }
 
-    private float[] parseAxis(String str, float[] defVal) {
+    private float[] parseAxis(String str) {
         if (str == null) {
-            return defVal;
+            return CustomSkyLayer.DEFAULT_AXIS;
         } else {
             String[] astring = Config.tokenize(str, " ");
 
             if (astring.length != 3) {
                 Config.warn("Invalid axis: " + str);
-                return defVal;
+                return CustomSkyLayer.DEFAULT_AXIS;
             } else {
                 float[] afloat = new float[3];
 
@@ -176,12 +175,12 @@ public class CustomSkyLayer {
 
                     if (afloat[i] == Float.MIN_VALUE) {
                         Config.warn("Invalid axis: " + str);
-                        return defVal;
+                        return CustomSkyLayer.DEFAULT_AXIS;
                     }
 
                     if (afloat[i] < -1.0F || afloat[i] > 1.0F) {
                         Config.warn("Invalid axis values: " + str);
-                        return defVal;
+                        return CustomSkyLayer.DEFAULT_AXIS;
                     }
                 }
 
@@ -191,10 +190,9 @@ public class CustomSkyLayer {
 
                 if (f2 * f2 + f * f + f1 * f1 < 1.0E-5F) {
                     Config.warn("Invalid axis values: " + str);
-                    return defVal;
+                    return CustomSkyLayer.DEFAULT_AXIS;
                 } else {
-                    float[] afloat1 = new float[]{f1, f, -f2};
-                    return afloat1;
+                    return new float[]{f1, f, -f2};
                 }
             }
         }

@@ -159,11 +159,11 @@ public class BlockModelShapes {
                 BlockQuartz.EnumType blockquartz$enumtype = state.getValue(BlockQuartz.VARIANT);
 
                 return switch (blockquartz$enumtype) {
-                    default -> new ModelResourceLocation("quartz_block", "normal");
                     case CHISELED -> new ModelResourceLocation("chiseled_quartz_block", "normal");
                     case LINES_Y -> new ModelResourceLocation("quartz_column", "axis=y");
                     case LINES_X -> new ModelResourceLocation("quartz_column", "axis=x");
                     case LINES_Z -> new ModelResourceLocation("quartz_column", "axis=z");
+                    default -> new ModelResourceLocation("quartz_block", "normal");
                 };
             }
         });

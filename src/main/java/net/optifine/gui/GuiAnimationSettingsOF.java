@@ -32,8 +32,8 @@ public class GuiAnimationSettingsOF extends GuiScreen {
             }
         }
 
-        this.buttonList.add(new GuiButton(210, width / 2 - 155, height / 6 + 168 + 11, 70, 20, Lang.get("of.options.animation.allOn")));
-        this.buttonList.add(new GuiButton(211, width / 2 - 155 + 80, height / 6 + 168 + 11, 70, 20, Lang.get("of.options.animation.allOff")));
+        this.buttonList.add(new GuiButton(210, (float) width / 2 - 155, (float) height / 6 + 168 + 11, 70, 20, Lang.get("of.options.animation.allOn")));
+        this.buttonList.add(new GuiButton(211, (float) width / 2 - 155 + 80, (float) height / 6 + 168 + 11, 70, 20, Lang.get("of.options.animation.allOff")));
         this.buttonList.add(new GuiOptionButton(200, width / 2 + 5, height / 6 + 168 + 11, I18n.format("gui.done")));
     }
 
@@ -64,7 +64,7 @@ public class GuiAnimationSettingsOF extends GuiScreen {
 
     public void drawScreen(int x, int y, float f) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.title, width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.title, (float) width / 2, 15, 16777215);
         super.drawScreen(x, y, f);
     }
 }

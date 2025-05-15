@@ -54,13 +54,10 @@ public class TileEntityEnchantmentTable extends TileEntity implements ITickable,
             if (this.bookSpread < 0.5F || rand.nextInt(40) == 0) {
                 float f1 = this.field_145932_k;
 
-                while (true) {
+                do {
                     this.field_145932_k += (float) (rand.nextInt(4) - rand.nextInt(4));
 
-                    if (f1 != this.field_145932_k) {
-                        break;
-                    }
-                }
+                } while (f1 == this.field_145932_k);
             }
         } else {
             this.field_145924_q += 0.02F;

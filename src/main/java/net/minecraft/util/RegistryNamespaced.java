@@ -2,6 +2,7 @@ package net.minecraft.util;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class RegistryNamespaced<K, V> extends RegistrySimple<K, V> implements IO
         return this.underlyingIntegerMap.getByValue(id);
     }
 
-    public Iterator<V> iterator() {
+    public @NotNull Iterator<V> iterator() {
         return this.underlyingIntegerMap.iterator();
     }
 }

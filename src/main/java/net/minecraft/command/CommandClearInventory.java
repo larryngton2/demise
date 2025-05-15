@@ -39,26 +39,22 @@ public class CommandClearInventory extends CommandBase {
             }
         }
 
-        if (args.length >= 2 && item == null) {
+        int k = entityplayermp.inventory.clearMatchingItems(item, i, j, nbttagcompound);
+        entityplayermp.inventoryContainer.detectAndSendChanges();
+
+        if (!entityplayermp.capabilities.isCreativeMode) {
+            entityplayermp.updateHeldItem();
+        }
+
+        sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, k);
+
+        if (k == 0) {
             throw new CommandException("commands.clear.failure", entityplayermp.getName());
         } else {
-            int k = entityplayermp.inventory.clearMatchingItems(item, i, j, nbttagcompound);
-            entityplayermp.inventoryContainer.detectAndSendChanges();
-
-            if (!entityplayermp.capabilities.isCreativeMode) {
-                entityplayermp.updateHeldItem();
-            }
-
-            sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, k);
-
-            if (k == 0) {
-                throw new CommandException("commands.clear.failure", entityplayermp.getName());
+            if (j == 0) {
+                sender.addChatMessage(new ChatComponentTranslation("commands.clear.testing", entityplayermp.getName(), k));
             } else {
-                if (j == 0) {
-                    sender.addChatMessage(new ChatComponentTranslation("commands.clear.testing", entityplayermp.getName(), k));
-                } else {
-                    notifyOperators(sender, this, "commands.clear.success", entityplayermp.getName(), k);
-                }
+                notifyOperators(sender, this, "commands.clear.success", entityplayermp.getName(), k);
             }
         }
     }

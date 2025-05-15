@@ -14,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 public abstract class TileEntity {
     private static final Logger logger = LogManager.getLogger();
@@ -80,7 +79,7 @@ public abstract class TileEntity {
         if (tileentity != null) {
             tileentity.readFromNBT(nbt);
         } else {
-            logger.warn("Skipping BlockEntity with id " + nbt.getString("id"));
+            logger.warn("Skipping BlockEntity with id {}", nbt.getString("id"));
         }
 
         return tileentity;

@@ -11,7 +11,7 @@ import java.util.List;
 public class ItemAppleGold extends ItemFood {
     public ItemAppleGold(int amount, float saturation, boolean isWolfFood) {
         super(amount, saturation, isWolfFood);
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
     }
 
     public boolean hasEffect(ItemStack stack) {

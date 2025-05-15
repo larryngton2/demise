@@ -29,7 +29,7 @@ public class GuiEditSign extends GuiScreen {
     public void initGui() {
         this.buttonList.clear();
         Keyboard.enableRepeatEvents(true);
-        this.buttonList.add(this.doneBtn = new GuiButton(0, width / 2 - 100, height / 4 + 120, I18n.format("gui.done")));
+        this.buttonList.add(this.doneBtn = new GuiButton(0, (float) width / 2 - 100, (float) height / 4 + 120, I18n.format("gui.done")));
         this.tileSign.setEditable(false);
     }
 
@@ -48,7 +48,7 @@ public class GuiEditSign extends GuiScreen {
         ++this.updateCounter;
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 0) {
                 this.tileSign.markDirty();
@@ -85,7 +85,7 @@ public class GuiEditSign extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, I18n.format("sign.edit"), width / 2, 40, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("sign.edit"), (float) width / 2, 40, 16777215);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) (width / 2), 0.0F, 50.0F);

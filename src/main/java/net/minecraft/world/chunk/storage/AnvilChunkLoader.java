@@ -32,8 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO {
     private static final Logger logger = LogManager.getLogger();
-    private final Map<ChunkCoordIntPair, NBTTagCompound> chunksToRemove = new ConcurrentHashMap();
-    private final Set<ChunkCoordIntPair> pendingAnvilChunksCoordinates = Collections.<ChunkCoordIntPair>newSetFromMap(new ConcurrentHashMap());
+    private final Map<ChunkCoordIntPair, NBTTagCompound> chunksToRemove = new ConcurrentHashMap<>();
+    private final Set<ChunkCoordIntPair> pendingAnvilChunksCoordinates = Collections.<ChunkCoordIntPair>newSetFromMap(new ConcurrentHashMap<>());
     private final File chunkSaveLocation;
     private boolean field_183014_e = false;
 
@@ -60,19 +60,19 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO {
 
     protected Chunk checkedReadChunkFromNBT(World worldIn, int x, int z, NBTTagCompound p_75822_4_) {
         if (!p_75822_4_.hasKey("Level", 10)) {
-            logger.error("Chunk file at " + x + "," + z + " is missing level data, skipping");
+            logger.error("Chunk file at {},{} is missing level data, skipping", x, z);
             return null;
         } else {
             NBTTagCompound nbttagcompound = p_75822_4_.getCompoundTag("Level");
 
             if (!nbttagcompound.hasKey("Sections", 9)) {
-                logger.error("Chunk file at " + x + "," + z + " is missing block data, skipping");
+                logger.error("Chunk file at {},{} is missing block data, skipping", x, z);
                 return null;
             } else {
                 Chunk chunk = this.readChunkFromNBT(worldIn, nbttagcompound);
 
                 if (!chunk.isAtLocation(x, z)) {
-                    logger.error("Chunk file at " + x + "," + z + " is in the wrong location; relocating. (Expected " + x + ", " + z + ", got " + chunk.xPosition + ", " + chunk.zPosition + ")");
+                    logger.error("Chunk file at {},{} is in the wrong location; relocating. (Expected {}, {}, got {}, {})", x, z, x, z, chunk.xPosition, chunk.zPosition);
                     nbttagcompound.setInteger("xPos", x);
                     nbttagcompound.setInteger("zPos", z);
                     chunk = this.readChunkFromNBT(worldIn, nbttagcompound);
@@ -83,7 +83,7 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO {
         }
     }
 
-    public void saveChunk(World worldIn, Chunk chunkIn) throws MinecraftException, IOException {
+    public void saveChunk(World worldIn, Chunk chunkIn) throws MinecraftException {
         worldIn.checkSessionLock();
 
         try {
@@ -133,7 +133,7 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO {
                 this.pendingAnvilChunksCoordinates.remove(chunkcoordintpair);
             }
 
-            return lvt_3_1_;
+            return true;
         }
     }
 
@@ -143,7 +143,7 @@ public class AnvilChunkLoader implements IChunkLoader, IThreadedFileIO {
         dataoutputstream.close();
     }
 
-    public void saveExtraChunkData(World worldIn, Chunk chunkIn) throws IOException {
+    public void saveExtraChunkData(World worldIn, Chunk chunkIn) {
     }
 
     public void chunkTick() {

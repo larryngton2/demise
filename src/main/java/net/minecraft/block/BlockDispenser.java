@@ -27,7 +27,7 @@ import java.util.Random;
 public class BlockDispenser extends BlockContainer {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool TRIGGERED = PropertyBool.create("triggered");
-    public static final RegistryDefaulted<Item, IBehaviorDispenseItem> dispenseBehaviorRegistry = new RegistryDefaulted(new BehaviorDefaultDispenseItem());
+    public static final RegistryDefaulted<Item, IBehaviorDispenseItem> dispenseBehaviorRegistry = new RegistryDefaulted<>(new BehaviorDefaultDispenseItem());
     protected Random rand = new Random();
 
     protected BlockDispenser() {
@@ -71,9 +71,7 @@ public class BlockDispenser extends BlockContainer {
     }
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (worldIn.isRemote) {
-            return true;
-        } else {
+        if (!worldIn.isRemote) {
             TileEntity tileentity = worldIn.getTileEntity(pos);
 
             if (tileentity instanceof TileEntityDispenser) {
@@ -86,8 +84,8 @@ public class BlockDispenser extends BlockContainer {
                 }
             }
 
-            return true;
         }
+        return true;
     }
 
     protected void dispense(World worldIn, BlockPos pos) {

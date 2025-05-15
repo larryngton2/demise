@@ -246,7 +246,7 @@ public class RegionFile {
             this.chunkZ = z;
         }
 
-        public void close() throws IOException {
+        public void close() {
             RegionFile.this.write(this.chunkX, this.chunkZ, this.buf, this.count);
         }
     }

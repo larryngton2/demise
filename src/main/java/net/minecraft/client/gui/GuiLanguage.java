@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class GuiLanguage extends GuiScreen {
-    protected GuiScreen parentScreen;
+    protected final GuiScreen parentScreen;
     private GuiLanguage.List list;
     private final GameSettings game_settings_3;
     private final LanguageManager languageManager;
@@ -37,7 +37,7 @@ public class GuiLanguage extends GuiScreen {
         this.list.handleMouseInput();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             switch (button.id) {
                 case 5:
@@ -67,8 +67,8 @@ public class GuiLanguage extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.list.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, I18n.format("options.language"), width / 2, 16, 16777215);
-        drawCenteredString(this.fontRendererObj, "(" + I18n.format("options.languageWarning") + ")", width / 2, height - 56, 8421504);
+        drawCenteredString(this.fontRendererObj, I18n.format("options.language"), (float) width / 2, 16, 16777215);
+        drawCenteredString(this.fontRendererObj, "(" + I18n.format("options.languageWarning") + ")", (float) width / 2, height - 56, 8421504);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -115,7 +115,7 @@ public class GuiLanguage extends GuiScreen {
 
         protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn) {
             GuiLanguage.this.fontRendererObj.setBidiFlag(true);
-            drawCenteredString(GuiLanguage.this.fontRendererObj, this.languageMap.get(this.langCodeList.get(entryID)).toString(), this.width / 2, p_180791_3_ + 1, 16777215);
+            drawCenteredString(GuiLanguage.this.fontRendererObj, this.languageMap.get(this.langCodeList.get(entryID)).toString(), (float) this.width / 2, p_180791_3_ + 1, 16777215);
             GuiLanguage.this.fontRendererObj.setBidiFlag(GuiLanguage.this.languageManager.getCurrentLanguage().isBidirectional());
         }
     }

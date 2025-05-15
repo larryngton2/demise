@@ -33,7 +33,7 @@ public class S3FPacketCustomPayload implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeString(this.channel);
         buf.writeBytes(this.data);
     }

@@ -59,7 +59,7 @@ public class MapGenNetherBridge extends MapGenStructure {
             }
 
             this.updateBoundingBox();
-            this.setRandomHeight(worldIn, p_i2040_2_, 48, 70);
+            this.setRandomHeight(worldIn, p_i2040_2_);
         }
     }
 }

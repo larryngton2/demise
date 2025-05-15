@@ -4,31 +4,32 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.UnmodifiableIterator;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
 public class Cartesian {
-    public static <T> Iterable<T[]> cartesianProduct(Class<T> clazz, Iterable<? extends Iterable<? extends T>> sets) {
-        return new Cartesian.Product(clazz, toArray(Iterable.class, sets));
+    public static <T> Product cartesianProduct(Class<T> clazz, Iterable<? extends Iterable<? extends T>> sets) {
+        return new Cartesian.Product<>(clazz, toArray(sets));
     }
 
     public static <T> Iterable<List<T>> cartesianProduct(Iterable<? extends Iterable<? extends T>> sets) {
         return arraysAsLists(cartesianProduct(Object.class, sets));
     }
 
-    private static <T> Iterable<List<T>> arraysAsLists(Iterable<Object[]> arrays) {
-        return Iterables.transform(arrays, new Cartesian.GetList());
+    private static <T> Iterable arraysAsLists(Iterable<Object[]> arrays) {
+        return Iterables.transform(arrays, new Cartesian.GetList<>());
     }
 
-    private static <T> T[] toArray(Class<? super T> clazz, Iterable<? extends T> it) {
+    private static <T> T[] toArray(Iterable<? extends T> it) {
         List<T> list = Lists.newArrayList();
 
         for (T t : it) {
             list.add(t);
         }
 
-        return list.toArray(createArray(clazz, list.size()));
+        return list.toArray(createArray((Class<? super T>) Iterable.class, list.size()));
     }
 
     private static <T> T[] createArray(Class<? super T> p_179319_0_, int p_179319_1_) {
@@ -53,7 +54,7 @@ public class Cartesian {
             this.iterables = iterables;
         }
 
-        public Iterator<T[]> iterator() {
+        public @NotNull Iterator<T[]> iterator() {
 
             Iterator<T[]> iterator;
             if (this.iterables.length <= 0) {

@@ -21,7 +21,6 @@ import wtf.demise.utils.render.ColorUtils;
 import java.nio.*;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Comparator;
 
 public class WorldRenderer {
     private ByteBuffer byteBuffer;
@@ -46,7 +45,7 @@ public class WorldRenderer {
     public SVertexBuilder sVertexBuilder;
     public RenderEnv renderEnv = null;
     public BitSet animatedSprites = null;
-    public BitSet animatedSpritesCached = new BitSet();
+    public final BitSet animatedSpritesCached = new BitSet();
     private boolean modeTriangles = false;
     private ByteBuffer byteBufferTriangles;
 
@@ -63,7 +62,7 @@ public class WorldRenderer {
             int i = this.byteBuffer.capacity();
             int j = i % 2097152;
             int k = j + (((this.rawIntBuffer.position() + p_181670_1_) * 4 - j) / 2097152 + 1) * 2097152;
-            LogManager.getLogger().warn("Needed to grow BufferBuilder buffer: Old size " + i + " bytes, new size " + k + " bytes.");
+            LogManager.getLogger().warn("Needed to grow BufferBuilder buffer: Old size {} bytes, new size {} bytes.", i, k);
             int l = this.rawIntBuffer.position();
             ByteBuffer bytebuffer = GLAllocation.createDirectByteBuffer(k);
             this.byteBuffer.position(0);
@@ -165,7 +164,7 @@ public class WorldRenderer {
             System.arraycopy(this.quadSprites, 0, atextureatlassprite, 0, j);
         }
 
-        return new WorldRenderer.State(aint, new VertexFormat(this.vertexFormat), atextureatlassprite);
+        return new State(aint, new VertexFormat(this.vertexFormat), atextureatlassprite);
     }
 
     public int getBufferSize() {
@@ -435,9 +434,7 @@ public class WorldRenderer {
     }
 
     public WorldRenderer color(int red, int green, int blue, int alpha) {
-        if (this.noColor) {
-            return this;
-        } else {
+        if (!this.noColor) {
             int i = this.vertexCount * this.vertexFormat.getNextOffset() + this.vertexFormat.getOffset(this.vertexFormatIndex);
 
             switch (this.vertexFormatElement.getType()) {
@@ -480,8 +477,8 @@ public class WorldRenderer {
             }
 
             this.nextVertexFormatIndex();
-            return this;
         }
+        return this;
     }
 
     public void addVertexData(int[] vertexData) {
@@ -793,18 +790,16 @@ public class WorldRenderer {
     }
 
     private int getBufferQuadSize() {
-        int i = this.rawIntBuffer.capacity() * 4 / (this.vertexFormat.getIntegerSize() * 4);
-        return i;
+        return this.rawIntBuffer.capacity() * 4 / (this.vertexFormat.getIntegerSize() * 4);
     }
 
     public RenderEnv getRenderEnv(IBlockState p_getRenderEnv_1_, BlockPos p_getRenderEnv_2_) {
         if (this.renderEnv == null) {
             this.renderEnv = new RenderEnv(p_getRenderEnv_1_, p_getRenderEnv_2_);
-            return this.renderEnv;
         } else {
             this.renderEnv.reset(p_getRenderEnv_1_, p_getRenderEnv_2_);
-            return this.renderEnv;
         }
+        return this.renderEnv;
     }
 
     public boolean isDrawing() {
@@ -890,7 +885,7 @@ public class WorldRenderer {
         return this.noColor;
     }
 
-    public class State {
+    public static class State {
         private final int[] stateRawBuffer;
         private final VertexFormat stateVertexFormat;
         private TextureAtlasSprite[] stateQuadSprites;

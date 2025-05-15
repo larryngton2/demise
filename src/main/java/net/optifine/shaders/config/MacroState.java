@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 
 public class MacroState {
     private boolean active = true;
-    private final Deque<Boolean> dequeState = new ArrayDeque();
-    private final Deque<Boolean> dequeResolved = new ArrayDeque();
-    private final Map<String, String> mapMacroValues = new HashMap();
+    private final Deque<Boolean> dequeState = new ArrayDeque<>();
+    private final Deque<Boolean> dequeResolved = new ArrayDeque<>();
+    private final Map<String, String> mapMacroValues = new HashMap<>();
     private static final Pattern PATTERN_DIRECTIVE = Pattern.compile("\\s*#\\s*(\\w+)\\s*(.*)");
     private static final Pattern PATTERN_DEFINED = Pattern.compile("defined\\s+(\\w+)");
     private static final Pattern PATTERN_DEFINED_FUNC = Pattern.compile("defined\\s*\\(\\s*(\\w+)\\s*\\)");
@@ -87,7 +87,7 @@ public class MacroState {
 
                     if (flag7) {
                         this.dequeState.add(Boolean.FALSE);
-                        this.dequeResolved.add(flag7);
+                        this.dequeResolved.add(true);
                     } else {
                         boolean flag8 = this.eval(param);
                         this.dequeState.add(flag8);
@@ -117,7 +117,7 @@ public class MacroState {
         boolean flag = false;
         int i = 0;
 
-        while (true) {
+        do {
             flag = false;
             Matcher matcher2 = PATTERN_MACRO.matcher(str);
 
@@ -144,10 +144,7 @@ public class MacroState {
                 }
             }
 
-            if (!flag || i >= 100) {
-                break;
-            }
-        }
+        } while (flag && i < 100);
 
         if (i >= 100) {
             Config.warn("Too many iterations: " + i + ", when resolving: " + str);
@@ -160,13 +157,11 @@ public class MacroState {
 
                 if (iexpression.getExpressionType() == ExpressionType.BOOL) {
                     IExpressionBool iexpressionbool = (IExpressionBool) iexpression;
-                    boolean flag1 = iexpressionbool.eval();
-                    return flag1;
+                    return iexpressionbool.eval();
                 } else if (iexpression.getExpressionType() == ExpressionType.FLOAT) {
                     IExpressionFloat iexpressionfloat = (IExpressionFloat) iexpression;
                     float f = iexpressionfloat.eval();
-                    boolean flag2 = f != 0.0F;
-                    return flag2;
+                    return f != 0.0F;
                 } else {
                     throw new ParseException("Not a boolean or float expression: " + iexpression.getExpressionType());
                 }

@@ -5,17 +5,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityArmorStand;
 
 public class ModelArmorStand extends ModelArmorStandArmor {
-    public ModelRenderer standRightSide;
-    public ModelRenderer standLeftSide;
-    public ModelRenderer standWaist;
-    public ModelRenderer standBase;
+    public final ModelRenderer standRightSide;
+    public final ModelRenderer standLeftSide;
+    public final ModelRenderer standWaist;
+    public final ModelRenderer standBase;
 
     public ModelArmorStand() {
         this(0.0F);
     }
 
     public ModelArmorStand(float p_i46306_1_) {
-        super(p_i46306_1_, 64, 64);
+        super(p_i46306_1_, 64);
         this.bipedHead = new ModelRenderer(this, 0, 0);
         this.bipedHead.addBox(-1.0F, -7.0F, -1.0F, 2, 7, 2, p_i46306_1_);
         this.bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
@@ -86,20 +86,16 @@ public class ModelArmorStand extends ModelArmorStandArmor {
             float f = 2.0F;
             GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
             GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
-            this.standRightSide.render(scale);
-            this.standLeftSide.render(scale);
-            this.standWaist.render(scale);
-            this.standBase.render(scale);
         } else {
             if (entityIn.isSneaking()) {
                 GlStateManager.translate(0.0F, 0.2F, 0.0F);
             }
 
-            this.standRightSide.render(scale);
-            this.standLeftSide.render(scale);
-            this.standWaist.render(scale);
-            this.standBase.render(scale);
         }
+        this.standRightSide.render(scale);
+        this.standLeftSide.render(scale);
+        this.standWaist.render(scale);
+        this.standBase.render(scale);
 
         GlStateManager.popMatrix();
     }

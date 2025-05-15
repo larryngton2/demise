@@ -83,7 +83,7 @@ public class ConnectedTexturesCompact {
     }
 
     private static BakedQuad[] getQuadsCompact4(int upLeft, int upRight, int downLeft, int downRight, TextureAtlasSprite[] sprites, int side, BakedQuad quad, RenderEnv renderEnv) {
-        return upLeft == upRight ? (downLeft == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.UP, upLeft, ConnectedTexturesCompact.Dir.DOWN, downLeft, sprites, side, quad, renderEnv) : getQuadsCompact(ConnectedTexturesCompact.Dir.UP, upLeft, ConnectedTexturesCompact.Dir.DOWN_LEFT, downLeft, ConnectedTexturesCompact.Dir.DOWN_RIGHT, downRight, sprites, side, quad, renderEnv)) : (downLeft == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.UP_LEFT, upLeft, ConnectedTexturesCompact.Dir.UP_RIGHT, upRight, ConnectedTexturesCompact.Dir.DOWN, downLeft, sprites, side, quad, renderEnv) : (upLeft == downLeft ? (upRight == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.LEFT, upLeft, ConnectedTexturesCompact.Dir.RIGHT, upRight, sprites, side, quad, renderEnv) : getQuadsCompact(ConnectedTexturesCompact.Dir.LEFT, upLeft, ConnectedTexturesCompact.Dir.UP_RIGHT, upRight, ConnectedTexturesCompact.Dir.DOWN_RIGHT, downRight, sprites, side, quad, renderEnv)) : (upRight == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.UP_LEFT, upLeft, ConnectedTexturesCompact.Dir.DOWN_LEFT, downLeft, ConnectedTexturesCompact.Dir.RIGHT, upRight, sprites, side, quad, renderEnv) : getQuadsCompact(ConnectedTexturesCompact.Dir.UP_LEFT, upLeft, ConnectedTexturesCompact.Dir.UP_RIGHT, upRight, ConnectedTexturesCompact.Dir.DOWN_LEFT, downLeft, ConnectedTexturesCompact.Dir.DOWN_RIGHT, downRight, sprites, side, quad, renderEnv))));
+        return upLeft == upRight ? (downLeft == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.UP, upLeft, ConnectedTexturesCompact.Dir.DOWN, downLeft, sprites, side, quad, renderEnv) : getQuadsCompact(ConnectedTexturesCompact.Dir.UP, upLeft, ConnectedTexturesCompact.Dir.DOWN_LEFT, downLeft, ConnectedTexturesCompact.Dir.DOWN_RIGHT, downRight, sprites, side, quad, renderEnv)) : (downLeft == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.UP_LEFT, upLeft, ConnectedTexturesCompact.Dir.UP_RIGHT, upRight, ConnectedTexturesCompact.Dir.DOWN, downLeft, sprites, side, quad, renderEnv) : (upLeft == downLeft ? (upRight == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.LEFT, upLeft, ConnectedTexturesCompact.Dir.RIGHT, upRight, sprites, side, quad, renderEnv) : getQuadsCompact(ConnectedTexturesCompact.Dir.LEFT, upLeft, ConnectedTexturesCompact.Dir.UP_RIGHT, upRight, ConnectedTexturesCompact.Dir.DOWN_RIGHT, downRight, sprites, side, quad, renderEnv)) : (upRight == downRight ? getQuadsCompact(ConnectedTexturesCompact.Dir.UP_LEFT, upLeft, ConnectedTexturesCompact.Dir.DOWN_LEFT, downLeft, ConnectedTexturesCompact.Dir.RIGHT, upRight, sprites, side, quad, renderEnv) : getQuadsCompact(upLeft, upRight, downLeft, downRight, sprites, side, quad, renderEnv))));
     }
 
     private static BakedQuad[] getQuadsCompact(int index, TextureAtlasSprite[] sprites, BakedQuad quad, RenderEnv renderEnv) {
@@ -104,11 +104,11 @@ public class ConnectedTexturesCompact {
         return renderEnv.getArrayQuadsCtm(bakedquad, bakedquad1, bakedquad2);
     }
 
-    private static BakedQuad[] getQuadsCompact(ConnectedTexturesCompact.Dir dir1, int index1, ConnectedTexturesCompact.Dir dir2, int index2, ConnectedTexturesCompact.Dir dir3, int index3, ConnectedTexturesCompact.Dir dir4, int index4, TextureAtlasSprite[] sprites, int side, BakedQuad quad, RenderEnv renderEnv) {
-        BakedQuad bakedquad = getQuadCompact(sprites[index1], dir1, side, quad, renderEnv);
-        BakedQuad bakedquad1 = getQuadCompact(sprites[index2], dir2, side, quad, renderEnv);
-        BakedQuad bakedquad2 = getQuadCompact(sprites[index3], dir3, side, quad, renderEnv);
-        BakedQuad bakedquad3 = getQuadCompact(sprites[index4], dir4, side, quad, renderEnv);
+    private static BakedQuad[] getQuadsCompact(int index1, int index2, int index3, int index4, TextureAtlasSprite[] sprites, int side, BakedQuad quad, RenderEnv renderEnv) {
+        BakedQuad bakedquad = getQuadCompact(sprites[index1], Dir.UP_LEFT, side, quad, renderEnv);
+        BakedQuad bakedquad1 = getQuadCompact(sprites[index2], Dir.UP_RIGHT, side, quad, renderEnv);
+        BakedQuad bakedquad2 = getQuadCompact(sprites[index3], Dir.DOWN_LEFT, side, quad, renderEnv);
+        BakedQuad bakedquad3 = getQuadCompact(sprites[index4], Dir.DOWN_RIGHT, side, quad, renderEnv);
         return renderEnv.getArrayQuadsCtm(bakedquad, bakedquad1, bakedquad2, bakedquad3);
     }
 
@@ -145,7 +145,7 @@ public class ConnectedTexturesCompact {
                 Map<BakedQuad, BakedQuad> map = amap1[dir.ordinal()];
 
                 if (map == null) {
-                    map = new IdentityHashMap(1);
+                    map = new IdentityHashMap<>(1);
                     amap1[dir.ordinal()] = map;
                 }
 
@@ -171,8 +171,7 @@ public class ConnectedTexturesCompact {
             fixVertexCompact(aint, i, textureatlassprite, sprite, side, x1, y1, x2, y2);
         }
 
-        BakedQuad bakedquad = new BakedQuad(aint, quad.getTintIndex(), quad.getFace(), sprite);
-        return bakedquad;
+        return new BakedQuad(aint, quad.getTintIndex(), quad.getFace(), sprite);
     }
 
     private static void fixVertexCompact(int[] data, int vertex, TextureAtlasSprite spriteFrom, TextureAtlasSprite spriteTo, int side, int x1, int y1, int x2, int y2) {

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,7 +28,7 @@ public class RegistrySimple<K, V> implements IRegistry<K, V> {
         Validate.notNull(value);
 
         if (this.registryObjects.containsKey(key)) {
-            logger.debug("Adding duplicate key '" + key + "' to registry");
+            logger.debug("Adding duplicate key '{}' to registry", key);
         }
 
         this.registryObjects.put(key, value);
@@ -41,7 +42,7 @@ public class RegistrySimple<K, V> implements IRegistry<K, V> {
         return this.registryObjects.containsKey(key);
     }
 
-    public Iterator<V> iterator() {
+    public @NotNull Iterator<V> iterator() {
         return this.registryObjects.values().iterator();
     }
 }

@@ -16,11 +16,11 @@ public class C16PacketClientStatus implements Packet<INetHandlerPlayServer> {
         this.status = statusIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.status = buf.readEnumValue(EnumState.class);
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeEnumValue(this.status);
     }
 

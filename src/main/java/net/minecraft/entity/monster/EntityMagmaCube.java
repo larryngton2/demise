@@ -22,10 +22,6 @@ public class EntityMagmaCube extends EntitySlime {
         return this.worldObj.getDifficulty() != EnumDifficulty.PEACEFUL;
     }
 
-    public boolean isNotColliding() {
-        return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this) && this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty() && !this.worldObj.isAnyLiquid(this.getEntityBoundingBox());
-    }
-
     public int getTotalArmorValue() {
         return this.getSlimeSize() * 3;
     }

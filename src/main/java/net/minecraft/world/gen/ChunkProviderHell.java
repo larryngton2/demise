@@ -72,7 +72,7 @@ public class ChunkProviderHell implements IChunkProvider {
         int k = i + 1;
         int l = 17;
         int i1 = i + 1;
-        this.noiseField = this.initializeNoiseField(this.noiseField, p_180515_1_ * i, 0, p_180515_2_ * i, k, l, i1);
+        this.noiseField = this.initializeNoiseField(this.noiseField, p_180515_1_ * i, p_180515_2_ * i, k, l, i1);
 
         for (int j1 = 0; j1 < i; ++j1) {
             for (int k1 = 0; k1 < i; ++k1) {
@@ -222,18 +222,18 @@ public class ChunkProviderHell implements IChunkProvider {
         return chunk;
     }
 
-    private double[] initializeNoiseField(double[] p_73164_1_, int p_73164_2_, int p_73164_3_, int p_73164_4_, int p_73164_5_, int p_73164_6_, int p_73164_7_) {
+    private double[] initializeNoiseField(double[] p_73164_1_, int p_73164_2_, int p_73164_4_, int p_73164_5_, int p_73164_6_, int p_73164_7_) {
         if (p_73164_1_ == null) {
             p_73164_1_ = new double[p_73164_5_ * p_73164_6_ * p_73164_7_];
         }
 
         double d0 = 684.412D;
         double d1 = 2053.236D;
-        this.noiseData4 = this.netherNoiseGen6.generateNoiseOctaves(this.noiseData4, p_73164_2_, p_73164_3_, p_73164_4_, p_73164_5_, 1, p_73164_7_, 1.0D, 0.0D, 1.0D);
-        this.noiseData5 = this.netherNoiseGen7.generateNoiseOctaves(this.noiseData5, p_73164_2_, p_73164_3_, p_73164_4_, p_73164_5_, 1, p_73164_7_, 100.0D, 0.0D, 100.0D);
-        this.noiseData1 = this.netherNoiseGen3.generateNoiseOctaves(this.noiseData1, p_73164_2_, p_73164_3_, p_73164_4_, p_73164_5_, p_73164_6_, p_73164_7_, d0 / 80.0D, d1 / 60.0D, d0 / 80.0D);
-        this.noiseData2 = this.netherNoiseGen1.generateNoiseOctaves(this.noiseData2, p_73164_2_, p_73164_3_, p_73164_4_, p_73164_5_, p_73164_6_, p_73164_7_, d0, d1, d0);
-        this.noiseData3 = this.netherNoiseGen2.generateNoiseOctaves(this.noiseData3, p_73164_2_, p_73164_3_, p_73164_4_, p_73164_5_, p_73164_6_, p_73164_7_, d0, d1, d0);
+        this.noiseData4 = this.netherNoiseGen6.generateNoiseOctaves(this.noiseData4, p_73164_2_, 0, p_73164_4_, p_73164_5_, 1, p_73164_7_, 1.0D, 0.0D, 1.0D);
+        this.noiseData5 = this.netherNoiseGen7.generateNoiseOctaves(this.noiseData5, p_73164_2_, 0, p_73164_4_, p_73164_5_, 1, p_73164_7_, 100.0D, 0.0D, 100.0D);
+        this.noiseData1 = this.netherNoiseGen3.generateNoiseOctaves(this.noiseData1, p_73164_2_, 0, p_73164_4_, p_73164_5_, p_73164_6_, p_73164_7_, d0 / 80.0D, d1 / 60.0D, d0 / 80.0D);
+        this.noiseData2 = this.netherNoiseGen1.generateNoiseOctaves(this.noiseData2, p_73164_2_, 0, p_73164_4_, p_73164_5_, p_73164_6_, p_73164_7_, d0, d1, d0);
+        this.noiseData3 = this.netherNoiseGen2.generateNoiseOctaves(this.noiseData3, p_73164_2_, 0, p_73164_4_, p_73164_5_, p_73164_6_, p_73164_7_, d0, d1, d0);
         int i = 0;
         double[] adouble = new double[p_73164_6_];
 
@@ -275,12 +275,6 @@ public class ChunkProviderHell implements IChunkProvider {
                     if (k > p_73164_6_ - 4) {
                         double d9 = (float) (k - (p_73164_6_ - 4)) / 3.0F;
                         d4 = d4 * (1.0D - d9) + -10.0D * d9;
-                    }
-
-                    if ((double) k < d3) {
-                        double d10 = (d3 - (double) k) / 4.0D;
-                        d10 = MathHelper.clamp_double(d10, 0.0D, 1.0D);
-                        d4 = d4 * (1.0D - d10) + -10.0D * d10;
                     }
 
                     p_73164_1_[i] = d4;
@@ -341,8 +335,7 @@ public class ChunkProviderHell implements IChunkProvider {
         return false;
     }
 
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
-        return true;
+    public void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
     }
 
     public void saveExtraData() {

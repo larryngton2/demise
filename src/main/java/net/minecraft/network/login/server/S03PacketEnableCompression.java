@@ -16,11 +16,11 @@ public class S03PacketEnableCompression implements Packet<INetHandlerLoginClient
         this.compressionTreshold = compressionTresholdIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.compressionTreshold = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.compressionTreshold);
     }
 

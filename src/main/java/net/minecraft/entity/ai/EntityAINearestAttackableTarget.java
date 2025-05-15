@@ -8,7 +8,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EntitySelectors;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class EntityAINearestAttackableTarget<T extends EntityLivingBase> extends
                     }
                 }
 
-                return EntityAINearestAttackableTarget.this.isSuitableTarget(p_apply_1_, false);
+                return EntityAINearestAttackableTarget.this.isSuitableTarget(p_apply_1_);
             }
         };
     }

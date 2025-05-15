@@ -10,7 +10,7 @@ public class UserListOps extends UserList<GameProfile, UserListOpsEntry> {
         super(saveFile);
     }
 
-    protected UserListEntry<GameProfile> createEntry(JsonObject entryData) {
+    protected UserListEntry createEntry(JsonObject entryData) {
         return new UserListOpsEntry(entryData);
     }
 

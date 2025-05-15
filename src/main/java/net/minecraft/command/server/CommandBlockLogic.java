@@ -16,7 +16,6 @@ import net.minecraft.world.World;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 public abstract class CommandBlockLogic implements ICommandSender {
     private static final SimpleDateFormat timestampFormat = new SimpleDateFormat("HH:mm:ss");
@@ -96,8 +95,8 @@ public abstract class CommandBlockLogic implements ICommandSender {
             } catch (Throwable throwable) {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Executing command block");
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Command to be executed");
-                crashreportcategory.addCrashSectionCallable("Command", () -> CommandBlockLogic.this.getCommand());
-                crashreportcategory.addCrashSectionCallable("Name", () -> CommandBlockLogic.this.getName());
+                crashreportcategory.addCrashSectionCallable("Command", CommandBlockLogic.this::getCommand);
+                crashreportcategory.addCrashSectionCallable("Name", CommandBlockLogic.this::getName);
                 throw new ReportedException(crashreport);
             }
         } else {

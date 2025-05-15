@@ -16,7 +16,7 @@ public class S3APacketTabComplete implements Packet<INetHandlerPlayClient> {
         this.matches = matchesIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.matches = new String[buf.readVarIntFromBuffer()];
 
         for (int i = 0; i < this.matches.length; ++i) {
@@ -24,7 +24,7 @@ public class S3APacketTabComplete implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.matches.length);
 
         for (String s : this.matches) {

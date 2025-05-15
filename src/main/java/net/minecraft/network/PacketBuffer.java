@@ -72,11 +72,11 @@ public class PacketBuffer extends ByteBuf {
         this.writeLong(pos.toLong());
     }
 
-    public IChatComponent readChatComponent() throws IOException {
+    public IChatComponent readChatComponent() {
         return IChatComponent.Serializer.jsonToComponent(this.readStringFromBuffer(32767));
     }
 
-    public void writeChatComponent(IChatComponent component) throws IOException {
+    public void writeChatComponent(IChatComponent component) {
         this.writeString(IChatComponent.Serializer.componentToJson(component));
     }
 

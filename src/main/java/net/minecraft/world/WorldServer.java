@@ -1,6 +1,5 @@
 package net.minecraft.world;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -54,7 +53,7 @@ public class WorldServer extends World implements IThreadListener {
     private final EntityTracker theEntityTracker;
     private final PlayerManager thePlayerManager;
     private final Set<NextTickListEntry> pendingTickListEntriesHashSet = Sets.newHashSet();
-    private final TreeSet<NextTickListEntry> pendingTickListEntriesTreeSet = new TreeSet();
+    private final TreeSet<NextTickListEntry> pendingTickListEntriesTreeSet = new TreeSet<>();
     private final Map<UUID, Entity> entitiesByUuid = Maps.newHashMap();
     public ChunkProviderServer theChunkProviderServer;
     public boolean disableLevelSaving;
@@ -583,7 +582,7 @@ public class WorldServer extends World implements IThreadListener {
 
                 try {
                     this.addWorldInfoToCrashReport(crashreport);
-                } catch (Throwable var5) {
+                } catch (Throwable ignored) {
                 }
 
                 throw new ReportedException(crashreport);

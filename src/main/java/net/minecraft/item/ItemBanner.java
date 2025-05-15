@@ -22,7 +22,7 @@ public class ItemBanner extends ItemBlock {
         super(Blocks.standing_banner);
         this.maxStackSize = 16;
         this.setCreativeTab(CreativeTabs.tabDecorations);
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
         this.setMaxDamage(0);
     }
 

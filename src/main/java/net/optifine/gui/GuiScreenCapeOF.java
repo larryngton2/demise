@@ -101,10 +101,10 @@ public class GuiScreenCapeOF extends GuiScreenOF {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRenderer, this.title, width / 2, 20, 16777215);
+        drawCenteredString(this.fontRenderer, this.title, (float) width / 2, 20, 16777215);
 
         if (this.message != null) {
-            drawCenteredString(this.fontRenderer, this.message, width / 2, height / 6 + 60, 16777215);
+            drawCenteredString(this.fontRenderer, this.message, (float) width / 2, (float) height / 6 + 60, 16777215);
 
             if (System.currentTimeMillis() > this.messageHideTimeMs) {
                 this.message = null;

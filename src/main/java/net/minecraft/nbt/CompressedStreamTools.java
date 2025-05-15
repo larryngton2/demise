@@ -78,7 +78,7 @@ public class CompressedStreamTools {
     }
 
     public static NBTTagCompound read(DataInput p_152456_0_, NBTSizeTracker p_152456_1_) throws IOException {
-        NBTBase nbtbase = func_152455_a(p_152456_0_, 0, p_152456_1_);
+        NBTBase nbtbase = func_152455_a(p_152456_0_, p_152456_1_);
 
         if (nbtbase instanceof NBTTagCompound) {
             return (NBTTagCompound) nbtbase;
@@ -100,7 +100,7 @@ public class CompressedStreamTools {
         }
     }
 
-    private static NBTBase func_152455_a(DataInput p_152455_0_, int p_152455_1_, NBTSizeTracker p_152455_2_) throws IOException {
+    private static NBTBase func_152455_a(DataInput p_152455_0_, NBTSizeTracker p_152455_2_) throws IOException {
         byte b0 = p_152455_0_.readByte();
 
         if (b0 == 0) {
@@ -110,7 +110,7 @@ public class CompressedStreamTools {
             NBTBase nbtbase = NBTBase.createNewByType(b0);
 
             try {
-                nbtbase.read(p_152455_0_, p_152455_1_, p_152455_2_);
+                nbtbase.read(p_152455_0_, 0, p_152455_2_);
                 return nbtbase;
             } catch (IOException ioexception) {
                 CrashReport crashreport = CrashReport.makeCrashReport(ioexception, "Loading NBT data");

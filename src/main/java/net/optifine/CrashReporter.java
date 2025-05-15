@@ -58,12 +58,11 @@ public class CrashReporter {
     }
 
     private static String makeReport(CrashReport crashReport) {
-        String stringbuffer = "OptiFineVersion: " + Config.getVersion() + "\n" +
+        return "OptiFineVersion: " + Config.getVersion() + "\n" +
                 "Summary: " + makeSummary(crashReport) + "\n" +
                 "\n" +
                 crashReport.getCompleteReport() +
                 "\n";
-        return stringbuffer;
     }
 
     private static String makeSummary(CrashReport crashReport) {
@@ -79,8 +78,7 @@ public class CrashReporter {
                 s = astacktraceelement[0].toString().trim();
             }
 
-            String s1 = throwable.getClass().getName() + ": " + throwable.getMessage() + " (" + crashReport.getDescription() + ")" + " [" + s + "]";
-            return s1;
+            return throwable.getClass().getName() + ": " + throwable.getMessage() + " (" + crashReport.getDescription() + ")" + " [" + s + "]";
         }
     }
 

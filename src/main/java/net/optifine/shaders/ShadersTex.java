@@ -30,7 +30,7 @@ public class ShadersTex {
     public static final int defBaseTexColor = 0;
     public static final int defNormTexColor = -8421377;
     public static final int defSpecTexColor = 0;
-    public static Map<Integer, MultiTexID> multiTexMap = new HashMap();
+    public static final Map<Integer, MultiTexID> multiTexMap = new HashMap<>();
 
     public static IntBuffer getIntBuffer(int size) {
         if (intBuffer.capacity() < size) {
@@ -425,13 +425,11 @@ public class ShadersTex {
         }
 
         int l1 = (k1 + 1) / 2;
-        int i2 = j1 << 24 | ((c0 >>> 16 & 255) * i + (c1 >>> 16 & 255) * j + (c2 >>> 16 & 255) * k + (c3 >>> 16 & 255) * l + l1) / k1 << 16 | ((c0 >>> 8 & 255) * i + (c1 >>> 8 & 255) * j + (c2 >>> 8 & 255) * k + (c3 >>> 8 & 255) * l + l1) / k1 << 8 | ((c0 & 255) * i + (c1 & 255) * j + (c2 & 255) * k + (c3 & 255) * l + l1) / k1;
-        return i2;
+        return j1 << 24 | ((c0 >>> 16 & 255) * i + (c1 >>> 16 & 255) * j + (c2 >>> 16 & 255) * k + (c3 >>> 16 & 255) * l + l1) / k1 << 16 | ((c0 >>> 8 & 255) * i + (c1 >>> 8 & 255) * j + (c2 >>> 8 & 255) * k + (c3 >>> 8 & 255) * l + l1) / k1 << 8 | ((c0 & 255) * i + (c1 & 255) * j + (c2 & 255) * k + (c3 & 255) * l + l1) / k1;
     }
 
     public static int blend4Simple(int c0, int c1, int c2, int c3) {
-        int i = ((c0 >>> 24 & 255) + (c1 >>> 24 & 255) + (c2 >>> 24 & 255) + (c3 >>> 24 & 255) + 2) / 4 << 24 | ((c0 >>> 16 & 255) + (c1 >>> 16 & 255) + (c2 >>> 16 & 255) + (c3 >>> 16 & 255) + 2) / 4 << 16 | ((c0 >>> 8 & 255) + (c1 >>> 8 & 255) + (c2 >>> 8 & 255) + (c3 >>> 8 & 255) + 2) / 4 << 8 | ((c0 & 255) + (c1 & 255) + (c2 & 255) + (c3 & 255) + 2) / 4;
-        return i;
+        return ((c0 >>> 24 & 255) + (c1 >>> 24 & 255) + (c2 >>> 24 & 255) + (c3 >>> 24 & 255) + 2) / 4 << 24 | ((c0 >>> 16 & 255) + (c1 >>> 16 & 255) + (c2 >>> 16 & 255) + (c3 >>> 16 & 255) + 2) / 4 << 16 | ((c0 >>> 8 & 255) + (c1 >>> 8 & 255) + (c2 >>> 8 & 255) + (c3 >>> 8 & 255) + 2) / 4 << 8 | ((c0 & 255) + (c1 & 255) + (c2 & 255) + (c3 & 255) + 2) / 4;
     }
 
     public static void genMipmapAlpha(int[] aint, int offset, int width, int height) {
@@ -689,7 +687,7 @@ public class ShadersTex {
         }
     }
 
-    public static int loadSimpleTexture(int textureID, BufferedImage bufferedimage, boolean linear, boolean clamp, IResourceManager resourceManager, ResourceLocation location, MultiTexID multiTex) {
+    public static void loadSimpleTexture(int textureID, BufferedImage bufferedimage, boolean linear, boolean clamp, IResourceManager resourceManager, ResourceLocation location, MultiTexID multiTex) {
         int i = bufferedimage.getWidth();
         int j = bufferedimage.getHeight();
         int k = i * j;
@@ -697,7 +695,6 @@ public class ShadersTex {
         bufferedimage.getRGB(0, 0, i, j, aint, 0, i);
         loadNSMap(resourceManager, location, i, j, aint);
         setupTexture(multiTex, aint, i, j, linear, clamp);
-        return textureID;
     }
 
     public static void mergeImage(int[] aint, int dstoff, int srcoff, int size) {

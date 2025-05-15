@@ -33,7 +33,7 @@ public class S44PacketWorldBorder implements Packet<INetHandlerPlayClient> {
         this.warningTime = border.getWarningTime();
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.action = buf.readEnumValue(Action.class);
 
         switch (this.action) {
@@ -72,7 +72,7 @@ public class S44PacketWorldBorder implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeEnumValue(this.action);
 
         switch (this.action) {

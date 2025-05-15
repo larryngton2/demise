@@ -28,15 +28,13 @@ public class GuiVideoSettings extends GuiScreenOF {
         for (int i = 0; i < videoOptions.length; ++i) {
             GameSettings.Options gamesettings$options = videoOptions[i];
 
-            if (gamesettings$options != null) {
-                int j = width / 2 - 155 + i % 2 * 160;
-                int k = height / 6 + 21 * (i / 2) - 12;
+            int j = width / 2 - 155 + i % 2 * 160;
+            int k = height / 6 + 21 * (i / 2) - 12;
 
-                if (gamesettings$options.getEnumFloat()) {
-                    this.buttonList.add(new GuiOptionSliderOF(gamesettings$options.returnEnumOrdinal(), j, k, gamesettings$options));
-                } else {
-                    this.buttonList.add(new GuiOptionButtonOF(gamesettings$options.returnEnumOrdinal(), j, k, gamesettings$options, this.guiGameSettings.getKeyBinding(gamesettings$options)));
-                }
+            if (gamesettings$options.getEnumFloat()) {
+                this.buttonList.add(new GuiOptionSliderOF(gamesettings$options.returnEnumOrdinal(), j, k, gamesettings$options));
+            } else {
+                this.buttonList.add(new GuiOptionButtonOF(gamesettings$options.returnEnumOrdinal(), j, k, gamesettings$options, this.guiGameSettings.getKeyBinding(gamesettings$options)));
             }
         }
 
@@ -57,10 +55,10 @@ public class GuiVideoSettings extends GuiScreenOF {
         i1 = width / 2 - 155 + 160;
         this.buttonList.add(new GuiOptionButton(222, i1, l, Lang.get("of.options.other")));
         l = l + 21;
-        this.buttonList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168 + 11, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 - 100, (float) height / 6 + 168 + 11, I18n.format("gui.done")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         this.actionPerformed(button, 1);
     }
 
@@ -151,21 +149,11 @@ public class GuiVideoSettings extends GuiScreenOF {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.screenTitle, width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.screenTitle, (float) width / 2, 15, 16777215);
         String s = Config.getVersion();
         String s1 = "HD_U";
 
-        if (s1.equals("HD")) {
-            s = "OptiFine HD M6_pre2";
-        }
-
-        if (s1.equals("HD_U")) {
-            s = "OptiFine HD M6_pre2 Ultra";
-        }
-
-        if (s1.equals("L")) {
-            s = "OptiFine M6_pre2 Light";
-        }
+        s = "OptiFine HD M6_pre2 Ultra";
 
         this.drawString(this.fontRendererObj, s, 2, height - 10, 8421504);
         String s2 = "Minecraft 1.8.9";

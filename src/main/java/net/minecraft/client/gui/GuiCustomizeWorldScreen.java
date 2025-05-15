@@ -17,7 +17,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
     protected String field_175341_a = "Customize World Settings";
     protected String field_175333_f = "Page 1 of 3";
     protected String field_175335_g = "Basic Settings";
-    protected String[] field_175342_h = new String[4];
+    protected final String[] field_175342_h = new String[4];
     private GuiPageButtonList field_175349_r;
     private GuiButton field_175348_s;
     private GuiButton field_175347_t;
@@ -32,7 +32,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
     private boolean field_175340_C = false;
     private final Predicate<String> field_175332_D = p_apply_1_ -> {
         Float f = Floats.tryParse(p_apply_1_);
-        return p_apply_1_.length() == 0 || f != null && Floats.isFinite(f) && f >= 0.0F;
+        return p_apply_1_.isEmpty() || f != null && Floats.isFinite(f) && f >= 0.0F;
     };
     private final ChunkProviderSettings.Factory field_175334_E = new ChunkProviderSettings.Factory();
     private ChunkProviderSettings.Factory field_175336_F;
@@ -56,15 +56,15 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
         this.buttonList.clear();
         this.buttonList.add(this.field_175345_v = new GuiButton(302, 20, 5, 80, 20, I18n.format("createWorld.customize.custom.prev")));
         this.buttonList.add(this.field_175344_w = new GuiButton(303, width - 100, 5, 80, 20, I18n.format("createWorld.customize.custom.next")));
-        this.buttonList.add(this.field_175346_u = new GuiButton(304, width / 2 - 187, height - 27, 90, 20, I18n.format("createWorld.customize.custom.defaults")));
-        this.buttonList.add(this.field_175347_t = new GuiButton(301, width / 2 - 92, height - 27, 90, 20, I18n.format("createWorld.customize.custom.randomize")));
-        this.buttonList.add(this.field_175350_z = new GuiButton(305, width / 2 + 3, height - 27, 90, 20, I18n.format("createWorld.customize.custom.presets")));
-        this.buttonList.add(this.field_175348_s = new GuiButton(300, width / 2 + 98, height - 27, 90, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.field_175346_u = new GuiButton(304, (float) width / 2 - 187, height - 27, 90, 20, I18n.format("createWorld.customize.custom.defaults")));
+        this.buttonList.add(this.field_175347_t = new GuiButton(301, (float) width / 2 - 92, height - 27, 90, 20, I18n.format("createWorld.customize.custom.randomize")));
+        this.buttonList.add(this.field_175350_z = new GuiButton(305, (float) width / 2 + 3, height - 27, 90, 20, I18n.format("createWorld.customize.custom.presets")));
+        this.buttonList.add(this.field_175348_s = new GuiButton(300, (float) width / 2 + 98, height - 27, 90, 20, I18n.format("gui.done")));
         this.field_175346_u.enabled = this.field_175338_A;
-        this.field_175352_x = new GuiButton(306, width / 2 - 55, 160, 50, 20, I18n.format("gui.yes"));
+        this.field_175352_x = new GuiButton(306, (float) width / 2 - 55, 160, 50, 20, I18n.format("gui.yes"));
         this.field_175352_x.visible = false;
         this.buttonList.add(this.field_175352_x);
-        this.field_175351_y = new GuiButton(307, width / 2 + 5, 160, 50, 20, I18n.format("gui.no"));
+        this.field_175351_y = new GuiButton(307, (float) width / 2 + 5, 160, 50, 20, I18n.format("gui.no"));
         this.field_175351_y.visible = false;
         this.buttonList.add(this.field_175351_y);
 
@@ -118,7 +118,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
 
         try {
             f = Float.parseFloat(p_175319_2_);
-        } catch (NumberFormatException var5) {
+        } catch (NumberFormatException ignored) {
         }
 
         float f1 = switch (p_175319_1_) {
@@ -674,7 +674,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
 
                 case 304:
                     if (this.field_175338_A) {
-                        this.func_175322_b(304);
+                        this.func_175322_b();
                     }
 
                     break;
@@ -700,8 +700,8 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
         this.func_181031_a(false);
     }
 
-    private void func_175322_b(int p_175322_1_) {
-        this.field_175339_B = p_175322_1_;
+    private void func_175322_b() {
+        this.field_175339_B = 304;
         this.func_175329_a(true);
     }
 
@@ -812,9 +812,9 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.field_175349_r.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, this.field_175341_a, width / 2, 2, 16777215);
-        drawCenteredString(this.fontRendererObj, this.field_175333_f, width / 2, 12, 16777215);
-        drawCenteredString(this.fontRendererObj, this.field_175335_g, width / 2, 22, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_175341_a, (float) width / 2, 2, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_175333_f, (float) width / 2, 12, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_175335_g, (float) width / 2, 22, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         /*

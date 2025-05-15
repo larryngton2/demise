@@ -91,8 +91,8 @@ public class GuiShaderOptions extends GuiScreenOF {
             }
         }
 
-        this.buttonList.add(new GuiButton(201, width / 2 - i1 - 20, height / 6 + 168 + 11, i1, j1, I18n.format("controls.reset")));
-        this.buttonList.add(new GuiButton(200, width / 2 + 20, height / 6 + 168 + 11, i1, j1, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(201, (float) width / 2 - i1 - 20, (float) height / 6 + 168 + 11, i1, j1, I18n.format("controls.reset")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 + 20, (float) height / 6 + 168 + 11, i1, j1, I18n.format("gui.done")));
     }
 
     public static String getButtonText(ShaderOption so, float btnWidth) {
@@ -201,9 +201,9 @@ public class GuiShaderOptions extends GuiScreenOF {
         this.drawDefaultBackground();
 
         if (this.screenText != null) {
-            drawCenteredString(this.fontRendererObj, this.screenText, width / 2, 15, 16777215);
+            drawCenteredString(this.fontRendererObj, this.screenText, (float) width / 2, 15, 16777215);
         } else {
-            drawCenteredString(this.fontRendererObj, this.title, width / 2, 15, 16777215);
+            drawCenteredString(this.fontRendererObj, this.title, (float) width / 2, 15, 16777215);
         }
 
         super.drawScreen(x, y, f);

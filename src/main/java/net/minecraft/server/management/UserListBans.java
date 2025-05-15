@@ -10,7 +10,7 @@ public class UserListBans extends UserList<GameProfile, UserListBansEntry> {
         super(bansFile);
     }
 
-    protected UserListEntry<GameProfile> createEntry(JsonObject entryData) {
+    protected UserListEntry createEntry(JsonObject entryData) {
         return new UserListBansEntry(entryData);
     }
 

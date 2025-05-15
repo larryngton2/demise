@@ -97,14 +97,15 @@ public class Property {
         this.value = this.defaultValue;
     }
 
-    public boolean loadFrom(Properties props) {
+    public void loadFrom(Properties props) {
         this.resetValue();
 
         if (props == null) {
-            return false;
         } else {
             String s = props.getProperty(this.propertyName);
-            return s != null && this.setPropertyValue(s);
+            if (s != null) {
+                this.setPropertyValue(s);
+            }
         }
     }
 

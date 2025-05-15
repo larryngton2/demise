@@ -17,11 +17,11 @@ public class C00PacketLoginStart implements Packet<INetHandlerLoginServer> {
         this.profile = profileIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.profile = new GameProfile(null, buf.readStringFromBuffer(16));
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeString(this.profile.getName());
     }
 

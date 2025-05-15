@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Iterator;
 import java.util.Map;
 
 public class ContainerRepair extends Container {
@@ -347,7 +346,7 @@ public class ContainerRepair extends Container {
 
                 slot.onSlotChange(itemstack1, itemstack);
             } else if (index != 0 && index != 1) {
-                if (index >= 3 && index < 39 && !this.mergeItemStack(itemstack1, 0, 2, false)) {
+                if (index < 39 && !this.mergeItemStack(itemstack1, 0, 2, false)) {
                     return null;
                 }
             } else if (!this.mergeItemStack(itemstack1, 3, 39, false)) {

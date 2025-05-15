@@ -7,8 +7,8 @@ import net.minecraft.util.ResourceLocation;
 import java.util.Random;
 
 public class EnchantmentDurability extends Enchantment {
-    protected EnchantmentDurability(int enchID, ResourceLocation enchName, int enchWeight) {
-        super(enchID, enchName, enchWeight, EnumEnchantmentType.BREAKABLE);
+    protected EnchantmentDurability(ResourceLocation enchName) {
+        super(34, enchName, 5, EnumEnchantmentType.BREAKABLE);
         this.setName("durability");
     }
 

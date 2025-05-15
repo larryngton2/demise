@@ -17,7 +17,7 @@ public class CommandSaveAll extends CommandBase {
         return "commands.save.usage";
     }
 
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) {
         MinecraftServer minecraftserver = MinecraftServer.getServer();
         sender.addChatMessage(new ChatComponentTranslation("commands.save.start"));
 

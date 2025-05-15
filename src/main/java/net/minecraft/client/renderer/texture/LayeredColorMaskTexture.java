@@ -28,7 +28,7 @@ public class LayeredColorMaskTexture extends AbstractTexture {
         this.field_174950_i = p_i46101_3_;
     }
 
-    public void loadTexture(IResourceManager resourceManager) throws IOException {
+    public void loadTexture(IResourceManager resourceManager) {
         this.deleteGlTexture();
         BufferedImage bufferedimage;
 

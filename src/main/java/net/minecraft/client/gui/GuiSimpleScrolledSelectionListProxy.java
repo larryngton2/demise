@@ -82,8 +82,8 @@ public class GuiSimpleScrolledSelectionListProxy extends GuiSlot {
             this.drawSelectionBox(k, l, mouseXIn, mouseYIn);
             GlStateManager.disableDepth();
             int i1 = 4;
-            this.overlayBackground(0, this.top, 255, 255);
-            this.overlayBackground(this.bottom, this.height, 255, 255);
+            this.overlayBackground(0, this.top);
+            this.overlayBackground(this.bottom, this.height);
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1);
             GlStateManager.disableAlpha();

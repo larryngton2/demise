@@ -31,7 +31,7 @@ public class S1DPacketEntityEffect implements Packet<INetHandlerPlayClient> {
         this.hideParticles = (byte) (effect.getIsShowParticles() ? 1 : 0);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readVarIntFromBuffer();
         this.effectId = buf.readByte();
         this.amplifier = buf.readByte();
@@ -39,7 +39,7 @@ public class S1DPacketEntityEffect implements Packet<INetHandlerPlayClient> {
         this.hideParticles = buf.readByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityId);
         buf.writeByte(this.effectId);
         buf.writeByte(this.amplifier);

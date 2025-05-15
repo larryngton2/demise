@@ -25,7 +25,7 @@ public class BlockCarpet extends Block {
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.0625F, 1.0F);
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabDecorations);
-        this.setBlockBoundsFromMeta(0);
+        this.setBlockBoundsFromMeta();
     }
 
     public MapColor getMapColor(IBlockState state) {
@@ -41,14 +41,14 @@ public class BlockCarpet extends Block {
     }
 
     public void setBlockBoundsForItemRender() {
-        this.setBlockBoundsFromMeta(0);
+        this.setBlockBoundsFromMeta();
     }
 
     public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {
-        this.setBlockBoundsFromMeta(0);
+        this.setBlockBoundsFromMeta();
     }
 
-    protected void setBlockBoundsFromMeta(int meta) {
+    protected void setBlockBoundsFromMeta() {
         int i = 0;
         float f = (float) ((1 + i)) / 16.0F;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, f, 1.0F);
@@ -62,13 +62,11 @@ public class BlockCarpet extends Block {
         this.checkForDrop(worldIn, pos, state);
     }
 
-    private boolean checkForDrop(World worldIn, BlockPos pos, IBlockState state) {
+    private void checkForDrop(World worldIn, BlockPos pos, IBlockState state) {
         if (!this.canBlockStay(worldIn, pos)) {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
-            return false;
         } else {
-            return true;
         }
     }
 

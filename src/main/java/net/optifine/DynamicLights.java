@@ -36,8 +36,8 @@ import java.util.Properties;
 
 public class DynamicLights {
     private static final DynamicLightsMap mapDynamicLights = new DynamicLightsMap();
-    private static final Map<Class, Integer> mapEntityLightLevels = new HashMap();
-    private static final Map<Item, Integer> mapItemLightLevels = new HashMap();
+    private static final Map<Class, Integer> mapEntityLightLevels = new HashMap<>();
+    private static final Map<Item, Integer> mapItemLightLevels = new HashMap<>();
     private static long timeUpdateMs = 0L;
     private static final double MAX_DIST = 7.5D;
     private static final double MAX_DIST_SQ = 56.25D;
@@ -98,7 +98,7 @@ public class DynamicLights {
                 ResourceLocation resourcelocation = new ResourceLocation(s, "optifine/dynamic_lights.properties");
                 InputStream inputstream = Config.getResourceStream(resourcelocation);
                 loadModConfiguration(inputstream, resourcelocation.toString(), s);
-            } catch (IOException var5) {
+            } catch (IOException ignored) {
             }
         }
 
@@ -249,8 +249,7 @@ public class DynamicLights {
             }
         }
 
-        double d11 = Config.limit(d0, 0.0D, 15.0D);
-        return d11;
+        return Config.limit(d0, 0.0D, 15.0D);
     }
 
     public static int getLightLevel(ItemStack itemStack) {
@@ -375,7 +374,6 @@ public class DynamicLights {
     }
 
     public static ItemStack getItemStack(EntityItem entityItem) {
-        ItemStack itemstack = entityItem.getDataWatcher().getWatchableObjectItemStack(10);
-        return itemstack;
+        return entityItem.getDataWatcher().getWatchableObjectItemStack(10);
     }
 }

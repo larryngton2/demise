@@ -93,10 +93,10 @@ public class ModelBakery {
                 try {
                     this.registerVariant(modelblockdefinition, modelresourcelocation);
                 } catch (Exception exception) {
-                    LOGGER.warn("Unable to load variant: " + modelresourcelocation.getVariant() + " from " + modelresourcelocation, exception);
+                    LOGGER.warn("Unable to load variant: {} from {}", modelresourcelocation.getVariant(), modelresourcelocation, exception);
                 }
             } catch (Exception exception1) {
-                LOGGER.warn("Unable to load definition " + modelresourcelocation, exception1);
+                LOGGER.warn("Unable to load definition {}", modelresourcelocation, exception1);
             }
         }
     }
@@ -151,7 +151,7 @@ public class ModelBakery {
                         ModelBlock modelblock = this.loadModel(resourcelocation);
                         this.models.put(resourcelocation, modelblock);
                     } catch (Exception exception) {
-                        LOGGER.warn("Unable to load block model: '" + resourcelocation + "' for variant: '" + modelresourcelocation + "'", exception);
+                        LOGGER.warn("Unable to load block model: '{}' for variant: '{}'", resourcelocation, modelresourcelocation, exception);
                     }
                 }
             }
@@ -231,7 +231,7 @@ public class ModelBakery {
                         ModelBlock modelblock = this.loadModel(resourcelocation);
                         this.models.put(resourcelocation, modelblock);
                     } catch (Exception exception) {
-                        LOGGER.warn("Unable to load item model: '" + resourcelocation + "' for item: '" + Item.itemRegistry.getNameForObject(item) + "'", exception);
+                        LOGGER.warn("Unable to load item model: '{}' for item: '{}'", resourcelocation, Item.itemRegistry.getNameForObject(item), exception);
                     }
                 }
             }
@@ -247,7 +247,7 @@ public class ModelBakery {
                 this.models.put(p_loadItemModel_2_, modelblock);
             } catch (Exception exception) {
                 LOGGER.warn("Unable to load item model: '{}' for item: '{}'", p_loadItemModel_2_, p_loadItemModel_3_);
-                LOGGER.warn(exception.getClass().getName() + ": " + exception.getMessage());
+                LOGGER.warn("{}: {}", exception.getClass().getName(), exception.getMessage());
             }
         }
     }
@@ -337,12 +337,12 @@ public class ModelBakery {
                     ++i;
                     weightedbakedmodel$builder.add(this.bakeModel(modelblock, modelblockdefinition$variant.getRotation(), modelblockdefinition$variant.isUvLocked()), modelblockdefinition$variant.getWeight());
                 } else {
-                    LOGGER.warn("Missing model for: " + modelresourcelocation);
+                    LOGGER.warn("Missing model for: {}", modelresourcelocation);
                 }
             }
 
             if (i == 0) {
-                LOGGER.warn("No weighted models for: " + modelresourcelocation);
+                LOGGER.warn("No weighted models for: {}", modelresourcelocation);
             } else if (i == 1) {
                 this.bakedRegistry.putObject(modelresourcelocation, weightedbakedmodel$builder.first());
             } else {
@@ -367,7 +367,7 @@ public class ModelBakery {
                     this.bakedRegistry.putObject(modelresourcelocation1, this.bakeModel(modelblock1, ModelRotation.X0_Y0, false));
                 }
             } else {
-                LOGGER.warn("Missing model for: " + resourcelocation);
+                LOGGER.warn("Missing model for: {}", resourcelocation);
             }
         }
     }
@@ -375,7 +375,7 @@ public class ModelBakery {
     private Set<ResourceLocation> getVariantsTextureLocations() {
         Set<ResourceLocation> set = Sets.newHashSet();
         List<ModelResourceLocation> list = Lists.newArrayList(this.variants.keySet());
-        list.sort((p_compare_1_, p_compare_2_) -> p_compare_1_.toString().compareTo(p_compare_2_.toString()));
+        list.sort(Comparator.comparing(ModelResourceLocation::toString));
 
         for (ModelResourceLocation modelresourcelocation : list) {
             ModelBlockDefinition.Variants modelblockdefinition$variants = this.variants.get(modelresourcelocation);
@@ -384,7 +384,7 @@ public class ModelBakery {
                 ModelBlock modelblock = this.models.get(modelblockdefinition$variant.getModelLocation());
 
                 if (modelblock == null) {
-                    LOGGER.warn("Missing model for: " + modelresourcelocation);
+                    LOGGER.warn("Missing model for: {}", modelresourcelocation);
                 } else {
                     set.addAll(this.getTextureLocations(modelblock));
                 }
@@ -471,7 +471,7 @@ public class ModelBakery {
                     deque.add(resourcelocation3);
                 }
             } catch (Exception var6) {
-                LOGGER.warn("In parent chain: " + JOINER.join(this.getParentPath(resourcelocation2)) + "; unable to load model: '" + resourcelocation2 + "'");
+                LOGGER.warn("In parent chain: {}; unable to load model: '{}'", JOINER.join(this.getParentPath(resourcelocation2)), resourcelocation2);
             }
 
             set.add(resourcelocation2);
@@ -611,8 +611,7 @@ public class ModelBakery {
     }
 
     public ModelBlock getModelBlock(ResourceLocation p_getModelBlock_1_) {
-        ModelBlock modelblock = this.models.get(p_getModelBlock_1_);
-        return modelblock;
+        return this.models.get(p_getModelBlock_1_);
     }
 
     public static void fixModelLocations(ModelBlock p_fixModelLocations_0_, String p_fixModelLocations_1_) {
@@ -638,9 +637,7 @@ public class ModelBakery {
 
     public static ResourceLocation fixModelLocation(ResourceLocation p_fixModelLocation_0_, String p_fixModelLocation_1_) {
         if (p_fixModelLocation_0_ != null && p_fixModelLocation_1_ != null) {
-            if (!p_fixModelLocation_0_.getResourceDomain().equals("minecraft")) {
-                return p_fixModelLocation_0_;
-            } else {
+            if (p_fixModelLocation_0_.getResourceDomain().equals("minecraft")) {
                 String s = p_fixModelLocation_0_.getResourcePath();
                 String s1 = fixResourcePath(s, p_fixModelLocation_1_);
 
@@ -648,8 +645,8 @@ public class ModelBakery {
                     p_fixModelLocation_0_ = new ResourceLocation(p_fixModelLocation_0_.getResourceDomain(), s1);
                 }
 
-                return p_fixModelLocation_0_;
             }
+            return p_fixModelLocation_0_;
         } else {
             return p_fixModelLocation_0_;
         }
@@ -673,6 +670,7 @@ public class ModelBakery {
         }
     }
 
+    @SafeVarargs
     public static <T extends ResourceLocation> void registerItemVariants(Item p_registerItemVariants_0_, T... p_registerItemVariants_1_) {
         RegistryDelegate registrydelegate = (RegistryDelegate) Reflector.getFieldValue(p_registerItemVariants_0_, Reflector.ForgeItem_delegate);
 

@@ -64,7 +64,7 @@ public class BlockMushroom extends BlockBush implements IGrowable {
         }
     }
 
-    public boolean generateBigMushroom(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+    public void generateBigMushroom(World worldIn, BlockPos pos, IBlockState state, Random rand) {
         worldIn.setBlockToAir(pos);
         WorldGenerator worldgenerator = null;
 
@@ -75,10 +75,8 @@ public class BlockMushroom extends BlockBush implements IGrowable {
         }
 
         if (worldgenerator != null && worldgenerator.generate(worldIn, rand, pos)) {
-            return true;
         } else {
             worldIn.setBlockState(pos, state, 3);
-            return false;
         }
     }
 

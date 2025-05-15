@@ -103,8 +103,8 @@ public class NBTTagList extends NBTBase {
         }
     }
 
-    public NBTBase removeTag(int i) {
-        return this.tagList.remove(i);
+    public void removeTag(int i) {
+        this.tagList.remove(i);
     }
 
     public boolean hasNoTags() {

@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 public class TextureMap extends AbstractTexture implements ITickableTextureObject {
     private static final boolean ENABLE_SKIP = Boolean.parseBoolean(System.getProperty("fml.skipFirstTextureLoad", "true"));
@@ -100,7 +99,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
         this.missingImage.setIndexInMap(this.counterIndexInMap.nextValue());
     }
 
-    public void loadTexture(IResourceManager resourceManager) throws IOException {
+    public void loadTexture(IResourceManager resourceManager) {
         if (this.iconCreator != null) {
             this.loadSprites(resourceManager, this.iconCreator);
         }
@@ -226,11 +225,11 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
                         AnimationMetadataSection animationmetadatasection = iresource.getMetadata("animation");
                         textureatlassprite3.loadSprite(abufferedimage, animationmetadatasection);
                     } catch (RuntimeException runtimeexception) {
-                        logger.error("Unable to parse metadata from " + resourcelocation2, runtimeexception);
+                        logger.error("Unable to parse metadata from {}", resourcelocation2, runtimeexception);
                         ReflectorForge.FMLClientHandler_trackBrokenTexture(resourcelocation2, runtimeexception.getMessage());
                         continue;
                     } catch (IOException ioexception1) {
-                        logger.error("Using missing texture, unable to load " + resourcelocation2 + ", " + ioexception1.getClass().getName());
+                        logger.error("Using missing texture, unable to load {}, {}", resourcelocation2, ioexception1.getClass().getName());
                         ReflectorForge.FMLClientHandler_trackMissingTexture(resourcelocation2);
                         continue;
                     }
@@ -290,11 +289,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
             stitcher.addSprite(this.missingImage);
             this.skipFirst = false;
 
-            try {
-                stitcher.doStitch();
-            } catch (StitcherException stitcherexception) {
-                throw stitcherexception;
-            }
+            stitcher.doStitch();
 
             logger.info("Created: {}x{} {}-atlas", stitcher.getCurrentWidth(), stitcher.getCurrentHeight(), this.basePath);
 
@@ -595,7 +590,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
     }
 
     private int detectMaxMipmapLevel(Map p_detectMaxMipmapLevel_1_, IResourceManager p_detectMaxMipmapLevel_2_) {
-        int i = this.detectMinimumSpriteSize(p_detectMaxMipmapLevel_1_, p_detectMaxMipmapLevel_2_, 20);
+        int i = this.detectMinimumSpriteSize(p_detectMaxMipmapLevel_1_, p_detectMaxMipmapLevel_2_);
 
         if (i < 16) {
             i = 16;
@@ -616,7 +611,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
         return j;
     }
 
-    private int detectMinimumSpriteSize(Map p_detectMinimumSpriteSize_1_, IResourceManager p_detectMinimumSpriteSize_2_, int p_detectMinimumSpriteSize_3_) {
+    private int detectMinimumSpriteSize(Map p_detectMinimumSpriteSize_1_, IResourceManager p_detectMinimumSpriteSize_2_) {
         Map map = new HashMap();
 
         for (Object o : p_detectMinimumSpriteSize_1_.entrySet()) {
@@ -649,7 +644,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
                             }
                         }
                     }
-                } catch (Exception var17) {
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -666,7 +661,7 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
 
         int i1 = 16;
         int k1 = 0;
-        l1 = l * p_detectMinimumSpriteSize_3_ / 100;
+        l1 = l * 20 / 100;
 
         for (Object o : set1) {
             int i2 = (Integer) o;

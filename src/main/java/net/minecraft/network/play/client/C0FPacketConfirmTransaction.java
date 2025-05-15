@@ -26,13 +26,13 @@ public class C0FPacketConfirmTransaction implements Packet<INetHandlerPlayServer
         handler.processConfirmTransaction(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.windowId = buf.readByte();
         this.uid = buf.readShort();
         this.accepted = buf.readByte() != 0;
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         if (ViaLoadingBase.getInstance().getTargetVersion().isNewerThanOrEqualTo(ProtocolVersion.v1_17)) {
             buf.writeInt(this.windowId);
         } else {

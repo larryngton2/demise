@@ -7,8 +7,6 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.ChunkProviderSettings;
 
-import java.util.concurrent.Callable;
-
 public abstract class GenLayer {
     private long worldGenSeed;
     protected GenLayer parent;

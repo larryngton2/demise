@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class Locale {
     private static final Splitter splitter = Splitter.on('=').limit(2);
     private static final Pattern pattern = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
-    Map<String, String> properties = Maps.newHashMap();
+    final Map<String, String> properties = Maps.newHashMap();
     private boolean unicode;
 
     public synchronized void loadLocaleDataFiles(IResourceManager resourceManager, List<String> languageList) {
@@ -29,7 +29,7 @@ public class Locale {
             for (String s2 : resourceManager.getResourceDomains()) {
                 try {
                     this.loadLocaleData(resourceManager.getAllResources(new ResourceLocation(s2, s1)));
-                } catch (IOException var9) {
+                } catch (IOException ignored) {
                 }
             }
         }

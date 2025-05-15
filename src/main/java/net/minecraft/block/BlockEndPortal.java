@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockEndPortal extends BlockContainer {
-    protected BlockEndPortal(Material materialIn) {
-        super(materialIn);
+    protected BlockEndPortal() {
+        super(Material.portal);
         this.setLightLevel(1.0F);
     }
 

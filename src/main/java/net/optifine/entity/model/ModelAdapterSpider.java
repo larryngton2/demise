@@ -13,8 +13,8 @@ public class ModelAdapterSpider extends ModelAdapter {
         super(EntitySpider.class, "spider", 1.0F);
     }
 
-    protected ModelAdapterSpider(Class entityClass, String name, float shadowSize) {
-        super(entityClass, name, shadowSize);
+    protected ModelAdapterSpider(Class entityClass) {
+        super(entityClass, "cave_spider", (float) 0.7);
     }
 
     public ModelBase makeModel() {

@@ -30,7 +30,7 @@ public class ComponentScatteredFeaturePieces {
         }
 
         public DesertPyramid(Random p_i2062_1_, int p_i2062_2_, int p_i2062_3_) {
-            super(p_i2062_1_, p_i2062_2_, 64, p_i2062_3_, 21, 15, 21);
+            super(p_i2062_1_, p_i2062_2_, p_i2062_3_, 21, 15, 21);
         }
 
         protected void writeStructureToNBT(NBTTagCompound tagCompound) {
@@ -252,7 +252,7 @@ public class ComponentScatteredFeaturePieces {
         public Feature() {
         }
 
-        protected Feature(Random p_i2065_1_, int p_i2065_2_, int p_i2065_3_, int p_i2065_4_, int p_i2065_5_, int p_i2065_6_, int p_i2065_7_) {
+        protected Feature(Random p_i2065_1_, int p_i2065_2_, int p_i2065_4_, int p_i2065_5_, int p_i2065_6_, int p_i2065_7_) {
             super(0);
             this.scatteredFeatureSizeX = p_i2065_5_;
             this.scatteredFeatureSizeY = p_i2065_6_;
@@ -262,11 +262,11 @@ public class ComponentScatteredFeaturePieces {
             switch (this.coordBaseMode) {
                 case NORTH:
                 case SOUTH:
-                    this.boundingBox = new StructureBoundingBox(p_i2065_2_, p_i2065_3_, p_i2065_4_, p_i2065_2_ + p_i2065_5_ - 1, p_i2065_3_ + p_i2065_6_ - 1, p_i2065_4_ + p_i2065_7_ - 1);
+                    this.boundingBox = new StructureBoundingBox(p_i2065_2_, 64, p_i2065_4_, p_i2065_2_ + p_i2065_5_ - 1, 64 + p_i2065_6_ - 1, p_i2065_4_ + p_i2065_7_ - 1);
                     break;
 
                 default:
-                    this.boundingBox = new StructureBoundingBox(p_i2065_2_, p_i2065_3_, p_i2065_4_, p_i2065_2_ + p_i2065_7_ - 1, p_i2065_3_ + p_i2065_6_ - 1, p_i2065_4_ + p_i2065_5_ - 1);
+                    this.boundingBox = new StructureBoundingBox(p_i2065_2_, 64, p_i2065_4_, p_i2065_2_ + p_i2065_7_ - 1, 64 + p_i2065_6_ - 1, p_i2065_4_ + p_i2065_5_ - 1);
             }
         }
 
@@ -284,7 +284,7 @@ public class ComponentScatteredFeaturePieces {
             this.field_74936_d = tagCompound.getInteger("HPos");
         }
 
-        protected boolean func_74935_a(World worldIn, StructureBoundingBox p_74935_2_, int p_74935_3_) {
+        protected boolean func_74935_a(World worldIn, StructureBoundingBox p_74935_2_) {
             if (this.field_74936_d >= 0) {
                 return true;
             } else {
@@ -307,7 +307,7 @@ public class ComponentScatteredFeaturePieces {
                     return false;
                 } else {
                     this.field_74936_d = i / j;
-                    this.boundingBox.offset(0, this.field_74936_d - this.boundingBox.minY + p_74935_3_, 0);
+                    this.boundingBox.offset(0, this.field_74936_d - this.boundingBox.minY + 0, 0);
                     return true;
                 }
             }
@@ -327,7 +327,7 @@ public class ComponentScatteredFeaturePieces {
         }
 
         public JunglePyramid(Random p_i2064_1_, int p_i2064_2_, int p_i2064_3_) {
-            super(p_i2064_1_, p_i2064_2_, 64, p_i2064_3_, 12, 10, 15);
+            super(p_i2064_1_, p_i2064_2_, p_i2064_3_, 12, 10, 15);
         }
 
         protected void writeStructureToNBT(NBTTagCompound tagCompound) {
@@ -347,7 +347,7 @@ public class ComponentScatteredFeaturePieces {
         }
 
         public boolean addComponentParts(World worldIn, Random randomIn, StructureBoundingBox structureBoundingBoxIn) {
-            if (!this.func_74935_a(worldIn, structureBoundingBoxIn, 0)) {
+            if (!this.func_74935_a(worldIn, structureBoundingBoxIn)) {
                 return false;
             } else {
                 int i = this.getMetadataWithOffset(Blocks.stone_stairs, 3);
@@ -549,7 +549,7 @@ public class ComponentScatteredFeaturePieces {
         }
 
         public SwampHut(Random p_i2066_1_, int p_i2066_2_, int p_i2066_3_) {
-            super(p_i2066_1_, p_i2066_2_, 64, p_i2066_3_, 7, 7, 9);
+            super(p_i2066_1_, p_i2066_2_, p_i2066_3_, 7, 7, 9);
         }
 
         protected void writeStructureToNBT(NBTTagCompound tagCompound) {
@@ -563,7 +563,7 @@ public class ComponentScatteredFeaturePieces {
         }
 
         public boolean addComponentParts(World worldIn, Random randomIn, StructureBoundingBox structureBoundingBoxIn) {
-            if (!this.func_74935_a(worldIn, structureBoundingBoxIn, 0)) {
+            if (!this.func_74935_a(worldIn, structureBoundingBoxIn)) {
                 return false;
             } else {
                 this.fillWithBlocks(worldIn, structureBoundingBoxIn, 1, 1, 1, 5, 1, 7, Blocks.planks.getStateFromMeta(BlockPlanks.EnumType.SPRUCE.getMetadata()), Blocks.planks.getStateFromMeta(BlockPlanks.EnumType.SPRUCE.getMetadata()), false);

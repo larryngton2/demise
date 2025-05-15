@@ -13,24 +13,24 @@ public class GuiIngameMenu extends GuiScreen {
         this.buttonList.clear();
         int i = -16;
 
-        float initialY = (height / 2) - (98 / 2) - 5;
+        float initialY = ((float) height / 2) - ((float) 98 / 2) - 5;
 
-        this.buttonList.add(new GuiButton(1, width / 2 - 100, initialY + 96 + i, I18n.format("menu.returnToMenu")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 100, initialY + 96 + i, I18n.format("menu.returnToMenu")));
 
         if (!mc.isIntegratedServerRunning()) {
             this.buttonList.get(0).displayString = I18n.format("menu.disconnect");
         }
 
-        this.buttonList.add(new GuiButton(4, width / 2 - 100, initialY + 24 + i, I18n.format("menu.returnToGame")));
-        this.buttonList.add(new GuiButton(5, width / 2 - 100, initialY + 48 + i, 98, 20, I18n.format("gui.achievements")));
-        this.buttonList.add(new GuiButton(6, width / 2 + 2, initialY + 48 + i, 98, 20, I18n.format("gui.stats")));
-        this.buttonList.add(new GuiButton(0, width / 2 - 100, initialY + 72 + i, 98, 20, I18n.format("menu.options")));
+        this.buttonList.add(new GuiButton(4, (float) width / 2 - 100, initialY + 24 + i, I18n.format("menu.returnToGame")));
+        this.buttonList.add(new GuiButton(5, (float) width / 2 - 100, initialY + 48 + i, 98, 20, I18n.format("gui.achievements")));
+        this.buttonList.add(new GuiButton(6, (float) width / 2 + 2, initialY + 48 + i, 98, 20, I18n.format("gui.stats")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 - 100, initialY + 72 + i, 98, 20, I18n.format("menu.options")));
         GuiButton guibutton;
-        this.buttonList.add(guibutton = new GuiButton(7, width / 2 + 2, initialY + 72 + i, 98, 20, I18n.format("menu.shareToLan")));
+        this.buttonList.add(guibutton = new GuiButton(7, (float) width / 2 + 2, initialY + 72 + i, 98, 20, I18n.format("menu.shareToLan")));
         guibutton.enabled = mc.isSingleplayer() && !mc.getIntegratedServer().getPublic();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         switch (button.id) {
             case 0:
                 mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
@@ -81,7 +81,7 @@ public class GuiIngameMenu extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, I18n.format("menu.game"), width / 2, height / 2 - 65, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("menu.game"), (float) width / 2, (float) height / 2 - 65, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

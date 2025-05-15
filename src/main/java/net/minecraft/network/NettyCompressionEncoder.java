@@ -16,7 +16,7 @@ public class NettyCompressionEncoder extends MessageToByteEncoder<ByteBuf> {
         this.deflater = new Deflater();
     }
 
-    protected void encode(ChannelHandlerContext p_encode_1_, ByteBuf p_encode_2_, ByteBuf p_encode_3_) throws Exception {
+    protected void encode(ChannelHandlerContext p_encode_1_, ByteBuf p_encode_2_, ByteBuf p_encode_3_) {
         int i = p_encode_2_.readableBytes();
         PacketBuffer packetbuffer = new PacketBuffer(p_encode_3_);
 

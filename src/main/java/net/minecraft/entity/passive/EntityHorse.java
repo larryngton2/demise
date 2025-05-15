@@ -108,11 +108,11 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
             int i = this.getHorseType();
 
             return switch (i) {
-                default -> StatCollector.translateToLocal("entity.horse.name");
                 case 1 -> StatCollector.translateToLocal("entity.donkey.name");
                 case 2 -> StatCollector.translateToLocal("entity.mule.name");
                 case 3 -> StatCollector.translateToLocal("entity.zombiehorse.name");
                 case 4 -> StatCollector.translateToLocal("entity.skeletonhorse.name");
+                default -> StatCollector.translateToLocal("entity.horse.name");
             };
         }
     }
@@ -247,10 +247,9 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
         this.temper = temperIn;
     }
 
-    public int increaseTemper(int p_110198_1_) {
+    public void increaseTemper(int p_110198_1_) {
         int i = MathHelper.clamp_int(this.getTemper() + p_110198_1_, 0, this.getMaxTemper());
         this.setTemper(i);
-        return i;
     }
 
     public boolean attackEntityFrom(DamageSource source, float amount) {
@@ -266,11 +265,10 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
         return this.riddenByEntity == null;
     }
 
-    public boolean prepareChunkForSpawn() {
+    public void prepareChunkForSpawn() {
         int i = MathHelper.floor_double(this.posX);
         int j = MathHelper.floor_double(this.posZ);
         this.worldObj.getBiomeGenForCoords(new BlockPos(i, 0, j));
-        return true;
     }
 
     public void dropChests() {
@@ -371,11 +369,11 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
         return super.getCanSpawnHere();
     }
 
-    protected EntityHorse getClosestHorse(Entity entityIn, double distance) {
+    protected EntityHorse getClosestHorse(Entity entityIn) {
         double d0 = Double.MAX_VALUE;
         Entity entity = null;
 
-        for (Entity entity1 : this.worldObj.getEntitiesInAABBexcluding(entityIn, entityIn.getEntityBoundingBox().addCoord(distance, distance, distance), horseBreedingSelector)) {
+        for (Entity entity1 : this.worldObj.getEntitiesInAABBexcluding(entityIn, entityIn.getEntityBoundingBox().addCoord(16.0, 16.0, 16.0), horseBreedingSelector)) {
             double d1 = entity1.getDistanceSq(entityIn.posX, entityIn.posY, entityIn.posZ);
 
             if (d1 < d0) {
@@ -605,7 +603,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
                     }
                 }
 
-                if (!flag && !this.isUndead()) {
+                if (!this.isUndead()) {
                     float f = 0.0F;
                     int j = 0;
                     int k = 0;
@@ -666,7 +664,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
                 }
 
                 if (!this.isTame() && !flag) {
-                    if (itemstack != null && itemstack.interactWithEntity(player, this)) {
+                    if (itemstack.interactWithEntity(player, this)) {
                         return true;
                     }
 
@@ -779,7 +777,7 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
             }
 
             if (this.isBreeding() && !this.isAdultHorse() && !this.isEatingHaystack()) {
-                EntityHorse entityhorse = this.getClosestHorse(this, 16.0D);
+                EntityHorse entityhorse = this.getClosestHorse(this);
 
                 if (entityhorse != null && this.getDistanceSqToEntity(entityhorse) > 4.0D) {
                     this.navigator.getPathToEntityLiving(entityhorse);
@@ -929,10 +927,9 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
         }
     }
 
-    public boolean setTamedBy(EntityPlayer player) {
+    public void setTamedBy(EntityPlayer player) {
         this.setOwnerId(player.getUniqueID().toString());
         this.setHorseTamed(true);
-        return true;
     }
 
     public void moveEntityWithHeading(float strafe, float forward) {
@@ -1355,8 +1352,8 @@ public class EntityHorse extends EntityAnimal implements IInvBasic {
     }
 
     public static class GroupData implements IEntityLivingData {
-        public int horseType;
-        public int horseVariant;
+        public final int horseType;
+        public final int horseVariant;
 
         public GroupData(int type, int variant) {
             this.horseType = type;

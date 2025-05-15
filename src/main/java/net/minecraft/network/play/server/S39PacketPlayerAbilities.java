@@ -27,7 +27,7 @@ public class S39PacketPlayerAbilities implements Packet<INetHandlerPlayClient> {
         this.setWalkSpeed(capabilities.getWalkSpeed());
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         byte b0 = buf.readByte();
         this.setInvulnerable((b0 & 1) > 0);
         this.setFlying((b0 & 2) > 0);
@@ -37,7 +37,7 @@ public class S39PacketPlayerAbilities implements Packet<INetHandlerPlayClient> {
         this.setWalkSpeed(buf.readFloat());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         byte b0 = 0;
 
         if (this.isInvulnerable()) {

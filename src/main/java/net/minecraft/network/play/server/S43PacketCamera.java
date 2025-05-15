@@ -18,11 +18,11 @@ public class S43PacketCamera implements Packet<INetHandlerPlayClient> {
         this.entityId = entityIn.getEntityId();
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityId);
     }
 

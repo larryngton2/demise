@@ -95,7 +95,7 @@ public class EntityFireworkRocket extends Entity {
 
         ++this.fireworkAge;
 
-        if (this.worldObj.isRemote && this.fireworkAge % 2 < 2) {
+        if (this.worldObj.isRemote) {
             this.worldObj.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, this.posX, this.posY - 0.3D, this.posZ, this.rand.nextGaussian() * 0.05D, -this.motionY * 0.5D, this.rand.nextGaussian() * 0.05D);
         }
 

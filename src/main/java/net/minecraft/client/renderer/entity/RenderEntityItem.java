@@ -84,7 +84,7 @@ public class RenderEntityItem extends Render<EntityItem> {
         if (itemPhysics != null && itemPhysics.isEnabled()) {
             if (!entity.onGround) {
                 rotation *= 1.005f;
-                entity.rotationPitch += rotation;
+                entity.rotationPitch += (float) rotation;
             }
 
             final Minecraft mc = Minecraft.getMinecraft();
@@ -124,14 +124,14 @@ public class RenderEntityItem extends Render<EntityItem> {
             if (is3D || mc.getRenderManager().options != null) {
                 if (is3D) {
                     if (!entity.onGround) {
-                        entity.rotationPitch += rotation;
+                        entity.rotationPitch += (float) rotation;
                     }
                 } else {
                     if (!Double.isNaN(entity.posX) && !Double.isNaN(entity.posY) && !Double.isNaN(entity.posZ) && entity.worldObj != null) {
                         if (entity.onGround) {
                             entity.rotationPitch = 0;
                         } else {
-                            entity.rotationPitch += rotation;
+                            entity.rotationPitch += (float) rotation;
                         }
                     }
                 }

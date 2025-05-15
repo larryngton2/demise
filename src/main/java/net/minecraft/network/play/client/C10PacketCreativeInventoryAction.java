@@ -28,7 +28,7 @@ public class C10PacketCreativeInventoryAction implements Packet<INetHandlerPlayS
         this.stack = buf.readItemStackFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeShort(this.slotId);
         buf.writeItemStackToBuffer(this.stack);
     }

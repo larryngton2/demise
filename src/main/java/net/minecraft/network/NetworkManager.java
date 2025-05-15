@@ -97,11 +97,11 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         logger.debug("Enabled auto read");
     }
 
-    public void channelInactive(ChannelHandlerContext p_channelInactive_1_) throws Exception {
+    public void channelInactive(ChannelHandlerContext p_channelInactive_1_) {
         this.closeChannel(new ChatComponentTranslation("disconnect.endOfStream"));
     }
 
-    public void exceptionCaught(ChannelHandlerContext p_exceptionCaught_1_, Throwable p_exceptionCaught_2_) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext p_exceptionCaught_1_, Throwable p_exceptionCaught_2_) {
         ChatComponentTranslation chatcomponenttranslation;
 
         if (p_exceptionCaught_2_ instanceof TimeoutException) {
@@ -156,7 +156,8 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         }
     }
 
-    public void sendPacket(Packet packetIn, GenericFutureListener<? extends Future<? super Void>> listener, GenericFutureListener<? extends Future<? super Void>>... listeners) {
+    @SafeVarargs
+    public final void sendPacket(Packet packetIn, GenericFutureListener<? extends Future<? super Void>> listener, GenericFutureListener<? extends Future<? super Void>>... listeners) {
         if (this.isChannelOpen()) {
             this.flushOutboundQueue();
             this.dispatchPacket(packetIn, ArrayUtils.add(listeners, 0, listener));
@@ -287,7 +288,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     public static NetworkManager provideLocalClient(SocketAddress address) {
         final NetworkManager networkmanager = new NetworkManager(EnumPacketDirection.CLIENTBOUND);
         (new Bootstrap()).group(CLIENT_LOCAL_EVENTLOOP.getValue()).handler(new ChannelInitializer<>() {
-            protected void initChannel(Channel p_initChannel_1_) throws Exception {
+            protected void initChannel(Channel p_initChannel_1_) {
                 p_initChannel_1_.pipeline().addLast("packet_handler", networkmanager);
             }
         }).channel(LocalChannel.class).connect(address).syncUninterruptibly();
@@ -366,7 +367,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
     }
 
     @Override
-    protected void messageReceived(ChannelHandlerContext p_channelRead0_1_, Packet p_channelRead0_2_) throws Exception {
+    protected void messageReceived(ChannelHandlerContext p_channelRead0_1_, Packet p_channelRead0_2_) {
         if (this.channel.isOpen()) {
             Packet<INetHandler> p = (Packet<INetHandler>) p_channelRead0_2_;
             try {
@@ -385,7 +386,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
 
                     p_channelRead0_2_.processPacket(this.packetListener);
                 }
-            } catch (final ThreadQuickExitException var4) {
+            } catch (final ThreadQuickExitException ignored) {
             }
         }
     }
@@ -394,6 +395,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
         private final Packet packet;
         private final GenericFutureListener<? extends Future<? super Void>>[] futureListeners;
 
+        @SafeVarargs
         public InboundHandlerTuplePacketListener(Packet inPacket, GenericFutureListener<? extends Future<? super Void>>... inFutureListeners) {
             this.packet = inPacket;
             this.futureListeners = inFutureListeners;

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class IteratorCache {
-    private static final Deque<IteratorCache.IteratorReusable<Object>> dequeIterators = new ArrayDeque();
+    private static final Deque<IteratorCache.IteratorReusable<Object>> dequeIterators = new ArrayDeque<>();
 
     public static Iterator<Object> getReadOnly(List list) {
         synchronized (dequeIterators) {
@@ -68,13 +68,10 @@ public class IteratorCache {
                 IteratorCache.finished(this);
                 return false;
             } else {
-                return this.hasNext;
+                return true;
             }
         }
 
-        public void remove() {
-            throw new UnsupportedOperationException("remove");
-        }
     }
 
     public interface IteratorReusable<E> extends Iterator<E> {

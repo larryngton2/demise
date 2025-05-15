@@ -122,7 +122,7 @@ public final class NBTUtil {
                     boolean flag = false;
 
                     for (int j = 0; j < nbttaglist1.tagCount(); ++j) {
-                        if (func_181123_a(nbtbase, nbttaglist1.get(j), p_181123_2_)) {
+                        if (func_181123_a(nbtbase, nbttaglist1.get(j), true)) {
                             flag = true;
                             break;
                         }

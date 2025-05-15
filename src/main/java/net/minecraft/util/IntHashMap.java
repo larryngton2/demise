@@ -143,7 +143,7 @@ public class IntHashMap<V> {
 
     private void insert(int p_76040_1_, int p_76040_2_, V p_76040_3_, int p_76040_4_) {
         IntHashMap.Entry<V> entry = this.slots[p_76040_4_];
-        this.slots[p_76040_4_] = new IntHashMap.Entry(p_76040_1_, p_76040_2_, p_76040_3_, entry);
+        this.slots[p_76040_4_] = new IntHashMap.Entry<>(p_76040_1_, p_76040_2_, p_76040_3_, entry);
 
         if (this.count++ >= this.threshold) {
             this.grow(2 * this.slots.length);
@@ -172,10 +172,8 @@ public class IntHashMap<V> {
         }
 
         public final boolean equals(Object p_equals_1_) {
-            if (!(p_equals_1_ instanceof IntHashMap.Entry)) {
-                return false;
-            } else {
-                IntHashMap.Entry<V> entry = (IntHashMap.Entry) p_equals_1_;
+            if (p_equals_1_ instanceof IntHashMap.Entry) {
+                Entry<V> entry = (Entry) p_equals_1_;
                 Object object = this.getHash();
                 Object object1 = entry.getHash();
 
@@ -186,8 +184,8 @@ public class IntHashMap<V> {
                     return Objects.equals(object2, object3);
                 }
 
-                return false;
             }
+            return false;
         }
 
         public final int hashCode() {

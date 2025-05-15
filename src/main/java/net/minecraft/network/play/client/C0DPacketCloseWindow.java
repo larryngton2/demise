@@ -20,11 +20,11 @@ public class C0DPacketCloseWindow implements Packet<INetHandlerPlayServer> {
         handler.processCloseWindow(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.windowId = buf.readByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.windowId);
     }
 }

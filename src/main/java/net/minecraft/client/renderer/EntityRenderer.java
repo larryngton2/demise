@@ -249,7 +249,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 theShaderGroup.createBindFramebuffers(mc.displayWidth, mc.displayHeight);
                 useShader = true;
             } catch (IOException | JsonSyntaxException ioexception) {
-                logger.warn("Failed to load shader: " + resourceLocationIn, ioexception);
+                logger.warn("Failed to load shader: {}", resourceLocationIn, ioexception);
                 shaderIndex = shaderCount;
                 useShader = false;
             }
@@ -722,11 +722,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             clipDistance = 173.0F;
         }
 
-        if (cameraZoom != 1.0D) {
-            GlStateManager.translate((float) cameraYaw, (float) (-cameraPitch), 0.0F);
-            GlStateManager.scale(cameraZoom, cameraZoom, 1.0D);
-        }
-
         float aspect = (float) mc.displayWidth / (float) mc.displayHeight;
         Project.gluPerspective(getFOVModifier(partialTicks, true), aspect, 0.05F, clipDistance);
         GlStateManager.matrixMode(5888);
@@ -1099,10 +1094,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 mc.mcProfiler.endStartSection("gui");
 
                 if (!mc.gameSettings.hideGUI || mc.currentScreen != null) {
-                    if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("World Bloom")) {
-                        Demise.INSTANCE.getModuleManager().getModule(Camera.class).drawWorldBloom();
-                    }
-
                     GlStateManager.alphaFunc(516, 0.1F);
                     mc.ingameGUI.renderGameOverlay(partialTicks);
 
@@ -2019,7 +2010,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             flag = ((EntityPlayer) entity).capabilities.isCreativeMode;
         }
 
-        GL11.glFogfv(GL11.GL_FOG_COLOR, setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
+        GL11.glFogfv(GL11.GL_FOG_COLOR, setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue));
         GL11.glNormal3f(0.0F, -1.0F, 0.0F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         Block block = ActiveRenderInfo.getBlockAtEntityViewpoint(mc.theWorld, entity, partialTicks);
@@ -2113,13 +2104,13 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         GlStateManager.colorMaterial(1028, 4608);
     }
 
-    private FloatBuffer setFogColorBuffer(float red, float green, float blue, float alpha) {
+    private FloatBuffer setFogColorBuffer(float red, float green, float blue) {
         if (Config.isShaders()) {
             Shaders.setFogColor(red, green, blue);
         }
 
         fogColorBuffer.clear();
-        fogColorBuffer.put(red).put(green).put(blue).put(alpha);
+        fogColorBuffer.put(red).put(green).put(blue).put((float) 1.0);
         fogColorBuffer.flip();
         return fogColorBuffer;
     }
@@ -2219,7 +2210,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             if (Config.getNewRelease() != null) {
                 String s = "HD_U".replace("HD_U", "HD Ultra").replace("L", "Light");
                 String s1 = s + " " + Config.getNewRelease();
-                ChatComponentText chatcomponenttext = new ChatComponentText(I18n.format("of.message.newVersion", "\u00a7n" + s1 + "\u00a7r"));
+                ChatComponentText chatcomponenttext = new ChatComponentText(I18n.format("of.message.newVersion", "§n" + s1 + "§r"));
                 chatcomponenttext.setChatStyle((new ChatStyle()).setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://optifine.net/downloads")));
                 mc.ingameGUI.getChatGUI().printChatMessage(chatcomponenttext);
                 Config.setNewRelease(null);
@@ -2286,7 +2277,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             }
 
             Reflector.setFieldValue(p_updateMainMenu_1_, Reflector.GuiMainMenu_splashText, s);
-        } catch (Throwable var6) {
+        } catch (Throwable ignored) {
         }
     }
 
@@ -2296,13 +2287,11 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         } else if (theShaderGroup != null && theShaderGroup != fxaaShaders[2] && theShaderGroup != fxaaShaders[4]) {
             return true;
         } else if (p_setFxaaShader_1_ != 2 && p_setFxaaShader_1_ != 4) {
-            if (theShaderGroup == null) {
-                return true;
-            } else {
+            if (theShaderGroup != null) {
                 theShaderGroup.deleteShaderGroup();
                 theShaderGroup = null;
-                return true;
             }
+            return true;
         } else if (theShaderGroup != null && theShaderGroup == fxaaShaders[p_setFxaaShader_1_]) {
             return true;
         } else if (mc.theWorld == null) {
@@ -2349,7 +2338,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             int i1 = 0;
             boolean flag1 = false;
 
-            while (true) {
+            do {
                 flag1 = false;
 
                 for (int j1 = 0; j1 < 100; ++j1) {
@@ -2383,10 +2372,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                     l = System.currentTimeMillis() + 5000L;
                 }
 
-                if (!flag1) {
-                    break;
-                }
-            }
+            } while (flag1);
 
             Config.log("Chunks loaded: " + i1);
             Config.log("Finished loading visible chunks");

@@ -17,11 +17,11 @@ public class GuiScreenDemo extends GuiScreen {
     public void initGui() {
         this.buttonList.clear();
         int i = -16;
-        this.buttonList.add(new GuiButton(1, width / 2 - 116, height / 2 + 62 + i, 114, 20, I18n.format("demo.help.buy")));
-        this.buttonList.add(new GuiButton(2, width / 2 + 2, height / 2 + 62 + i, 114, 20, I18n.format("demo.help.later")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 116, (float) height / 2 + 62 + i, 114, 20, I18n.format("demo.help.buy")));
+        this.buttonList.add(new GuiButton(2, (float) width / 2 + 2, (float) height / 2 + 62 + i, 114, 20, I18n.format("demo.help.later")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         switch (button.id) {
             case 1:
                 button.enabled = false;

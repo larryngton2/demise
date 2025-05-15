@@ -22,8 +22,8 @@ public class ChunkProviderEnd implements IChunkProvider {
     private final NoiseGeneratorOctaves noiseGen1;
     private final NoiseGeneratorOctaves noiseGen2;
     private final NoiseGeneratorOctaves noiseGen3;
-    public NoiseGeneratorOctaves noiseGen4;
-    public NoiseGeneratorOctaves noiseGen5;
+    public final NoiseGeneratorOctaves noiseGen4;
+    public final NoiseGeneratorOctaves noiseGen5;
     private final World endWorld;
     private double[] densities;
     private BiomeGenBase[] biomesForGeneration;
@@ -48,7 +48,7 @@ public class ChunkProviderEnd implements IChunkProvider {
         int j = i + 1;
         int k = 33;
         int l = i + 1;
-        this.densities = this.initializeNoiseField(this.densities, p_180520_1_ * i, 0, p_180520_2_ * i, j, k, l);
+        this.densities = this.initializeNoiseField(this.densities, p_180520_1_ * i, p_180520_2_ * i, j, k, l);
 
         for (int i1 = 0; i1 < i; ++i1) {
             for (int j1 = 0; j1 < i; ++j1) {
@@ -118,18 +118,10 @@ public class ChunkProviderEnd implements IChunkProvider {
                         l = -1;
                     } else if (iblockstate2.getBlock() == Blocks.stone) {
                         if (l == -1) {
-                            if (k <= 0) {
-                                iblockstate = Blocks.air.getDefaultState();
-                                iblockstate1 = Blocks.end_stone.getDefaultState();
-                            }
 
                             l = k;
 
-                            if (i1 >= 0) {
-                                p_180519_1_.setBlockState(i, i1, j, iblockstate);
-                            } else {
-                                p_180519_1_.setBlockState(i, i1, j, iblockstate1);
-                            }
+                            p_180519_1_.setBlockState(i, i1, j, iblockstate);
                         } else if (l > 0) {
                             --l;
                             p_180519_1_.setBlockState(i, i1, j, iblockstate1);
@@ -157,7 +149,7 @@ public class ChunkProviderEnd implements IChunkProvider {
         return chunk;
     }
 
-    private double[] initializeNoiseField(double[] p_73187_1_, int p_73187_2_, int p_73187_3_, int p_73187_4_, int p_73187_5_, int p_73187_6_, int p_73187_7_) {
+    private double[] initializeNoiseField(double[] p_73187_1_, int p_73187_2_, int p_73187_4_, int p_73187_5_, int p_73187_6_, int p_73187_7_) {
         if (p_73187_1_ == null) {
             p_73187_1_ = new double[p_73187_5_ * p_73187_6_ * p_73187_7_];
         }
@@ -167,9 +159,9 @@ public class ChunkProviderEnd implements IChunkProvider {
         this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, p_73187_2_, p_73187_4_, p_73187_5_, p_73187_7_, 1.121D, 1.121D, 0.5D);
         this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, p_73187_2_, p_73187_4_, p_73187_5_, p_73187_7_, 200.0D, 200.0D, 0.5D);
         d0 = d0 * 2.0D;
-        this.noiseData1 = this.noiseGen3.generateNoiseOctaves(this.noiseData1, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0 / 80.0D, d1 / 160.0D, d0 / 80.0D);
-        this.noiseData2 = this.noiseGen1.generateNoiseOctaves(this.noiseData2, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0, d1, d0);
-        this.noiseData3 = this.noiseGen2.generateNoiseOctaves(this.noiseData3, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0, d1, d0);
+        this.noiseData1 = this.noiseGen3.generateNoiseOctaves(this.noiseData1, p_73187_2_, 0, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0 / 80.0D, d1 / 160.0D, d0 / 80.0D);
+        this.noiseData2 = this.noiseGen1.generateNoiseOctaves(this.noiseData2, p_73187_2_, 0, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0, d1, d0);
+        this.noiseData3 = this.noiseGen2.generateNoiseOctaves(this.noiseData3, p_73187_2_, 0, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0, d1, d0);
         int i = 0;
 
         for (int j = 0; j < p_73187_5_; ++j) {
@@ -241,8 +233,7 @@ public class ChunkProviderEnd implements IChunkProvider {
         return false;
     }
 
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
-        return true;
+    public void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
     }
 
     public void saveExtraData() {

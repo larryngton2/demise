@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class NBTTagCompound extends NBTBase {
     private final Map<String, NBTBase> tagMap = Maps.newHashMap();
@@ -326,7 +325,7 @@ public class NBTTagCompound extends NBTBase {
         return input.readUTF();
     }
 
-    static NBTBase readNBT(byte id, String key, DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException {
+    static NBTBase readNBT(byte id, String key, DataInput input, int depth, NBTSizeTracker sizeTracker) {
         NBTBase nbtbase = NBTBase.createNewByType(id);
 
         try {

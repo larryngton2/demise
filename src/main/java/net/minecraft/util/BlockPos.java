@@ -2,6 +2,7 @@ package net.minecraft.util;
 
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
@@ -127,7 +128,7 @@ public class BlockPos extends Vec3i {
         final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
         final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
         return new Iterable<>() {
-            public Iterator<BlockPos> iterator() {
+            public @NotNull Iterator<BlockPos> iterator() {
                 return new AbstractIterator<>() {
                     private BlockPos lastReturned = null;
 
@@ -166,7 +167,7 @@ public class BlockPos extends Vec3i {
         final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
         final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
         return new Iterable<>() {
-            public Iterator<BlockPos.MutableBlockPos> iterator() {
+            public @NotNull Iterator<BlockPos.MutableBlockPos> iterator() {
                 return new AbstractIterator<>() {
                     private BlockPos.MutableBlockPos theBlockPos = null;
 

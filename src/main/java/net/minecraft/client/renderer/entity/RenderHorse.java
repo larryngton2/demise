@@ -39,11 +39,11 @@ public class RenderHorse extends RenderLiving<EntityHorse> {
     protected ResourceLocation getEntityTexture(EntityHorse entity) {
         if (!entity.func_110239_cn()) {
             return switch (entity.getHorseType()) {
-                default -> whiteHorseTextures;
                 case 1 -> donkeyTextures;
                 case 2 -> muleTextures;
                 case 3 -> zombieHorseTextures;
                 case 4 -> skeletonHorseTextures;
+                default -> whiteHorseTextures;
             };
         } else {
             return this.func_110848_b(entity);

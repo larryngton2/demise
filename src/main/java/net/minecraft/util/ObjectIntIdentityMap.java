@@ -3,13 +3,14 @@ package net.minecraft.util;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 
 public class ObjectIntIdentityMap<T> implements IObjectIntIterable<T> {
-    private final IdentityHashMap<T, Integer> identityMap = new IdentityHashMap(512);
+    private final IdentityHashMap<T, Integer> identityMap = new IdentityHashMap<>(512);
     private final List<T> objectList = Lists.newArrayList();
 
     public void put(T key, int value) {
@@ -31,7 +32,7 @@ public class ObjectIntIdentityMap<T> implements IObjectIntIterable<T> {
         return value >= 0 && value < this.objectList.size() ? this.objectList.get(value) : null;
     }
 
-    public Iterator<T> iterator() {
+    public @NotNull Iterator<T> iterator() {
         return Iterators.filter(this.objectList.iterator(), Predicates.notNull());
     }
 }

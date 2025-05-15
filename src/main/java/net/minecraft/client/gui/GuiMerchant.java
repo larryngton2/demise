@@ -63,7 +63,7 @@ public class GuiMerchant extends GuiContainer {
         }
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         boolean flag = false;
 
         if (button == this.nextButton) {
@@ -154,9 +154,9 @@ public class GuiMerchant extends GuiContainer {
 
             if (this.isPointInRegion(36, 24, 16, 16, mouseX, mouseY) && itemstack != null) {
                 this.renderToolTip(itemstack, mouseX, mouseY);
-            } else if (itemstack1 != null && this.isPointInRegion(62, 24, 16, 16, mouseX, mouseY) && itemstack1 != null) {
+            } else if (itemstack1 != null && this.isPointInRegion(62, 24, 16, 16, mouseX, mouseY)) {
                 this.renderToolTip(itemstack1, mouseX, mouseY);
-            } else if (itemstack2 != null && this.isPointInRegion(120, 24, 16, 16, mouseX, mouseY) && itemstack2 != null) {
+            } else if (itemstack2 != null && this.isPointInRegion(120, 24, 16, 16, mouseX, mouseY)) {
                 this.renderToolTip(itemstack2, mouseX, mouseY);
             } else if (merchantrecipe.isRecipeDisabled() && (this.isPointInRegion(83, 21, 28, 21, mouseX, mouseY) || this.isPointInRegion(83, 51, 28, 21, mouseX, mouseY))) {
                 this.drawCreativeTabHoveringText(I18n.format("merchant.deprecated"), mouseX, mouseY);
@@ -190,13 +190,13 @@ public class GuiMerchant extends GuiContainer {
                 int j = 176;
 
                 if (!this.enabled) {
-                    j += this.width * 2;
+                    j += (int) (this.width * 2);
                 } else if (flag) {
-                    j += this.width;
+                    j += (int) this.width;
                 }
 
                 if (!this.field_146157_o) {
-                    i += this.height;
+                    i += (int) this.height;
                 }
 
                 drawTexturedModalRect(this.xPosition, this.yPosition, j, i, this.width, this.height);

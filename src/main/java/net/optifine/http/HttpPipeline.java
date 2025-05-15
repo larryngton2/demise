@@ -49,14 +49,13 @@ public class HttpPipeline {
 
             String s2 = "GET";
             String s3 = "HTTP/1.1";
-            Map<String, String> map = new LinkedHashMap();
+            Map<String, String> map = new LinkedHashMap<>();
             map.put("User-Agent", "Java/" + System.getProperty("java.version"));
             map.put("Host", s1);
             map.put("Accept", "text/html, image/gif, image/png");
             map.put("Connection", "keep-alive");
             byte[] abyte = new byte[0];
-            HttpRequest httprequest = new HttpRequest(s1, i, proxy, s2, s, s3, map, abyte);
-            return httprequest;
+            return new HttpRequest(s1, i, proxy, s2, s, s3, map, abyte);
         }
     }
 
@@ -90,8 +89,7 @@ public class HttpPipeline {
     }
 
     private static String makeConnectionKey(String host, int port, Proxy proxy) {
-        String s = host + ":" + port + "-" + proxy;
-        return s;
+        return host + ":" + port + "-" + proxy;
     }
 
     public static byte[] get(String urlStr) throws IOException {
@@ -102,8 +100,7 @@ public class HttpPipeline {
         if (urlStr.startsWith("file:")) {
             URL url = new URL(urlStr);
             InputStream inputstream = url.openStream();
-            byte[] abyte = Config.readAll(inputstream);
-            return abyte;
+            return Config.readAll(inputstream);
         } else {
             HttpRequest httprequest = makeRequest(urlStr, proxy);
             HttpResponse httpresponse = executeRequest(httprequest);
@@ -117,7 +114,7 @@ public class HttpPipeline {
     }
 
     public static HttpResponse executeRequest(HttpRequest req) throws IOException {
-        final Map<String, Object> map = new HashMap();
+        final Map<String, Object> map = new HashMap<>();
         String s = "Response";
         String s1 = "Exception";
         HttpListener httplistener = new HttpListener() {

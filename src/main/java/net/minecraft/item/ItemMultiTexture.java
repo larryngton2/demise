@@ -12,7 +12,7 @@ public class ItemMultiTexture extends ItemBlock {
         this.theBlock = block2;
         this.nameFunction = nameFunction;
         this.setMaxDamage(0);
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
     }
 
     public ItemMultiTexture(Block block, Block block2, final String[] namesByMeta) {

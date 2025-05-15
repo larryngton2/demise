@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class GuiScreenOF extends GuiScreen {
-    protected void actionPerformedRightClick(GuiButton button) throws IOException {
+    protected void actionPerformedRightClick(GuiButton button) {
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {

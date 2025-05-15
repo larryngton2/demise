@@ -26,7 +26,7 @@ public class S32PacketConfirmTransaction implements Packet<INetHandlerPlayClient
         handler.handleConfirmTransaction(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         if (ViaLoadingBase.getInstance().getTargetVersion().isNewerThanOrEqualTo(ProtocolVersion.v1_17)) {
             this.windowId = buf.readInt();
         } else {
@@ -36,7 +36,7 @@ public class S32PacketConfirmTransaction implements Packet<INetHandlerPlayClient
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.windowId);
         buf.writeShort(this.actionNumber);
         buf.writeBoolean(this.accepted);

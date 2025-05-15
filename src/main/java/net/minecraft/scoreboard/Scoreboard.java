@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,9 +65,7 @@ public class Scoreboard {
         } else {
             Map<ScoreObjective, Score> map = this.entitiesScoreObjectives.computeIfAbsent(name, k -> Maps.newHashMap());
 
-            Score score = map.computeIfAbsent(objective, o -> new Score(this, o, name));
-
-            return score;
+            return map.computeIfAbsent(objective, o -> new Score(this, o, name));
         }
     }
 

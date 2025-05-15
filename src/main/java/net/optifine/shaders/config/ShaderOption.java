@@ -16,9 +16,9 @@ public abstract class ShaderOption {
     private String[] paths = null;
     private boolean enabled = true;
     private boolean visible = true;
-    public static final String COLOR_GREEN = "\u00a7a";
-    public static final String COLOR_RED = "\u00a7c";
-    public static final String COLOR_BLUE = "\u00a79";
+    public static final String COLOR_GREEN = "§a";
+    public static final String COLOR_RED = "§c";
+    public static final String COLOR_BLUE = "§9";
 
     public ShaderOption(String name, String description, String value, String[] values, String valueDefault, String path) {
         this.name = name;
@@ -183,8 +183,7 @@ public abstract class ShaderOption {
             if (i < 0) {
                 return 0.0F;
             } else {
-                float f = (float) i / ((float) this.values.length - 1.0F);
-                return f;
+                return (float) i / ((float) this.values.length - 1.0F);
             }
         }
     }

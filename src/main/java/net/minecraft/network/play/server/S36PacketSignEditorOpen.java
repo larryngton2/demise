@@ -21,11 +21,11 @@ public class S36PacketSignEditorOpen implements Packet<INetHandlerPlayClient> {
         handler.handleSignEditorOpen(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.signPosition = buf.readBlockPos();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeBlockPos(this.signPosition);
     }
 

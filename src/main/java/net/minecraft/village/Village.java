@@ -34,7 +34,7 @@ public class Village {
     private int tickCounter;
     private int numVillagers;
     private int noBreedTicks;
-    private final TreeMap<String, Integer> playerReputation = new TreeMap();
+    private final TreeMap<String, Integer> playerReputation = new TreeMap<>();
     private final List<Village.VillageAggressor> villageAgressors = Lists.newArrayList();
     private int numIronGolems;
 
@@ -65,7 +65,7 @@ public class Village {
         int i = this.numVillagers / 10;
 
         if (this.numIronGolems < i && this.villageDoorInfoList.size() > 20 && this.worldObj.rand.nextInt(7000) == 0) {
-            Vec3 vec3 = this.func_179862_a(this.center, 2, 4, 2);
+            Vec3 vec3 = this.func_179862_a(this.center);
 
             if (vec3 != null) {
                 EntityIronGolem entityirongolem = new EntityIronGolem(this.worldObj);
@@ -76,11 +76,11 @@ public class Village {
         }
     }
 
-    private Vec3 func_179862_a(BlockPos p_179862_1_, int p_179862_2_, int p_179862_3_, int p_179862_4_) {
+    private Vec3 func_179862_a(BlockPos p_179862_1_) {
         for (int i = 0; i < 10; ++i) {
             BlockPos blockpos = p_179862_1_.add(this.worldObj.rand.nextInt(16) - 8, this.worldObj.rand.nextInt(6) - 3, this.worldObj.rand.nextInt(16) - 8);
 
-            if (this.func_179866_a(blockpos) && this.func_179861_a(new BlockPos(p_179862_2_, p_179862_3_, p_179862_4_), blockpos)) {
+            if (this.func_179866_a(blockpos) && this.func_179861_a(new BlockPos(2, 4, 2), blockpos)) {
                 return new Vec3(blockpos.getX(), blockpos.getY(), blockpos.getZ());
             }
         }
@@ -222,7 +222,7 @@ public class Village {
             }
         }
 
-        this.villageAgressors.add(new Village.VillageAggressor(entitylivingbaseIn, this.tickCounter));
+        this.villageAgressors.add(new VillageAggressor(entitylivingbaseIn, this.tickCounter));
     }
 
     public EntityLivingBase findNearestVillageAggressor(EntityLivingBase entitylivingbaseIn) {
@@ -321,11 +321,10 @@ public class Village {
         return integer != null ? integer : 0;
     }
 
-    public int setReputationForPlayer(String p_82688_1_, int p_82688_2_) {
+    public void setReputationForPlayer(String p_82688_1_, int p_82688_2_) {
         int i = this.getReputationForPlayer(p_82688_1_);
         int j = MathHelper.clamp_int(i + p_82688_2_, -30, 10);
         this.playerReputation.put(p_82688_1_, j);
-        return j;
     }
 
     public boolean isPlayerReputationTooLow(String p_82687_1_) {
@@ -425,8 +424,8 @@ public class Village {
         }
     }
 
-    class VillageAggressor {
-        public EntityLivingBase agressor;
+    static class VillageAggressor {
+        public final EntityLivingBase agressor;
         public int agressionTime;
 
         VillageAggressor(EntityLivingBase p_i1674_2_, int p_i1674_3_) {

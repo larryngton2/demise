@@ -242,13 +242,12 @@ public class ChatStyle {
     public boolean equals(Object p_equals_1_) {
         if (this == p_equals_1_) {
             return true;
-        } else if (!(p_equals_1_ instanceof ChatStyle)) {
+        } else if (!(p_equals_1_ instanceof ChatStyle chatstyle)) {
             return false;
         } else {
             boolean flag;
             label0:
             {
-                ChatStyle chatstyle = (ChatStyle) p_equals_1_;
 
                 if (this.getBold() == chatstyle.getBold() && this.getColor() == chatstyle.getColor() && this.getItalic() == chatstyle.getItalic() && this.getObfuscated() == chatstyle.getObfuscated() && this.getStrikethrough() == chatstyle.getStrikethrough() && this.getUnderlined() == chatstyle.getUnderlined()) {
                     label85:
@@ -280,10 +279,10 @@ public class ChatStyle {
                 }
 
                 flag = false;
-                return flag;
+                return false;
             }
             flag = true;
-            return flag;
+            return true;
         }
     }
 

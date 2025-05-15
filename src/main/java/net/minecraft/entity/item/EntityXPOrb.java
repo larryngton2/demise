@@ -128,12 +128,12 @@ public class EntityXPOrb extends Entity {
         }
     }
 
-    public boolean handleWaterMovement() {
-        return this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this);
+    public void handleWaterMovement() {
+        this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.water, this);
     }
 
-    protected void dealFireDamage(int amount) {
-        this.attackEntityFrom(DamageSource.inFire, (float) amount);
+    protected void dealFireDamage() {
+        this.attackEntityFrom(DamageSource.inFire, (float) 1);
     }
 
     public boolean attackEntityFrom(DamageSource source, float amount) {

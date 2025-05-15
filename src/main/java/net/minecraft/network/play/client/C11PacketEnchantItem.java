@@ -22,12 +22,12 @@ public class C11PacketEnchantItem implements Packet<INetHandlerPlayServer> {
         handler.processEnchantItem(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.windowId = buf.readByte();
         this.button = buf.readByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.windowId);
         buf.writeByte(this.button);
     }

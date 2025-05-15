@@ -113,7 +113,7 @@ public class MapGenCaves extends MapGenBase {
                     for (int j1 = k2; !flag3 && j1 < k; ++j1) {
                         for (int k1 = i3; !flag3 && k1 < i1; ++k1) {
                             for (int l1 = l + 1; !flag3 && l1 >= l2 - 1; --l1) {
-                                if (l1 >= 0 && l1 < 256) {
+                                if (l1 < 256) {
                                     IBlockState iblockstate = p_180702_5_.getBlockState(j1, l1, k1);
 
                                     if (iblockstate.getBlock() == Blocks.flowing_water || iblockstate.getBlock() == Blocks.water) {

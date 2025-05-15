@@ -25,7 +25,7 @@ public abstract class BlockLeaves extends BlockLeavesBase {
     protected boolean isTransparent;
 
     public BlockLeaves() {
-        super(Material.leaves, false);
+        super();
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabDecorations);
         this.setHardness(0.2F);

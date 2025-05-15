@@ -28,9 +28,9 @@ import java.util.Set;
 
 public class EntityTrackerEntry {
     private static final Logger logger = LogManager.getLogger();
-    public Entity trackedEntity;
-    public int trackingDistanceThreshold;
-    public int updateFrequency;
+    public final Entity trackedEntity;
+    public final int trackingDistanceThreshold;
+    public final int updateFrequency;
     public int encodedPosX;
     public int encodedPosY;
     public int encodedPosZ;
@@ -51,7 +51,7 @@ public class EntityTrackerEntry {
     private boolean ridingEntity;
     private boolean onGround;
     public boolean playerEntitiesUpdated;
-    public Set<EntityPlayerMP> trackingPlayers = Sets.newHashSet();
+    public final Set<EntityPlayerMP> trackingPlayers = Sets.newHashSet();
 
     public EntityTrackerEntry(Entity trackedEntityIn, int trackingDistanceThresholdIn, int updateFrequencyIn, boolean sendVelocityUpdatesIn) {
         this.trackedEntity = trackedEntityIn;
@@ -395,7 +395,7 @@ public class EntityTrackerEntry {
             }
 
             if (entityfireball.shootingEntity != null) {
-                s0epacketspawnobject2 = new S0EPacketSpawnObject(this.trackedEntity, i, ((EntityFireball) this.trackedEntity).shootingEntity.getEntityId());
+                s0epacketspawnobject2 = new S0EPacketSpawnObject(this.trackedEntity, i, entityfireball.shootingEntity.getEntityId());
             } else {
                 s0epacketspawnobject2 = new S0EPacketSpawnObject(this.trackedEntity, i, 0);
             }

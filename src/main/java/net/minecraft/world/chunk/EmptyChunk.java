@@ -18,10 +18,6 @@ public class EmptyChunk extends Chunk {
         super(worldIn, x, z);
     }
 
-    public boolean isAtLocation(int x, int z) {
-        return x == this.xPosition && z == this.zPosition;
-    }
-
     public int getHeightValue(int x, int z) {
         return 0;
     }

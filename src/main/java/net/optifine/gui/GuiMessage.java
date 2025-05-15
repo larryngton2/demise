@@ -15,7 +15,7 @@ public class GuiMessage extends GuiScreen {
     private final String messageLine1;
     private final String messageLine2;
     private final List listLines2 = Lists.newArrayList();
-    protected String confirmButtonText;
+    protected final String confirmButtonText;
     private int ticksUntilEnable;
 
     public GuiMessage(GuiScreen parentScreen, String line1, String line2) {
@@ -31,17 +31,17 @@ public class GuiMessage extends GuiScreen {
         this.listLines2.addAll(this.fontRendererObj.listFormattedStringToWidth(this.messageLine2, width - 50));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         Config.getMinecraft().displayGuiScreen(this.parentScreen);
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.messageLine1, width / 2, 70, 16777215);
+        drawCenteredString(this.fontRendererObj, this.messageLine1, (float) width / 2, 70, 16777215);
         int i = 90;
 
         for (Object s : this.listLines2) {
-            drawCenteredString(this.fontRendererObj, (String) s, width / 2, i, 16777215);
+            drawCenteredString(this.fontRendererObj, (String) s, (float) width / 2, i, 16777215);
             i += this.fontRendererObj.FONT_HEIGHT;
         }
 

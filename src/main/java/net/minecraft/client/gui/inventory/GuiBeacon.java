@@ -100,7 +100,7 @@ public class GuiBeacon extends GuiContainer {
         this.beaconConfirmButton.enabled = this.tileBeacon.getStackInSlot(0) != null && j > 0;
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.id == -2) {
             mc.displayGuiScreen(null);
         } else if (button.id == -1) {
@@ -182,11 +182,11 @@ public class GuiBeacon extends GuiContainer {
                 int j = 0;
 
                 if (!this.enabled) {
-                    j += this.width * 2;
+                    j += (int) (this.width * 2);
                 } else if (this.field_146142_r) {
-                    j += this.width;
+                    j += (int) this.width;
                 } else if (this.hovered) {
-                    j += this.width * 3;
+                    j += (int) (this.width * 3);
                 }
 
                 drawTexturedModalRect(this.xPosition, this.yPosition, j, i, this.width, this.height);

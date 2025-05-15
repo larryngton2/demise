@@ -21,12 +21,12 @@ public class S0APacketUseBed implements Packet<INetHandlerPlayClient> {
         this.bedPos = bedPosIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.playerID = buf.readVarIntFromBuffer();
         this.bedPos = buf.readBlockPos();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.playerID);
         buf.writeBlockPos(this.bedPos);
     }

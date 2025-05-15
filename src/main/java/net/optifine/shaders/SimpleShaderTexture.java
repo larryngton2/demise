@@ -29,7 +29,7 @@ public class SimpleShaderTexture extends AbstractTexture {
         } else {
             try {
                 BufferedImage bufferedimage = TextureUtil.readBufferedImage(inputstream);
-                TextureMetadataSection texturemetadatasection = loadTextureMetadataSection(this.texturePath, new TextureMetadataSection(false, false, new ArrayList()));
+                TextureMetadataSection texturemetadatasection = loadTextureMetadataSection(this.texturePath, new TextureMetadataSection(false, false, new ArrayList<>()));
                 TextureUtil.uploadTextureImageAllocate(this.getGlTextureId(), bufferedimage, texturemetadatasection.getTextureBlur(), texturemetadatasection.getTextureClamp());
             } finally {
                 IOUtils.closeQuietly(inputstream);
@@ -43,13 +43,12 @@ public class SimpleShaderTexture extends AbstractTexture {
         InputStream inputstream = Shaders.getShaderPackResourceStream(s);
 
         if (inputstream != null) {
-            IMetadataSerializer imetadataserializer = METADATA_SERIALIZER;
             BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(inputstream));
             TextureMetadataSection texturemetadatasection1;
 
             try {
                 JsonObject jsonobject = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
-                TextureMetadataSection texturemetadatasection = imetadataserializer.parseMetadataSection(s1, jsonobject);
+                TextureMetadataSection texturemetadatasection = METADATA_SERIALIZER.parseMetadataSection(s1, jsonobject);
 
                 if (texturemetadatasection == null) {
                     return def;

@@ -126,7 +126,7 @@ public abstract class BlockLiquid extends Block {
                         vec3 = vec3.addVector((blockpos.getX() - pos.getX()) * k, (blockpos.getY() - pos.getY()) * k, (blockpos.getZ() - pos.getZ()) * k);
                     }
                 }
-            } else if (j >= 0) {
+            } else {
                 int l = j - i;
                 vec3 = vec3.addVector((blockpos.getX() - pos.getX()) * l, (blockpos.getY() - pos.getY()) * l, (blockpos.getZ() - pos.getZ()) * l);
             }

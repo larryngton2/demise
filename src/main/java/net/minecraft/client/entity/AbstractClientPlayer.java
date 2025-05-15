@@ -23,7 +23,6 @@ import net.optifine.player.PlayerConfigurations;
 import net.optifine.reflect.Reflector;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.LookEvent;
-import wtf.demise.utils.player.RotationUtils;
 
 public abstract class AbstractClientPlayer extends EntityPlayer {
     private NetworkPlayerInfo playerInfo;
@@ -90,7 +89,7 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
         }
     }
 
-    public static ThreadDownloadImageData getDownloadImageSkin(ResourceLocation resourceLocationIn, String username) {
+    public static void getDownloadImageSkin(ResourceLocation resourceLocationIn, String username) {
         TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
         ITextureObject itextureobject = texturemanager.getTexture(resourceLocationIn);
 
@@ -99,7 +98,6 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
             texturemanager.loadTexture(resourceLocationIn, itextureobject);
         }
 
-        return (ThreadDownloadImageData) itextureobject;
     }
 
     public static ResourceLocation getLocationSkin(String username) {
@@ -187,7 +185,4 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
         return this.getVectorForRotation(pitch, yaw);
     }
 
-    public Vec3 getLookCustom(float yaw, float pitch) {
-        return this.getVectorForRotation(pitch, yaw);
-    }
 }

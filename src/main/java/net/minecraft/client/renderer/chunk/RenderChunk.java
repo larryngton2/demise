@@ -319,8 +319,7 @@ public class RenderChunk {
 
         try {
             if (this.compileTask != null && this.compileTask.getStatus() == ChunkCompileTaskGenerator.Status.PENDING) {
-                ChunkCompileTaskGenerator chunkcompiletaskgenerator2 = null;
-                return chunkcompiletaskgenerator2;
+                return null;
             }
 
             if (this.compileTask != null && this.compileTask.getStatus() != ChunkCompileTaskGenerator.Status.DONE) {
@@ -330,8 +329,7 @@ public class RenderChunk {
 
             this.compileTask = new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY);
             this.compileTask.setCompiledChunk(this.compiledChunk);
-            ChunkCompileTaskGenerator chunkcompiletaskgenerator = this.compileTask;
-            chunkcompiletaskgenerator1 = chunkcompiletaskgenerator;
+            chunkcompiletaskgenerator1 = this.compileTask;
         } finally {
             this.lockCompileTask.unlock();
         }
@@ -456,8 +454,8 @@ public class RenderChunk {
         return this.playerUpdate;
     }
 
-    protected RegionRenderCache createRegionRenderCache(World p_createRegionRenderCache_1_, BlockPos p_createRegionRenderCache_2_, BlockPos p_createRegionRenderCache_3_, int p_createRegionRenderCache_4_) {
-        return new RegionRenderCache(p_createRegionRenderCache_1_, p_createRegionRenderCache_2_, p_createRegionRenderCache_3_, p_createRegionRenderCache_4_);
+    protected RegionRenderCache createRegionRenderCache(World p_createRegionRenderCache_1_, BlockPos p_createRegionRenderCache_2_, BlockPos p_createRegionRenderCache_3_) {
+        return new RegionRenderCache(p_createRegionRenderCache_1_, p_createRegionRenderCache_2_, p_createRegionRenderCache_3_, 1);
     }
 
     private EnumWorldBlockLayer fixBlockLayer(IBlockState p_fixBlockLayer_1_, EnumWorldBlockLayer p_fixBlockLayer_2_) {
@@ -469,9 +467,7 @@ public class RenderChunk {
             }
         }
 
-        if (!this.fixBlockLayer) {
-            return p_fixBlockLayer_2_;
-        } else {
+        if (this.fixBlockLayer) {
             if (this.isMipmaps) {
                 if (p_fixBlockLayer_2_ == EnumWorldBlockLayer.CUTOUT) {
                     Block block = p_fixBlockLayer_1_.getBlock();
@@ -490,8 +486,8 @@ public class RenderChunk {
                 return EnumWorldBlockLayer.CUTOUT;
             }
 
-            return p_fixBlockLayer_2_;
         }
+        return p_fixBlockLayer_2_;
     }
 
     private void postRenderOverlays(RegionRenderCacheBuilder p_postRenderOverlays_1_, CompiledChunk p_postRenderOverlays_2_, boolean[] p_postRenderOverlays_3_) {
@@ -512,14 +508,13 @@ public class RenderChunk {
     private ChunkCacheOF makeChunkCacheOF(BlockPos p_makeChunkCacheOF_1_) {
         BlockPos blockpos = p_makeChunkCacheOF_1_.add(-1, -1, -1);
         BlockPos blockpos1 = p_makeChunkCacheOF_1_.add(16, 16, 16);
-        ChunkCache chunkcache = this.createRegionRenderCache(this.world, blockpos, blockpos1, 1);
+        ChunkCache chunkcache = this.createRegionRenderCache(this.world, blockpos, blockpos1);
 
         if (Reflector.MinecraftForgeClient_onRebuildChunk.exists()) {
             Reflector.call(Reflector.MinecraftForgeClient_onRebuildChunk, this.world, p_makeChunkCacheOF_1_, chunkcache);
         }
 
-        ChunkCacheOF chunkcacheof = new ChunkCacheOF(chunkcache, blockpos, blockpos1, 1);
-        return chunkcacheof;
+        return new ChunkCacheOF(chunkcache, blockpos, blockpos1, 1);
     }
 
     public RenderChunk getRenderChunkOffset16(ViewFrustum p_getRenderChunkOffset16_1_, EnumFacing p_getRenderChunkOffset16_2_) {
@@ -543,13 +538,11 @@ public class RenderChunk {
     private Chunk getChunk(BlockPos p_getChunk_1_) {
         Chunk chunk = this.chunk;
 
-        if (chunk != null && chunk.isLoaded()) {
-            return chunk;
-        } else {
+        if (chunk == null || !chunk.isLoaded()) {
             chunk = this.world.getChunkFromBlockCoords(p_getChunk_1_);
             this.chunk = chunk;
-            return chunk;
         }
+        return chunk;
     }
 
     public boolean isChunkRegionEmpty() {

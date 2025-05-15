@@ -116,9 +116,8 @@ public class LongHashMap<V> {
         }
     }
 
-    public V remove(long p_76159_1_) {
+    public void remove(long p_76159_1_) {
         LongHashMap.Entry<V> entry = this.removeKey(p_76159_1_);
-        return entry == null ? null : entry.value;
     }
 
     final LongHashMap.Entry<V> removeKey(long p_76152_1_) {
@@ -152,7 +151,7 @@ public class LongHashMap<V> {
 
     private void createKey(int p_76156_1_, long p_76156_2_, V p_76156_4_, int p_76156_5_) {
         LongHashMap.Entry<V> entry = this.hashArray[p_76156_5_];
-        this.hashArray[p_76156_5_] = new LongHashMap.Entry(p_76156_1_, p_76156_2_, p_76156_4_, entry);
+        this.hashArray[p_76156_5_] = new LongHashMap.Entry<>(p_76156_1_, p_76156_2_, p_76156_4_, entry);
 
         if (this.numHashElements++ >= this.capacity) {
             this.resizeTable(2 * this.hashArray.length);
@@ -193,10 +192,8 @@ public class LongHashMap<V> {
         }
 
         public final boolean equals(Object p_equals_1_) {
-            if (!(p_equals_1_ instanceof LongHashMap.Entry)) {
-                return false;
-            } else {
-                LongHashMap.Entry<V> entry = (LongHashMap.Entry) p_equals_1_;
+            if (p_equals_1_ instanceof LongHashMap.Entry) {
+                Entry<V> entry = (Entry) p_equals_1_;
                 Object object = this.getKey();
                 Object object1 = entry.getKey();
 
@@ -207,8 +204,8 @@ public class LongHashMap<V> {
                     return Objects.equals(object2, object3);
                 }
 
-                return false;
             }
+            return false;
         }
 
         public final int hashCode() {

@@ -20,11 +20,11 @@ public class S00PacketKeepAlive implements Packet<INetHandlerPlayClient> {
         handler.handleKeepAlive(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.id = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.id);
     }
 

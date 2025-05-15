@@ -46,14 +46,6 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
         return 5;
     }
 
-    public boolean interactFirst(EntityPlayer playerIn) {
-        if (!this.worldObj.isRemote) {
-            playerIn.displayGUIChest(this);
-        }
-
-        return true;
-    }
-
     public void onActivatorRailPass(int x, int y, int z, boolean receivingPower) {
         boolean flag = !receivingPower;
 

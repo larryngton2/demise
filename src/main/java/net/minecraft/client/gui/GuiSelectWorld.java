@@ -22,7 +22,7 @@ import java.util.Date;
 public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
     private static final Logger logger = LogManager.getLogger();
     private final DateFormat field_146633_h = new SimpleDateFormat();
-    protected GuiScreen parentScreen;
+    protected final GuiScreen parentScreen;
     protected String screenTitle = "Select world";
     private boolean field_146634_i;
     private int selectedIndex;
@@ -90,19 +90,19 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
     }
 
     public void addWorldSelectionButtons() {
-        this.buttonList.add(this.selectButton = new GuiButton(1, width / 2 - 154, height - 52, 150, 20, I18n.format("selectWorld.select")));
-        this.buttonList.add(new GuiButton(3, width / 2 + 4, height - 52, 150, 20, I18n.format("selectWorld.create")));
-        this.buttonList.add(this.renameButton = new GuiButton(6, width / 2 - 154, height - 28, 72, 20, I18n.format("selectWorld.rename")));
-        this.buttonList.add(this.deleteButton = new GuiButton(2, width / 2 - 76, height - 28, 72, 20, I18n.format("selectWorld.delete")));
-        this.buttonList.add(this.recreateButton = new GuiButton(7, width / 2 + 4, height - 28, 72, 20, I18n.format("selectWorld.recreate")));
-        this.buttonList.add(new GuiButton(0, width / 2 + 82, height - 28, 72, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(this.selectButton = new GuiButton(1, (float) width / 2 - 154, height - 52, 150, 20, I18n.format("selectWorld.select")));
+        this.buttonList.add(new GuiButton(3, (float) width / 2 + 4, height - 52, 150, 20, I18n.format("selectWorld.create")));
+        this.buttonList.add(this.renameButton = new GuiButton(6, (float) width / 2 - 154, height - 28, 72, 20, I18n.format("selectWorld.rename")));
+        this.buttonList.add(this.deleteButton = new GuiButton(2, (float) width / 2 - 76, height - 28, 72, 20, I18n.format("selectWorld.delete")));
+        this.buttonList.add(this.recreateButton = new GuiButton(7, (float) width / 2 + 4, height - 28, 72, 20, I18n.format("selectWorld.recreate")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 + 82, height - 28, 72, 20, I18n.format("gui.cancel")));
         this.selectButton.enabled = false;
         this.deleteButton.enabled = false;
         this.renameButton.enabled = false;
         this.recreateButton.enabled = false;
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 2) {
                 String s = this.func_146614_d(this.selectedIndex);
@@ -178,7 +178,7 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.availableWorlds.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, this.screenTitle, width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, this.screenTitle, (float) width / 2, 20, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -187,8 +187,7 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback {
         String s1 = "'" + name + "' " + I18n.format("selectWorld.deleteWarning");
         String s2 = I18n.format("selectWorld.deleteButton");
         String s3 = I18n.format("gui.cancel");
-        GuiYesNo guiyesno = new GuiYesNo(selectWorld, s, s1, s2, s3, id);
-        return guiyesno;
+        return new GuiYesNo(selectWorld, s, s1, s2, s3, id);
     }
 
     class List extends GuiSlot {

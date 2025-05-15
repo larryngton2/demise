@@ -96,7 +96,7 @@ public class GuiScreenRealmsProxy extends GuiScreen {
         return this.fontRendererObj.listFormattedStringToWidth(p_154323_1_, p_154323_2_);
     }
 
-    public final void actionPerformed(GuiButton button) throws IOException {
+    public final void actionPerformed(GuiButton button) {
         this.field_154330_a.buttonClicked(((GuiButtonRealmsProxy) button).getRealmsButton());
     }
 
@@ -145,7 +145,7 @@ public class GuiScreenRealmsProxy extends GuiScreen {
         this.field_154330_a.mouseDragged(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
     }
 
-    public void keyTyped(char typedChar, int keyCode) throws IOException {
+    public void keyTyped(char typedChar, int keyCode) {
         this.field_154330_a.keyPressed(typedChar, keyCode);
     }
 

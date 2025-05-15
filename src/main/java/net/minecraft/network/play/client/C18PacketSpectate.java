@@ -19,11 +19,11 @@ public class C18PacketSpectate implements Packet<INetHandlerPlayServer> {
         this.id = id;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.id = buf.readUuid();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeUuid(this.id);
     }
 

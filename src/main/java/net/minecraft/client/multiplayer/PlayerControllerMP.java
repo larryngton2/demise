@@ -67,10 +67,10 @@ public class PlayerControllerMP {
         return this.currentGameType.isSurvivalOrAdventure();
     }
 
-    public boolean onPlayerDestroyBlock(BlockPos pos) {
+    public void onPlayerDestroyBlock(BlockPos pos) {
         if (this.currentGameType.isAdventure()) {
             if (this.currentGameType == WorldSettings.GameType.SPECTATOR) {
-                return false;
+                return;
             }
 
             if (!this.mc.thePlayer.isAllowEdit()) {
@@ -78,24 +78,22 @@ public class PlayerControllerMP {
                 ItemStack itemstack = this.mc.thePlayer.getCurrentEquippedItem();
 
                 if (itemstack == null) {
-                    return false;
+                    return;
                 }
 
                 if (!itemstack.canDestroy(block)) {
-                    return false;
+                    return;
                 }
             }
         }
 
         if (this.currentGameType.isCreative() && this.mc.thePlayer.getHeldItem() != null && this.mc.thePlayer.getHeldItem().getItem() instanceof ItemSword) {
-            return false;
         } else {
             World world = this.mc.theWorld;
             IBlockState iblockstate = world.getBlockState(pos);
             Block block1 = iblockstate.getBlock();
 
             if (block1.getMaterial() == Material.air) {
-                return false;
             } else {
                 world.playAuxSFX(2001, pos, Block.getStateId(iblockstate));
                 boolean flag = world.setBlockToAir(pos);
@@ -118,7 +116,6 @@ public class PlayerControllerMP {
                     }
                 }
 
-                return flag;
             }
         }
     }
@@ -320,7 +317,7 @@ public class PlayerControllerMP {
             int i = itemStackIn.stackSize;
             ItemStack itemstack = itemStackIn.useItemRightClick(worldIn, playerIn);
 
-            if (itemstack != itemStackIn || itemstack != null && itemstack.stackSize != i) {
+            if (itemstack != itemStackIn || itemstack.stackSize != i) {
                 playerIn.inventory.mainInventory[playerIn.inventory.currentItem] = itemstack;
 
                 if (itemstack.stackSize == 0) {

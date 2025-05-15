@@ -3,7 +3,6 @@ package net.minecraft.server.network;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetworkManager;
@@ -71,7 +70,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, ITickable 
 
     public void closeConnection(String reason) {
         try {
-            logger.info("Disconnecting " + this.getConnectionInfo() + ": " + reason);
+            logger.info("Disconnecting {}: {}", this.getConnectionInfo(), reason);
             ChatComponentText chatcomponenttext = new ChatComponentText(reason);
             this.networkManager.sendPacket(new S00PacketDisconnect(chatcomponenttext));
             this.networkManager.closeChannel(chatcomponenttext);
@@ -109,7 +108,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, ITickable 
     }
 
     public void onDisconnect(IChatComponent reason) {
-        logger.info(this.getConnectionInfo() + " lost connection: " + reason.getUnformattedText());
+        logger.info("{} lost connection: {}", this.getConnectionInfo(), reason.getUnformattedText());
     }
 
     public String getConnectionInfo() {
@@ -147,7 +146,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, ITickable 
                         NetHandlerLoginServer.this.loginGameProfile = NetHandlerLoginServer.this.server.getMinecraftSessionService().hasJoinedServer(new GameProfile(null, gameprofile.getName()), s);
 
                         if (NetHandlerLoginServer.this.loginGameProfile != null) {
-                            NetHandlerLoginServer.logger.info("UUID of player " + NetHandlerLoginServer.this.loginGameProfile.getName() + " is " + NetHandlerLoginServer.this.loginGameProfile.getId());
+                            NetHandlerLoginServer.logger.info("UUID of player {} is {}", NetHandlerLoginServer.this.loginGameProfile.getName(), NetHandlerLoginServer.this.loginGameProfile.getId());
                             NetHandlerLoginServer.this.currentLoginState = NetHandlerLoginServer.LoginState.READY_TO_ACCEPT;
                         } else if (NetHandlerLoginServer.this.server.isSinglePlayer()) {
                             NetHandlerLoginServer.logger.warn("Failed to verify username but will let them in anyway!");
@@ -155,7 +154,7 @@ public class NetHandlerLoginServer implements INetHandlerLoginServer, ITickable 
                             NetHandlerLoginServer.this.currentLoginState = NetHandlerLoginServer.LoginState.READY_TO_ACCEPT;
                         } else {
                             NetHandlerLoginServer.this.closeConnection("Failed to verify username!");
-                            NetHandlerLoginServer.logger.error("Username '" + NetHandlerLoginServer.this.loginGameProfile.getName() + "' tried to join with an invalid session");
+                            NetHandlerLoginServer.logger.error("Username '{}' tried to join with an invalid session", NetHandlerLoginServer.this.loginGameProfile.getName());
                         }
                     } catch (AuthenticationUnavailableException var3) {
                         if (NetHandlerLoginServer.this.server.isSinglePlayer()) {

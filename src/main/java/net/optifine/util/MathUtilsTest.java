@@ -3,17 +3,17 @@ package net.optifine.util;
 import net.minecraft.util.MathHelper;
 
 public class MathUtilsTest {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         MathUtilsTest.OPER[] amathutilstest$oper = MathUtilsTest.OPER.values();
 
         for (OPER mathutilstest$oper : amathutilstest$oper) {
             dbg("******** " + mathutilstest$oper + " ***********");
-            test(mathutilstest$oper, false);
+            test(mathutilstest$oper);
         }
     }
 
-    private static void test(MathUtilsTest.OPER oper, boolean fast) {
-        MathHelper.fastMath = fast;
+    private static void test(OPER oper) {
+        MathHelper.fastMath = false;
         double d0;
         double d1;
 

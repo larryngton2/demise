@@ -35,7 +35,6 @@ import net.optifine.reflect.Reflector;
 
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class WorldClient extends World {
     private final NetHandlerPlayClient sendQueue;
@@ -208,12 +207,12 @@ public class WorldClient extends World {
         return entity;
     }
 
-    public boolean invalidateRegionAndSetBlock(BlockPos pos, IBlockState state) {
+    public void invalidateRegionAndSetBlock(BlockPos pos, IBlockState state) {
         int i = pos.getX();
         int j = pos.getY();
         int k = pos.getZ();
         this.invalidateBlockReceiveRegion(i, j, k, i, j, k);
-        return super.setBlockState(pos, state, 3);
+        super.setBlockState(pos, state, 3);
     }
 
     public void sendQuittingDisconnectingPacket() {

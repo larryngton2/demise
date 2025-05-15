@@ -33,7 +33,6 @@ import net.optifine.reflect.Reflector;
 import net.optifine.reflect.ReflectorForge;
 import net.optifine.shaders.Shaders;
 import net.optifine.shaders.ShadersRender;
-import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
 
 import java.util.List;
@@ -492,8 +491,8 @@ public class RenderItem implements IResourceManagerReloadListener {
                 GlStateManager.disableBlend();
                 Tessellator tessellator = Tessellator.getInstance();
                 WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-                this.draw(worldrenderer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                this.draw(worldrenderer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
+                this.draw(worldrenderer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0);
+                this.draw(worldrenderer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0);
                 int j = 255 - i;
                 int k = i;
                 int l = 0;
@@ -508,7 +507,7 @@ public class RenderItem implements IResourceManagerReloadListener {
                     }
                 }
 
-                this.draw(worldrenderer, xPosition + 2, yPosition + 13, j1, 1, j, k, l, 255);
+                this.draw(worldrenderer, xPosition + 2, yPosition + 13, j1, 1, j, k, l);
                 GlStateManager.enableBlend();
                 GlStateManager.enableAlpha();
                 GlStateManager.enableTexture2D();
@@ -518,12 +517,12 @@ public class RenderItem implements IResourceManagerReloadListener {
         }
     }
 
-    private void draw(WorldRenderer renderer, float x, float y, int width, int height, int red, int green, int blue, int alpha) {
+    private void draw(WorldRenderer renderer, float x, float y, int width, int height, int red, int green, int blue) {
         renderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        renderer.pos(x, y, 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.pos(x, y + height, 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.pos(x + width, y + height, 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.pos(x + width, y, 0.0D).color(red, green, blue, alpha).endVertex();
+        renderer.pos(x, y, 0.0D).color(red, green, blue, 255).endVertex();
+        renderer.pos(x, y + height, 0.0D).color(red, green, blue, 255).endVertex();
+        renderer.pos(x + width, y + height, 0.0D).color(red, green, blue, 255).endVertex();
+        renderer.pos(x + width, y, 0.0D).color(red, green, blue, 255).endVertex();
         Tessellator.getInstance().draw();
     }
 

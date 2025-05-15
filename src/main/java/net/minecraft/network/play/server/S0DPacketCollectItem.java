@@ -18,12 +18,12 @@ public class S0DPacketCollectItem implements Packet<INetHandlerPlayClient> {
         this.entityId = entityIdIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.collectedItemEntityId = buf.readVarIntFromBuffer();
         this.entityId = buf.readVarIntFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.collectedItemEntityId);
         buf.writeVarIntToBuffer(this.entityId);
     }

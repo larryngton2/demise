@@ -48,7 +48,7 @@ public class EntityGuardian extends EntityMob {
         this.tasks.addTask(9, new EntityAILookIdle(this));
         this.wander.setMutexBits(3);
         entityaimovetowardsrestriction.setMutexBits(3);
-        this.targetTasks.addTask(1, new EntityAINearestAttackableTarget(this, EntityLivingBase.class, 10, true, false, new EntityGuardian.GuardianTargetSelector(this)));
+        this.targetTasks.addTask(1, new EntityAINearestAttackableTarget<>(this, EntityLivingBase.class, 10, true, false, new EntityGuardian.GuardianTargetSelector(this)));
         this.moveHelper = new EntityGuardian.GuardianMoveHelper(this);
         this.field_175484_c = this.field_175482_b = this.rand.nextFloat();
     }
@@ -479,7 +479,7 @@ public class EntityGuardian extends EntityMob {
                 d3 = MathHelper.sqrt_double(d3);
                 d1 = d1 / d3;
                 float f = (float) (MathHelper.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F;
-                this.entityGuardian.rotationYaw = this.limitAngle(this.entityGuardian.rotationYaw, f, 30.0F);
+                this.entityGuardian.rotationYaw = this.limitAngle(this.entityGuardian.rotationYaw, f);
                 this.entityGuardian.renderYawOffset = this.entityGuardian.rotationYaw;
                 float f1 = (float) (this.speed * this.entityGuardian.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue());
                 this.entityGuardian.setAIMoveSpeed(this.entityGuardian.getAIMoveSpeed() + (f1 - this.entityGuardian.getAIMoveSpeed()) * 0.125F);

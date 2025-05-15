@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ItemMonsterPlacer extends Item {
     public ItemMonsterPlacer() {
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
         this.setCreativeTab(CreativeTabs.tabMisc);
     }
 
@@ -95,9 +95,7 @@ public class ItemMonsterPlacer extends Item {
         } else {
             MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
 
-            if (movingobjectposition == null) {
-                return itemStackIn;
-            } else {
+            if (movingobjectposition != null) {
                 if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                     BlockPos blockpos = movingobjectposition.getBlockPos();
 
@@ -126,8 +124,8 @@ public class ItemMonsterPlacer extends Item {
                     }
                 }
 
-                return itemStackIn;
             }
+            return itemStackIn;
         }
     }
 

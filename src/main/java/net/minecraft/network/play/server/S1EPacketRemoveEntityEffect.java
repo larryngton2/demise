@@ -19,12 +19,12 @@ public class S1EPacketRemoveEntityEffect implements Packet<INetHandlerPlayClient
         this.effectId = effect.getPotionID();
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readVarIntFromBuffer();
         this.effectId = buf.readUnsignedByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityId);
         buf.writeByte(this.effectId);
     }

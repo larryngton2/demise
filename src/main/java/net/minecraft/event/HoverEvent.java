@@ -51,18 +51,18 @@ public class HoverEvent {
     }
 
     public enum Action {
-        SHOW_TEXT("show_text", true),
-        SHOW_ACHIEVEMENT("show_achievement", true),
-        SHOW_ITEM("show_item", true),
-        SHOW_ENTITY("show_entity", true);
+        SHOW_TEXT("show_text"),
+        SHOW_ACHIEVEMENT("show_achievement"),
+        SHOW_ITEM("show_item"),
+        SHOW_ENTITY("show_entity");
 
         private static final Map<String, HoverEvent.Action> nameMapping = Maps.newHashMap();
         private final boolean allowedInChat;
         private final String canonicalName;
 
-        Action(String canonicalNameIn, boolean allowedInChatIn) {
+        Action(String canonicalNameIn) {
             this.canonicalName = canonicalNameIn;
-            this.allowedInChat = allowedInChatIn;
+            this.allowedInChat = true;
         }
 
         public boolean shouldAllowInChat() {

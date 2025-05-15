@@ -30,10 +30,10 @@ public class ScreenChatOptions extends GuiScreen {
             ++i;
         }
 
-        this.buttonList.add(new GuiButton(200, width / 2 - 100, height / 6 + 120, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 - 100, (float) height / 6 + 120, I18n.format("gui.done")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id < 100 && button instanceof GuiOptionButton) {
                 this.game_settings.setOptionValue(((GuiOptionButton) button).returnEnumOptions(), 1);
@@ -49,7 +49,7 @@ public class ScreenChatOptions extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.field_146401_i, width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_146401_i, (float) width / 2, 20, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

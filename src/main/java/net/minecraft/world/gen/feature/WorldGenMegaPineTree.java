@@ -27,7 +27,7 @@ public class WorldGenMegaPineTree extends WorldGenHugeTrees {
         if (!this.func_175929_a(worldIn, rand, position, i)) {
             return false;
         } else {
-            this.func_150541_c(worldIn, position.getX(), position.getZ(), position.getY() + i, 0, rand);
+            this.func_150541_c(worldIn, position.getX(), position.getZ(), position.getY() + i, rand);
 
             for (int j = 0; j < i; ++j) {
                 Block block = worldIn.getBlockState(position.up(j)).getBlock();
@@ -61,13 +61,13 @@ public class WorldGenMegaPineTree extends WorldGenHugeTrees {
         }
     }
 
-    private void func_150541_c(World worldIn, int p_150541_2_, int p_150541_3_, int p_150541_4_, int p_150541_5_, Random p_150541_6_) {
+    private void func_150541_c(World worldIn, int p_150541_2_, int p_150541_3_, int p_150541_4_, Random p_150541_6_) {
         int i = p_150541_6_.nextInt(5) + (this.useBaseHeight ? this.baseHeight : 3);
         int j = 0;
 
         for (int k = p_150541_4_ - i; k <= p_150541_4_; ++k) {
             int l = p_150541_4_ - k;
-            int i1 = p_150541_5_ + MathHelper.floor_float((float) l / (float) i * 3.5F);
+            int i1 = 0 + MathHelper.floor_float((float) l / (float) i * 3.5F);
             this.func_175925_a(worldIn, new BlockPos(p_150541_2_, k, p_150541_3_), i1 + (l > 0 && i1 == j && (k & 1) == 0 ? 1 : 0));
             j = i1;
         }

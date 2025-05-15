@@ -53,7 +53,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
                 this.lanServerDetector = new LanServerDetector.ThreadLanServerFind(this.lanServerList);
                 this.lanServerDetector.start();
             } catch (Exception exception) {
-                logger.warn("Unable to start LAN server detection: " + exception.getMessage());
+                logger.warn("Unable to start LAN server detection: {}", exception.getMessage());
             }
 
             this.serverListSelector = new ServerSelectionList(this, mc, width, height, 32, height - 64, 36);
@@ -71,13 +71,13 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
     }
 
     public void createButtons() {
-        this.buttonList.add(this.btnEditServer = new GuiButton(7, width / 2 - 154, height - 28, 70, 20, I18n.format("selectServer.edit")));
-        this.buttonList.add(this.btnDeleteServer = new GuiButton(2, width / 2 - 74, height - 28, 70, 20, I18n.format("selectServer.delete")));
-        this.buttonList.add(this.btnSelectServer = new GuiButton(1, width / 2 - 154, height - 52, 100, 20, I18n.format("selectServer.select")));
-        this.buttonList.add(new GuiButton(4, width / 2 - 50, height - 52, 100, 20, I18n.format("selectServer.direct")));
-        this.buttonList.add(new GuiButton(3, width / 2 + 4 + 50, height - 52, 100, 20, I18n.format("selectServer.add")));
-        this.buttonList.add(new GuiButton(8, width / 2 + 4, height - 28, 70, 20, I18n.format("selectServer.refresh")));
-        this.buttonList.add(new GuiButton(0, width / 2 + 4 + 76, height - 28, 75, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(this.btnEditServer = new GuiButton(7, (float) width / 2 - 154, height - 28, 70, 20, I18n.format("selectServer.edit")));
+        this.buttonList.add(this.btnDeleteServer = new GuiButton(2, (float) width / 2 - 74, height - 28, 70, 20, I18n.format("selectServer.delete")));
+        this.buttonList.add(this.btnSelectServer = new GuiButton(1, (float) width / 2 - 154, height - 52, 100, 20, I18n.format("selectServer.select")));
+        this.buttonList.add(new GuiButton(4, (float) width / 2 - 50, height - 52, 100, 20, I18n.format("selectServer.direct")));
+        this.buttonList.add(new GuiButton(3, (float) width / 2 + 4 + 50, height - 52, 100, 20, I18n.format("selectServer.add")));
+        this.buttonList.add(new GuiButton(8, (float) width / 2 + 4, height - 28, 70, 20, I18n.format("selectServer.refresh")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 + 4 + 76, height - 28, 75, 20, I18n.format("gui.cancel")));
         this.selectServer(this.serverListSelector.func_148193_k());
 
         this.buttonList.add(ViaMCP.INSTANCE.getAsyncVersionSlider());
@@ -106,7 +106,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         this.oldServerPinger.clearPendingNetworks();
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.func_148193_k() < 0 ? null : this.serverListSelector.getListEntry(this.serverListSelector.func_148193_k());
 
@@ -266,7 +266,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback {
         this.hoveringText = null;
         this.drawDefaultBackground();
         this.serverListSelector.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.title"), width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.title"), (float) width / 2, 20, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (this.hoveringText != null) {

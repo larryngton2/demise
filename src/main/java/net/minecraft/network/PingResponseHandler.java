@@ -20,7 +20,7 @@ public class PingResponseHandler extends ChannelInboundHandlerAdapter {
         this.networkSystem = networkSystemIn;
     }
 
-    public void channelRead(ChannelHandlerContext p_channelRead_1_, Object p_channelRead_2_) throws Exception {
+    public void channelRead(ChannelHandlerContext p_channelRead_1_, Object p_channelRead_2_) {
         ByteBuf bytebuf = (ByteBuf) p_channelRead_2_;
         bytebuf.markReaderIndex();
         boolean flag = true;
@@ -34,7 +34,7 @@ public class PingResponseHandler extends ChannelInboundHandlerAdapter {
                 switch (i) {
                     case 0:
                         logger.debug("Ping: (<1.3.x) from {}:{}", inetsocketaddress.getAddress(), inetsocketaddress.getPort());
-                        String s2 = String.format("%s\u00a7%d\u00a7%d", minecraftserver.getMOTD(), minecraftserver.getCurrentPlayerCount(), minecraftserver.getMaxPlayers());
+                        String s2 = String.format("%s§%d§%d", minecraftserver.getMOTD(), minecraftserver.getCurrentPlayerCount(), minecraftserver.getMaxPlayers());
                         this.writeAndFlush(p_channelRead_1_, this.getStringBuffer(s2));
                         break;
 
@@ -44,7 +44,7 @@ public class PingResponseHandler extends ChannelInboundHandlerAdapter {
                         }
 
                         logger.debug("Ping: (1.4-1.5.x) from {}:{}", inetsocketaddress.getAddress(), inetsocketaddress.getPort());
-                        String s = String.format("\u00a71\u0000%d\u0000%s\u0000%s\u0000%d\u0000%d", 127, minecraftserver.getMinecraftVersion(), minecraftserver.getMOTD(), minecraftserver.getCurrentPlayerCount(), minecraftserver.getMaxPlayers());
+                        String s = String.format("§1\u0000%d\u0000%s\u0000%s\u0000%d\u0000%d", 127, minecraftserver.getMinecraftVersion(), minecraftserver.getMOTD(), minecraftserver.getCurrentPlayerCount(), minecraftserver.getMaxPlayers());
                         this.writeAndFlush(p_channelRead_1_, this.getStringBuffer(s));
                         break;
 
@@ -63,7 +63,7 @@ public class PingResponseHandler extends ChannelInboundHandlerAdapter {
                         }
 
                         logger.debug("Ping: (1.6) from {}:{}", inetsocketaddress.getAddress(), inetsocketaddress.getPort());
-                        String s1 = String.format("\u00a71\u0000%d\u0000%s\u0000%s\u0000%d\u0000%d", 127, minecraftserver.getMinecraftVersion(), minecraftserver.getMOTD(), minecraftserver.getCurrentPlayerCount(), minecraftserver.getMaxPlayers());
+                        String s1 = String.format("§1\u0000%d\u0000%s\u0000%s\u0000%d\u0000%d", 127, minecraftserver.getMinecraftVersion(), minecraftserver.getMOTD(), minecraftserver.getCurrentPlayerCount(), minecraftserver.getMaxPlayers());
                         ByteBuf bytebuf1 = this.getStringBuffer(s1);
 
                         try {
@@ -76,7 +76,7 @@ public class PingResponseHandler extends ChannelInboundHandlerAdapter {
                 bytebuf.release();
                 flag = false;
             }
-        } catch (RuntimeException var21) {
+        } catch (RuntimeException ignored) {
         } finally {
             if (flag) {
                 bytebuf.resetReaderIndex();

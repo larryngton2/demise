@@ -9,8 +9,7 @@ public class RenderResolverEntity implements IRenderResolver {
         if (renderentityparameterbool != null) {
             return renderentityparameterbool;
         } else {
-            RenderEntityParameterFloat renderentityparameterfloat = RenderEntityParameterFloat.parse(name);
-            return renderentityparameterfloat;
+            return RenderEntityParameterFloat.parse(name);
         }
     }
 }

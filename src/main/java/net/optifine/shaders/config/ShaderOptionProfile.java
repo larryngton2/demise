@@ -84,7 +84,7 @@ public class ShaderOptionProfile extends ShaderOption {
     }
 
     public String getValueColor(String val) {
-        return val.equals("<custom>") ? "\u00a7c" : "\u00a7a";
+        return val.equals("<custom>") ? "§c" : "§a";
     }
 
     public String getDescriptionText() {
@@ -125,14 +125,13 @@ public class ShaderOptionProfile extends ShaderOption {
     }
 
     private static String[] getProfileNames(ShaderProfile[] profs) {
-        List<String> list = new ArrayList();
+        List<String> list = new ArrayList<>();
 
         for (ShaderProfile shaderprofile : profs) {
             list.add(shaderprofile.getName());
         }
 
         list.add("<custom>");
-        String[] astring = list.toArray(new String[0]);
-        return astring;
+        return list.toArray(new String[0]);
     }
 }

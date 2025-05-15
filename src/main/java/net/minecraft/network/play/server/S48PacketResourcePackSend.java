@@ -22,12 +22,12 @@ public class S48PacketResourcePackSend implements Packet<INetHandlerPlayClient> 
         }
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.url = buf.readStringFromBuffer(32767);
         this.hash = buf.readStringFromBuffer(40);
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeString(this.url);
         buf.writeString(this.hash);
     }

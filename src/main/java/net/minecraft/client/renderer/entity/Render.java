@@ -52,7 +52,7 @@ public abstract class Render<T extends Entity> implements IEntityRenderer {
 
     protected void renderName(T entity, double x, double y, double z) {
         if (this.canRenderName(entity)) {
-            this.renderLivingLabel(entity, entity.getDisplayName().getFormattedText(), x, y, z, 64);
+            this.renderLivingLabel(entity, entity.getDisplayName().getFormattedText(), x, y, z);
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class Render<T extends Entity> implements IEntityRenderer {
     }
 
     protected void renderOffsetLivingLabel(T entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
-        this.renderLivingLabel(entityIn, str, x, y, z, 64);
+        this.renderLivingLabel(entityIn, str, x, y, z);
     }
 
     protected abstract ResourceLocation getEntityTexture(T entity);
@@ -287,10 +287,10 @@ public abstract class Render<T extends Entity> implements IEntityRenderer {
         return this.renderManager.getFontRenderer();
     }
 
-    protected void renderLivingLabel(T entityIn, String str, double x, double y, double z, int maxDistance) {
+    protected void renderLivingLabel(T entityIn, String str, double x, double y, double z) {
         double d0 = entityIn.getDistanceSqToEntity(this.renderManager.livingPlayer);
 
-        if (d0 <= (double) (maxDistance * maxDistance)) {
+        if (d0 <= (double) (64 * 64)) {
             FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
             float f = 1.6F;
             float f1 = 0.016666668F * f;

@@ -12,7 +12,7 @@ public class SaveHandlerMP implements ISaveHandler {
         return null;
     }
 
-    public void checkSessionLock() throws MinecraftException {
+    public void checkSessionLock() {
     }
 
     public IChunkLoader getChunkLoader(WorldProvider provider) {

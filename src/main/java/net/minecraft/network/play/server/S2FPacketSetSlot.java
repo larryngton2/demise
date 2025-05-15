@@ -31,7 +31,7 @@ public class S2FPacketSetSlot implements Packet<INetHandlerPlayClient> {
         this.item = buf.readItemStackFromBuffer();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.windowId);
         buf.writeShort(this.slot);
         buf.writeItemStackToBuffer(this.item);

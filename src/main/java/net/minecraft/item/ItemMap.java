@@ -24,7 +24,7 @@ import java.util.List;
 
 public class ItemMap extends ItemMapBase {
     protected ItemMap() {
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
     }
 
     public static MapData loadMapData(int mapId, World worldIn) {
@@ -117,14 +117,11 @@ public class ItemMap extends ItemMapBase {
                                             if (k4 > 1) {
                                                 label541:
                                                 {
-                                                    while (true) {
+                                                    do {
                                                         --k4;
                                                         iblockstate = chunk.getBlockState(blockpos$mutableblockpos.set(i4 + i3, k4, j4 + j3));
 
-                                                        if (iblockstate.getBlock().getMapColor(iblockstate) != MapColor.airColor || k4 <= 0) {
-                                                            break;
-                                                        }
-                                                    }
+                                                    } while (iblockstate.getBlock().getMapColor(iblockstate) == MapColor.airColor && k4 > 0);
 
                                                     if (k4 > 0 && iblockstate.getBlock().getMaterial().isLiquid()) {
                                                         int l4 = k4 - 1;

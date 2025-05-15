@@ -103,9 +103,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
-import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -148,7 +146,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     @Setter
     @Getter
     private boolean connectedToRealms = false;
-    public Timer timer = new Timer(20.0F);
+    public final Timer timer = new Timer(20.0F);
     private final PlayerUsageSnooper usageSnooper = new PlayerUsageSnooper("client", this, MinecraftServer.getCurrentTimeMillis());
     public WorldClient theWorld;
     public RenderGlobal renderGlobal;
@@ -243,8 +241,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.proxy = gameConfig.userInfo.proxy == null ? Proxy.NO_PROXY : gameConfig.userInfo.proxy;
         this.sessionService = (new YggdrasilAuthenticationService(gameConfig.userInfo.proxy, UUID.randomUUID().toString())).createMinecraftSessionService();
         this.session = gameConfig.userInfo.session;
-        logger.info("Setting user: " + this.session.getUsername());
-        logger.info("(Session ID is " + this.session.getSessionID() + ")");
+        logger.info("Setting user: {}", this.session.getUsername());
+        logger.info("(Session ID is {})", this.session.getSessionID());
         this.isDemo = gameConfig.gameInfo.isDemo;
         this.displayWidth = gameConfig.displayInfo.width > 0 ? gameConfig.displayInfo.width : 1;
         this.displayHeight = gameConfig.displayInfo.height > 0 ? gameConfig.displayInfo.height : 1;
@@ -312,7 +310,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         }
     }
 
-    private void startGame() throws LWJGLException, IOException {
+    private void startGame() throws LWJGLException {
         this.gameSettings = new GameSettings(this, this.mcDataDir);
         this.defaultResourcePacks.add(this.mcDefaultResourcePack);
         this.startTimerHackThread();
@@ -322,7 +320,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             this.displayHeight = this.gameSettings.overrideHeight;
         }
 
-        logger.info("LWJGL Version: " + Sys.getVersion());
+        logger.info("LWJGL Version: {}", Sys.getVersion());
         this.setWindowIcon();
         this.setInitialDisplayMode();
         this.createDisplay();
@@ -595,7 +593,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         return bytebuffer;
     }
 
-    private void updateDisplayMode() throws LWJGLException {
+    private void updateDisplayMode() {
         Set<DisplayMode> set = Sets.newHashSet();
         Collections.addAll(set, Display.getAvailableDisplayModes());
         DisplayMode displaymode = Display.getDesktopDisplayMode();
@@ -1201,25 +1199,17 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                 this.displayWidth = Display.getDisplayMode().getWidth();
                 this.displayHeight = Display.getDisplayMode().getHeight();
 
-                if (this.displayWidth <= 0) {
-                    this.displayWidth = 1;
-                }
-
-                if (this.displayHeight <= 0) {
-                    this.displayHeight = 1;
-                }
             } else {
                 Display.setDisplayMode(new DisplayMode(this.tempDisplayWidth, this.tempDisplayHeight));
                 this.displayWidth = this.tempDisplayWidth;
                 this.displayHeight = this.tempDisplayHeight;
 
-                if (this.displayWidth <= 0) {
-                    this.displayWidth = 1;
-                }
-
-                if (this.displayHeight <= 0) {
-                    this.displayHeight = 1;
-                }
+            }
+            if (this.displayWidth <= 0) {
+                this.displayWidth = 1;
+            }
+            if (this.displayHeight <= 0) {
+                this.displayHeight = 1;
             }
 
             if (this.currentScreen != null) {
@@ -1367,7 +1357,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                         if (!this.inGameHasFocus && Mouse.getEventButtonState()) {
                             this.setIngameFocus();
                         }
-                    } else if (this.currentScreen != null) {
+                    } else {
                         this.currentScreen.handleMouseInput();
                     }
                 }
@@ -1922,9 +1912,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
     public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash) {
         theCrash.getCategory().addCrashSectionCallable("Launched Version", () -> Minecraft.this.launchedVersion);
-        theCrash.getCategory().addCrashSectionCallable("LWJGL", () -> Sys.getVersion());
+        theCrash.getCategory().addCrashSectionCallable("LWJGL", Sys::getVersion);
         theCrash.getCategory().addCrashSectionCallable("OpenGL", () -> GL11.glGetString(GL11.GL_RENDERER) + " GL version " + GL11.glGetString(GL11.GL_VERSION) + ", " + GL11.glGetString(GL11.GL_VENDOR));
-        theCrash.getCategory().addCrashSectionCallable("GL Caps", () -> OpenGlHelper.getLogText());
+        theCrash.getCategory().addCrashSectionCallable("GL Caps", OpenGlHelper::getLogText);
         theCrash.getCategory().addCrashSectionCallable("Using VBOs", () -> Minecraft.this.gameSettings.useVbo ? "Yes" : "No");
         theCrash.getCategory().addCrashSectionCallable("Is Modded", () -> {
             String s = ClientBrandRetriever.getClientModName();
@@ -1964,7 +1954,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     }
 
     public ListenableFuture<Object> scheduleResourcesRefresh() {
-        return this.addScheduledTask(() -> Minecraft.this.refreshResources());
+        return this.addScheduledTask(Minecraft.this::refreshResources);
     }
 
     public void addServerStatsToSnooper(PlayerUsageSnooper playerSnooper) {

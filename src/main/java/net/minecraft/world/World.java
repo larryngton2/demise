@@ -33,7 +33,6 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldInfo;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 
 public abstract class World implements IBlockAccess {
     private int seaLevel = 63;
@@ -58,7 +57,7 @@ public abstract class World implements IBlockAccess {
     private int lastLightningBolt;
     public final Random rand = new Random();
     public final WorldProvider provider;
-    protected List<IWorldAccess> worldAccesses = Lists.newArrayList();
+    protected final List<IWorldAccess> worldAccesses = Lists.newArrayList();
     @Getter
     protected IChunkProvider chunkProvider;
     @Getter
@@ -73,13 +72,13 @@ public abstract class World implements IBlockAccess {
     private final Calendar theCalendar = Calendar.getInstance();
     protected Scoreboard worldScoreboard = new Scoreboard();
     public final boolean isRemote;
-    protected Set<ChunkCoordIntPair> activeChunkSet = Sets.newHashSet();
+    protected final Set<ChunkCoordIntPair> activeChunkSet = Sets.newHashSet();
     private int ambientTickCountdown;
     protected boolean spawnHostileMobs;
     protected boolean spawnPeacefulMobs;
     private boolean processingLoadedTiles;
     private final WorldBorder worldBorder;
-    int[] lightUpdateBlockList;
+    final int[] lightUpdateBlockList;
 
     protected World(ISaveHandler saveHandlerIn, WorldInfo info, WorldProvider providerIn, Profiler profilerIn, boolean client) {
         this.ambientTickCountdown = this.rand.nextInt(12000);
@@ -257,8 +256,8 @@ public abstract class World implements IBlockAccess {
         return FixedSoundEngine.destroyBlock(this, pos, dropBlock);
     }
 
-    public boolean setBlockState(BlockPos pos, IBlockState state) {
-        return this.setBlockState(pos, state, 3);
+    public void setBlockState(BlockPos pos, IBlockState state) {
+        this.setBlockState(pos, state, 3);
     }
 
     public void markBlockForUpdate(BlockPos pos) {
@@ -1280,14 +1279,13 @@ public abstract class World implements IBlockAccess {
         this.theProfiler.endSection();
     }
 
-    public boolean addTileEntity(TileEntity tile) {
+    public void addTileEntity(TileEntity tile) {
         boolean flag = this.loadedTileEntityList.add(tile);
 
-        if (flag && tile instanceof ITickable) {
+        if (tile instanceof ITickable) {
             this.tickableTileEntities.add(tile);
         }
 
-        return flag;
     }
 
     public void addTileEntities(Collection<TileEntity> tileEntityCollection) {
@@ -1581,8 +1579,8 @@ public abstract class World implements IBlockAccess {
         return false;
     }
 
-    public Explosion createExplosion(Entity entityIn, double x, double y, double z, float strength, boolean isSmoking) {
-        return this.newExplosion(entityIn, x, y, z, strength, false, isSmoking);
+    public void createExplosion(Entity entityIn, double x, double y, double z, float strength, boolean isSmoking) {
+        this.newExplosion(entityIn, x, y, z, strength, false, isSmoking);
     }
 
     public Explosion newExplosion(Entity entityIn, double x, double y, double z, float strength, boolean isFlaming, boolean isSmoking) {
@@ -1931,9 +1929,7 @@ public abstract class World implements IBlockAccess {
         BiomeGenBase biomegenbase = this.getBiomeGenForCoords(pos);
         float f = biomegenbase.getFloatTemperature(pos);
 
-        if (f > 0.15F) {
-            return false;
-        } else {
+        if (!(f > 0.15F)) {
             if (pos.getY() >= 0 && pos.getY() < 256 && this.getLightFor(EnumSkyBlock.BLOCK, pos) < 10) {
                 IBlockState iblockstate = this.getBlockState(pos);
                 Block block = iblockstate.getBlock();
@@ -1949,8 +1945,8 @@ public abstract class World implements IBlockAccess {
                 }
             }
 
-            return false;
         }
+        return false;
     }
 
     private boolean isWater(BlockPos pos) {
@@ -2323,12 +2319,10 @@ public abstract class World implements IBlockAccess {
                     } else {
                         i = Math.max(i, this.getStrongPower(pos.west(), EnumFacing.WEST));
 
-                        if (i >= 15) {
-                            return i;
-                        } else {
+                        if (i < 15) {
                             i = Math.max(i, this.getStrongPower(pos.east(), EnumFacing.EAST));
-                            return i;
                         }
+                        return i;
                     }
                 }
             }

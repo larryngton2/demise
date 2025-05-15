@@ -1,6 +1,5 @@
 package net.minecraft.command.server;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import net.minecraft.command.CommandBase;
@@ -51,7 +50,7 @@ public class CommandAchievement extends CommandBase {
                             }
 
                             notifyOperators(sender, this, "commands.achievement.give.success.all", entityplayermp.getName());
-                        } else if (flag1) {
+                        } else {
                             for (Achievement achievement5 : Lists.reverse(AchievementList.achievementList)) {
                                 entityplayermp.func_175145_a(achievement5);
                             }
@@ -75,7 +74,7 @@ public class CommandAchievement extends CommandBase {
                                 for (Achievement achievement1 : Lists.reverse(list)) {
                                     entityplayermp.triggerAchievement(achievement1);
                                 }
-                            } else if (flag1) {
+                            } else {
                                 if (!entityplayermp.getStatFile().hasAchievementUnlocked(achievement)) {
                                     throw new CommandException("commands.achievement.dontHave", entityplayermp.getName(), statbase.createChatComponent());
                                 }
@@ -109,7 +108,7 @@ public class CommandAchievement extends CommandBase {
                         if (flag) {
                             entityplayermp.triggerAchievement(statbase);
                             notifyOperators(sender, this, "commands.achievement.give.success.one", entityplayermp.getName(), statbase.createChatComponent());
-                        } else if (flag1) {
+                        } else {
                             entityplayermp.func_175145_a(statbase);
                             notifyOperators(sender, this, "commands.achievement.take.success.one", statbase.createChatComponent(), entityplayermp.getName());
                         }

@@ -44,8 +44,7 @@ public class ReflectorRaw {
                 }
             }
 
-            Field[] afield = (Field[]) list.toArray(new Field[0]);
-            return afield;
+            return (Field[]) list.toArray(new Field[0]);
         } catch (Exception var5) {
             return null;
         }
@@ -71,7 +70,7 @@ public class ReflectorRaw {
 
     public static Field[] getFields(Object obj, Field[] fields, Class fieldType, Object value) {
         try {
-            List<Field> list = new ArrayList();
+            List<Field> list = new ArrayList<>();
 
             for (Field field : fields) {
                 if (field.getType() == fieldType) {
@@ -90,8 +89,7 @@ public class ReflectorRaw {
                 }
             }
 
-            Field[] afield = list.toArray(new Field[0]);
-            return afield;
+            return list.toArray(new Field[0]);
         } catch (Exception var9) {
             return null;
         }

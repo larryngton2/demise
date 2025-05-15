@@ -37,10 +37,10 @@ public class GuiScreenOptionsSounds extends GuiScreen {
             }
         }
 
-        this.buttonList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, I18n.format("gui.done")));
+        this.buttonList.add(new GuiButton(200, (float) width / 2 - 100, (float) height / 6 + 168, I18n.format("gui.done")));
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 200) {
                 mc.gameSettings.saveOptions();
@@ -51,7 +51,7 @@ public class GuiScreenOptionsSounds extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, this.field_146507_a, width / 2, 15, 16777215);
+        drawCenteredString(this.fontRendererObj, this.field_146507_a, (float) width / 2, 15, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

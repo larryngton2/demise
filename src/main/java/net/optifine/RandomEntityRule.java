@@ -97,14 +97,9 @@ public class RandomEntityRule {
                 }
             }
 
-            if (j < 0) {
-                Config.warn("Invalid minHeight, maxHeight: " + s + ", " + s1);
-                return null;
-            } else {
-                RangeListInt rangelistint = new RangeListInt();
-                rangelistint.addRange(new RangeInt(i, j));
-                return rangelistint;
-            }
+            RangeListInt rangelistint = new RangeListInt();
+            rangelistint.addRange(new RangeInt(i, j));
+            return rangelistint;
         }
     }
 

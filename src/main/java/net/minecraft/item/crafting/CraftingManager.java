@@ -11,8 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -173,11 +171,11 @@ public class CraftingManager {
         this.addRecipe(new ItemStack(Blocks.daylight_detector), "GGG", "QQQ", "WWW", 'G', Blocks.glass, 'Q', Items.quartz, 'W', Blocks.wooden_slab);
         this.addRecipe(new ItemStack(Blocks.hopper), "I I", "ICI", " I ", 'I', Items.iron_ingot, 'C', Blocks.chest);
         this.addRecipe(new ItemStack(Items.armor_stand, 1), "///", " / ", "/_/", '/', Items.stick, '_', new ItemStack(Blocks.stone_slab, 1, BlockStoneSlab.EnumType.STONE.getMetadata()));
-        this.recipes.sort((p_compare_1_, p_compare_2_) -> p_compare_1_ instanceof ShapelessRecipes && p_compare_2_ instanceof ShapedRecipes ? 1 : (p_compare_2_ instanceof ShapelessRecipes && p_compare_1_ instanceof ShapedRecipes ? -1 : (p_compare_2_.getRecipeSize() < p_compare_1_.getRecipeSize() ? -1 : (p_compare_2_.getRecipeSize() > p_compare_1_.getRecipeSize() ? 1 : 0))));
+        this.recipes.sort((p_compare_1_, p_compare_2_) -> p_compare_1_ instanceof ShapelessRecipes && p_compare_2_ instanceof ShapedRecipes ? 1 : (p_compare_2_ instanceof ShapelessRecipes && p_compare_1_ instanceof ShapedRecipes ? -1 : (Integer.compare(p_compare_2_.getRecipeSize(), p_compare_1_.getRecipeSize()))));
     }
 
-    public ShapedRecipes addRecipe(ItemStack stack, Object... recipeComponents) {
-        String s = "";
+    public void addRecipe(ItemStack stack, Object... recipeComponents) {
+        StringBuilder s = new StringBuilder();
         int i = 0;
         int j = 0;
         int k = 0;
@@ -188,14 +186,14 @@ public class CraftingManager {
             for (String s2 : astring) {
                 ++k;
                 j = s2.length();
-                s = s + s2;
+                s.append(s2);
             }
         } else {
             while (recipeComponents[i] instanceof String) {
                 String s1 = (String) recipeComponents[i++];
                 ++k;
                 j = s1.length();
-                s = s + s1;
+                s.append(s1);
             }
         }
 
@@ -230,7 +228,6 @@ public class CraftingManager {
 
         ShapedRecipes shapedrecipes = new ShapedRecipes(j, k, aitemstack, stack);
         this.recipes.add(shapedrecipes);
-        return shapedrecipes;
     }
 
     public void addShapelessRecipe(ItemStack stack, Object... recipeComponents) {

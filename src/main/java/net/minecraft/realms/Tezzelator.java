@@ -3,7 +3,7 @@ package net.minecraft.realms;
 import net.minecraft.client.renderer.Tessellator;
 
 public class Tezzelator {
-    public static Tessellator t = Tessellator.getInstance();
+    public static final Tessellator t = Tessellator.getInstance();
     public static final Tezzelator instance = new Tezzelator();
 
     public void end() {

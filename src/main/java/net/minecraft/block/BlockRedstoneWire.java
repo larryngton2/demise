@@ -75,7 +75,7 @@ public class BlockRedstoneWire extends Block {
         return World.doesBlockHaveSolidTopSurface(worldIn, pos.down()) || worldIn.getBlockState(pos.down()).getBlock() == Blocks.glowstone;
     }
 
-    private IBlockState updateSurroundingRedstone(World worldIn, BlockPos pos, IBlockState state) {
+    private void updateSurroundingRedstone(World worldIn, BlockPos pos, IBlockState state) {
         state = this.calculateCurrentChanges(worldIn, pos, pos, state);
         List<BlockPos> list = Lists.newArrayList(this.blocksNeedingUpdate);
         this.blocksNeedingUpdate.clear();
@@ -84,7 +84,6 @@ public class BlockRedstoneWire extends Block {
             worldIn.notifyNeighborsOfStateChange(blockpos, this);
         }
 
-        return state;
     }
 
     private IBlockState calculateCurrentChanges(World worldIn, BlockPos pos1, BlockPos pos2, IBlockState state) {

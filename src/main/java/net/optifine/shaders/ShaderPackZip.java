@@ -16,7 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class ShaderPackZip implements IShaderPack {
-    protected File packFile;
+    protected final File packFile;
     protected ZipFile packZipFile;
     protected String baseFolder;
 
@@ -30,7 +30,7 @@ public class ShaderPackZip implements IShaderPack {
         if (this.packZipFile != null) {
             try {
                 this.packZipFile.close();
-            } catch (Exception var2) {
+            } catch (Exception ignored) {
             }
 
             this.packZipFile = null;
@@ -58,7 +58,7 @@ public class ShaderPackZip implements IShaderPack {
     }
 
     private String resolveRelative(String name) {
-        Deque<String> deque = new ArrayDeque();
+        Deque<String> deque = new ArrayDeque<>();
         String[] astring = Config.tokenize(name, "/");
 
         for (String s : astring) {
@@ -73,16 +73,13 @@ public class ShaderPackZip implements IShaderPack {
             }
         }
 
-        String s1 = Joiner.on('/').join(deque);
-        return s1;
+        return Joiner.on('/').join(deque);
     }
 
     private String detectBaseFolder(ZipFile zip) {
         ZipEntry zipentry = zip.getEntry("shaders/");
 
-        if (zipentry != null && zipentry.isDirectory()) {
-            return "";
-        } else {
+        if (zipentry == null || !zipentry.isDirectory()) {
             Pattern pattern = Pattern.compile("([^/]+/)shaders/");
             Enumeration<? extends ZipEntry> enumeration = zip.entries();
 
@@ -104,8 +101,8 @@ public class ShaderPackZip implements IShaderPack {
                 }
             }
 
-            return "";
         }
+        return "";
     }
 
     public boolean hasDirectory(String resName) {

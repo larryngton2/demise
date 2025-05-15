@@ -109,7 +109,7 @@ public class MapGenCavesHell extends MapGenBase {
                     for (int j1 = j2; !flag2 && j1 < k; ++j1) {
                         for (int k1 = l2; !flag2 && k1 < i1; ++k1) {
                             for (int l1 = l + 1; !flag2 && l1 >= k2 - 1; --l1) {
-                                if (l1 >= 0 && l1 < 128) {
+                                if (l1 < 128) {
                                     IBlockState iblockstate = p_180704_5_.getBlockState(j1, l1, k1);
 
                                     if (iblockstate.getBlock() == Blocks.flowing_lava || iblockstate.getBlock() == Blocks.lava) {

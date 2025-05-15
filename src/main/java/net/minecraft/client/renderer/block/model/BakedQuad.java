@@ -111,8 +111,7 @@ public class BakedQuad implements IVertexProducer {
 
         float f6 = (f + f2) / 2.0F;
         float f7 = (f1 + f3) / 2.0F;
-        TextureAtlasSprite textureatlassprite = Minecraft.getMinecraft().getTextureMapBlocks().getIconByUV(f6, f7);
-        return textureatlassprite;
+        return Minecraft.getMinecraft().getTextureMapBlocks().getIconByUV(f6, f7);
     }
 
     protected void fixVertexData() {
@@ -187,16 +186,14 @@ public class BakedQuad implements IVertexProducer {
     }
 
     public BakedQuad getQuadEmissive() {
-        if (this.quadEmissiveChecked) {
-            return this.quadEmissive;
-        } else {
+        if (!this.quadEmissiveChecked) {
             if (this.quadEmissive == null && this.sprite != null && this.sprite.spriteEmissive != null) {
                 this.quadEmissive = new BreakingFour(this, this.sprite.spriteEmissive);
             }
 
             this.quadEmissiveChecked = true;
-            return this.quadEmissive;
         }
+        return this.quadEmissive;
     }
 
     public String toString() {

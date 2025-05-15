@@ -35,7 +35,8 @@ public class BlockPart {
     }
 
     private float[] getFaceUvs(EnumFacing p_178236_1_) {
-        float[] afloat = switch (p_178236_1_) {
+
+        return switch (p_178236_1_) {
             case DOWN, UP ->
                     new float[]{this.positionFrom.x, this.positionFrom.z, this.positionTo.x, this.positionTo.z};
             case NORTH, SOUTH ->
@@ -44,8 +45,6 @@ public class BlockPart {
                     new float[]{this.positionFrom.z, 16.0F - this.positionTo.y, this.positionTo.z, 16.0F - this.positionFrom.y};
             default -> throw new NullPointerException();
         };
-
-        return afloat;
     }
 
     static class Deserializer implements JsonDeserializer<BlockPart> {

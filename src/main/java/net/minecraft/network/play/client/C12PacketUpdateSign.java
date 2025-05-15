@@ -20,7 +20,7 @@ public class C12PacketUpdateSign implements Packet<INetHandlerPlayServer> {
         this.lines = new IChatComponent[]{lines[0], lines[1], lines[2], lines[3]};
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.pos = buf.readBlockPos();
         this.lines = new IChatComponent[4];
 
@@ -31,7 +31,7 @@ public class C12PacketUpdateSign implements Packet<INetHandlerPlayServer> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeBlockPos(this.pos);
 
         for (int i = 0; i < 4; ++i) {

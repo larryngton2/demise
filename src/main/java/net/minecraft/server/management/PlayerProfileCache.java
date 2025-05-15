@@ -12,6 +12,7 @@ import com.mojang.authlib.ProfileLookupCallback;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.lang.reflect.ParameterizedType;
@@ -29,11 +30,11 @@ public class PlayerProfileCache {
     protected final Gson gson;
     private final File usercacheFile;
     private static final ParameterizedType TYPE = new ParameterizedType() {
-        public Type[] getActualTypeArguments() {
+        public Type @NotNull [] getActualTypeArguments() {
             return new Type[]{PlayerProfileCache.ProfileEntry.class};
         }
 
-        public Type getRawType() {
+        public @NotNull Type getRawType() {
             return List.class;
         }
 
@@ -88,7 +89,7 @@ public class PlayerProfileCache {
         }
 
         String s = gameProfile.getName().toLowerCase(Locale.ROOT);
-        PlayerProfileCache.ProfileEntry playerprofilecache$profileentry = new PlayerProfileCache.ProfileEntry(gameProfile, expirationDate);
+        PlayerProfileCache.ProfileEntry playerprofilecache$profileentry = new ProfileEntry(gameProfile, expirationDate);
 
         if (this.uuidToProfileEntryMap.containsKey(uuid)) {
             PlayerProfileCache.ProfileEntry playerprofilecache$profileentry1 = this.uuidToProfileEntryMap.get(uuid);
@@ -167,29 +168,29 @@ public class PlayerProfileCache {
                     this.addEntry(playerprofilecache$profileentry.getGameProfile(), playerprofilecache$profileentry.getExpirationDate());
                 }
             }
-        } catch (FileNotFoundException | JsonParseException var9) {
+        } catch (FileNotFoundException | JsonParseException ignored) {
         } finally {
             IOUtils.closeQuietly(bufferedreader);
         }
     }
 
     public void save() {
-        String s = this.gson.toJson(this.getEntriesWithLimit(1000));
+        String s = this.gson.toJson(this.getEntriesWithLimit());
         BufferedWriter bufferedwriter = null;
 
         try {
             bufferedwriter = Files.newWriter(this.usercacheFile, Charsets.UTF_8);
             bufferedwriter.write(s);
-        } catch (IOException var9) {
+        } catch (IOException ignored) {
         } finally {
             IOUtils.closeQuietly(bufferedwriter);
         }
     }
 
-    private List<PlayerProfileCache.ProfileEntry> getEntriesWithLimit(int limitSize) {
+    private List<PlayerProfileCache.ProfileEntry> getEntriesWithLimit() {
         ArrayList<PlayerProfileCache.ProfileEntry> arraylist = Lists.newArrayList();
 
-        for (GameProfile gameprofile : Lists.newArrayList(Iterators.limit(this.gameProfiles.iterator(), limitSize))) {
+        for (GameProfile gameprofile : Lists.newArrayList(Iterators.limit(this.gameProfiles.iterator(), 1000))) {
             PlayerProfileCache.ProfileEntry playerprofilecache$profileentry = this.getByUUID(gameprofile.getId());
 
             if (playerprofilecache$profileentry != null) {
@@ -200,7 +201,7 @@ public class PlayerProfileCache {
         return arraylist;
     }
 
-    class ProfileEntry {
+    static class ProfileEntry {
         private final GameProfile gameProfile;
         private final Date expirationDate;
 
@@ -260,8 +261,7 @@ public class PlayerProfileCache {
                             return null;
                         }
 
-                        PlayerProfileCache.ProfileEntry playerprofilecache$profileentry = PlayerProfileCache.this.new ProfileEntry(new GameProfile(uuid, s1), date);
-                        return playerprofilecache$profileentry;
+                        return new ProfileEntry(new GameProfile(uuid, s1), date);
                     } else {
                         return null;
                     }

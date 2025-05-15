@@ -36,7 +36,7 @@ public class ServerAddress {
                     String s = p_78860_0_.substring(1, i);
                     String s1 = p_78860_0_.substring(i + 1).trim();
 
-                    if (s1.startsWith(":") && !s1.isEmpty()) {
+                    if (s1.startsWith(":")) {
                         s1 = s1.substring(1);
                         astring = new String[]{s, s1};
                     } else {
@@ -50,12 +50,12 @@ public class ServerAddress {
             }
 
             String s2 = astring[0];
-            int j = astring.length > 1 ? parseIntWithDefault(astring[1], 25565) : 25565;
+            int j = astring.length > 1 ? parseIntWithDefault(astring[1]) : 25565;
 
             if (j == 25565) {
                 String[] astring1 = getServerAddress(s2);
                 s2 = astring1[0];
-                j = parseIntWithDefault(astring1[1], 25565);
+                j = parseIntWithDefault(astring1[1]);
             }
 
             return new ServerAddress(s2, j);
@@ -79,11 +79,11 @@ public class ServerAddress {
         }
     }
 
-    private static int parseIntWithDefault(String p_78862_0_, int p_78862_1_) {
+    private static int parseIntWithDefault(String p_78862_0_) {
         try {
             return Integer.parseInt(p_78862_0_.trim());
         } catch (Exception var3) {
-            return p_78862_1_;
+            return 25565;
         }
     }
 }

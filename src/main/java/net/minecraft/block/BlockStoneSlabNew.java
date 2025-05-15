@@ -109,16 +109,16 @@ public abstract class BlockStoneSlabNew extends BlockSlab {
     }
 
     public enum EnumType implements IStringSerializable {
-        RED_SANDSTONE(0, "red_sandstone", BlockSand.EnumType.RED_SAND.getMapColor());
+        RED_SANDSTONE(BlockSand.EnumType.RED_SAND.getMapColor());
 
         private static final BlockStoneSlabNew.EnumType[] META_LOOKUP = new BlockStoneSlabNew.EnumType[values().length];
         private final int meta;
         private final String name;
         private final MapColor field_181069_e;
 
-        EnumType(int p_i46391_3_, String p_i46391_4_, MapColor p_i46391_5_) {
-            this.meta = p_i46391_3_;
-            this.name = p_i46391_4_;
+        EnumType(MapColor p_i46391_5_) {
+            this.meta = 0;
+            this.name = "red_sandstone";
             this.field_181069_e = p_i46391_5_;
         }
 

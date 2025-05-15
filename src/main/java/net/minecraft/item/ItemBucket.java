@@ -15,7 +15,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 public class ItemBucket extends Item {
-    public Block isFull;
+    public final Block isFull;
 
     public ItemBucket(Block containedBlock) {
         this.maxStackSize = 1;
@@ -27,9 +27,7 @@ public class ItemBucket extends Item {
         boolean flag = this.isFull == Blocks.air;
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, flag);
 
-        if (movingobjectposition == null) {
-            return itemStackIn;
-        } else {
+        if (movingobjectposition != null) {
             if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                 BlockPos blockpos = movingobjectposition.getBlockPos();
 
@@ -74,8 +72,8 @@ public class ItemBucket extends Item {
                 }
             }
 
-            return itemStackIn;
         }
+        return itemStackIn;
     }
 
     private ItemStack fillBucket(ItemStack emptyBuckets, EntityPlayer player, Item fullBucket) {

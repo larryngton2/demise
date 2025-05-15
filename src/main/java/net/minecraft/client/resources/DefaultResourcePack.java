@@ -55,7 +55,7 @@ public class DefaultResourcePack implements IResourcePack {
         return defaultResourceDomains;
     }
 
-    public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer metadataSerializer, String metadataSectionName) throws IOException {
+    public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer metadataSerializer, String metadataSectionName) {
         try {
             InputStream inputstream = new FileInputStream(this.mapAssets.get("pack.mcmeta"));
             return AbstractResourcePack.readMetadata(metadataSerializer, inputstream, metadataSectionName);

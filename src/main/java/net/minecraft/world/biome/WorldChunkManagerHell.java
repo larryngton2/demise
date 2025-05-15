@@ -28,13 +28,12 @@ public class WorldChunkManagerHell extends WorldChunkManager {
         return biomes;
     }
 
-    public float[] getRainfall(float[] listToReuse, int x, int z, int width, int length) {
+    public void getRainfall(float[] listToReuse, int x, int z, int width, int length) {
         if (listToReuse == null || listToReuse.length < width * length) {
             listToReuse = new float[width * length];
         }
 
         Arrays.fill(listToReuse, 0, width * length, this.rainfall);
-        return listToReuse;
     }
 
     public BiomeGenBase[] loadBlockGeneratorData(BiomeGenBase[] oldBiomeList, int x, int z, int width, int depth) {

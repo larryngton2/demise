@@ -1,14 +1,14 @@
 package net.minecraft.util;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class ChatComponentStyle implements IChatComponent {
-    protected List<IChatComponent> siblings = Lists.newArrayList();
+    protected final List<IChatComponent> siblings = Lists.newArrayList();
     private ChatStyle style;
 
     public IChatComponent appendSibling(IChatComponent component) {
@@ -25,14 +25,13 @@ public abstract class ChatComponentStyle implements IChatComponent {
         return this.appendSibling(new ChatComponentText(text));
     }
 
-    public IChatComponent setChatStyle(ChatStyle style) {
+    public void setChatStyle(ChatStyle style) {
         this.style = style;
 
         for (IChatComponent ichatcomponent : this.siblings) {
             ichatcomponent.getChatStyle().setParentStyle(this.getChatStyle());
         }
 
-        return this;
     }
 
     public ChatStyle getChatStyle() {
@@ -47,7 +46,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
         return this.style;
     }
 
-    public Iterator<IChatComponent> iterator() {
+    public @NotNull Iterator<IChatComponent> iterator() {
         return Iterators.concat(Iterators.<IChatComponent>forArray(new ChatComponentStyle[]{this}), createDeepCopyIterator(this.siblings));
     }
 
@@ -74,7 +73,7 @@ public abstract class ChatComponentStyle implements IChatComponent {
     }
 
     public static Iterator<IChatComponent> createDeepCopyIterator(Iterable<IChatComponent> components) {
-        Iterator<IChatComponent> iterator = Iterators.concat(Iterators.transform(components.iterator(), p_apply_1_ -> p_apply_1_.iterator()));
+        Iterator<IChatComponent> iterator = Iterators.concat(Iterators.transform(components.iterator(), Iterable::iterator));
         iterator = Iterators.transform(iterator, p_apply_1_ -> {
             IChatComponent ichatcomponent = p_apply_1_.createCopy();
             ichatcomponent.setChatStyle(ichatcomponent.getChatStyle().createDeepCopy());

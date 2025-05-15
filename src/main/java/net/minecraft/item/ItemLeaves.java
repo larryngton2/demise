@@ -9,7 +9,7 @@ public class ItemLeaves extends ItemBlock {
         super(block);
         this.leaves = block;
         this.setMaxDamage(0);
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
     }
 
     public int getMetadata(int damage) {

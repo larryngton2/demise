@@ -5,6 +5,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3i;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
@@ -124,7 +125,7 @@ public class BlockPosM extends BlockPos {
         final BlockPos blockpos = new BlockPos(Math.min(from.getX(), to.getX()), Math.min(from.getY(), to.getY()), Math.min(from.getZ(), to.getZ()));
         final BlockPos blockpos1 = new BlockPos(Math.max(from.getX(), to.getX()), Math.max(from.getY(), to.getY()), Math.max(from.getZ(), to.getZ()));
         return new Iterable() {
-            public Iterator iterator() {
+            public @NotNull Iterator iterator() {
                 return new AbstractIterator() {
                     private BlockPosM theBlockPosM = null;
 

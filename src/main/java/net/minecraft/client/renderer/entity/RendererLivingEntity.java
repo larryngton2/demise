@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.render.RenderNameTagEvent;
 import wtf.demise.features.modules.impl.visual.ForceDinnerbone;
+import wtf.demise.utils.math.MathUtils;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -36,11 +37,11 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     private static final Logger logger = LogManager.getLogger();
     private static final DynamicTexture textureBrightness = new DynamicTexture(16, 16);
     public ModelBase mainModel;
-    protected FloatBuffer brightnessBuffer = GLAllocation.createDirectFloatBuffer(4);
+    protected final FloatBuffer brightnessBuffer = GLAllocation.createDirectFloatBuffer(4);
     protected List<LayerRenderer<T>> layerRenderers = Lists.newArrayList();
     protected boolean renderOutlines = false;
-    public static float NAME_TAG_RANGE = 64.0F;
-    public static float NAME_TAG_RANGE_SNEAK = 32.0F;
+    public static final float NAME_TAG_RANGE = 64.0F;
+    public static final float NAME_TAG_RANGE_SNEAK = 32.0F;
     public EntityLivingBase renderEntity;
     public float renderLimbSwing;
     public float renderLimbSwingAmount;
@@ -60,12 +61,12 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
         this.renderModelPushMatrix = this.mainModel instanceof ModelSpider;
     }
 
-    public <V extends EntityLivingBase, U extends LayerRenderer<V>> boolean addLayer(U layer) {
-        return this.layerRenderers.add((LayerRenderer<T>) layer);
+    public <V extends EntityLivingBase, U extends LayerRenderer<V>> void addLayer(U layer) {
+        this.layerRenderers.add((LayerRenderer<T>) layer);
     }
 
-    protected <V extends EntityLivingBase, U extends LayerRenderer<V>> boolean removeLayer(U layer) {
-        return this.layerRenderers.remove(layer);
+    protected <V extends EntityLivingBase, U extends LayerRenderer<V>> void removeLayer(U layer) {
+        this.layerRenderers.remove(layer);
     }
 
     public ModelBase getMainModel() {
@@ -73,16 +74,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     }
 
     protected float interpolateRotation(float par1, float par2, float par3) {
-        float f;
-
-        for (f = par2 - par1; f < -180.0F; f += 360.0F) {
-        }
-
-        while (f >= 180.0F) {
-            f -= 360.0F;
-        }
-
-        return par1 + par3 * f;
+        return MathUtils.interpolate(par1, par2, par3);
     }
 
     public void transformHeldFull3DItemLayer() {
@@ -216,7 +208,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                     GlStateManager.depthMask(true);
 
                     if (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).isSpectator()) {
-                        this.renderLayers(entity, f6, f5, partialTicks, f8, f2, f7, 0.0625F);
+                        this.renderLayers(entity, f6, f5, partialTicks, f8, f2, f7);
                     }
                 }
 
@@ -473,7 +465,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
         return (float) livingBase.ticksExisted + partialTicks;
     }
 
-    protected void renderLayers(T entitylivingbaseIn, float p_177093_2_, float p_177093_3_, float partialTicks, float p_177093_5_, float p_177093_6_, float p_177093_7_, float p_177093_8_) {
+    protected void renderLayers(T entitylivingbaseIn, float p_177093_2_, float p_177093_3_, float partialTicks, float p_177093_5_, float p_177093_6_, float p_177093_7_) {
         for (LayerRenderer<T> layerrenderer : this.layerRenderers) {
             boolean flag = this.setBrightness(entitylivingbaseIn, partialTicks, layerrenderer.shouldCombineTextures());
 
@@ -485,7 +477,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                 GlStateManager.pushMatrix();
             }
 
-            layerrenderer.doRenderLayer(entitylivingbaseIn, p_177093_2_, p_177093_3_, partialTicks, p_177093_5_, p_177093_6_, p_177093_7_, p_177093_8_);
+            layerrenderer.doRenderLayer(entitylivingbaseIn, p_177093_2_, p_177093_3_, partialTicks, p_177093_5_, p_177093_6_, p_177093_7_, (float) 0.0625);
 
             if (this.renderLayersPushMatrix) {
                 GlStateManager.popMatrix();
@@ -496,7 +488,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                     this.renderLayersPushMatrix = true;
                     EmissiveTextures.beginRenderEmissive();
                     GlStateManager.pushMatrix();
-                    layerrenderer.doRenderLayer(entitylivingbaseIn, p_177093_2_, p_177093_3_, partialTicks, p_177093_5_, p_177093_6_, p_177093_7_, p_177093_8_);
+                    layerrenderer.doRenderLayer(entitylivingbaseIn, p_177093_2_, p_177093_3_, partialTicks, p_177093_5_, p_177093_6_, p_177093_7_, (float) 0.0625);
                     GlStateManager.popMatrix();
                     EmissiveTextures.endRenderEmissive();
                 }

@@ -37,7 +37,7 @@ public class S08PacketPlayerPosLook implements Packet<INetHandlerPlayClient> {
         this.field_179835_f = p_i45993_9_;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.x = buf.readDouble();
         this.y = buf.readDouble();
         this.z = buf.readDouble();
@@ -46,7 +46,7 @@ public class S08PacketPlayerPosLook implements Packet<INetHandlerPlayClient> {
         this.field_179835_f = S08PacketPlayerPosLook.EnumFlags.func_180053_a(buf.readUnsignedByte());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeDouble(this.x);
         buf.writeDouble(this.y);
         buf.writeDouble(this.z);

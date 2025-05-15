@@ -84,12 +84,12 @@ public class SoundManager {
 
                         public void errorMessage(String p_errorMessage_1_, String p_errorMessage_2_, int p_errorMessage_3_) {
                             if (!p_errorMessage_2_.isEmpty()) {
-                                SoundManager.logger.error("Error in class '" + p_errorMessage_1_ + "'");
+                                SoundManager.logger.error("Error in class '{}'", p_errorMessage_1_);
                                 SoundManager.logger.error(p_errorMessage_2_);
                             }
                         }
                     });
-                    SoundManager.this.sndSystem = SoundManager.this.new SoundSystemStarterThread();
+                    SoundManager.this.sndSystem = new SoundSystemStarterThread();
                     SoundManager.this.loaded = true;
                     SoundManager.this.sndSystem.setMasterVolume(SoundManager.this.options.getSoundLevel(SoundCategory.MASTER));
                     SoundManager.logger.info(SoundManager.LOG_MARKER, "Sound engine started");
@@ -189,7 +189,7 @@ public class SoundManager {
 
                     try {
                         this.categorySounds.remove(this.sndHandler.getSound(isound.getSoundLocation()).getSoundCategory(), s1);
-                    } catch (RuntimeException var8) {
+                    } catch (RuntimeException ignored) {
                     }
 
                     if (isound instanceof ITickableSound) {
@@ -328,7 +328,7 @@ public class SoundManager {
         URLStreamHandler urlstreamhandler = new URLStreamHandler() {
             protected URLConnection openConnection(final URL p_openConnection_1_) {
                 return new URLConnection(p_openConnection_1_) {
-                    public void connect() throws IOException {
+                    public void connect() {
                     }
 
                     public InputStream getInputStream() throws IOException {
@@ -367,7 +367,7 @@ public class SoundManager {
         }
     }
 
-    class SoundSystemStarterThread extends SoundSystem {
+    static class SoundSystemStarterThread extends SoundSystem {
         private SoundSystemStarterThread() {
         }
 

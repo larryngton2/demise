@@ -13,23 +13,22 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
 import java.util.List;
 
 public class EntityDragon extends EntityLiving implements IBossDisplayData, IEntityMultiPart, IMob {
     public double targetX;
     public double targetY;
     public double targetZ;
-    public double[][] ringBuffer = new double[64][3];
+    public final double[][] ringBuffer = new double[64][3];
     public int ringBufferIndex = -1;
-    public EntityDragonPart[] dragonPartArray;
-    public EntityDragonPart dragonPartHead;
-    public EntityDragonPart dragonPartBody;
-    public EntityDragonPart dragonPartTail1;
-    public EntityDragonPart dragonPartTail2;
-    public EntityDragonPart dragonPartTail3;
-    public EntityDragonPart dragonPartWing1;
-    public EntityDragonPart dragonPartWing2;
+    public final EntityDragonPart[] dragonPartArray;
+    public final EntityDragonPart dragonPartHead;
+    public final EntityDragonPart dragonPartBody;
+    public final EntityDragonPart dragonPartTail1;
+    public final EntityDragonPart dragonPartTail2;
+    public final EntityDragonPart dragonPartTail3;
+    public final EntityDragonPart dragonPartWing1;
+    public final EntityDragonPart dragonPartWing2;
     public float prevAnimTime;
     public float animTime;
     public boolean forceNewTarget;
@@ -439,8 +438,8 @@ public class EntityDragon extends EntityLiving implements IBossDisplayData, IEnt
         return false;
     }
 
-    protected boolean attackDragonFrom(DamageSource source, float amount) {
-        return super.attackEntityFrom(source, amount);
+    protected void attackDragonFrom(DamageSource source, float amount) {
+        super.attackEntityFrom(source, amount);
     }
 
     public void onKillCommand() {

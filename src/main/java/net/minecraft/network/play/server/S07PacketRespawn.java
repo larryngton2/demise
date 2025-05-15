@@ -29,7 +29,7 @@ public class S07PacketRespawn implements Packet<INetHandlerPlayClient> {
         handler.handleRespawn(this);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.dimensionID = buf.readInt();
         this.difficulty = EnumDifficulty.getDifficultyEnum(buf.readUnsignedByte());
         this.gameType = WorldSettings.GameType.getByID(buf.readUnsignedByte());
@@ -40,7 +40,7 @@ public class S07PacketRespawn implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeInt(this.dimensionID);
         buf.writeByte(this.difficulty.getDifficultyId());
         buf.writeByte(this.gameType.getID());

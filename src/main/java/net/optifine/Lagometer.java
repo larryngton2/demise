@@ -18,13 +18,13 @@ public class Lagometer {
     private static GameSettings gameSettings;
     private static Profiler profiler;
     public static boolean active = false;
-    public static Lagometer.TimerNano timerTick = new Lagometer.TimerNano();
-    public static Lagometer.TimerNano timerScheduledExecutables = new Lagometer.TimerNano();
-    public static Lagometer.TimerNano timerChunkUpload = new Lagometer.TimerNano();
-    public static Lagometer.TimerNano timerChunkUpdate = new Lagometer.TimerNano();
-    public static Lagometer.TimerNano timerVisibility = new Lagometer.TimerNano();
-    public static Lagometer.TimerNano timerTerrain = new Lagometer.TimerNano();
-    public static Lagometer.TimerNano timerServer = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerTick = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerScheduledExecutables = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerChunkUpload = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerChunkUpdate = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerVisibility = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerTerrain = new Lagometer.TimerNano();
+    public static final Lagometer.TimerNano timerServer = new Lagometer.TimerNano();
     private static final long[] timesFrame = new long[512];
     private static final long[] timesTick = new long[512];
     private static final long[] timesScheduledExecutables = new long[512];
@@ -119,8 +119,8 @@ public class Lagometer {
                     }
                 }
 
-                renderTimeDivider(0, timesFrame.length, 33333333L, 196, 196, 196, (float) mc.displayHeight, worldrenderer);
-                renderTimeDivider(0, timesFrame.length, 16666666L, 196, 196, 196, (float) mc.displayHeight, worldrenderer);
+                renderTimeDivider(timesFrame.length, 33333333L, (float) mc.displayHeight, worldrenderer);
+                renderTimeDivider(timesFrame.length, 16666666L, (float) mc.displayHeight, worldrenderer);
                 tessellator.draw();
                 GlStateManager.enableTexture2D();
                 int j2 = mc.displayHeight - 80;
@@ -162,15 +162,13 @@ public class Lagometer {
         }
     }
 
-    private static long renderTimeDivider(int frameStart, int frameEnd, long time, int r, int g, int b, float baseHeight, WorldRenderer tessellator) {
+    private static void renderTimeDivider(int frameEnd, long time, float baseHeight, WorldRenderer tessellator) {
         long i = time / 200000L;
 
         if (i < 3L) {
-            return 0L;
         } else {
-            tessellator.pos((float) frameStart + 0.5F, baseHeight - (float) i + 0.5F, 0.0D).color(r, g, b, 255).endVertex();
-            tessellator.pos((float) frameEnd + 0.5F, baseHeight - (float) i + 0.5F, 0.0D).color(r, g, b, 255).endVertex();
-            return i;
+            tessellator.pos((float) 0 + 0.5F, baseHeight - (float) i + 0.5F, 0.0D).color(196, 196, 196, 255).endVertex();
+            tessellator.pos((float) frameEnd + 0.5F, baseHeight - (float) i + 0.5F, 0.0D).color(196, 196, 196, 255).endVertex();
         }
     }
 

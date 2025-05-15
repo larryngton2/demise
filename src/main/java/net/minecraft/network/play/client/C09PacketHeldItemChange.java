@@ -16,11 +16,11 @@ public class C09PacketHeldItemChange implements Packet<INetHandlerPlayServer> {
         this.slotId = slotId;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.slotId = buf.readShort();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeShort(this.slotId);
     }
 

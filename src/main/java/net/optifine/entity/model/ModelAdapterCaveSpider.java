@@ -8,7 +8,7 @@ import net.minecraft.entity.monster.EntityCaveSpider;
 
 public class ModelAdapterCaveSpider extends ModelAdapterSpider {
     public ModelAdapterCaveSpider() {
-        super(EntityCaveSpider.class, "cave_spider", 0.7F);
+        super(EntityCaveSpider.class);
     }
 
     public IEntityRenderer makeEntityRender(ModelBase modelBase, float shadowSize) {

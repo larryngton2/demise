@@ -25,7 +25,7 @@ public class EntityEndermite extends EntityMob {
         this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
         this.tasks.addTask(8, new EntityAILookIdle(this));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
     }
 
     public float getEyeHeight() {
@@ -57,10 +57,6 @@ public class EntityEndermite extends EntityMob {
 
     protected void playStepSound(BlockPos pos, Block blockIn) {
         this.playSound("mob.silverfish.step", 0.15F, 1.0F);
-    }
-
-    protected Item getDropItem() {
-        return null;
     }
 
     public void readEntityFromNBT(NBTTagCompound tagCompund) {

@@ -25,7 +25,7 @@ public class ItemSkull extends Item {
     public ItemSkull() {
         this.setCreativeTab(CreativeTabs.tabDecorations);
         this.setMaxDamage(0);
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
     }
 
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -129,16 +129,14 @@ public class ItemSkull extends Item {
         return super.getItemStackDisplayName(stack);
     }
 
-    public boolean updateItemStackNBT(NBTTagCompound nbt) {
+    public void updateItemStackNBT(NBTTagCompound nbt) {
         super.updateItemStackNBT(nbt);
 
         if (nbt.hasKey("SkullOwner", 8) && !nbt.getString("SkullOwner").isEmpty()) {
             GameProfile gameprofile = new GameProfile(null, nbt.getString("SkullOwner"));
             gameprofile = TileEntitySkull.updateGameprofile(gameprofile);
             nbt.setTag("SkullOwner", NBTUtil.writeGameProfile(new NBTTagCompound(), gameprofile));
-            return true;
         } else {
-            return false;
         }
     }
 }

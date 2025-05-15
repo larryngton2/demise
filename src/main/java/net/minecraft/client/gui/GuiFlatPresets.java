@@ -46,8 +46,8 @@ public class GuiFlatPresets extends GuiScreen {
         this.field_146435_s = new GuiFlatPresets.ListSlot();
         this.field_146433_u.setMaxStringLength(1230);
         this.field_146433_u.setText(this.parentScreen.func_146384_e());
-        this.buttonList.add(this.field_146434_t = new GuiButton(0, width / 2 - 155, height - 28, 150, 20, I18n.format("createWorld.customize.presets.select")));
-        this.buttonList.add(new GuiButton(1, width / 2 + 5, height - 28, 150, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(this.field_146434_t = new GuiButton(0, (float) width / 2 - 155, height - 28, 150, 20, I18n.format("createWorld.customize.presets.select")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 + 5, height - 28, 150, 20, I18n.format("gui.cancel")));
         this.func_146426_g();
     }
 
@@ -71,7 +71,7 @@ public class GuiFlatPresets extends GuiScreen {
         }
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.id == 0 && this.func_146430_p()) {
             this.parentScreen.func_146383_a(this.field_146433_u.getText());
             mc.displayGuiScreen(this.parentScreen);
@@ -83,7 +83,7 @@ public class GuiFlatPresets extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.field_146435_s.drawScreen(mouseX, mouseY, partialTicks);
-        drawCenteredString(this.fontRendererObj, this.presetsTitle, width / 2, 8, 16777215);
+        drawCenteredString(this.fontRendererObj, this.presetsTitle, (float) width / 2, 8, 16777215);
         this.drawString(this.fontRendererObj, this.presetsShare, 50, 30, 10526880);
         this.drawString(this.fontRendererObj, this.field_146436_r, 50, 70, 10526880);
         this.field_146433_u.drawTextBox();
@@ -96,16 +96,15 @@ public class GuiFlatPresets extends GuiScreen {
     }
 
     public void func_146426_g() {
-        boolean flag = this.func_146430_p();
-        this.field_146434_t.enabled = flag;
+        this.field_146434_t.enabled = this.func_146430_p();
     }
 
     private boolean func_146430_p() {
         return this.field_146435_s.field_148175_k > -1 && this.field_146435_s.field_148175_k < FLAT_WORLD_PRESETS.size() || this.field_146433_u.getText().length() > 1;
     }
 
-    private static void func_146425_a(String p_146425_0_, Item p_146425_1_, BiomeGenBase p_146425_2_, FlatLayerInfo... p_146425_3_) {
-        func_175354_a(p_146425_0_, p_146425_1_, 0, p_146425_2_, null, p_146425_3_);
+    private static void func_146425_a(FlatLayerInfo... p_146425_3_) {
+        func_175354_a("Redstone Ready", Items.redstone, 0, BiomeGenBase.desert, null, p_146425_3_);
     }
 
     private static void func_146421_a(String p_146421_0_, Item p_146421_1_, BiomeGenBase p_146421_2_, List<String> p_146421_3_, FlatLayerInfo... p_146421_4_) {
@@ -139,14 +138,14 @@ public class GuiFlatPresets extends GuiScreen {
         func_146421_a("Snowy Kingdom", Item.getItemFromBlock(Blocks.snow_layer), BiomeGenBase.icePlains, Arrays.asList("village", "biome_1"), new FlatLayerInfo(1, Blocks.snow_layer), new FlatLayerInfo(1, Blocks.grass), new FlatLayerInfo(3, Blocks.dirt), new FlatLayerInfo(59, Blocks.stone), new FlatLayerInfo(1, Blocks.bedrock));
         func_146421_a("Bottomless Pit", Items.feather, BiomeGenBase.plains, Arrays.asList("village", "biome_1"), new FlatLayerInfo(1, Blocks.grass), new FlatLayerInfo(3, Blocks.dirt), new FlatLayerInfo(2, Blocks.cobblestone));
         func_146421_a("Desert", Item.getItemFromBlock(Blocks.sand), BiomeGenBase.desert, Arrays.asList("village", "biome_1", "decoration", "stronghold", "mineshaft", "dungeon"), new FlatLayerInfo(8, Blocks.sand), new FlatLayerInfo(52, Blocks.sandstone), new FlatLayerInfo(3, Blocks.stone), new FlatLayerInfo(1, Blocks.bedrock));
-        func_146425_a("Redstone Ready", Items.redstone, BiomeGenBase.desert, new FlatLayerInfo(52, Blocks.sandstone), new FlatLayerInfo(3, Blocks.stone), new FlatLayerInfo(1, Blocks.bedrock));
+        func_146425_a(new FlatLayerInfo(52, Blocks.sandstone), new FlatLayerInfo(3, Blocks.stone), new FlatLayerInfo(1, Blocks.bedrock));
     }
 
     static class LayerItem {
-        public Item field_148234_a;
-        public int field_179037_b;
-        public String field_148232_b;
-        public String field_148233_c;
+        public final Item field_148234_a;
+        public final int field_179037_b;
+        public final String field_148232_b;
+        public final String field_148233_c;
 
         public LayerItem(Item p_i45518_1_, int p_i45518_2_, String p_i45518_3_, String p_i45518_4_) {
             this.field_148234_a = p_i45518_1_;
@@ -173,10 +172,10 @@ public class GuiFlatPresets extends GuiScreen {
         }
 
         private void func_148173_e(int p_148173_1_, int p_148173_2_) {
-            this.func_148171_c(p_148173_1_, p_148173_2_, 0, 0);
+            this.func_148171_c(p_148173_1_, p_148173_2_);
         }
 
-        private void func_148171_c(int p_148171_1_, int p_148171_2_, int p_148171_3_, int p_148171_4_) {
+        private void func_148171_c(int p_148171_1_, int p_148171_2_) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.mc.getTextureManager().bindTexture(Gui.statIcons);
             float f = 0.0078125F;
@@ -186,10 +185,10 @@ public class GuiFlatPresets extends GuiScreen {
             Tessellator tessellator = Tessellator.getInstance();
             WorldRenderer worldrenderer = tessellator.getWorldRenderer();
             worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-            worldrenderer.pos(p_148171_1_, p_148171_2_ + 18, zLevel).tex((float) (p_148171_3_) * 0.0078125F, (float) (p_148171_4_ + 18) * 0.0078125F).endVertex();
-            worldrenderer.pos(p_148171_1_ + 18, p_148171_2_ + 18, zLevel).tex((float) (p_148171_3_ + 18) * 0.0078125F, (float) (p_148171_4_ + 18) * 0.0078125F).endVertex();
-            worldrenderer.pos(p_148171_1_ + 18, p_148171_2_, zLevel).tex((float) (p_148171_3_ + 18) * 0.0078125F, (float) (p_148171_4_) * 0.0078125F).endVertex();
-            worldrenderer.pos(p_148171_1_, p_148171_2_, zLevel).tex((float) (p_148171_3_) * 0.0078125F, (float) (p_148171_4_) * 0.0078125F).endVertex();
+            worldrenderer.pos(p_148171_1_, p_148171_2_ + 18, zLevel).tex((float) (0) * 0.0078125F, (float) (0 + 18) * 0.0078125F).endVertex();
+            worldrenderer.pos(p_148171_1_ + 18, p_148171_2_ + 18, zLevel).tex((float) (0 + 18) * 0.0078125F, (float) (0 + 18) * 0.0078125F).endVertex();
+            worldrenderer.pos(p_148171_1_ + 18, p_148171_2_, zLevel).tex((float) (0 + 18) * 0.0078125F, (float) (0) * 0.0078125F).endVertex();
+            worldrenderer.pos(p_148171_1_, p_148171_2_, zLevel).tex((float) (0) * 0.0078125F, (float) (0) * 0.0078125F).endVertex();
             tessellator.draw();
         }
 

@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import com.google.common.base.Predicate;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
@@ -22,13 +21,13 @@ public class BlockOldLog extends BlockLog {
         BlockPlanks.EnumType blockplanks$enumtype = state.getValue(VARIANT);
 
         return switch (state.getValue(LOG_AXIS)) {
+            case Y -> blockplanks$enumtype.getMapColor();
             default -> switch (blockplanks$enumtype) {
-                default -> BlockPlanks.EnumType.SPRUCE.getMapColor();
                 case SPRUCE -> BlockPlanks.EnumType.DARK_OAK.getMapColor();
                 case BIRCH -> MapColor.quartzColor;
                 case JUNGLE -> BlockPlanks.EnumType.SPRUCE.getMapColor();
+                default -> BlockPlanks.EnumType.SPRUCE.getMapColor();
             };
-            case Y -> blockplanks$enumtype.getMapColor();
         };
     }
 

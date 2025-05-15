@@ -5,7 +5,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.MathHelper;
 
 public class EntityMoveHelper {
-    protected EntityLiving entity;
+    protected final EntityLiving entity;
     protected double posX;
     protected double posY;
     protected double posZ;
@@ -48,7 +48,7 @@ public class EntityMoveHelper {
 
             if (d3 >= 2.500000277905201E-7D) {
                 float f = (float) (MathHelper.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
-                this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f, 30.0F);
+                this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f);
                 this.entity.setAIMoveSpeed((float) (this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue()));
 
                 if (d2 > 0.0D && d0 * d0 + d1 * d1 < 1.0D) {
@@ -58,15 +58,15 @@ public class EntityMoveHelper {
         }
     }
 
-    protected float limitAngle(float p_75639_1_, float p_75639_2_, float p_75639_3_) {
+    protected float limitAngle(float p_75639_1_, float p_75639_2_) {
         float f = MathHelper.wrapAngleTo180_float(p_75639_2_ - p_75639_1_);
 
-        if (f > p_75639_3_) {
-            f = p_75639_3_;
+        if (f > (float) 30.0) {
+            f = (float) 30.0;
         }
 
-        if (f < -p_75639_3_) {
-            f = -p_75639_3_;
+        if (f < -(float) 30.0) {
+            f = -(float) 30.0;
         }
 
         float f1 = p_75639_1_ + f;

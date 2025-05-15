@@ -25,14 +25,14 @@ public class S10PacketSpawnPainting implements Packet<INetHandlerPlayClient> {
         this.title = painting.art.title;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityID = buf.readVarIntFromBuffer();
         this.title = buf.readStringFromBuffer(EntityPainting.EnumArt.field_180001_A);
         this.position = buf.readBlockPos();
         this.facing = EnumFacing.getHorizontal(buf.readUnsignedByte());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityID);
         buf.writeString(this.title);
         buf.writeBlockPos(this.position);

@@ -24,9 +24,9 @@ public class MapData extends WorldSavedData {
     public byte dimension;
     public byte scale;
     public byte[] colors = new byte[16384];
-    public List<MapData.MapInfo> playersArrayList = Lists.newArrayList();
+    public final List<MapData.MapInfo> playersArrayList = Lists.newArrayList();
     private final Map<EntityPlayer, MapData.MapInfo> playersHashMap = Maps.newHashMap();
-    public Map<String, Vec4b> mapDecorations = Maps.newLinkedHashMap();
+    public final Map<String, Vec4b> mapDecorations = Maps.newLinkedHashMap();
 
     public MapData(String mapname) {
         super(mapname);
@@ -60,14 +60,10 @@ public class MapData extends WorldSavedData {
             for (int i1 = 0; i1 < j; ++i1) {
                 int j1 = i1 + l;
 
-                if (j1 >= 0 || j1 < 128) {
-                    for (int k1 = 0; k1 < i; ++k1) {
-                        int l1 = k1 + k;
+                for (int k1 = 0; k1 < i; ++k1) {
+                    int l1 = k1 + k;
 
-                        if (l1 >= 0 || l1 < 128) {
-                            this.colors[l1 + j1 * 128] = abyte[k1 + i1 * i];
-                        }
-                    }
+                    this.colors[l1 + j1 * 128] = abyte[k1 + i1 * i];
                 }
             }
         }

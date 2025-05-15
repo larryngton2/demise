@@ -9,11 +9,11 @@ public class ModelArmorStandArmor extends ModelBiped {
     }
 
     public ModelArmorStandArmor(float modelSize) {
-        this(modelSize, 64, 32);
+        this(modelSize, 32);
     }
 
-    protected ModelArmorStandArmor(float modelSize, int textureWidthIn, int textureHeightIn) {
-        super(modelSize, 0.0F, textureWidthIn, textureHeightIn);
+    protected ModelArmorStandArmor(float modelSize, int textureHeightIn) {
+        super(modelSize, 0.0F, 64, textureHeightIn);
     }
 
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {

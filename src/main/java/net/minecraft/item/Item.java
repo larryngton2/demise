@@ -26,11 +26,11 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Item {
-    public static final RegistryNamespaced<ResourceLocation, Item> itemRegistry = new RegistryNamespaced();
+    public static final RegistryNamespaced<ResourceLocation, Item> itemRegistry = new RegistryNamespaced<>();
     private static final Map<Block, Item> BLOCK_TO_ITEM = Maps.newHashMap();
     protected static final UUID itemModifierUUID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
     private CreativeTabs tabToDisplayOn;
-    protected static Random itemRand = new Random();
+    protected static final Random itemRand = new Random();
     protected int maxStackSize = 64;
     private int maxDamage;
     protected boolean bFull3D;
@@ -57,15 +57,14 @@ public class Item {
         if (item == null) {
             try {
                 return getItemById(Integer.parseInt(id));
-            } catch (NumberFormatException var3) {
+            } catch (NumberFormatException ignored) {
             }
         }
 
         return item;
     }
 
-    public boolean updateItemStackNBT(NBTTagCompound nbt) {
-        return false;
+    public void updateItemStackNBT(NBTTagCompound nbt) {
     }
 
     public Item setMaxStackSize(int maxStackSize) {
@@ -101,8 +100,8 @@ public class Item {
         return this.hasSubtypes;
     }
 
-    protected Item setHasSubtypes(boolean hasSubtypes) {
-        this.hasSubtypes = hasSubtypes;
+    protected Item setHasSubtypes() {
+        this.hasSubtypes = true;
         return this;
     }
 
@@ -532,8 +531,8 @@ public class Item {
         registerItem(346, "fishing_rod", (new ItemFishingRod()).setUnlocalizedName("fishingRod"));
         registerItem(347, "clock", (new Item()).setUnlocalizedName("clock").setCreativeTab(CreativeTabs.tabTools));
         registerItem(348, "glowstone_dust", (new Item()).setUnlocalizedName("yellowDust").setPotionEffect(PotionHelper.glowstoneEffect).setCreativeTab(CreativeTabs.tabMaterials));
-        registerItem(349, "fish", (new ItemFishFood(false)).setUnlocalizedName("fish").setHasSubtypes(true));
-        registerItem(350, "cooked_fish", (new ItemFishFood(true)).setUnlocalizedName("fish").setHasSubtypes(true));
+        registerItem(349, "fish", (new ItemFishFood(false)).setUnlocalizedName("fish").setHasSubtypes());
+        registerItem(350, "cooked_fish", (new ItemFishFood(true)).setUnlocalizedName("fish").setHasSubtypes());
         registerItem(351, "dye", (new ItemDye()).setUnlocalizedName("dyePowder"));
         registerItem(352, "bone", (new Item()).setUnlocalizedName("bone").setFull3D().setCreativeTab(CreativeTabs.tabMisc));
         registerItem(353, "sugar", (new Item()).setUnlocalizedName("sugar").setPotionEffect(PotionHelper.sugarEffect).setCreativeTab(CreativeTabs.tabMaterials));

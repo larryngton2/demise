@@ -32,8 +32,7 @@ public class MacroProcessor {
         }
 
         byte[] abyte = s.getBytes(StandardCharsets.US_ASCII);
-        ByteArrayInputStream bytearrayinputstream = new ByteArrayInputStream(abyte);
-        return bytearrayinputstream;
+        return new ByteArrayInputStream(abyte);
     }
 
     public static String process(String strIn) throws IOException {
@@ -77,7 +76,7 @@ public class MacroProcessor {
                 }
 
                 if (list1 == null) {
-                    list1 = new ArrayList(Arrays.asList(ShaderMacros.getExtensions()));
+                    list1 = new ArrayList<>(Arrays.asList(ShaderMacros.getExtensions()));
                 }
 
                 Iterator iterator = list1.iterator();
@@ -96,7 +95,7 @@ public class MacroProcessor {
     }
 
     private static List<ShaderOption> getMacroOptions() {
-        List<ShaderOption> list = new ArrayList();
+        List<ShaderOption> list = new ArrayList<>();
         ShaderOption[] ashaderoption = Shaders.getShaderPackOptions();
 
         for (ShaderOption shaderoption : ashaderoption) {

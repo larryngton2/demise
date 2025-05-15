@@ -261,7 +261,7 @@ public class PotionHelper {
                                 k = 0;
                             } else if (c0 == 60) {
                                 k = 2;
-                            } else if (c0 == 62) {
+                            } else {
                                 k = 1;
                             }
                         }

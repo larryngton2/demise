@@ -5,8 +5,8 @@ import net.minecraft.entity.ai.attributes.BaseAttributeMap;
 import net.minecraft.util.ResourceLocation;
 
 public class PotionAbsorption extends Potion {
-    protected PotionAbsorption(int potionID, ResourceLocation location, boolean badEffect, int potionColor) {
-        super(potionID, location, badEffect, potionColor);
+    protected PotionAbsorption(ResourceLocation location) {
+        super(22, location, false, 2445989);
     }
 
     public void removeAttributesModifiersFromEntity(EntityLivingBase entityLivingBaseIn, BaseAttributeMap p_111187_2_, int amplifier) {

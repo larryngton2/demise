@@ -4,7 +4,7 @@ public class Path {
     private PathPoint[] pathPoints = new PathPoint[1024];
     private int count;
 
-    public PathPoint addPoint(PathPoint point) {
+    public void addPoint(PathPoint point) {
         if (point.index >= 0) {
             throw new IllegalStateException("OW KNOWS!");
         } else {
@@ -17,7 +17,6 @@ public class Path {
             this.pathPoints[this.count] = point;
             point.index = this.count;
             this.sortBack(this.count++);
-            return point;
         }
     }
 

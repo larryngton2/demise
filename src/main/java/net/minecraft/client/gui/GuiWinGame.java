@@ -49,7 +49,7 @@ public class GuiWinGame extends GuiScreen {
         }
     }
 
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) {
         if (keyCode == 1) {
             this.sendRespawnPacket();
         }
@@ -58,10 +58,6 @@ public class GuiWinGame extends GuiScreen {
     private void sendRespawnPacket() {
         mc.thePlayer.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.PERFORM_RESPAWN));
         mc.displayGuiScreen(null);
-    }
-
-    public boolean doesGuiPauseGame() {
-        return true;
     }
 
     public void initGui() {

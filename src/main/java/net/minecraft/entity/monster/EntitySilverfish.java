@@ -28,7 +28,7 @@ public class EntitySilverfish extends EntityMob {
         this.tasks.addTask(4, new EntityAIAttackOnCollide(this, EntityPlayer.class, 1.0D, false));
         this.tasks.addTask(5, new EntitySilverfish.AIHideInStone(this));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
-        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, true));
     }
 
     public double getYOffset() {
@@ -76,10 +76,6 @@ public class EntitySilverfish extends EntityMob {
 
     protected void playStepSound(BlockPos pos, Block blockIn) {
         this.playSound("mob.silverfish.step", 0.15F, 1.0F);
-    }
-
-    protected Item getDropItem() {
-        return null;
     }
 
     public void onUpdate() {

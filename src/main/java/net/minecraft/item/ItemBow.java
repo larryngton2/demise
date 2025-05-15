@@ -73,10 +73,6 @@ public class ItemBow extends Item {
         }
     }
 
-    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityPlayer playerIn) {
-        return stack;
-    }
-
     public int getMaxItemUseDuration(ItemStack stack) {
         return 72000;
     }

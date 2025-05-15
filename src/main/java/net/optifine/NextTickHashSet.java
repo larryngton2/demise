@@ -5,6 +5,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.LongHashMap;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.NextTickListEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -34,18 +35,14 @@ public class NextTickHashSet extends TreeSet {
             return false;
         } else {
 
-            if (nextticklistentry == null) {
-                return false;
-            } else {
-                Set set = this.getSubSet(nextticklistentry, true);
-                boolean flag = set.add(nextticklistentry);
-                boolean flag1 = super.add(obj);
+            Set set = this.getSubSet(nextticklistentry, true);
+            boolean flag = set.add(nextticklistentry);
+            boolean flag1 = super.add(obj);
 
-                if (flag != flag1) {
-                    throw new IllegalStateException("Added: " + flag + ", addedParent: " + flag1);
-                } else {
-                    return flag1;
-                }
+            if (flag != flag1) {
+                throw new IllegalStateException("Added: " + flag + ", addedParent: " + flag1);
+            } else {
+                return flag1;
             }
         }
     }
@@ -94,7 +91,7 @@ public class NextTickHashSet extends TreeSet {
         return hashset;
     }
 
-    public Iterator iterator() {
+    public @NotNull Iterator iterator() {
         if (this.minX == Integer.MIN_VALUE) {
             return super.iterator();
         } else if (this.size() <= 0) {

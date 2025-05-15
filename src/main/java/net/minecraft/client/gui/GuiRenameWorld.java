@@ -24,8 +24,8 @@ public class GuiRenameWorld extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.buttonList.clear();
-        this.buttonList.add(new GuiButton(0, width / 2 - 100, height / 4 + 96 + 12, I18n.format("selectWorld.renameButton")));
-        this.buttonList.add(new GuiButton(1, width / 2 - 100, height / 4 + 120 + 12, I18n.format("gui.cancel")));
+        this.buttonList.add(new GuiButton(0, (float) width / 2 - 100, (float) height / 4 + 96 + 12, I18n.format("selectWorld.renameButton")));
+        this.buttonList.add(new GuiButton(1, (float) width / 2 - 100, (float) height / 4 + 120 + 12, I18n.format("gui.cancel")));
         ISaveFormat isaveformat = mc.getSaveLoader();
         WorldInfo worldinfo = isaveformat.getWorldInfo(this.saveName);
         String s = worldinfo.getWorldName();
@@ -38,7 +38,7 @@ public class GuiRenameWorld extends GuiScreen {
         Keyboard.enableRepeatEvents(false);
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 1) {
                 mc.displayGuiScreen(this.parentScreen);
@@ -66,7 +66,7 @@ public class GuiRenameWorld extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, I18n.format("selectWorld.renameTitle"), width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("selectWorld.renameTitle"), (float) width / 2, 20, 16777215);
         this.drawString(this.fontRendererObj, I18n.format("selectWorld.enterName"), width / 2 - 100, 47, 10526880);
         this.field_146583_f.drawTextBox();
         super.drawScreen(mouseX, mouseY, partialTicks);

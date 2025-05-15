@@ -32,7 +32,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.*;
-import wtf.demise.events.impl.player.AngleEvent;
 
 import java.util.List;
 import java.util.Random;
@@ -87,7 +86,7 @@ public abstract class Entity implements ICommandSender {
     public float stepHeight;
     public boolean noClip;
     public float entityCollisionReduction;
-    protected Random rand;
+    protected final Random rand;
     public int ticksSinceStep;
     public int ticksExisted;
     public int fireResistance;
@@ -96,7 +95,7 @@ public abstract class Entity implements ICommandSender {
     public int hurtResistantTime;
     protected boolean firstUpdate;
     protected boolean isImmuneToFire;
-    protected DataWatcher dataWatcher;
+    protected final DataWatcher dataWatcher;
     private double entityRiderPitchDelta;
     private double entityRiderYawDelta;
     public boolean addedToChunk;
@@ -614,7 +613,7 @@ public abstract class Entity implements ICommandSender {
                     d13 = 0.0D;
                 }
 
-                if (block1 != null && this.onGround) {
+                if (this.onGround) {
                     block1.onEntityCollidedWithBlock(this.worldObj, blockpos, this);
                 }
 
@@ -650,7 +649,7 @@ public abstract class Entity implements ICommandSender {
             boolean flag2 = this.isWet();
 
             if (this.worldObj.isFlammableWithin(this.getEntityBoundingBox().contract(0.001D, 0.001D, 0.001D))) {
-                this.dealFireDamage(1);
+                this.dealFireDamage();
 
                 if (!flag2) {
                     ++this.fire;
@@ -756,9 +755,9 @@ public abstract class Entity implements ICommandSender {
         return null;
     }
 
-    protected void dealFireDamage(int amount) {
+    protected void dealFireDamage() {
         if (!this.isImmuneToFire) {
-            this.attackEntityFrom(DamageSource.inFire, (float) amount);
+            this.attackEntityFrom(DamageSource.inFire, (float) 1);
         }
     }
 
@@ -780,7 +779,7 @@ public abstract class Entity implements ICommandSender {
         return this.inWater;
     }
 
-    public boolean handleWaterMovement() {
+    public void handleWaterMovement() {
         if (this.worldObj.handleMaterialAcceleration(this.getEntityBoundingBox().expand(0.0D, -0.4000000059604645D, 0.0D).contract(0.001D, 0.001D, 0.001D), Material.water, this)) {
             if (!this.inWater && !this.firstUpdate) {
                 this.resetHeight();
@@ -793,7 +792,6 @@ public abstract class Entity implements ICommandSender {
             this.inWater = false;
         }
 
-        return this.inWater;
     }
 
     protected void resetHeight() {
@@ -1330,9 +1328,7 @@ public abstract class Entity implements ICommandSender {
     }
 
     public boolean isEntityInsideOpaqueBlock() {
-        if (this.noClip) {
-            return false;
-        } else {
+        if (!this.noClip) {
             BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
             for (int i = 0; i < 8; ++i) {
@@ -1349,8 +1345,8 @@ public abstract class Entity implements ICommandSender {
                 }
             }
 
-            return false;
         }
+        return false;
     }
 
     public boolean interactFirst(EntityPlayer playerIn) {
@@ -1445,11 +1441,9 @@ public abstract class Entity implements ICommandSender {
                 this.ridingEntity.riddenByEntity = null;
             }
 
-            if (entityIn != null) {
-                for (Entity entity = entityIn.ridingEntity; entity != null; entity = entity.ridingEntity) {
-                    if (entity == this) {
-                        return;
-                    }
+            for (Entity entity = entityIn.ridingEntity; entity != null; entity = entity.ridingEntity) {
+                if (entity == this) {
+                    return;
                 }
             }
 
@@ -1805,7 +1799,7 @@ public abstract class Entity implements ICommandSender {
     public void addEntityCrashInfo(CrashReportCategory category) {
         category.addCrashSectionCallable("Entity Type", () -> EntityList.getEntityString(Entity.this) + " (" + Entity.this.getClass().getCanonicalName() + ")");
         category.addCrashSection("Entity ID", this.entityId);
-        category.addCrashSectionCallable("Entity Name", () -> Entity.this.getName());
+        category.addCrashSectionCallable("Entity Name", Entity.this::getName);
         category.addCrashSection("Entity's Exact location", String.format("%.2f, %.2f, %.2f", this.posX, this.posY, this.posZ));
         category.addCrashSection("Entity's Block location", CrashReportCategory.getCoordinateInfo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
         category.addCrashSection("Entity's Momentum", String.format("%.2f, %.2f, %.2f", this.motionX, this.motionY, this.motionZ));

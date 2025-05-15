@@ -342,7 +342,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
             guicontainercreative$containercreative.inventorySlots = Lists.newArrayList();
 
             for (int j = 0; j < container.inventorySlots.size(); ++j) {
-                Slot slot = new GuiContainerCreative.CreativeSlot(container.inventorySlots.get(j), j);
+                Slot slot = new CreativeSlot(container.inventorySlots.get(j), j);
                 guicontainercreative$containercreative.inventorySlots.add(slot);
 
                 if (j >= 5 && j < 9) {
@@ -351,7 +351,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
                     int l1 = j1 % 2;
                     slot.xDisplayPosition = 9 + k1 * 54;
                     slot.yDisplayPosition = 6 + l1 * 27;
-                } else if (j >= 0 && j < 5) {
+                } else if (j < 5) {
                     slot.yDisplayPosition = -2000;
                     slot.xDisplayPosition = -2000;
                 } else if (j < container.inventorySlots.size()) {
@@ -614,7 +614,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
         zLevel = 0.0F;
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.id == 0) {
             mc.displayGuiScreen(new GuiAchievements(this, mc.thePlayer.getStatFileWriter()));
         }
@@ -629,7 +629,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
     }
 
     static class ContainerCreative extends Container {
-        public List<ItemStack> itemList = Lists.newArrayList();
+        public final List<ItemStack> itemList = Lists.newArrayList();
 
         public ContainerCreative(EntityPlayer p_i1086_1_) {
             InventoryPlayer inventoryplayer = p_i1086_1_.inventory;
@@ -676,7 +676,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
             return this.itemList.size() > 45;
         }
 
-        protected void retrySlotClick(int slotId, int clickedButton, boolean mode, EntityPlayer playerIn) {
+        protected void retrySlotClick(int slotId, int clickedButton, EntityPlayer playerIn) {
         }
 
         public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
@@ -700,7 +700,7 @@ public class GuiContainerCreative extends InventoryEffectRenderer {
         }
     }
 
-    class CreativeSlot extends Slot {
+    static class CreativeSlot extends Slot {
         private final Slot slot;
 
         public CreativeSlot(Slot p_i46313_2_, int p_i46313_3_) {

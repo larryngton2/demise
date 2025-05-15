@@ -3,8 +3,8 @@ package net.minecraft.enchantment;
 import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentFishingSpeed extends Enchantment {
-    protected EnchantmentFishingSpeed(int enchID, ResourceLocation enchName, int enchWeight, EnumEnchantmentType enchType) {
-        super(enchID, enchName, enchWeight, enchType);
+    protected EnchantmentFishingSpeed(ResourceLocation enchName) {
+        super(62, enchName, 2, EnumEnchantmentType.FISHING_ROD);
         this.setName("fishingSpeed");
     }
 

@@ -43,15 +43,13 @@ public class CommandTeleport extends CommandBase {
             }
 
             if (args.length != 1 && args.length != 2) {
-                if (args.length < i + 3) {
-                    throw new WrongUsageException("commands.tp.usage");
-                } else if (entity.worldObj != null) {
+                if (entity.worldObj != null) {
                     int lvt_5_2_ = i + 1;
-                    CommandBase.CoordinateArg commandbase$coordinatearg = parseCoordinate(entity.posX, args[i], true);
-                    CommandBase.CoordinateArg commandbase$coordinatearg1 = parseCoordinate(entity.posY, args[lvt_5_2_++], 0, 0, false);
-                    CommandBase.CoordinateArg commandbase$coordinatearg2 = parseCoordinate(entity.posZ, args[lvt_5_2_++], true);
-                    CommandBase.CoordinateArg commandbase$coordinatearg3 = parseCoordinate(entity.rotationYaw, args.length > lvt_5_2_ ? args[lvt_5_2_++] : "~", false);
-                    CommandBase.CoordinateArg commandbase$coordinatearg4 = parseCoordinate(entity.rotationPitch, args.length > lvt_5_2_ ? args[lvt_5_2_] : "~", false);
+                    CoordinateArg commandbase$coordinatearg = parseCoordinate(entity.posX, args[i], true);
+                    CoordinateArg commandbase$coordinatearg1 = parseCoordinate(entity.posY, args[lvt_5_2_++], 0, 0, false);
+                    CoordinateArg commandbase$coordinatearg2 = parseCoordinate(entity.posZ, args[lvt_5_2_++], true);
+                    CoordinateArg commandbase$coordinatearg3 = parseCoordinate(entity.rotationYaw, args.length > lvt_5_2_ ? args[lvt_5_2_++] : "~", false);
+                    CoordinateArg commandbase$coordinatearg4 = parseCoordinate(entity.rotationPitch, args.length > lvt_5_2_ ? args[lvt_5_2_] : "~", false);
 
                     if (entity instanceof EntityPlayerMP) {
                         Set<S08PacketPlayerPosLook.EnumFlags> set = EnumSet.noneOf(S08PacketPlayerPosLook.EnumFlags.class);

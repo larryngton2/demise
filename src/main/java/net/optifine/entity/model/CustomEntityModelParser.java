@@ -68,9 +68,7 @@ public class CustomEntityModelParser {
             processId(jsonobject, map);
             CustomModelRenderer custommodelrenderer = parseCustomModelRenderer(jsonobject, aint, s1);
 
-            if (custommodelrenderer != null) {
-                list.add(custommodelrenderer);
-            }
+            list.add(custommodelrenderer);
         }
 
         CustomModelRenderer[] acustommodelrenderer = (CustomModelRenderer[]) list.toArray(new CustomModelRenderer[0]);
@@ -80,8 +78,7 @@ public class CustomEntityModelParser {
             resourcelocation = getResourceLocation(s1, s2, ".png");
         }
 
-        CustomEntityRenderer customentityrenderer = new CustomEntityRenderer(s, s1, resourcelocation, acustommodelrenderer, f);
-        return customentityrenderer;
+        return new CustomEntityRenderer(s, s1, resourcelocation, acustommodelrenderer, f);
     }
 
     private static void processBaseId(JsonObject elem, Map mapModelJsons) {
@@ -174,7 +171,7 @@ public class CustomEntityModelParser {
         JsonArray jsonarray = (JsonArray) elem.get("animations");
 
         if (jsonarray != null) {
-            List<ModelVariableUpdater> list = new ArrayList();
+            List<ModelVariableUpdater> list = new ArrayList<>();
 
             for (int i = 0; i < jsonarray.size(); ++i) {
                 JsonObject jsonobject = (JsonObject) jsonarray.get(i);
@@ -194,8 +191,7 @@ public class CustomEntityModelParser {
         }
 
         ModelRenderer modelrenderer = PlayerItemParser.parseModelRenderer(elem, modelbase, textureSize, basePath);
-        CustomModelRenderer custommodelrenderer = new CustomModelRenderer(s, flag, modelrenderer, modelupdater);
-        return custommodelrenderer;
+        return new CustomModelRenderer(s, flag, modelrenderer, modelupdater);
     }
 
     private static void checkNull(Object obj, String msg) {
@@ -213,8 +209,7 @@ public class CustomEntityModelParser {
             String s = Config.readInputStream(inputstream, "ASCII");
             inputstream.close();
             JsonParser jsonparser = new JsonParser();
-            JsonObject jsonobject = (JsonObject) jsonparser.parse(s);
-            return jsonobject;
+            return (JsonObject) jsonparser.parse(s);
         }
     }
 }

@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ReflectorForge {
-    public static Object EVENT_RESULT_ALLOW = Reflector.getFieldValue(Reflector.Event_Result_ALLOW);
-    public static Object EVENT_RESULT_DENY = Reflector.getFieldValue(Reflector.Event_Result_DENY);
-    public static Object EVENT_RESULT_DEFAULT = Reflector.getFieldValue(Reflector.Event_Result_DEFAULT);
+    public static final Object EVENT_RESULT_ALLOW = Reflector.getFieldValue(Reflector.Event_Result_ALLOW);
+    public static final Object EVENT_RESULT_DENY = Reflector.getFieldValue(Reflector.Event_Result_DENY);
+    public static final Object EVENT_RESULT_DEFAULT = Reflector.getFieldValue(Reflector.Event_Result_DEFAULT);
 
     public static void FMLClientHandler_trackBrokenTexture(ResourceLocation loc, String message) {
         if (!Reflector.FMLClientHandler_trackBrokenTexture.exists()) {
@@ -66,8 +66,7 @@ public class ReflectorForge {
                 if (abyte == null) {
                     return null;
                 } else {
-                    InputStream inputstream = new ByteArrayInputStream(abyte);
-                    return inputstream;
+                    return new ByteArrayInputStream(abyte);
                 }
             }
         }
@@ -101,7 +100,7 @@ public class ReflectorForge {
             if (list == null) {
                 return new String[0];
             } else {
-                List<String> list1 = new ArrayList();
+                List<String> list1 = new ArrayList<>();
 
                 for (Object object1 : list) {
                     if (Reflector.ModContainer.isInstance(object1)) {
@@ -113,8 +112,7 @@ public class ReflectorForge {
                     }
                 }
 
-                String[] astring = list1.toArray(new String[0]);
-                return astring;
+                return list1.toArray(new String[0]);
             }
         }
     }

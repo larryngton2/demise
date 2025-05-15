@@ -32,9 +32,9 @@ public class GuiCommandBlock extends GuiScreen {
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
         this.buttonList.clear();
-        this.buttonList.add(this.doneBtn = new GuiButton(0, width / 2 - 4 - 150, height / 4 + 120 + 12, 150, 20, I18n.format("gui.done")));
-        this.buttonList.add(this.cancelBtn = new GuiButton(1, width / 2 + 4, height / 4 + 120 + 12, 150, 20, I18n.format("gui.cancel")));
-        this.buttonList.add(this.field_175390_s = new GuiButton(4, width / 2 + 150 - 20, 150, 20, 20, "O"));
+        this.buttonList.add(this.doneBtn = new GuiButton(0, (float) width / 2 - 4 - 150, (float) height / 4 + 120 + 12, 150, 20, I18n.format("gui.done")));
+        this.buttonList.add(this.cancelBtn = new GuiButton(1, (float) width / 2 + 4, (float) height / 4 + 120 + 12, 150, 20, I18n.format("gui.cancel")));
+        this.buttonList.add(this.field_175390_s = new GuiButton(4, (float) width / 2 + 150 - 20, 150, 20, 20, "O"));
         this.commandTextField = new GuiTextField(2, this.fontRendererObj, width / 2 - 150, 50, 300, 20);
         this.commandTextField.setMaxStringLength(32767);
         this.commandTextField.setFocused(true);
@@ -52,7 +52,7 @@ public class GuiCommandBlock extends GuiScreen {
         Keyboard.enableRepeatEvents(false);
     }
 
-    protected void actionPerformed(GuiButton button) throws IOException {
+    protected void actionPerformed(GuiButton button) {
         if (button.enabled) {
             if (button.id == 1) {
                 this.localCommandBlock.setTrackOutput(this.field_175389_t);
@@ -99,7 +99,7 @@ public class GuiCommandBlock extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        drawCenteredString(this.fontRendererObj, I18n.format("advMode.setCommand"), width / 2, 20, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("advMode.setCommand"), (float) width / 2, 20, 16777215);
         this.drawString(this.fontRendererObj, I18n.format("advMode.command"), width / 2 - 150, 37, 10526880);
         this.commandTextField.drawTextBox();
         int i = 75;

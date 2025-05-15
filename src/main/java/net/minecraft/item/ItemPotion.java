@@ -20,7 +20,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,7 +30,7 @@ public class ItemPotion extends Item {
 
     public ItemPotion() {
         this.setMaxStackSize(1);
-        this.setHasSubtypes(true);
+        this.setHasSubtypes();
         this.setMaxDamage(0);
         this.setCreativeTab(CreativeTabs.tabBrewing);
     }
@@ -123,11 +122,10 @@ public class ItemPotion extends Item {
             }
 
             playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
-            return itemStackIn;
         } else {
             playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
-            return itemStackIn;
         }
+        return itemStackIn;
     }
 
     public static boolean isSplash(int meta) {
@@ -152,10 +150,8 @@ public class ItemPotion extends Item {
                 }
             }
 
-            return false;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public String getItemStackDisplayName(ItemStack stack) {
@@ -270,7 +266,7 @@ public class ItemPotion extends Item {
                         if (l != 0) {
                             if (l == 1) {
                                 i1 = lvt_6_1_ | 32;
-                            } else if (l == 2) {
+                            } else {
                                 i1 = lvt_6_1_ | 64;
                             }
                         }

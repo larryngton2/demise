@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class TestExpressions {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         ExpressionParser expressionparser = new ExpressionParser(null);
 
         while (true) {

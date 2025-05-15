@@ -46,7 +46,7 @@ public class ItemAliases {
                 Config.dbg("[Shaders] Delayed loading of item mappings after resources are loaded");
                 updateOnResourcesReloaded = true;
             } else {
-                List<Integer> list = new ArrayList();
+                List<Integer> list = new ArrayList<>();
                 String s = "/shaders/item.properties";
                 InputStream inputstream = shaderPack.getResourceAsStream(s);
 
@@ -71,7 +71,7 @@ public class ItemAliases {
                 ResourceLocation resourcelocation = new ResourceLocation(s, "shaders/item.properties");
                 InputStream inputstream = Config.getResourceStream(resourcelocation);
                 loadItemAliases(inputstream, resourcelocation.toString(), listItemAliases);
-            } catch (IOException var6) {
+            } catch (IOException ignored) {
             }
         }
     }

@@ -130,7 +130,7 @@ public class MapGenStronghold extends MapGenStructure {
             }
 
             this.updateBoundingBox();
-            this.markAvailableHeight(worldIn, p_i2067_2_, 10);
+            this.markAvailableHeight(worldIn, p_i2067_2_);
         }
     }
 }

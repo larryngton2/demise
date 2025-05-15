@@ -25,15 +25,15 @@ public enum EnumChatFormatting {
     LIGHT_PURPLE("LIGHT_PURPLE", 'd', 13),
     YELLOW("YELLOW", 'e', 14),
     WHITE("WHITE", 'f', 15),
-    OBFUSCATED("OBFUSCATED", 'k', true),
-    BOLD("BOLD", 'l', true),
-    STRIKETHROUGH("STRIKETHROUGH", 'm', true),
-    UNDERLINE("UNDERLINE", 'n', true),
-    ITALIC("ITALIC", 'o', true),
+    OBFUSCATED("OBFUSCATED", 'k'),
+    BOLD("BOLD", 'l'),
+    STRIKETHROUGH("STRIKETHROUGH", 'm'),
+    UNDERLINE("UNDERLINE", 'n'),
+    ITALIC("ITALIC", 'o'),
     RESET("RESET", 'r', -1);
 
     private static final Map<String, EnumChatFormatting> nameMapping = Maps.newHashMap();
-    private static final Pattern formattingCodePattern = Pattern.compile("(?i)" + '\u00a7' + "[0-9A-FK-OR]");
+    private static final Pattern formattingCodePattern = Pattern.compile("(?i)" + '§' + "[0-9A-FK-OR]");
     private final String name;
     private final char formattingCode;
     private final boolean fancyStyling;
@@ -48,8 +48,8 @@ public enum EnumChatFormatting {
         this(formattingName, formattingCodeIn, false, colorIndex);
     }
 
-    EnumChatFormatting(String formattingName, char formattingCodeIn, boolean fancyStylingIn) {
-        this(formattingName, formattingCodeIn, fancyStylingIn, -1);
+    EnumChatFormatting(String formattingName, char formattingCodeIn) {
+        this(formattingName, formattingCodeIn, true, -1);
     }
 
     EnumChatFormatting(String formattingName, char formattingCodeIn, boolean fancyStylingIn, int colorIndex) {
@@ -57,7 +57,7 @@ public enum EnumChatFormatting {
         this.formattingCode = formattingCodeIn;
         this.fancyStyling = fancyStylingIn;
         this.colorIndex = colorIndex;
-        this.controlString = "\u00a7" + formattingCodeIn;
+        this.controlString = "§" + formattingCodeIn;
     }
 
     public int getColorIndex() {

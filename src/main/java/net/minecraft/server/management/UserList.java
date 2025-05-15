@@ -8,6 +8,7 @@ import com.google.gson.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,11 +26,11 @@ public class UserList<K, V extends UserListEntry<K>> {
     private final Map<String, V> values = Maps.newHashMap();
     private boolean lanServer = true;
     private static final ParameterizedType saveFileFormat = new ParameterizedType() {
-        public Type[] getActualTypeArguments() {
+        public Type @NotNull [] getActualTypeArguments() {
             return new Type[]{UserListEntry.class};
         }
 
-        public Type getRawType() {
+        public @NotNull Type getRawType() {
             return List.class;
         }
 
@@ -104,8 +105,8 @@ public class UserList<K, V extends UserListEntry<K>> {
         }
     }
 
-    protected UserListEntry<K> createEntry(JsonObject entryData) {
-        return new UserListEntry(null, entryData);
+    protected UserListEntry createEntry(JsonObject entryData) {
+        return new UserListEntry<>(null, entryData);
     }
 
     protected Map<String, V> getValues() {
@@ -138,8 +139,7 @@ public class UserList<K, V extends UserListEntry<K>> {
         public UserListEntry<K> deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException {
             if (p_deserialize_1_.isJsonObject()) {
                 JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-                UserListEntry<K> userlistentry = UserList.this.createEntry(jsonobject);
-                return userlistentry;
+                return (UserListEntry<K>) UserList.this.createEntry(jsonobject);
             } else {
                 return null;
             }

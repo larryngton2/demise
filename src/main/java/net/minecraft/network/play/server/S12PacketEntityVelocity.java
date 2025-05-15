@@ -53,14 +53,14 @@ public class S12PacketEntityVelocity implements Packet<INetHandlerPlayClient> {
         this.motionZ = (int) (motionZIn * 8000.0D);
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityID = buf.readVarIntFromBuffer();
         this.motionX = buf.readShort();
         this.motionY = buf.readShort();
         this.motionZ = buf.readShort();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityID);
         buf.writeShort(this.motionX);
         buf.writeShort(this.motionY);

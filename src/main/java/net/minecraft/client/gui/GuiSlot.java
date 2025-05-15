@@ -27,7 +27,7 @@ public abstract class GuiSlot {
     protected float amountScrolled;
     protected int selectedElement = -1;
     protected long lastClicked;
-    protected boolean field_178041_q = true;
+    protected final boolean field_178041_q = true;
     protected boolean showSelectionBox = true;
     protected boolean hasListHeader;
     protected int headerPadding;
@@ -57,11 +57,11 @@ public abstract class GuiSlot {
         this.showSelectionBox = showSelectionBoxIn;
     }
 
-    protected void setHasListHeader(boolean hasListHeaderIn, int headerPaddingIn) {
-        this.hasListHeader = hasListHeaderIn;
+    protected void setHasListHeader(int headerPaddingIn) {
+        this.hasListHeader = true;
         this.headerPadding = headerPaddingIn;
 
-        if (!hasListHeaderIn) {
+        if (!true) {
             this.headerPadding = 0;
         }
     }
@@ -165,8 +165,8 @@ public abstract class GuiSlot {
             GlStateManager.disableDepth();
             int i1 = 4;
             //todo this is a mark btw
-            this.overlayBackground(0, this.top, 255, 255);
-            this.overlayBackground(this.bottom, this.height, 255, 255);
+            this.overlayBackground(0, this.top);
+            this.overlayBackground(this.bottom, this.height);
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1);
             GlStateManager.disableAlpha();
@@ -300,7 +300,7 @@ public abstract class GuiSlot {
             if (i2 != 0) {
                 if (i2 > 0) {
                     i2 = -1;
-                } else if (i2 < 0) {
+                } else {
                     i2 = 1;
                 }
 
@@ -362,17 +362,17 @@ public abstract class GuiSlot {
         return this.width / 2 + 124;
     }
 
-    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha) {
+    protected void overlayBackground(int startY, int endY) {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         this.mc.getTextureManager().bindTexture(Gui.optionsBackground);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        worldrenderer.pos(this.left, endY, 0.0D).tex(0.0D, (float) endY / 32.0F).color(64, 64, 64, endAlpha).endVertex();
-        worldrenderer.pos(this.left + this.width, endY, 0.0D).tex((float) this.width / 32.0F, (float) endY / 32.0F).color(64, 64, 64, endAlpha).endVertex();
-        worldrenderer.pos(this.left + this.width, startY, 0.0D).tex((float) this.width / 32.0F, (float) startY / 32.0F).color(64, 64, 64, startAlpha).endVertex();
-        worldrenderer.pos(this.left, startY, 0.0D).tex(0.0D, (float) startY / 32.0F).color(64, 64, 64, startAlpha).endVertex();
+        worldrenderer.pos(this.left, endY, 0.0D).tex(0.0D, (float) endY / 32.0F).color(64, 64, 64, 255).endVertex();
+        worldrenderer.pos(this.left + this.width, endY, 0.0D).tex((float) this.width / 32.0F, (float) endY / 32.0F).color(64, 64, 64, 255).endVertex();
+        worldrenderer.pos(this.left + this.width, startY, 0.0D).tex((float) this.width / 32.0F, (float) startY / 32.0F).color(64, 64, 64, 255).endVertex();
+        worldrenderer.pos(this.left, startY, 0.0D).tex(0.0D, (float) startY / 32.0F).color(64, 64, 64, 255).endVertex();
         tessellator.draw();
     }
 

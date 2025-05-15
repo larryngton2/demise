@@ -74,7 +74,7 @@ public class S0EPacketSpawnObject implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readVarIntFromBuffer();
         this.type = buf.readByte();
         this.x = buf.readInt();
@@ -91,7 +91,7 @@ public class S0EPacketSpawnObject implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityId);
         buf.writeByte(this.type);
         buf.writeInt(this.x);

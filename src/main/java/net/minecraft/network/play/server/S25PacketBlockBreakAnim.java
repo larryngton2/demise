@@ -21,13 +21,13 @@ public class S25PacketBlockBreakAnim implements Packet<INetHandlerPlayClient> {
         this.progress = progress;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.breakerId = buf.readVarIntFromBuffer();
         this.position = buf.readBlockPos();
         this.progress = buf.readUnsignedByte();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.breakerId);
         buf.writeBlockPos(this.position);
         buf.writeByte(this.progress);

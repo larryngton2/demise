@@ -19,7 +19,7 @@ import java.util.List;
 public class ChunkProviderClient implements IChunkProvider {
     private static final Logger logger = LogManager.getLogger();
     private final Chunk blankChunk;
-    private final LongHashMap<Chunk> chunkMapping = new LongHashMap();
+    private final LongHashMap<Chunk> chunkMapping = new LongHashMap<>();
     private final List<Chunk> chunkListing = Lists.newArrayList();
     private final World worldObj;
 
@@ -43,12 +43,11 @@ public class ChunkProviderClient implements IChunkProvider {
         this.chunkListing.remove(chunk);
     }
 
-    public Chunk loadChunk(int chunkX, int chunkZ) {
+    public void loadChunk(int chunkX, int chunkZ) {
         Chunk chunk = new Chunk(this.worldObj, chunkX, chunkZ);
         this.chunkMapping.add(ChunkCoordIntPair.chunkXZ2Int(chunkX, chunkZ), chunk);
         this.chunkListing.add(chunk);
         chunk.setChunkLoaded(true);
-        return chunk;
     }
 
     public Chunk provideChunk(int x, int z) {
@@ -56,8 +55,7 @@ public class ChunkProviderClient implements IChunkProvider {
         return chunk == null ? this.blankChunk : chunk;
     }
 
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
-        return true;
+    public void saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback) {
     }
 
     public void saveExtraData() {

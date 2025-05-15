@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import com.google.common.base.Predicate;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyInteger;
@@ -138,8 +137,7 @@ public class BlockStem extends BlockBush implements IGrowable {
     }
 
     public Item getItem(World worldIn, BlockPos pos) {
-        Item item = this.getSeedItem();
-        return item;
+        return this.getSeedItem();
     }
 
     public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient) {

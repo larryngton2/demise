@@ -122,7 +122,7 @@ public class CommandStats extends CommandBase {
 
                     CommandResultStats.setScoreBoardStat(commandresultstats, commandresultstats$type, s1, s2);
                     notifyOperators(sender, this, "commands.stats.success", commandresultstats$type.getTypeName(), s2, s1);
-                } else if ("clear".equals(s)) {
+                } else {
                     CommandResultStats.setScoreBoardStat(commandresultstats, commandresultstats$type, null, null);
                     notifyOperators(sender, this, "commands.stats.cleared", commandresultstats$type.getTypeName());
                 }

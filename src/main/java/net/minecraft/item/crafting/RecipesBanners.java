@@ -127,7 +127,7 @@ public class RecipesBanners {
                         boolean flag1 = false;
                         boolean flag2 = false;
 
-                        for (int i = 0; i < p_179533_1_.getSizeInventory() && flag; ++i) {
+                        for (int i = 0; i < p_179533_1_.getSizeInventory(); ++i) {
                             ItemStack itemstack = p_179533_1_.getStackInSlot(i);
 
                             if (itemstack != null && itemstack.getItem() != Items.banner) {
@@ -155,7 +155,7 @@ public class RecipesBanners {
                     } else if (p_179533_1_.getSizeInventory() == tileentitybanner$enumbannerpattern.getCraftingLayers().length * tileentitybanner$enumbannerpattern.getCraftingLayers()[0].length()) {
                         int j = -1;
 
-                        for (int k = 0; k < p_179533_1_.getSizeInventory() && flag; ++k) {
+                        for (int k = 0; k < p_179533_1_.getSizeInventory(); ++k) {
                             int l = k / 3;
                             int i1 = k % 3;
                             ItemStack itemstack1 = p_179533_1_.getStackInSlot(k);

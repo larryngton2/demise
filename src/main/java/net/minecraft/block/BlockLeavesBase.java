@@ -8,9 +8,9 @@ import net.minecraft.world.IBlockAccess;
 public class BlockLeavesBase extends Block {
     protected boolean fancyGraphics;
 
-    protected BlockLeavesBase(Material materialIn, boolean fancyGraphics) {
-        super(materialIn);
-        this.fancyGraphics = fancyGraphics;
+    protected BlockLeavesBase() {
+        super(Material.leaves);
+        this.fancyGraphics = false;
     }
 
     public boolean isOpaqueCube() {

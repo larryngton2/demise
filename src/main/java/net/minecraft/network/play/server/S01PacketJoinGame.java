@@ -33,7 +33,7 @@ public class S01PacketJoinGame implements Packet<INetHandlerPlayClient> {
         this.reducedDebugInfo = reducedDebugInfoIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityId = buf.readInt();
         int i = buf.readUnsignedByte();
         this.hardcoreMode = (i & 8) == 8;
@@ -51,7 +51,7 @@ public class S01PacketJoinGame implements Packet<INetHandlerPlayClient> {
         this.reducedDebugInfo = buf.readBoolean();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeInt(this.entityId);
         int i = this.gameType.getID();
 

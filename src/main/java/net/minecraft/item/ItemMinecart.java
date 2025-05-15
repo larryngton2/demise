@@ -61,9 +61,6 @@ public class ItemMinecart extends Item {
             return stack;
         }
 
-        protected void playDispenseSound(IBlockSource source) {
-            source.getWorld().playAuxSFX(1000, source.getBlockPos(), 0);
-        }
     };
     private final EntityMinecart.EnumMinecartType minecartType;
 

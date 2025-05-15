@@ -24,7 +24,7 @@ public class LanguageManager implements IResourceManagerReloadListener {
     public LanguageManager(IMetadataSerializer theMetadataSerializerIn, String currentLanguageIn) {
         this.theMetadataSerializer = theMetadataSerializerIn;
         this.currentLanguage = currentLanguageIn;
-        I18n.setLocale(currentLocale);
+        I18n.setLocale();
     }
 
     public void parseLanguageMetadata(List<IResourcePack> resourcesPacks) {
@@ -42,7 +42,7 @@ public class LanguageManager implements IResourceManagerReloadListener {
                     }
                 }
             } catch (RuntimeException | IOException runtimeexception) {
-                logger.warn("Unable to parse metadata section of resourcepack: " + iresourcepack.getPackName(), runtimeexception);
+                logger.warn("Unable to parse metadata section of resourcepack: {}", iresourcepack.getPackName(), runtimeexception);
             }
         }
     }

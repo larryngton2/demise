@@ -10,10 +10,10 @@ import java.util.List;
 public class GuiLabel extends Gui {
     protected int field_146167_a = 200;
     protected int field_146161_f = 20;
-    public int field_146162_g;
+    public final int field_146162_g;
     public int field_146174_h;
     private final List<String> field_146173_k;
-    public int field_175204_i;
+    public final int field_175204_i;
     private boolean centered;
     public boolean visible = true;
     private final boolean labelBgEnabled;
@@ -60,7 +60,7 @@ public class GuiLabel extends Gui {
 
             for (int k = 0; k < this.field_146173_k.size(); ++k) {
                 if (this.centered) {
-                    drawCenteredString(this.fontRenderer, this.field_146173_k.get(k), this.field_146162_g + this.field_146167_a / 2, j + k * 10, this.field_146168_n);
+                    drawCenteredString(this.fontRenderer, this.field_146173_k.get(k), this.field_146162_g + (float) this.field_146167_a / 2, j + k * 10, this.field_146168_n);
                 } else {
                     this.drawString(this.fontRenderer, this.field_146173_k.get(k), this.field_146162_g, j + k * 10, this.field_146168_n);
                 }

@@ -66,9 +66,7 @@ public class BlockDaylightDetector extends BlockContainer {
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (playerIn.isAllowEdit()) {
-            if (worldIn.isRemote) {
-                return true;
-            } else {
+            if (!worldIn.isRemote) {
                 if (this.inverted) {
                     worldIn.setBlockState(pos, Blocks.daylight_detector.getDefaultState().withProperty(POWER, state.getValue(POWER)), 4);
                     Blocks.daylight_detector.updatePower(worldIn, pos);
@@ -77,8 +75,8 @@ public class BlockDaylightDetector extends BlockContainer {
                     Blocks.daylight_detector_inverted.updatePower(worldIn, pos);
                 }
 
-                return true;
             }
+            return true;
         } else {
             return super.onBlockActivated(worldIn, pos, state, playerIn, side, hitX, hitY, hitZ);
         }

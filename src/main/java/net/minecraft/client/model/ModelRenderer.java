@@ -28,14 +28,14 @@ public class ModelRenderer {
     public boolean mirror;
     public boolean showModel;
     public boolean isHidden;
-    public List<ModelBox> cubeList;
+    public final List<ModelBox> cubeList;
     public List<ModelRenderer> childModels;
     public final String boxName;
     private final ModelBase baseModel;
     public float offsetX;
     public float offsetY;
     public float offsetZ;
-    public List spriteList;
+    public final List spriteList;
     public boolean mirrorV;
     public float scaleX;
     public float scaleY;
@@ -375,9 +375,7 @@ public class ModelRenderer {
     }
 
     public ModelRenderer getChild(String p_getChild_1_) {
-        if (p_getChild_1_ == null) {
-            return null;
-        } else {
+        if (p_getChild_1_ != null) {
             if (this.childModels != null) {
                 for (ModelRenderer modelrenderer : this.childModels) {
                     if (p_getChild_1_.equals(modelrenderer.getId())) {
@@ -386,8 +384,8 @@ public class ModelRenderer {
                 }
             }
 
-            return null;
         }
+        return null;
     }
 
     public ModelRenderer getChildDeep(String p_getChildDeep_1_) {

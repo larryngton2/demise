@@ -31,13 +31,13 @@ public class ChannelLWJGL3OpenAL extends Channel {
             try {
                 AL10.alSourceStopv(this.ALSource);
                 AL10.alGetError();
-            } catch (Exception var3) {
+            } catch (Exception ignored) {
             }
 
             try {
                 AL10.alDeleteSources(this.ALSource);
                 AL10.alGetError();
-            } catch (Exception var2) {
+            } catch (Exception ignored) {
             }
 
             this.ALSource.clear();
@@ -47,16 +47,15 @@ public class ChannelLWJGL3OpenAL extends Channel {
         super.cleanup();
     }
 
-    public boolean attachBuffer(IntBuffer buf) {
+    public void attachBuffer(IntBuffer buf) {
         if (this.errorCheck(this.channelType != 0, "Sound buffers may only be attached to normal sources.")) {
-            return false;
         } else {
             AL10.alSourcei(this.ALSource.get(0), 4105, buf.get(0));
             if (this.attachedSource != null && this.attachedSource.soundBuffer != null && this.attachedSource.soundBuffer.audioFormat != null) {
                 this.setAudioFormat(this.attachedSource.soundBuffer.audioFormat);
             }
 
-            return this.checkALError();
+            this.checkALError();
         }
     }
 
@@ -306,7 +305,7 @@ public class ChannelLWJGL3OpenAL extends Channel {
         try {
             AL10.alSourceStop(this.ALSource.get(0));
             AL10.alGetError();
-        } catch (Exception var2) {
+        } catch (Exception ignored) {
         }
 
         if (this.channelType == 1) {

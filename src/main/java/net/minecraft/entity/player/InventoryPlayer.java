@@ -15,13 +15,11 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ReportedException;
 
-import java.util.concurrent.Callable;
-
 public class InventoryPlayer implements IInventory {
     public ItemStack[] mainInventory = new ItemStack[36];
     public ItemStack[] armorInventory = new ItemStack[4];
     public int currentItem;
-    public EntityPlayer player;
+    public final EntityPlayer player;
     private ItemStack itemStack;
     public boolean inventoryChanged;
 
@@ -230,14 +228,12 @@ public class InventoryPlayer implements IInventory {
                 k = this.getInventoryStackLimit() - this.mainInventory[j].stackSize;
             }
 
-            if (k == 0) {
-                return i;
-            } else {
+            if (k != 0) {
                 i = i - k;
                 this.mainInventory[j].stackSize += k;
                 this.mainInventory[j].animationsToGo = 5;
-                return i;
             }
+            return i;
         }
     }
 
@@ -249,17 +245,15 @@ public class InventoryPlayer implements IInventory {
         }
     }
 
-    public boolean consumeInventoryItem(Item itemIn) {
+    public void consumeInventoryItem(Item itemIn) {
         int i = this.getInventorySlotContainItem(itemIn);
 
         if (i < 0) {
-            return false;
         } else {
             if (--this.mainInventory[i].stackSize <= 0) {
                 this.mainInventory[i] = null;
             }
 
-            return true;
         }
     }
 
@@ -288,14 +282,11 @@ public class InventoryPlayer implements IInventory {
                 } else {
                     int i;
 
-                    while (true) {
+                    do {
                         i = itemStackIn.stackSize;
                         itemStackIn.stackSize = this.storePartialItemStack(itemStackIn);
 
-                        if (itemStackIn.stackSize <= 0 || itemStackIn.stackSize >= i) {
-                            break;
-                        }
-                    }
+                    } while (itemStackIn.stackSize > 0 && itemStackIn.stackSize < i);
 
                     if (itemStackIn.stackSize == i && this.player.capabilities.isCreativeMode) {
                         itemStackIn.stackSize = 0;
@@ -309,7 +300,7 @@ public class InventoryPlayer implements IInventory {
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being added");
                 crashreportcategory.addCrashSection("Item ID", Item.getIdFromItem(itemStackIn.getItem()));
                 crashreportcategory.addCrashSection("Item data", itemStackIn.getMetadata());
-                crashreportcategory.addCrashSectionCallable("Item name", () -> itemStackIn.getDisplayName());
+                crashreportcategory.addCrashSectionCallable("Item name", itemStackIn::getDisplayName);
                 throw new ReportedException(crashreport);
             }
         } else {
@@ -414,7 +405,7 @@ public class InventoryPlayer implements IInventory {
             ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttagcompound);
 
             if (itemstack != null) {
-                if (j >= 0 && j < this.mainInventory.length) {
+                if (j < this.mainInventory.length) {
                     this.mainInventory[j] = itemstack;
                 }
 

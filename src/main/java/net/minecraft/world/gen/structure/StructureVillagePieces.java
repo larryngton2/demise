@@ -21,7 +21,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -174,9 +173,8 @@ public class StructureVillagePieces {
         }
     }
 
-    private static StructureComponent func_176069_e(StructureVillagePieces.Start start, List<StructureComponent> p_176069_1_, Random rand, int p_176069_3_, int p_176069_4_, int p_176069_5_, EnumFacing facing, int p_176069_7_) {
+    private static void func_176069_e(Start start, List<StructureComponent> p_176069_1_, Random rand, int p_176069_3_, int p_176069_4_, int p_176069_5_, EnumFacing facing, int p_176069_7_) {
         if (p_176069_7_ > 3 + start.terrainType) {
-            return null;
         } else if (Math.abs(p_176069_3_ - start.getBoundingBox().minX) <= 112 && Math.abs(p_176069_5_ - start.getBoundingBox().minZ) <= 112) {
             StructureBoundingBox structureboundingbox = StructureVillagePieces.Path.func_175848_a(start, p_176069_1_, rand, p_176069_3_, p_176069_4_, p_176069_5_, facing);
 
@@ -191,13 +189,10 @@ public class StructureVillagePieces {
                 if (start.getWorldChunkManager().areBiomesViable(i, j, i1 / 2 + 4, MapGenVillage.villageSpawnBiomes)) {
                     p_176069_1_.add(structurecomponent);
                     start.field_74930_j.add(structurecomponent);
-                    return structurecomponent;
                 }
             }
 
-            return null;
         } else {
-            return null;
         }
     }
 
@@ -281,7 +276,7 @@ public class StructureVillagePieces {
 
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 2, 1, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 2, 2, 0, structureBoundingBoxIn);
-            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 2, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 2, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
 
             if (this.getBlockStateFromPos(worldIn, 2, 0, -1, structureBoundingBoxIn).getBlock().getMaterial() == Material.air && this.getBlockStateFromPos(worldIn, 2, -1, -1, structureBoundingBoxIn).getBlock().getMaterial() != Material.air) {
                 this.setBlockState(worldIn, Blocks.stone_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.stone_stairs, 3)), 2, 0, -1, structureBoundingBoxIn);
@@ -294,7 +289,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 2, 1);
             return true;
         }
 
@@ -555,7 +550,7 @@ public class StructureVillagePieces {
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 2, 1, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 2, 2, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, this.coordBaseMode), 2, 3, 1, structureBoundingBoxIn);
-            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 2, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 2, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
 
             if (this.getBlockStateFromPos(worldIn, 2, 0, -1, structureBoundingBoxIn).getBlock().getMaterial() == Material.air && this.getBlockStateFromPos(worldIn, 2, -1, -1, structureBoundingBoxIn).getBlock().getMaterial() != Material.air) {
                 this.setBlockState(worldIn, Blocks.stone_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.stone_stairs, 3)), 2, 0, -1, structureBoundingBoxIn);
@@ -564,7 +559,7 @@ public class StructureVillagePieces {
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 6, 1, 5, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 6, 2, 5, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, this.coordBaseMode.getOpposite()), 6, 3, 4, structureBoundingBoxIn);
-            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 6, 1, 5, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 6, 5, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
 
             for (int i1 = 0; i1 < 5; ++i1) {
                 for (int j1 = 0; j1 < 9; ++j1) {
@@ -573,7 +568,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 2, 2);
             return true;
         }
 
@@ -670,7 +665,7 @@ public class StructureVillagePieces {
             this.setBlockState(worldIn, Blocks.crafting_table.getDefaultState(), 7, 1, 1, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 1, 1, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 1, 2, 0, structureBoundingBoxIn);
-            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 1, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
 
             if (this.getBlockStateFromPos(worldIn, 1, 0, -1, structureBoundingBoxIn).getBlock().getMaterial() == Material.air && this.getBlockStateFromPos(worldIn, 1, -1, -1, structureBoundingBoxIn).getBlock().getMaterial() != Material.air) {
                 this.setBlockState(worldIn, Blocks.stone_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.stone_stairs, 3)), 1, 0, -1, structureBoundingBoxIn);
@@ -683,7 +678,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 2, 1);
             return true;
         }
 
@@ -785,7 +780,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1);
             return true;
         }
 
@@ -906,7 +901,7 @@ public class StructureVillagePieces {
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 2, 1, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 2, 2, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, this.coordBaseMode), 2, 3, 1, structureBoundingBoxIn);
-            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 2, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 2, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
             this.fillWithBlocks(worldIn, structureBoundingBoxIn, 1, 0, -1, 3, 2, -1, Blocks.air.getDefaultState(), Blocks.air.getDefaultState(), false);
 
             if (this.getBlockStateFromPos(worldIn, 2, 0, -1, structureBoundingBoxIn).getBlock().getMaterial() == Material.air && this.getBlockStateFromPos(worldIn, 2, -1, -1, structureBoundingBoxIn).getBlock().getMaterial() != Material.air) {
@@ -927,7 +922,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 2, 2);
             return true;
         }
     }
@@ -1042,7 +1037,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 2, 1);
             return true;
         }
     }
@@ -1074,7 +1069,7 @@ public class StructureVillagePieces {
             boolean flag = false;
 
             for (int i = rand.nextInt(5); i < this.length - 8; i += 2 + rand.nextInt(5)) {
-                StructureComponent structurecomponent = this.getNextComponentNN((StructureVillagePieces.Start) componentIn, listIn, rand, 0, i);
+                StructureComponent structurecomponent = this.getNextComponentNN((StructureVillagePieces.Start) componentIn, listIn, rand, i);
 
                 if (structurecomponent != null) {
                     i += Math.max(structurecomponent.boundingBox.getXSize(), structurecomponent.boundingBox.getZSize());
@@ -1083,7 +1078,7 @@ public class StructureVillagePieces {
             }
 
             for (int j = rand.nextInt(5); j < this.length - 8; j += 2 + rand.nextInt(5)) {
-                StructureComponent structurecomponent1 = this.getNextComponentPP((StructureVillagePieces.Start) componentIn, listIn, rand, 0, j);
+                StructureComponent structurecomponent1 = this.getNextComponentPP((StructureVillagePieces.Start) componentIn, listIn, rand, j);
 
                 if (structurecomponent1 != null) {
                     j += Math.max(structurecomponent1.boundingBox.getXSize(), structurecomponent1.boundingBox.getZSize());
@@ -1163,10 +1158,10 @@ public class StructureVillagePieces {
     }
 
     public static class PieceWeight {
-        public Class<? extends StructureVillagePieces.Village> villagePieceClass;
+        public final Class<? extends StructureVillagePieces.Village> villagePieceClass;
         public final int villagePieceWeight;
         public int villagePiecesSpawned;
-        public int villagePiecesLimit;
+        public final int villagePiecesLimit;
 
         public PieceWeight(Class<? extends StructureVillagePieces.Village> p_i2098_1_, int p_i2098_2_, int p_i2098_3_) {
             this.villagePieceClass = p_i2098_1_;
@@ -1198,8 +1193,8 @@ public class StructureVillagePieces {
         public int terrainType;
         public StructureVillagePieces.PieceWeight structVillagePieceWeight;
         public List<StructureVillagePieces.PieceWeight> structureVillageWeightedPieceList;
-        public List<StructureComponent> field_74932_i = Lists.newArrayList();
-        public List<StructureComponent> field_74930_j = Lists.newArrayList();
+        public final List<StructureComponent> field_74932_i = Lists.newArrayList();
+        public final List<StructureComponent> field_74930_j = Lists.newArrayList();
 
         public Start() {
         }
@@ -1287,40 +1282,40 @@ public class StructureVillagePieces {
             this.isDesertVillage = tagCompound.getBoolean("Desert");
         }
 
-        protected StructureComponent getNextComponentNN(StructureVillagePieces.Start start, List<StructureComponent> p_74891_2_, Random rand, int p_74891_4_, int p_74891_5_) {
+        protected StructureComponent getNextComponentNN(Start start, List<StructureComponent> p_74891_2_, Random rand, int p_74891_5_) {
             if (this.coordBaseMode != null) {
                 switch (this.coordBaseMode) {
                     case NORTH:
-                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX - 1, this.boundingBox.minY + p_74891_4_, this.boundingBox.minZ + p_74891_5_, EnumFacing.WEST, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX - 1, this.boundingBox.minY + 0, this.boundingBox.minZ + p_74891_5_, EnumFacing.WEST, this.getComponentType());
 
                     case SOUTH:
-                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX - 1, this.boundingBox.minY + p_74891_4_, this.boundingBox.minZ + p_74891_5_, EnumFacing.WEST, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX - 1, this.boundingBox.minY + 0, this.boundingBox.minZ + p_74891_5_, EnumFacing.WEST, this.getComponentType());
 
                     case WEST:
-                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX + p_74891_5_, this.boundingBox.minY + p_74891_4_, this.boundingBox.minZ - 1, EnumFacing.NORTH, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX + p_74891_5_, this.boundingBox.minY + 0, this.boundingBox.minZ - 1, EnumFacing.NORTH, this.getComponentType());
 
                     case EAST:
-                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX + p_74891_5_, this.boundingBox.minY + p_74891_4_, this.boundingBox.minZ - 1, EnumFacing.NORTH, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74891_2_, rand, this.boundingBox.minX + p_74891_5_, this.boundingBox.minY + 0, this.boundingBox.minZ - 1, EnumFacing.NORTH, this.getComponentType());
                 }
             }
 
             return null;
         }
 
-        protected StructureComponent getNextComponentPP(StructureVillagePieces.Start start, List<StructureComponent> p_74894_2_, Random rand, int p_74894_4_, int p_74894_5_) {
+        protected StructureComponent getNextComponentPP(Start start, List<StructureComponent> p_74894_2_, Random rand, int p_74894_5_) {
             if (this.coordBaseMode != null) {
                 switch (this.coordBaseMode) {
                     case NORTH:
-                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.maxX + 1, this.boundingBox.minY + p_74894_4_, this.boundingBox.minZ + p_74894_5_, EnumFacing.EAST, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.maxX + 1, this.boundingBox.minY + 0, this.boundingBox.minZ + p_74894_5_, EnumFacing.EAST, this.getComponentType());
 
                     case SOUTH:
-                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.maxX + 1, this.boundingBox.minY + p_74894_4_, this.boundingBox.minZ + p_74894_5_, EnumFacing.EAST, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.maxX + 1, this.boundingBox.minY + 0, this.boundingBox.minZ + p_74894_5_, EnumFacing.EAST, this.getComponentType());
 
                     case WEST:
-                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.minX + p_74894_5_, this.boundingBox.minY + p_74894_4_, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.minX + p_74894_5_, this.boundingBox.minY + 0, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, this.getComponentType());
 
                     case EAST:
-                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.minX + p_74894_5_, this.boundingBox.minY + p_74894_4_, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, this.getComponentType());
+                        return StructureVillagePieces.func_176066_d(start, p_74894_2_, rand, this.boundingBox.minX + p_74894_5_, this.boundingBox.minY + 0, this.boundingBox.maxZ + 1, EnumFacing.SOUTH, this.getComponentType());
                 }
             }
 
@@ -1354,11 +1349,11 @@ public class StructureVillagePieces {
             return p_74895_0_ != null && p_74895_0_.minY > 10;
         }
 
-        protected void spawnVillagers(World worldIn, StructureBoundingBox p_74893_2_, int p_74893_3_, int p_74893_4_, int p_74893_5_, int p_74893_6_) {
+        protected void spawnVillagers(World worldIn, StructureBoundingBox p_74893_2_, int p_74893_3_, int p_74893_5_, int p_74893_6_) {
             if (this.villagersSpawned < p_74893_6_) {
                 for (int i = this.villagersSpawned; i < p_74893_6_; ++i) {
                     int j = this.getXWithOffset(p_74893_3_ + i, p_74893_5_);
-                    int k = this.getYWithOffset(p_74893_4_);
+                    int k = this.getYWithOffset(1);
                     int l = this.getZWithOffset(p_74893_3_ + i, p_74893_5_);
 
                     if (!p_74893_2_.isVecInside(new BlockPos(j, k, l))) {
@@ -1576,7 +1571,7 @@ public class StructureVillagePieces {
 
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 1, 1, 0, structureBoundingBoxIn);
             this.setBlockState(worldIn, Blocks.air.getDefaultState(), 1, 2, 0, structureBoundingBoxIn);
-            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 1, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
+            this.placeDoorCurrentPosition(worldIn, structureBoundingBoxIn, randomIn, 1, 0, EnumFacing.getHorizontal(this.getMetadataWithOffset(Blocks.oak_door, 1)));
 
             if (this.getBlockStateFromPos(worldIn, 1, 0, -1, structureBoundingBoxIn).getBlock().getMaterial() == Material.air && this.getBlockStateFromPos(worldIn, 1, -1, -1, structureBoundingBoxIn).getBlock().getMaterial() != Material.air) {
                 this.setBlockState(worldIn, Blocks.stone_stairs.getStateFromMeta(this.getMetadataWithOffset(Blocks.stone_stairs, 3)), 1, 0, -1, structureBoundingBoxIn);
@@ -1589,7 +1584,7 @@ public class StructureVillagePieces {
                 }
             }
 
-            this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1);
+            this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 2, 1);
             return true;
         }
     }

@@ -16,11 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 public abstract class MapGenStructure extends MapGenBase {
     private MapGenStructureData structureData;
-    protected Map<Long, StructureStart> structureMap = Maps.newHashMap();
+    protected final Map<Long, StructureStart> structureMap = Maps.newHashMap();
 
     public abstract String getStructureName();
 

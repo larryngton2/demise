@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public interface IChatComponent extends Iterable<IChatComponent> {
-    IChatComponent setChatStyle(ChatStyle style);
+    void setChatStyle(ChatStyle style);
 
     ChatStyle getChatStyle();
 

@@ -61,9 +61,7 @@ public class BlockBrewingStand extends BlockContainer {
     }
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (worldIn.isRemote) {
-            return true;
-        } else {
+        if (!worldIn.isRemote) {
             TileEntity tileentity = worldIn.getTileEntity(pos);
 
             if (tileentity instanceof TileEntityBrewingStand) {
@@ -71,8 +69,8 @@ public class BlockBrewingStand extends BlockContainer {
                 playerIn.triggerAchievement(StatList.field_181729_M);
             }
 
-            return true;
         }
+        return true;
     }
 
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {

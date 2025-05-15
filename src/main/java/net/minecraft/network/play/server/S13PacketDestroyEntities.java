@@ -16,7 +16,7 @@ public class S13PacketDestroyEntities implements Packet<INetHandlerPlayClient> {
         this.entityIDs = entityIDsIn;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.entityIDs = new int[buf.readVarIntFromBuffer()];
 
         for (int i = 0; i < this.entityIDs.length; ++i) {
@@ -24,7 +24,7 @@ public class S13PacketDestroyEntities implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.entityIDs.length);
 
         for (int entityID : this.entityIDs) {

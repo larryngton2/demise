@@ -23,8 +23,8 @@ public class ConnectedParser {
     private String context = null;
     public static final VillagerProfession[] PROFESSIONS_INVALID = new VillagerProfession[0];
     public static final EnumDyeColor[] DYE_COLORS_INVALID = new EnumDyeColor[0];
-    private static final INameGetter<Enum> NAME_GETTER_ENUM = en -> en.name();
-    private static final INameGetter<EnumDyeColor> NAME_GETTER_DYE_COLOR = col -> col.getName();
+    private static final INameGetter<Enum> NAME_GETTER_ENUM = Enum::name;
+    private static final INameGetter<EnumDyeColor> NAME_GETTER_DYE_COLOR = EnumDyeColor::getName;
 
     public ConnectedParser(String context) {
         this.context = context;
@@ -67,8 +67,7 @@ public class ConnectedParser {
                 }
             }
 
-            MatchBlock[] amatchblock1 = (MatchBlock[]) list.toArray(new MatchBlock[0]);
-            return amatchblock1;
+            return (MatchBlock[]) list.toArray(new MatchBlock[0]);
         }
     }
 
@@ -191,8 +190,7 @@ public class ConnectedParser {
                 this.warn("Block not found for name: " + s);
                 return null;
             } else {
-                Block[] ablock = new Block[]{block};
-                return ablock;
+                return new Block[]{block};
             }
         }
     }
@@ -204,12 +202,11 @@ public class ConnectedParser {
             String s = params[0];
 
             if (this.startsWithDigit(s)) {
-                int[] aint = this.parseIntList(s);
-                return aint;
+                return this.parseIntList(s);
             } else {
                 IBlockState iblockstate = block.getDefaultState();
                 Collection collection = iblockstate.getPropertyNames();
-                Map<IProperty, List<Comparable>> map = new HashMap();
+                Map<IProperty, List<Comparable>> map = new HashMap<>();
 
                 for (String s1 : params) {
                     if (!s1.isEmpty()) {
@@ -232,7 +229,7 @@ public class ConnectedParser {
                         List<Comparable> list = map.get(s2);
 
                         if (list == null) {
-                            list = new ArrayList();
+                            list = new ArrayList<>();
                             map.put(iproperty, list);
                         }
 
@@ -254,18 +251,17 @@ public class ConnectedParser {
                 if (map.isEmpty()) {
                     return null;
                 } else {
-                    List<Integer> list1 = new ArrayList();
+                    List<Integer> list1 = new ArrayList<>();
 
                     for (int k = 0; k < 16; ++k) {
-                        int l = k;
 
                         try {
-                            IBlockState iblockstate1 = this.getStateFromMeta(block, l);
+                            IBlockState iblockstate1 = this.getStateFromMeta(block, k);
 
                             if (this.matchState(iblockstate1, map)) {
-                                list1.add(l);
+                                list1.add(k);
                             }
-                        } catch (IllegalArgumentException var18) {
+                        } catch (IllegalArgumentException ignored) {
                         }
                     }
 
@@ -398,13 +394,12 @@ public class ConnectedParser {
             }
 
             if (flag) {
-                List<BiomeGenBase> list1 = new ArrayList(Arrays.asList(BiomeGenBase.getBiomeGenArray()));
+                List<BiomeGenBase> list1 = new ArrayList<>(Arrays.asList(BiomeGenBase.getBiomeGenArray()));
                 list1.removeAll(list);
                 list = list1;
             }
 
-            BiomeGenBase[] abiomegenbase = (BiomeGenBase[]) list.toArray(new BiomeGenBase[0]);
-            return abiomegenbase;
+            return (BiomeGenBase[]) list.toArray(new BiomeGenBase[0]);
         }
     }
 
@@ -450,7 +445,7 @@ public class ConnectedParser {
         if (str == null) {
             return null;
         } else {
-            List<Integer> list = new ArrayList();
+            List<Integer> list = new ArrayList<>();
             String[] astring = Config.tokenize(str, " ,");
 
             for (String s : astring) {
@@ -659,8 +654,7 @@ public class ConnectedParser {
             str = str.trim();
 
             try {
-                int i = Integer.parseInt(str, 16) & 16777215;
-                return i;
+                return Integer.parseInt(str, 16) & 16777215;
             } catch (NumberFormatException var3) {
                 return defVal;
             }
@@ -674,8 +668,7 @@ public class ConnectedParser {
             str = str.trim();
 
             try {
-                int i = (int) (Long.parseLong(str, 16));
-                return i;
+                return (int) (Long.parseLong(str, 16));
             } catch (NumberFormatException var3) {
                 return defVal;
             }
@@ -683,9 +676,7 @@ public class ConnectedParser {
     }
 
     public EnumWorldBlockLayer parseBlockRenderLayer(String str, EnumWorldBlockLayer def) {
-        if (str == null) {
-            return def;
-        } else {
+        if (str != null) {
             str = str.toLowerCase().trim();
             EnumWorldBlockLayer[] aenumworldblocklayer = EnumWorldBlockLayer.values();
 
@@ -695,14 +686,12 @@ public class ConnectedParser {
                 }
             }
 
-            return def;
         }
+        return def;
     }
 
     public <T> T parseObject(String str, T[] objs, INameGetter nameGetter, String property) {
-        if (str == null) {
-            return null;
-        } else {
+        if (str != null) {
             String s = str.toLowerCase().trim();
 
             for (T t : objs) {
@@ -714,8 +703,8 @@ public class ConnectedParser {
             }
 
             this.warn("Invalid " + property + ": " + str);
-            return null;
         }
+        return null;
     }
 
     public <T> T[] parseObjects(String str, T[] objs, INameGetter nameGetter, String property, T[] errValue) {
@@ -765,7 +754,7 @@ public class ConnectedParser {
         if (profStr == null) {
             return null;
         } else {
-            List<VillagerProfession> list = new ArrayList();
+            List<VillagerProfession> list = new ArrayList<>();
             String[] astring = Config.tokenize(profStr, " ");
 
             for (String s : astring) {
@@ -782,8 +771,7 @@ public class ConnectedParser {
             if (list.isEmpty()) {
                 return null;
             } else {
-                VillagerProfession[] avillagerprofession = list.toArray(new VillagerProfession[0]);
-                return avillagerprofession;
+                return list.toArray(new VillagerProfession[0]);
             }
         }
     }
@@ -828,7 +816,7 @@ public class ConnectedParser {
     }
 
     private static int[] parseCareerIds(int prof, String str) {
-        Set<Integer> set = new HashSet();
+        Set<Integer> set = new HashSet<>();
         String[] astring = Config.tokenize(str, ",");
 
         for (String s : astring) {
@@ -920,7 +908,7 @@ public class ConnectedParser {
 
     public int[] parseItems(String str) {
         str = str.trim();
-        Set<Integer> set = new TreeSet();
+        Set<Integer> set = new TreeSet<>();
         String[] astring = Config.tokenize(str, " ");
 
         for (String s : astring) {
@@ -941,13 +929,12 @@ public class ConnectedParser {
         }
 
         Integer[] ainteger = set.toArray(new Integer[0]);
-        int[] aint = Config.toPrimitive(ainteger);
-        return aint;
+        return Config.toPrimitive(ainteger);
     }
 
     public int[] parseEntities(String str) {
         str = str.trim();
-        Set<Integer> set = new TreeSet();
+        Set<Integer> set = new TreeSet<>();
         String[] astring = Config.tokenize(str, " ");
 
         for (String s : astring) {
@@ -961,7 +948,6 @@ public class ConnectedParser {
         }
 
         Integer[] ainteger = set.toArray(new Integer[0]);
-        int[] aint = Config.toPrimitive(ainteger);
-        return aint;
+        return Config.toPrimitive(ainteger);
     }
 }

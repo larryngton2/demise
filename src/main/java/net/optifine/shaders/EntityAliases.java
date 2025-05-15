@@ -23,8 +23,7 @@ public class EntityAliases {
         if (entityAliases == null) {
             return -1;
         } else if (entityId >= 0 && entityId < entityAliases.length) {
-            int i = entityAliases[entityId];
-            return i;
+            return entityAliases[entityId];
         } else {
             return -1;
         }
@@ -45,7 +44,7 @@ public class EntityAliases {
                 Config.dbg("[Shaders] Delayed loading of entity mappings after resources are loaded");
                 updateOnResourcesReloaded = true;
             } else {
-                List<Integer> list = new ArrayList();
+                List<Integer> list = new ArrayList<>();
                 String s = "/shaders/entity.properties";
                 InputStream inputstream = shaderPack.getResourceAsStream(s);
 
@@ -70,7 +69,7 @@ public class EntityAliases {
                 ResourceLocation resourcelocation = new ResourceLocation(s, "shaders/entity.properties");
                 InputStream inputstream = Config.getResourceStream(resourcelocation);
                 loadEntityAliases(inputstream, resourcelocation.toString(), listEntityAliases);
-            } catch (IOException var6) {
+            } catch (IOException ignored) {
             }
         }
     }

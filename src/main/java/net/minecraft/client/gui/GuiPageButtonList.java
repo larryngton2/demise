@@ -132,7 +132,7 @@ public class GuiPageButtonList extends GuiListExtended {
     }
 
     private Gui func_178058_a(GuiPageButtonList.GuiListEntry p_178058_1_, int p_178058_2_, boolean p_178058_3_) {
-        return p_178058_1_ instanceof GuiSlideEntry ? this.func_178067_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiSlideEntry) p_178058_1_) : (p_178058_1_ instanceof GuiButtonEntry ? this.func_178065_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiButtonEntry) p_178058_1_) : (p_178058_1_ instanceof EditBoxEntry ? this.func_178068_a(this.width / 2 - 155 + p_178058_2_, 0, (EditBoxEntry) p_178058_1_) : (p_178058_1_ instanceof GuiLabelEntry ? this.func_178063_a(this.width / 2 - 155 + p_178058_2_, 0, (GuiLabelEntry) p_178058_1_, p_178058_3_) : null)));
+        return p_178058_1_ instanceof GuiSlideEntry ? this.func_178067_a(this.width / 2 - 155 + p_178058_2_, (GuiSlideEntry) p_178058_1_) : (p_178058_1_ instanceof GuiButtonEntry ? this.func_178065_a(this.width / 2 - 155 + p_178058_2_, (GuiButtonEntry) p_178058_1_) : (p_178058_1_ instanceof EditBoxEntry ? this.func_178068_a(this.width / 2 - 155 + p_178058_2_, (EditBoxEntry) p_178058_1_) : (p_178058_1_ instanceof GuiLabelEntry ? this.func_178063_a(this.width / 2 - 155 + p_178058_2_, (GuiLabelEntry) p_178058_1_, p_178058_3_) : null)));
     }
 
     public void func_181155_a(boolean p_181155_1_) {
@@ -164,20 +164,20 @@ public class GuiPageButtonList extends GuiListExtended {
         return flag;
     }
 
-    private GuiSlider func_178067_a(int p_178067_1_, int p_178067_2_, GuiPageButtonList.GuiSlideEntry p_178067_3_) {
-        GuiSlider guislider = new GuiSlider(this.field_178076_z, p_178067_3_.func_178935_b(), p_178067_1_, p_178067_2_, p_178067_3_.func_178936_c(), p_178067_3_.func_178943_e(), p_178067_3_.func_178944_f(), p_178067_3_.func_178942_g(), p_178067_3_.func_178945_a());
+    private GuiSlider func_178067_a(int p_178067_1_, GuiSlideEntry p_178067_3_) {
+        GuiSlider guislider = new GuiSlider(this.field_178076_z, p_178067_3_.func_178935_b(), p_178067_1_, 0, p_178067_3_.func_178936_c(), p_178067_3_.func_178943_e(), p_178067_3_.func_178944_f(), p_178067_3_.func_178942_g(), p_178067_3_.func_178945_a());
         guislider.visible = p_178067_3_.func_178934_d();
         return guislider;
     }
 
-    private GuiListButton func_178065_a(int p_178065_1_, int p_178065_2_, GuiPageButtonList.GuiButtonEntry p_178065_3_) {
-        GuiListButton guilistbutton = new GuiListButton(this.field_178076_z, p_178065_3_.func_178935_b(), p_178065_1_, p_178065_2_, p_178065_3_.func_178936_c(), p_178065_3_.func_178940_a());
+    private GuiListButton func_178065_a(int p_178065_1_, GuiButtonEntry p_178065_3_) {
+        GuiListButton guilistbutton = new GuiListButton(this.field_178076_z, p_178065_3_.func_178935_b(), p_178065_1_, 0, p_178065_3_.func_178936_c(), p_178065_3_.func_178940_a());
         guilistbutton.visible = p_178065_3_.func_178934_d();
         return guilistbutton;
     }
 
-    private GuiTextField func_178068_a(int p_178068_1_, int p_178068_2_, GuiPageButtonList.EditBoxEntry p_178068_3_) {
-        GuiTextField guitextfield = new GuiTextField(p_178068_3_.func_178935_b(), this.mc.fontRendererObj, p_178068_1_, p_178068_2_, 150, 20);
+    private GuiTextField func_178068_a(int p_178068_1_, EditBoxEntry p_178068_3_) {
+        GuiTextField guitextfield = new GuiTextField(p_178068_3_.func_178935_b(), this.mc.fontRendererObj, p_178068_1_, 0, 150, 20);
         guitextfield.setText(p_178068_3_.func_178936_c());
         guitextfield.func_175207_a(this.field_178076_z);
         guitextfield.setVisible(p_178068_3_.func_178934_d());
@@ -185,13 +185,13 @@ public class GuiPageButtonList extends GuiListExtended {
         return guitextfield;
     }
 
-    private GuiLabel func_178063_a(int p_178063_1_, int p_178063_2_, GuiPageButtonList.GuiLabelEntry p_178063_3_, boolean p_178063_4_) {
+    private GuiLabel func_178063_a(int p_178063_1_, GuiLabelEntry p_178063_3_, boolean p_178063_4_) {
         GuiLabel guilabel;
 
         if (p_178063_4_) {
-            guilabel = new GuiLabel(this.mc.fontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, p_178063_2_, this.width - p_178063_1_ * 2, 20, -1);
+            guilabel = new GuiLabel(this.mc.fontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, 0, this.width - p_178063_1_ * 2, 20, -1);
         } else {
-            guilabel = new GuiLabel(this.mc.fontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, p_178063_2_, 150, 20, -1);
+            guilabel = new GuiLabel(this.mc.fontRendererObj, p_178063_3_.func_178935_b(), p_178063_1_, 0, 150, 20, -1);
         }
 
         guilabel.visible = p_178063_3_.func_178934_d();

@@ -95,17 +95,17 @@ public class VertexFormat {
     }
 
     public String toString() {
-        String s = "format: " + this.elements.size() + " elements: ";
+        StringBuilder s = new StringBuilder("format: " + this.elements.size() + " elements: ");
 
         for (int i = 0; i < this.elements.size(); ++i) {
-            s = s + this.elements.get(i).toString();
+            s.append(this.elements.get(i).toString());
 
             if (i != this.elements.size() - 1) {
-                s = s + " ";
+                s.append(" ");
             }
         }
 
-        return s;
+        return s.toString();
     }
 
     private boolean hasPosition() {

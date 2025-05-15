@@ -20,12 +20,12 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
     private BlockPos basePos = BlockPos.ORIGIN;
     int heightLimit;
     int height;
-    double heightAttenuation = 0.618D;
-    double branchSlope = 0.381D;
-    double scaleWidth = 1.0D;
-    double leafDensity = 1.0D;
-    int trunkSize = 1;
-    int heightLimitLimit = 12;
+    final double heightAttenuation = 0.618D;
+    final double branchSlope = 0.381D;
+    final double scaleWidth = 1.0D;
+    final double leafDensity = 1.0D;
+    final int trunkSize = 1;
+    final int heightLimitLimit = 12;
     int leafDistanceLimit = 4;
     List<WorldGenBigTree.FoliageCoordinates> field_175948_j;
 
@@ -154,7 +154,7 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
         if (k > 0) {
             if (i == k) {
                 blocklog$enumaxis = BlockLog.EnumAxis.X;
-            } else if (j == k) {
+            } else {
                 blocklog$enumaxis = BlockLog.EnumAxis.Z;
             }
         }
@@ -203,9 +203,7 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
         float f1 = (float) blockpos.getY() / (float) i;
         float f2 = (float) blockpos.getZ() / (float) i;
 
-        if (i == 0) {
-            return -1;
-        } else {
+        if (i != 0) {
             for (int j = 0; j <= i; ++j) {
                 BlockPos blockpos1 = posOne.add(0.5F + (float) j * f, 0.5F + (float) j * f1, 0.5F + (float) j * f2);
 
@@ -214,8 +212,8 @@ public class WorldGenBigTree extends WorldGenAbstractTree {
                 }
             }
 
-            return -1;
         }
+        return -1;
     }
 
     public void func_175904_e() {

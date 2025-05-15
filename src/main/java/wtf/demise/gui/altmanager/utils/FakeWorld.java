@@ -451,8 +451,7 @@ public final class FakeWorld extends World {
         }
 
         @Override
-        public boolean saveChunks(final boolean var1, final IProgressUpdate var2) {
-            return false;
+        public void saveChunks(final boolean var1, final IProgressUpdate var2) {
         }
 
         @Override

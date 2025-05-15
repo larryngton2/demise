@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShaderExpressionResolver implements IExpressionResolver {
-    private final Map<String, IExpression> mapExpressions = new HashMap();
+    private final Map<String, IExpression> mapExpressions = new HashMap<>();
 
     public ShaderExpressionResolver(Map<String, IExpression> map) {
         this.registerExpressions();
@@ -65,13 +65,11 @@ public class ShaderExpressionResolver implements IExpressionResolver {
         }
     }
 
-    public boolean registerExpression(String name, IExpression expr) {
+    public void registerExpression(String name, IExpression expr) {
         if (this.mapExpressions.containsKey(name)) {
             SMCLog.warning("Expression already defined: " + name);
-            return false;
         } else {
             this.mapExpressions.put(name, expr);
-            return true;
         }
     }
 

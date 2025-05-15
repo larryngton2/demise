@@ -14,20 +14,12 @@ public abstract class EntityWaterMob extends EntityLiving implements IAnimals {
         return true;
     }
 
-    public boolean getCanSpawnHere() {
-        return true;
-    }
-
     public boolean isNotColliding() {
         return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this);
     }
 
     public int getTalkInterval() {
         return 120;
-    }
-
-    protected boolean canDespawn() {
-        return true;
     }
 
     protected int getExperiencePoints(EntityPlayer player) {

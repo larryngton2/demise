@@ -47,8 +47,6 @@ import net.minecraft.world.*;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.features.modules.impl.combat.Velocity;
-import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.RotationUtils;
 
 import java.util.Collection;
@@ -57,9 +55,9 @@ import java.util.UUID;
 
 @SuppressWarnings("incomplete-switch")
 public abstract class EntityPlayer extends EntityLivingBase {
-    public InventoryPlayer inventory = new InventoryPlayer(this);
+    public final InventoryPlayer inventory = new InventoryPlayer(this);
     private InventoryEnderChest theInventoryEnderChest = new InventoryEnderChest();
-    public Container inventoryContainer;
+    public final Container inventoryContainer;
     public Container openContainer;
     protected FoodStats foodStats = new FoodStats();
     protected int flyToggleTimer;
@@ -81,7 +79,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
     private BlockPos spawnChunk;
     private boolean spawnForced;
     private BlockPos startMinecartRidingCoordinate;
-    public PlayerCapabilities capabilities = new PlayerCapabilities();
+    public final PlayerCapabilities capabilities = new PlayerCapabilities();
     public int experienceLevel;
     public int experienceTotal;
     public float experience;
@@ -89,7 +87,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
     public ItemStack itemInUse;
     public int itemInUseCount;
     protected float speedOnGround = 0.1F;
-    protected float speedInAir = 0.02F;
+    protected final float speedInAir = 0.02F;
     private int lastXPSound;
     public final GameProfile gameProfile;
     private boolean hasReducedDebug = false;
@@ -497,12 +495,8 @@ public abstract class EntityPlayer extends EntityLivingBase {
             this.inventory.dropAllItems();
         }
 
-        if (cause != null) {
-            this.motionX = -MathHelper.cos((this.attackedAtYaw + this.rotationYaw) * (float) Math.PI / 180.0F) * 0.1F;
-            this.motionZ = -MathHelper.sin((this.attackedAtYaw + this.rotationYaw) * (float) Math.PI / 180.0F) * 0.1F;
-        } else {
-            this.motionX = this.motionZ = 0.0D;
-        }
+        this.motionX = -MathHelper.cos((this.attackedAtYaw + this.rotationYaw) * (float) Math.PI / 180.0F) * 0.1F;
+        this.motionZ = -MathHelper.sin((this.attackedAtYaw + this.rotationYaw) * (float) Math.PI / 180.0F) * 0.1F;
 
         this.triggerAchievement(StatList.deathsStat);
         this.func_175145_a(StatList.timeSinceDeathStat);
@@ -1577,7 +1571,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
             return false;
         } else {
             Team team = this.getTeam();
-            return team == null || player == null || player.getTeam() != team || !team.getSeeFriendlyInvisiblesEnabled();
+            return team == null || player.getTeam() != team || !team.getSeeFriendlyInvisiblesEnabled();
         }
     }
 

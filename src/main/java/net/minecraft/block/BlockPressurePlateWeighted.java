@@ -14,8 +14,8 @@ public class BlockPressurePlateWeighted extends BlockBasePressurePlate {
     public static final PropertyInteger POWER = PropertyInteger.create("power", 0, 15);
     private final int field_150068_a;
 
-    protected BlockPressurePlateWeighted(Material p_i46379_1_, int p_i46379_2_) {
-        this(p_i46379_1_, p_i46379_2_, p_i46379_1_.getMaterialMapColor());
+    protected BlockPressurePlateWeighted() {
+        this(Material.iron, 150, Material.iron.getMaterialMapColor());
     }
 
     protected BlockPressurePlateWeighted(Material p_i46380_1_, int p_i46380_2_, MapColor p_i46380_3_) {

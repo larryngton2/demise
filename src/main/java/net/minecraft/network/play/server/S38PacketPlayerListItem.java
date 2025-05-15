@@ -25,7 +25,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
         this.action = actionIn;
 
         for (EntityPlayerMP entityplayermp : players) {
-            this.players.add(new S38PacketPlayerListItem.AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
+            this.players.add(new AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
         }
     }
 
@@ -33,7 +33,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
         this.action = actionIn;
 
         for (EntityPlayerMP entityplayermp : players) {
-            this.players.add(new S38PacketPlayerListItem.AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
+            this.players.add(new AddPlayerData(entityplayermp.getGameProfile(), entityplayermp.ping, entityplayermp.theItemInWorldManager.getGameType(), entityplayermp.getTabListDisplayName()));
         }
     }
 
@@ -96,7 +96,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
                     gameprofile = new GameProfile(buf.readUuid(), null);
             }
 
-            this.players.add(new S38PacketPlayerListItem.AddPlayerData(gameprofile, k, worldsettings$gametype, ichatcomponent));
+            this.players.add(new AddPlayerData(gameprofile, k, worldsettings$gametype, ichatcomponent));
         }
     }
 
@@ -187,7 +187,7 @@ public class S38PacketPlayerListItem implements Packet<INetHandlerPlayClient> {
         REMOVE_PLAYER
     }
 
-    public class AddPlayerData {
+    public static class AddPlayerData {
         private final int ping;
         private final WorldSettings.GameType gamemode;
         private final GameProfile profile;

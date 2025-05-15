@@ -21,7 +21,7 @@ public class EntityAITasks {
     }
 
     public void addTask(int priority, EntityAIBase task) {
-        this.taskEntries.add(new EntityAITasks.EntityAITaskEntry(priority, task));
+        this.taskEntries.add(new EntityAITaskEntry(priority, task));
     }
 
     public void removeTask(EntityAIBase task) {
@@ -100,8 +100,7 @@ public class EntityAITasks {
     }
 
     private boolean canContinue(EntityAITasks.EntityAITaskEntry taskEntry) {
-        boolean flag = taskEntry.action.continueExecuting();
-        return flag;
+        return taskEntry.action.continueExecuting();
     }
 
     private boolean canUse(EntityAITasks.EntityAITaskEntry taskEntry) {
@@ -124,9 +123,9 @@ public class EntityAITasks {
         return (taskEntry1.action.getMutexBits() & taskEntry2.action.getMutexBits()) == 0;
     }
 
-    class EntityAITaskEntry {
-        public EntityAIBase action;
-        public int priority;
+    static class EntityAITaskEntry {
+        public final EntityAIBase action;
+        public final int priority;
 
         public EntityAITaskEntry(int priorityIn, EntityAIBase task) {
             this.priority = priorityIn;

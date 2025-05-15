@@ -60,7 +60,7 @@ public class CustomItems {
         useGlint = true;
 
         if (Config.isCustomItems()) {
-            readCitProperties("mcpatcher/cit.properties");
+            readCitProperties();
             IResourcePack[] airesourcepack = Config.getResourcePacks();
 
             for (int i = airesourcepack.length - 1; i >= 0; --i) {
@@ -80,21 +80,21 @@ public class CustomItems {
         }
     }
 
-    private static void readCitProperties(String fileName) {
+    private static void readCitProperties() {
         try {
-            ResourceLocation resourcelocation = new ResourceLocation(fileName);
+            ResourceLocation resourcelocation = new ResourceLocation("mcpatcher/cit.properties");
             InputStream inputstream = Config.getResourceStream(resourcelocation);
 
             if (inputstream == null) {
                 return;
             }
 
-            Config.dbg("CustomItems: Loading " + fileName);
+            Config.dbg("CustomItems: Loading " + "mcpatcher/cit.properties");
             Properties properties = new PropertiesOrdered();
             properties.load(inputstream);
             inputstream.close();
             useGlint = Config.parseBoolean(properties.getProperty("useGlint"), true);
-        } catch (FileNotFoundException var4) {
+        } catch (FileNotFoundException ignored) {
         } catch (IOException ioexception) {
             ioexception.printStackTrace();
         }
@@ -168,12 +168,11 @@ public class CustomItems {
     }
 
     private static Comparator getPropertiesComparator() {
-        Comparator comparator = (o1, o2) -> {
+        return (o1, o2) -> {
             CustomItemProperties customitemproperties = (CustomItemProperties) o1;
             CustomItemProperties customitemproperties1 = (CustomItemProperties) o2;
             return customitemproperties.layer != customitemproperties1.layer ? customitemproperties.layer - customitemproperties1.layer : (customitemproperties.weight != customitemproperties1.weight ? customitemproperties1.weight - customitemproperties.weight : (!customitemproperties.basePath.equals(customitemproperties1.basePath) ? customitemproperties.basePath.compareTo(customitemproperties1.basePath) : customitemproperties.name.compareTo(customitemproperties1.name)));
         };
-        return comparator;
     }
 
     public static void updateIcons(TextureMap textureMap) {
@@ -199,7 +198,7 @@ public class CustomItems {
     }
 
     private static List<CustomItemProperties> getAllProperties() {
-        List<CustomItemProperties> list = new ArrayList();
+        List<CustomItemProperties> list = new ArrayList<>();
         addAll(itemProperties, list);
         addAll(enchantmentProperties, list);
         return list;

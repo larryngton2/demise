@@ -33,8 +33,8 @@ import static java.lang.String.valueOf;
 public class FontRenderer implements IResourceManagerReloadListener {
     private static final ResourceLocation[] unicodePageLocations = new ResourceLocation[256];
     private final int[] charWidth = new int[256];
-    public int FONT_HEIGHT = 9;
-    public Random fontRandom = new Random();
+    public final int FONT_HEIGHT = 9;
+    public final Random fontRandom = new Random();
     private final byte[] glyphWidth = new byte[65536];
     private final int[] colorCode = new int[32];
     private ResourceLocation locationFontTexture;
@@ -53,8 +53,8 @@ public class FontRenderer implements IResourceManagerReloadListener {
     private boolean italicStyle;
     private boolean underlineStyle;
     private boolean strikethroughStyle;
-    public GameSettings gameSettings;
-    public ResourceLocation locationFontTextureBase;
+    public final GameSettings gameSettings;
+    public final ResourceLocation locationFontTextureBase;
     public float offsetBold = 1.0F;
     private final float[] charWidthFloat = new float[256];
     private boolean blend = false;
@@ -147,7 +147,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
                 int i2 = j1 * k + l1;
                 boolean flag = true;
 
-                for (int j2 = 0; j2 < l && flag; ++j2) {
+                for (int j2 = 0; j2 < l; ++j2) {
                     int k2 = (k1 * l + j2) * i;
                     int l2 = aint[i2 + k2];
                     int i3 = l2 >> 24 & 255;
@@ -199,7 +199,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
 
     private float renderChar(char ch, boolean italic) {
         if (ch != 32 && ch != 160) {
-            int i = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".indexOf(ch);
+            int i = "ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000".indexOf(ch);
             return i != -1 && !this.unicodeFlag ? this.renderDefaultChar(i, italic) : this.renderUnicodeChar(ch, italic);
         } else {
             return !this.unicodeFlag ? this.charWidthFloat[ch] : 4.0F;
@@ -299,8 +299,8 @@ public class FontRenderer implements IResourceManagerReloadListener {
         this.drawString(text, x - width, y, color, true);
     }
 
-    public int drawString(String text, int x, int y, int color) {
-        return this.drawString(text, (float) x, (float) y, color, false);
+    public void drawString(String text, int x, int y, int color) {
+        this.drawString(text, (float) x, (float) y, color, false);
     }
 
     public int drawString(String text, double x, double y, int color) {
@@ -404,7 +404,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
                     this.underlineStyle = false;
                     this.italicStyle = false;
 
-                    if (l < 0 || l > 15) {
+                    if (l < 0) {
                         l = 15;
                     }
 
@@ -430,7 +430,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
                     this.underlineStyle = true;
                 } else if (l == 20) {
                     this.italicStyle = true;
-                } else if (l == 21) {
+                } else {
                     this.randomStyle = false;
                     this.boldStyle = false;
                     this.strikethroughStyle = false;
@@ -441,20 +441,17 @@ public class FontRenderer implements IResourceManagerReloadListener {
 
                 ++i;
             } else {
-                int j = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".indexOf(c0);
+                int j = "ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000".indexOf(c0);
 
                 if (this.randomStyle && j != -1) {
                     int k = this.getCharWidth(c0);
                     char c1;
 
-                    while (true) {
+                    do {
                         j = this.fontRandom.nextInt("\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".length());
                         c1 = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".charAt(j);
 
-                        if (k == this.getCharWidth(c1)) {
-                            break;
-                        }
-                    }
+                    } while (k != this.getCharWidth(c1));
 
                     c0 = c1;
                 }
@@ -529,13 +526,13 @@ public class FontRenderer implements IResourceManagerReloadListener {
         this.posX += p_doDraw_1_;
     }
 
-    private int renderStringAligned(String text, float x, float y, float width, int color, boolean dropShadow) {
+    private void renderStringAligned(String text, float x, float y, float width, int color, boolean dropShadow) {
         if (this.bidiFlag) {
             int i = this.getStringWidth(this.bidiReorder(text));
             x = x + width - i;
         }
 
-        return this.renderString(text, x, y, color, dropShadow);
+        this.renderString(text, x, y, color, dropShadow);
     }
 
     private int renderString(String text, float x, float y, int color, boolean dropShadow) {
@@ -611,7 +608,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
         if (p_getCharWidthFloat_1_ == 167) {
             return -1.0F;
         } else if (p_getCharWidthFloat_1_ != 32 && p_getCharWidthFloat_1_ != 160) {
-            int i = "\u00c0\u00c1\u00c2\u00c8\u00ca\u00cb\u00cd\u00d3\u00d4\u00d5\u00da\u00df\u00e3\u00f5\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0207\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000\u00c7\u00fc\u00e9\u00e2\u00e4\u00e0\u00e5\u00e7\u00ea\u00eb\u00e8\u00ef\u00ee\u00ec\u00c4\u00c5\u00c9\u00e6\u00c6\u00f4\u00f6\u00f2\u00fb\u00f9\u00ff\u00d6\u00dc\u00f8\u00a3\u00d8\u00d7\u0192\u00e1\u00ed\u00f3\u00fa\u00f1\u00d1\u00aa\u00ba\u00bf\u00ae\u00ac\u00bd\u00bc\u00a1\u00ab\u00bb\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255d\u255c\u255b\u2510\u2514\u2534\u252c\u251c\u2500\u253c\u255e\u255f\u255a\u2554\u2569\u2566\u2560\u2550\u256c\u2567\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256b\u256a\u2518\u250c\u2588\u2584\u258c\u2590\u2580\u03b1\u03b2\u0393\u03c0\u03a3\u03c3\u03bc\u03c4\u03a6\u0398\u03a9\u03b4\u221e\u2205\u2208\u2229\u2261\u00b1\u2265\u2264\u2320\u2321\u00f7\u2248\u00b0\u2219\u00b7\u221a\u207f\u00b2\u25a0\u0000".indexOf(p_getCharWidthFloat_1_);
+            int i = "ÀÁÂÈÊËÍÓÔÕÚßãõğİıŒœŞşŴŵžȇ\u0000\u0000\u0000\u0000\u0000\u0000\u0000 !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u0000ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αβΓπΣσμτΦΘΩδ∞∅∈∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■\u0000".indexOf(p_getCharWidthFloat_1_);
 
             if (p_getCharWidthFloat_1_ > 0 && i != -1 && !this.unicodeFlag) {
                 return this.charWidthFloat[i];
@@ -702,16 +699,16 @@ public class FontRenderer implements IResourceManagerReloadListener {
         this.resetStyles();
         this.textColor = textColor;
         str = this.trimStringNewline(str);
-        this.renderSplitString(str, x, y, wrapWidth, false);
+        this.renderSplitString(str, x, y, wrapWidth);
 
         if (this.blend) {
             GlStateManager.setBlendState(this.oldBlendState);
         }
     }
 
-    private void renderSplitString(String str, float x, float y, float wrapWidth, boolean addShadow) {
+    private void renderSplitString(String str, float x, float y, float wrapWidth) {
         for (String s : this.listFormattedStringToWidth(str, wrapWidth)) {
-            this.renderStringAligned(s, x, y, wrapWidth, this.textColor, addShadow);
+            this.renderStringAligned(s, x, y, wrapWidth, this.textColor, false);
             y += this.FONT_HEIGHT;
         }
     }
@@ -780,7 +777,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
 
                     break;
 
-                case '\u00a7':
+                case '§':
                     if (j < i - 1) {
                         ++j;
                         char c1 = str.charAt(j);
@@ -818,7 +815,7 @@ public class FontRenderer implements IResourceManagerReloadListener {
     }
 
     public static String getFormatFromString(String text) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         int i = -1;
         int j = text.length();
 
@@ -827,14 +824,14 @@ public class FontRenderer implements IResourceManagerReloadListener {
                 char c0 = text.charAt(i + 1);
 
                 if (isFormatColor(c0)) {
-                    s = "\u00a7" + c0;
+                    s = new StringBuilder("§" + c0);
                 } else if (isFormatSpecial(c0)) {
-                    s = s + "\u00a7" + c0;
+                    s.append("§").append(c0);
                 }
             }
         }
 
-        return s;
+        return s.toString();
     }
 
     public boolean getBidiFlag() {

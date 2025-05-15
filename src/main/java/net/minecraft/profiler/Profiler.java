@@ -19,7 +19,7 @@ public class Profiler {
     public boolean profilingEnabled;
     private String profilingSection = "";
     private final Map<String, Long> profilingMap = Maps.newHashMap();
-    public boolean profilerGlobalEnabled = true;
+    public final boolean profilerGlobalEnabled = true;
     private boolean profilerLocalEnabled;
     private static final String SCHEDULED_EXECUTABLES = "scheduledExecutables";
     private static final String TICK = "tick";
@@ -33,7 +33,7 @@ public class Profiler {
     private static final int HASH_DISPLAY = "display".hashCode();
 
     public Profiler() {
-        this.profilerLocalEnabled = this.profilerGlobalEnabled;
+        this.profilerLocalEnabled = true;
     }
 
     public void clearProfiling() {
@@ -95,7 +95,7 @@ public class Profiler {
                 }
 
                 if (k > 100000000L) {
-                    logger.warn("Something's taking too long! '" + this.profilingSection + "' took aprox " + (double) k / 1000000.0D + " ms");
+                    logger.warn("Something's taking too long! '{}' took aprox {} ms", this.profilingSection, (double) k / 1000000.0D);
                 }
 
                 this.profilingSection = !this.sectionList.isEmpty() ? this.sectionList.get(this.sectionList.size() - 1) : "";
@@ -173,9 +173,9 @@ public class Profiler {
     }
 
     public static final class Result implements Comparable<Profiler.Result> {
-        public double field_76332_a;
-        public double field_76330_b;
-        public String field_76331_c;
+        public final double field_76332_a;
+        public final double field_76330_b;
+        public final String field_76331_c;
 
         public Result(String profilerName, double usePercentage, double totalUsePercentage) {
             this.field_76331_c = profilerName;

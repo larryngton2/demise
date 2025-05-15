@@ -4,17 +4,17 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 
 public class ModelSpider extends ModelBase {
-    public ModelRenderer spiderHead;
-    public ModelRenderer spiderNeck;
-    public ModelRenderer spiderBody;
-    public ModelRenderer spiderLeg1;
-    public ModelRenderer spiderLeg2;
-    public ModelRenderer spiderLeg3;
-    public ModelRenderer spiderLeg4;
-    public ModelRenderer spiderLeg5;
-    public ModelRenderer spiderLeg6;
-    public ModelRenderer spiderLeg7;
-    public ModelRenderer spiderLeg8;
+    public final ModelRenderer spiderHead;
+    public final ModelRenderer spiderNeck;
+    public final ModelRenderer spiderBody;
+    public final ModelRenderer spiderLeg1;
+    public final ModelRenderer spiderLeg2;
+    public final ModelRenderer spiderLeg3;
+    public final ModelRenderer spiderLeg4;
+    public final ModelRenderer spiderLeg5;
+    public final ModelRenderer spiderLeg6;
+    public final ModelRenderer spiderLeg7;
+    public final ModelRenderer spiderLeg8;
 
     public ModelSpider() {
         float f = 0.0F;
@@ -100,20 +100,20 @@ public class ModelSpider extends ModelBase {
         float f9 = Math.abs(MathHelper.sin(limbSwing * 0.6662F + ((float) Math.PI / 2F)) * 0.4F) * limbSwingAmount;
         float f10 = Math.abs(MathHelper.sin(limbSwing * 0.6662F + ((float) Math.PI * 3F / 2F)) * 0.4F) * limbSwingAmount;
         this.spiderLeg1.rotateAngleY += f3;
-        this.spiderLeg2.rotateAngleY += -f3;
+        this.spiderLeg2.rotateAngleY -= f3;
         this.spiderLeg3.rotateAngleY += f4;
-        this.spiderLeg4.rotateAngleY += -f4;
+        this.spiderLeg4.rotateAngleY -= f4;
         this.spiderLeg5.rotateAngleY += f5;
-        this.spiderLeg6.rotateAngleY += -f5;
+        this.spiderLeg6.rotateAngleY -= f5;
         this.spiderLeg7.rotateAngleY += f6;
-        this.spiderLeg8.rotateAngleY += -f6;
+        this.spiderLeg8.rotateAngleY -= f6;
         this.spiderLeg1.rotateAngleZ += f7;
-        this.spiderLeg2.rotateAngleZ += -f7;
+        this.spiderLeg2.rotateAngleZ -= f7;
         this.spiderLeg3.rotateAngleZ += f8;
-        this.spiderLeg4.rotateAngleZ += -f8;
+        this.spiderLeg4.rotateAngleZ -= f8;
         this.spiderLeg5.rotateAngleZ += f9;
-        this.spiderLeg6.rotateAngleZ += -f9;
+        this.spiderLeg6.rotateAngleZ -= f9;
         this.spiderLeg7.rotateAngleZ += f10;
-        this.spiderLeg8.rotateAngleZ += -f10;
+        this.spiderLeg8.rotateAngleZ -= f10;
     }
 }

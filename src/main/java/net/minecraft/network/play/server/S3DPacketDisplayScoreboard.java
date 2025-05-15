@@ -24,12 +24,12 @@ public class S3DPacketDisplayScoreboard implements Packet<INetHandlerPlayClient>
         }
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.position = buf.readByte();
         this.scoreName = buf.readStringFromBuffer(16);
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeByte(this.position);
         buf.writeString(this.scoreName);
     }

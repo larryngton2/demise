@@ -45,7 +45,7 @@ public class ChunkRenderDispatcher {
         this.worldVertexUploader = new WorldVertexBufferUploader();
         this.vertexUploader = new VertexBufferUploader();
         this.queueChunkUploads = Queues.newArrayDeque();
-        this.listPausedBuilders = new ArrayList();
+        this.listPausedBuilders = new ArrayList<>();
         int i = Math.max(1, (int) ((double) Runtime.getRuntime().maxMemory() * 0.3D) / 10485760);
         int j = Math.max(1, MathHelper.clamp_int(Runtime.getRuntime().availableProcessors() - 2, 1, i / 5));
 
@@ -136,7 +136,7 @@ public class ChunkRenderDispatcher {
 
             try {
                 this.renderWorker.processTask(chunkcompiletaskgenerator);
-            } catch (InterruptedException var8) {
+            } catch (InterruptedException ignored) {
             }
 
             flag = true;
@@ -144,7 +144,7 @@ public class ChunkRenderDispatcher {
             chunkRenderer.getLockCompileTask().unlock();
         }
 
-        return flag;
+        return true;
     }
 
     public void stopChunkUpdates() {
@@ -158,7 +158,7 @@ public class ChunkRenderDispatcher {
         while (list.size() != this.countRenderBuilders) {
             try {
                 list.add(this.allocateRenderBuilder());
-            } catch (InterruptedException var3) {
+            } catch (InterruptedException ignored) {
             }
         }
 
@@ -186,17 +186,15 @@ public class ChunkRenderDispatcher {
 
             if (chunkcompiletaskgenerator != null) {
                 chunkcompiletaskgenerator.addFinishRunnable(() -> ChunkRenderDispatcher.this.queueChunkUpdates.remove(chunkcompiletaskgenerator));
-                boolean flag2 = this.queueChunkUpdates.offer(chunkcompiletaskgenerator);
-                return flag2;
+                return this.queueChunkUpdates.offer(chunkcompiletaskgenerator);
             }
 
-            boolean flag = true;
-            flag1 = flag;
+            flag1 = true;
         } finally {
             chunkRenderer.getLockCompileTask().unlock();
         }
 
-        return flag1;
+        return true;
     }
 
     public ListenableFuture<Object> uploadChunk(final EnumWorldBlockLayer player, final WorldRenderer p_178503_2_, final RenderChunk chunkRenderer, final CompiledChunk compiledChunkIn) {
@@ -256,7 +254,7 @@ public class ChunkRenderDispatcher {
                 if (regionrendercachebuilder != null) {
                     this.listPausedBuilders.add(regionrendercachebuilder);
                 }
-            } catch (InterruptedException var2) {
+            } catch (InterruptedException ignored) {
             }
         }
     }

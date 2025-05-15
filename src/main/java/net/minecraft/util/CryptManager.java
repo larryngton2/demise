@@ -39,16 +39,16 @@ public class CryptManager {
 
     public static byte[] getServerIdHash(String serverId, PublicKey publicKey, SecretKey secretKey) {
         try {
-            return digestOperation("SHA-1", serverId.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded());
+            return digestOperation(serverId.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded());
         } catch (UnsupportedEncodingException unsupportedencodingexception) {
             unsupportedencodingexception.printStackTrace();
             return null;
         }
     }
 
-    private static byte[] digestOperation(String algorithm, byte[]... data) {
+    private static byte[] digestOperation(byte[]... data) {
         try {
-            MessageDigest messagedigest = MessageDigest.getInstance(algorithm);
+            MessageDigest messagedigest = MessageDigest.getInstance("SHA-1");
 
             for (byte[] abyte : data) {
                 messagedigest.update(abyte);
@@ -66,7 +66,7 @@ public class CryptManager {
             EncodedKeySpec encodedkeyspec = new X509EncodedKeySpec(encodedKey);
             KeyFactory keyfactory = KeyFactory.getInstance("RSA");
             return keyfactory.generatePublic(encodedkeyspec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException var3) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ignored) {
         }
 
         LOGGER.error("Public key reconstitute failed!");

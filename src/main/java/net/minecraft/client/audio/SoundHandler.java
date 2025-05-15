@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,11 +31,11 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
     private static final Logger logger = LogManager.getLogger();
     private static final Gson GSON = (new GsonBuilder()).registerTypeAdapter(SoundList.class, new SoundListSerializer()).create();
     private static final ParameterizedType TYPE = new ParameterizedType() {
-        public Type[] getActualTypeArguments() {
+        public Type @NotNull [] getActualTypeArguments() {
             return new Type[]{String.class, SoundList.class};
         }
 
-        public Type getRawType() {
+        public @NotNull Type getRawType() {
             return Map.class;
         }
 
@@ -69,12 +70,12 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
                         logger.warn("Invalid sounds.json", runtimeexception);
                     }
                 }
-            } catch (IOException var11) {
+            } catch (IOException ignored) {
             }
         }
     }
 
-    protected Map<String, SoundList> getSoundMap(InputStream stream) {
+    protected Map getSoundMap(InputStream stream) {
         Map map;
 
         try {
@@ -118,7 +119,7 @@ public class SoundHandler implements IResourceManagerReloadListener, ITickable {
                         logger.warn("File {} does not exist, cannot add it to event {}", resourcelocation1, location);
                         continue;
                     } catch (IOException ioexception) {
-                        logger.warn("Could not load sound file " + resourcelocation1 + ", cannot add it to event " + location, ioexception);
+                        logger.warn("Could not load sound file {}, cannot add it to event {}", resourcelocation1, location, ioexception);
                         continue;
                     } finally {
                         IOUtils.closeQuietly(inputstream);

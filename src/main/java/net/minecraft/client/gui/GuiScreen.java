@@ -57,7 +57,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
     public static int width;
     public static int height;
     protected List<GuiButton> buttonList = Lists.newArrayList();
-    protected List<GuiLabel> labelList = Lists.newArrayList();
+    protected final List<GuiLabel> labelList = Lists.newArrayList();
     public boolean allowUserInput;
     protected FontRenderer fontRendererObj;
     public GuiButton selectedButton;
@@ -117,7 +117,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
             if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 return (String) transferable.getTransferData(DataFlavor.stringFlavor);
             }
-        } catch (Exception var1) {
+        } catch (Exception ignored) {
         }
 
         return "";
@@ -128,7 +128,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
             try {
                 StringSelection stringselection = new StringSelection(copyText);
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringselection, null);
-            } catch (Exception var2) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -231,7 +231,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
                     if (nbtbase instanceof NBTTagCompound) {
                         itemstack = ItemStack.loadItemStackFromNBT((NBTTagCompound) nbtbase);
                     }
-                } catch (NBTException var11) {
+                } catch (NBTException ignored) {
                 }
 
                 if (itemstack != null) {
@@ -292,9 +292,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
     }
 
     protected boolean handleComponentClick(IChatComponent component) {
-        if (component == null) {
-            return false;
-        } else {
+        if (component != null) {
             ClickEvent clickevent = component.getChatStyle().getChatClickEvent();
 
             if (isShiftKeyDown()) {
@@ -326,7 +324,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
                             this.openWebLink(uri);
                         }
                     } catch (URISyntaxException urisyntaxexception) {
-                        LOGGER.error("Can't open url for " + clickevent, urisyntaxexception);
+                        LOGGER.error("Can't open url for {}", clickevent, urisyntaxexception);
                     }
                 } else if (clickevent.getAction() == ClickEvent.Action.OPEN_FILE) {
                     URI uri1 = (new File(clickevent.getValue())).toURI();
@@ -336,14 +334,14 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
                 } else if (clickevent.getAction() == ClickEvent.Action.RUN_COMMAND) {
                     this.sendChatMessage(clickevent.getValue(), false);
                 } else {
-                    LOGGER.error("Don't know how to handle " + clickevent);
+                    LOGGER.error("Don't know how to handle {}", clickevent);
                 }
 
                 return true;
             }
 
-            return false;
         }
+        return false;
     }
 
     public void sendChatMessage(String msg) {
@@ -361,10 +359,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         if (mouseButton == 0) {
             /// DON'T REPLACE THIS WITH ENHANCED "FOR"
-            for (int i = 0; i < this.buttonList.size(); ++i) {
-                GuiButton guibutton = this.buttonList.get(i);
-
-                if (guibutton.mousePressed(this.mc, mouseX, mouseY)) {
+            for (GuiButton guibutton : this.buttonList) {
+                if (guibutton.mousePressed(mc, mouseX, mouseY)) {
                     this.selectedButton = guibutton;
                     guibutton.playPressSound(mc.getSoundHandler());
                     this.actionPerformed(guibutton);

@@ -9,8 +9,6 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 
-import java.util.concurrent.Callable;
-
 public class WorldInfo {
     public static final EnumDifficulty DEFAULT_DIFFICULTY = EnumDifficulty.NORMAL;
     private long randomSeed;
@@ -564,7 +562,7 @@ public class WorldInfo {
                     case 19133 -> "Anvil";
                     default -> s;
                 };
-            } catch (Throwable var3) {
+            } catch (Throwable ignored) {
             }
 
             return String.format("0x%05X - %s", WorldInfo.this.saveVersion, s);

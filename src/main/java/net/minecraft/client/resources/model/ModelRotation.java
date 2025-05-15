@@ -7,7 +7,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.model.IModelPart;
 import net.minecraftforge.client.model.IModelState;
 import net.minecraftforge.client.model.ITransformation;
-import net.minecraftforge.client.model.TRSRTransformation;
 import net.optifine.reflect.Reflector;
 import org.lwjglx.util.vector.Matrix4f;
 import org.lwjglx.util.vector.Vector3f;
@@ -100,7 +99,7 @@ public enum ModelRotation implements IModelState, ITransformation {
         return mapRotations.get(combineXY(MathHelper.normalizeAngle(p_177524_0_, 360), MathHelper.normalizeAngle(p_177524_1_, 360)));
     }
 
-    public Optional<TRSRTransformation> apply(Optional<? extends IModelPart> p_apply_1_) {
+    public Optional apply(Optional<? extends IModelPart> p_apply_1_) {
         return (Optional) Reflector.call(Reflector.ForgeHooksClient_applyTransform, new Object[]{this.getMatrix(), p_apply_1_});
     }
 

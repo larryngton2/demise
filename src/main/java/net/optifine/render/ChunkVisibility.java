@@ -82,9 +82,7 @@ public class ChunkVisibility {
                         ExtendedBlockStorage extendedblockstorage = aextendedblockstorage[k2];
 
                         if (extendedblockstorage != null && !extendedblockstorage.isEmpty()) {
-                            if (k2 > l1) {
-                                l1 = k2;
-                            }
+                            l1 = k2;
 
                             break;
                         }
@@ -102,7 +100,7 @@ public class ChunkVisibility {
                                 }
                             }
                         }
-                    } catch (ConcurrentModificationException var21) {
+                    } catch (ConcurrentModificationException ignored) {
                     }
 
                     ClassInheritanceMultiMap<Entity>[] classinheritancemultimap = chunk1.getEntityLists();
@@ -111,9 +109,7 @@ public class ChunkVisibility {
                         ClassInheritanceMultiMap<Entity> classinheritancemultimap1 = classinheritancemultimap[i3];
 
                         if (!classinheritancemultimap1.isEmpty() && (chunk1 != chunk || i3 != j || classinheritancemultimap1.size() != 1)) {
-                            if (i3 > l1) {
-                                l1 = i3;
-                            }
+                            l1 = i3;
 
                             break;
                         }
@@ -143,7 +139,7 @@ public class ChunkVisibility {
         EnumFacing[][] aenumfacing = new EnumFacing[i][];
 
         for (int j = 0; j < i; ++j) {
-            List<EnumFacing> list = new ArrayList();
+            List<EnumFacing> list = new ArrayList<>();
 
             for (int k = 0; k < EnumFacing.VALUES.length; ++k) {
                 EnumFacing enumfacing = EnumFacing.VALUES[k];

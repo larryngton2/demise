@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class MapStorage {
     private final ISaveHandler saveHandler;
-    protected Map<String, WorldSavedData> loadedDataMap = Maps.newHashMap();
+    protected final Map<String, WorldSavedData> loadedDataMap = Maps.newHashMap();
     private final List<WorldSavedData> loadedDataList = Lists.newArrayList();
     private final Map<String, Short> idCounts = Maps.newHashMap();
 
@@ -26,9 +26,7 @@ public class MapStorage {
     public WorldSavedData loadData(Class<? extends WorldSavedData> clazz, String dataIdentifier) {
         WorldSavedData worldsaveddata = this.loadedDataMap.get(dataIdentifier);
 
-        if (worldsaveddata != null) {
-            return worldsaveddata;
-        } else {
+        if (worldsaveddata == null) {
             if (this.saveHandler != null) {
                 try {
                     File file1 = this.saveHandler.getMapFileFromName(dataIdentifier);
@@ -55,8 +53,8 @@ public class MapStorage {
                 this.loadedDataList.add(worldsaveddata);
             }
 
-            return worldsaveddata;
         }
+        return worldsaveddata;
     }
 
     public void setData(String dataIdentifier, WorldSavedData data) {
@@ -137,9 +135,7 @@ public class MapStorage {
 
         this.idCounts.put(key, oshort);
 
-        if (this.saveHandler == null) {
-            return oshort;
-        } else {
+        if (this.saveHandler != null) {
             try {
                 File file1 = this.saveHandler.getMapFileFromName("idcounts");
 
@@ -159,7 +155,7 @@ public class MapStorage {
                 exception.printStackTrace();
             }
 
-            return oshort;
         }
+        return oshort;
     }
 }

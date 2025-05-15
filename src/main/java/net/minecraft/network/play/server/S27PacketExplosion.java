@@ -37,7 +37,7 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
         }
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.posX = buf.readFloat();
         this.posY = buf.readFloat();
         this.posZ = buf.readFloat();
@@ -60,7 +60,7 @@ public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
         this.field_149159_h = buf.readFloat();
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeFloat((float) this.posX);
         buf.writeFloat((float) this.posY);
         buf.writeFloat((float) this.posZ);

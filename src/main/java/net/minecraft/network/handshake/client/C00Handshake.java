@@ -23,14 +23,14 @@ public class C00Handshake implements Packet<INetHandlerHandshakeServer> {
         this.requestedState = requestedState;
     }
 
-    public void readPacketData(PacketBuffer buf) throws IOException {
+    public void readPacketData(PacketBuffer buf) {
         this.protocolVersion = buf.readVarIntFromBuffer();
         this.ip = buf.readStringFromBuffer(255);
         this.port = buf.readUnsignedShort();
         this.requestedState = EnumConnectionState.getById(buf.readVarIntFromBuffer());
     }
 
-    public void writePacketData(PacketBuffer buf) throws IOException {
+    public void writePacketData(PacketBuffer buf) {
         buf.writeVarIntToBuffer(this.protocolVersion);
         buf.writeString(this.ip);
         buf.writeShort(this.port);

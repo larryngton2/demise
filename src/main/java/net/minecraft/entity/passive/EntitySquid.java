@@ -43,10 +43,6 @@ public class EntitySquid extends EntityWaterMob {
         return this.height * 0.5F;
     }
 
-    protected String getLivingSound() {
-        return null;
-    }
-
     protected String getHurtSound() {
         return null;
     }
@@ -57,10 +53,6 @@ public class EntitySquid extends EntityWaterMob {
 
     protected float getSoundVolume() {
         return 0.4F;
-    }
-
-    protected Item getDropItem() {
-        return null;
     }
 
     protected boolean canTriggerWalking() {

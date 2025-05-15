@@ -74,8 +74,7 @@ public class TextureAnimations {
             }
         }
 
-        TextureAnimation[] atextureanimation1 = (TextureAnimation[]) list.toArray(new TextureAnimation[0]);
-        return atextureanimation1;
+        return (TextureAnimation[]) list.toArray(new TextureAnimation[0]);
     }
 
     private static TextureAnimation[] getTextureAnimations(IResourcePack rp) {
@@ -113,8 +112,7 @@ public class TextureAnimations {
                 }
             }
 
-            TextureAnimation[] atextureanimation = (TextureAnimation[]) list.toArray(new TextureAnimation[0]);
-            return atextureanimation;
+            return (TextureAnimation[]) list.toArray(new TextureAnimation[0]);
         }
     }
 
@@ -159,8 +157,7 @@ public class TextureAnimations {
                                 BufferedImage bufferedimage = readTextureImage(inputstream);
 
                                 if (i + k <= bufferedimage.getWidth() && j + l <= bufferedimage.getHeight()) {
-                                    TextureAnimation textureanimation = new TextureAnimation(s, abyte, s1, resourcelocation, i, j, k, l, props);
-                                    return textureanimation;
+                                    return new TextureAnimation(s, abyte, s1, resourcelocation, i, j, k, l, props);
                                 } else {
                                     Config.warn("TextureAnimation: Animation coordinates are outside the target texture: " + s1);
                                     return null;
@@ -209,7 +206,7 @@ public class TextureAnimations {
                     return null;
                 } else {
                     if (targetWidth > 0 && bufferedimage.getWidth() != targetWidth) {
-                        double d0 = bufferedimage.getHeight() / bufferedimage.getWidth();
+                        double d0 = (double) bufferedimage.getHeight() / bufferedimage.getWidth();
                         int j = (int) ((double) targetWidth * d0);
                         bufferedimage = scaleBufferedImage(bufferedimage, targetWidth, j);
                     }

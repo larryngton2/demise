@@ -19,7 +19,6 @@ import java.lang.management.RuntimeMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class CrashReport {
     private static final Logger logger = LogManager.getLogger();
@@ -71,7 +70,7 @@ public class CrashReport {
 
             return String.format("%d total; %s", i, stringbuilder);
         });
-        this.theReportCategory.addCrashSectionCallable("IntCache", () -> IntCache.getCacheSizes());
+        this.theReportCategory.addCrashSectionCallable("IntCache", IntCache::getCacheSizes);
 
         if (Reflector.FMLCommonHandler_enhanceCrashReport.exists()) {
             Object object = Reflector.call(Reflector.FMLCommonHandler_instance);
@@ -192,7 +191,7 @@ public class CrashReport {
                 this.crashReportFile = toFile;
                 return true;
             } catch (Throwable throwable) {
-                logger.error("Could not save crash report to " + toFile, throwable);
+                logger.error("Could not save crash report to {}", toFile, throwable);
                 return false;
             }
         }
@@ -220,7 +219,7 @@ public class CrashReport {
                 System.out.println("Negative index in crash report handler (" + astacktraceelement.length + "/" + i + ")");
             }
 
-            if (astacktraceelement != null && 0 <= j && j < astacktraceelement.length) {
+            if (0 <= j && j < astacktraceelement.length) {
                 stacktraceelement = astacktraceelement[j];
 
                 if (astacktraceelement.length + 1 - i < astacktraceelement.length) {
@@ -233,7 +232,7 @@ public class CrashReport {
             if (i > 0 && !this.crashReportSections.isEmpty()) {
                 CrashReportCategory crashreportcategory1 = this.crashReportSections.get(this.crashReportSections.size() - 1);
                 crashreportcategory1.trimStackTraceEntriesFromBottom(i);
-            } else if (astacktraceelement != null && astacktraceelement.length >= i && 0 <= j && j < astacktraceelement.length) {
+            } else if (astacktraceelement.length >= i && 0 <= j && j < astacktraceelement.length) {
                 this.stacktrace = new StackTraceElement[j];
                 System.arraycopy(astacktraceelement, 0, this.stacktrace, 0, this.stacktrace.length);
             } else {

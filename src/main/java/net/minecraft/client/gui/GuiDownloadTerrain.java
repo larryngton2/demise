@@ -19,7 +19,7 @@ public class GuiDownloadTerrain extends GuiScreen {
         this.netHandlerPlayClient = netHandler;
     }
 
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void keyTyped(char typedChar, int keyCode) {
     }
 
     public void initGui() {
@@ -41,7 +41,7 @@ public class GuiDownloadTerrain extends GuiScreen {
             MainMenu.draw(Demise.INSTANCE.getStartTimeLong());
         }
 
-        drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingTerrain"), width / 2, height / 2 - 50, 16777215);
+        drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.downloadingTerrain"), (float) width / 2, (float) height / 2 - 50, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

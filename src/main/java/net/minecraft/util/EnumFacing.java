@@ -3,6 +3,7 @@ package net.minecraft.util;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -93,20 +94,20 @@ public enum EnumFacing implements IStringSerializable {
     private EnumFacing rotateX() {
         return switch (this) {
             case NORTH -> DOWN;
-            default -> throw new IllegalStateException("Unable to get X-rotated facing of " + this);
             case SOUTH -> UP;
             case UP -> NORTH;
             case DOWN -> SOUTH;
+            default -> throw new IllegalStateException("Unable to get X-rotated facing of " + this);
         };
     }
 
     private EnumFacing rotateZ() {
         return switch (this) {
             case EAST -> DOWN;
-            default -> throw new IllegalStateException("Unable to get Z-rotated facing of " + this);
             case WEST -> UP;
             case UP -> EAST;
             case DOWN -> WEST;
+            default -> throw new IllegalStateException("Unable to get Z-rotated facing of " + this);
         };
     }
 
@@ -306,7 +307,7 @@ public enum EnumFacing implements IStringSerializable {
             return p_apply_1_ != null && p_apply_1_.getAxis().getPlane() == this;
         }
 
-        public Iterator<EnumFacing> iterator() {
+        public @NotNull Iterator<EnumFacing> iterator() {
             return Iterators.forArray(this.facings());
         }
     }

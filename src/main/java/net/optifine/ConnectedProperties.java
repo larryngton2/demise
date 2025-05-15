@@ -129,7 +129,7 @@ public class ConnectedProperties {
         if (this.tiles == null) {
             return null;
         } else {
-            Map<Integer, Integer> map = new HashMap();
+            Map<Integer, Integer> map = new HashMap<>();
 
             for (Object object : props.keySet()) {
                 if (object instanceof String s) {
@@ -572,12 +572,10 @@ public class ConnectedProperties {
         TextureMap texturemap = Minecraft.getMinecraft().getTextureMapBlocks();
         TextureAtlasSprite textureatlassprite = texturemap.getSpriteSafe(iconName);
 
-        if (textureatlassprite != null) {
-            return textureatlassprite;
-        } else {
+        if (textureatlassprite == null) {
             textureatlassprite = texturemap.getSpriteSafe("blocks/" + iconName);
-            return textureatlassprite;
         }
+        return textureatlassprite;
     }
 
     private boolean isValidCtm(String path) {
@@ -872,8 +870,7 @@ public class ConnectedProperties {
                 }
             }
 
-            TextureAtlasSprite[] atextureatlassprite = (TextureAtlasSprite[]) list.toArray(new TextureAtlasSprite[0]);
-            return atextureatlassprite;
+            return (TextureAtlasSprite[]) list.toArray(new TextureAtlasSprite[0]);
         }
     }
 
@@ -911,16 +908,14 @@ public class ConnectedProperties {
     }
 
     private int getMax(int[] mds, int max) {
-        if (mds == null) {
-            return max;
-        } else {
+        if (mds != null) {
             for (int j : mds) {
                 if (j > max) {
                     max = j;
                 }
             }
 
-            return max;
         }
+        return max;
     }
 }
