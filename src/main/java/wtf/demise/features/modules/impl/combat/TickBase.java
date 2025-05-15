@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//todo fix maxTick implementation
 @ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TickBase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
@@ -52,7 +51,6 @@ public class TickBase extends Module {
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
     private EntityPlayer target;
     private boolean firstAnimation = true;
-    private int currentTick;
 
     @Override
     public void onEnable() {
@@ -70,8 +68,6 @@ public class TickBase extends Module {
     @EventTarget
     public void onTimerManipulation(TimerManipulationEvent e) {
         if (mode.is("Past")) {
-            updateTicks();
-
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
             }
@@ -80,10 +76,9 @@ public class TickBase extends Module {
                 shifted += e.getTime() - previousTime;
             }
 
-            if (shifted >= currentTick * 50L) {
+            if (shifted >= maxTick.get() * 50L) {
                 shifted = 0;
                 timer.reset();
-                currentTick = (int) maxTick.get();
             }
 
             previousTime = e.getTime();
@@ -96,7 +91,6 @@ public class TickBase extends Module {
         if (mode.is("Future")) {
             if (e.isPre()) return;
 
-            updateTicks();
 
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
@@ -105,7 +99,7 @@ public class TickBase extends Module {
             if (timer.hasTimeElapsed(delay.get())) {
                 if (shouldStart()) {
                     firstAnimation = false;
-                    while (skippedTick < currentTick && !shouldStop()) {
+                    while (skippedTick < maxTick.get() && !shouldStop()) {
                         skippedTick++;
                         try {
                             mc.runTick();
@@ -113,9 +107,8 @@ public class TickBase extends Module {
                             throw new RuntimeException(ex);
                         }
                     }
-                    currentTick = (int) maxTick.get();
-                    timer.reset();
                 }
+                timer.reset();
             }
         }
     }
@@ -128,7 +121,7 @@ public class TickBase extends Module {
 
         simulatedSelf.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
 
-        for (int i = 0; i < currentTick; i++) {
+        for (int i = 0; i < maxTick.get(); i++) {
             simulatedSelf.tick();
             selfPrediction.add(new PlayerUtils.PredictProcess(
                             simulatedSelf.getPos(),
@@ -165,32 +158,20 @@ public class TickBase extends Module {
         }
     }
 
-    private void updateTicks() {
-        if (target == null || shouldStop()) {
-            currentTick = (int) maxTick.get();
-            return;
-        }
-
-        while (currentTick > 0 && currentTick < maxTick.get() && !shouldStart()) {
-            currentTick--;
-        }
-
-        currentTick = (int) Math.max(Math.min(currentTick, maxTick.get()), 0);
-    }
-
-    private boolean shouldStart() {
-        Vec3 prediction;
-
+    private Vec3 getTargetPrediction() {
         if (useBacktrackPos.get() && getModule(BackTrack.class).isEnabled()) {
             Vec3 realPos = BackTrack.realPosition;
             Vec3 realLastPos = BackTrack.realLastPos;
-
-            prediction = realPos.subtract(new Vec3(realLastPos.xCoord, realLastPos.yCoord, realLastPos.zCoord)).multiply(targetPredictionTicks.get());
-        } else {
-            prediction = target.getPositionVector().subtract(new Vec3(target.prevPosX, target.prevPosY, target.prevPosZ)).multiply(targetPredictionTicks.get());
+            return realPos.subtract(new Vec3(realLastPos.xCoord, realLastPos.yCoord, realLastPos.zCoord))
+                    .multiply(targetPredictionTicks.get());
         }
+        return target.getPositionVector()
+                .subtract(new Vec3(target.prevPosX, target.prevPosY, target.prevPosZ))
+                .multiply(targetPredictionTicks.get());
+    }
 
-        AxisAlignedBB entityBoundingBox = target.getHitbox().offset(prediction);
+    private boolean shouldStart() {
+        AxisAlignedBB entityBoundingBox = target.getHitbox().offset(getTargetPrediction());
 
         double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(entityBoundingBox.getCenter(), mc.thePlayer);
         double predictedSelfDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.get(selfPrediction.size() - 1).position, target);
