@@ -83,7 +83,6 @@ import wtf.demise.features.modules.impl.visual.Atmosphere;
 import wtf.demise.features.modules.impl.visual.Camera;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.render.shader.impl.Sky;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -1292,10 +1291,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             ShadersRender.setFrustrumPosition(icamera, d0, d1, d2);
         } else {
             icamera.setPosition(d0, d1, d2);
-        }
-
-        if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("Shader Sky")) {
-            Sky.draw(Demise.INSTANCE.getStartTime());
         }
 
         if ((Config.isSkyEnabled() || Config.isSunMoonEnabled() || Config.isStarsEnabled()) && !Shaders.isShadowPass) {
