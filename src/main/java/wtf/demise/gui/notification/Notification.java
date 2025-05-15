@@ -38,7 +38,7 @@ public class Notification implements InstanceAccess {
     }
 
     public double getWidth() {
-        return Math.max(Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 8, 120);
+        return Math.max(Fonts.interSemiBold.get(17).getStringWidth(getTitle()), Fonts.interRegular.get(17).getStringWidth(getDescription())) + 9;
     }
 
     public double getHeight() {

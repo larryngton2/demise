@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
+import org.joml.Vector4d;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
@@ -12,6 +13,7 @@ import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.render.ProjectionComponent;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
@@ -29,11 +31,25 @@ public class TargetHUDWidget extends Widget {
 
     @Override
     public void render() {
+        this.height = getTHUDHeight();
+        this.width = getTHUDWidth();
+
         if (setting.target != null) {
-            this.height = getTHUDHeight();
-            this.width = getTHUDWidth();
-            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
-            targetHUD.render();
+            if (!setting.targetHUDTracking.get()) {
+                TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
+                targetHUD.render();
+            } else {
+                //todo
+                Vector4d position = ProjectionComponent.get(setting.target);
+
+                if (position == null) return;
+
+                double x = position.z;
+                double y = position.w - (position.w - position.y) / 2 - 0 / 2f;
+
+                TargetHUD targetHUD = new TargetHUD((float) x, (float) y, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
+                targetHUD.render();
+            }
         }
     }
 

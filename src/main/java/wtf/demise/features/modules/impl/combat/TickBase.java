@@ -29,16 +29,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//todo improve "future" mode
+//todo fix maxTick implementation
 @ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TickBase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
-    private final SliderValue attackRange = new SliderValue("Attack range", 3f, 0.1f, 7f, 0.1f, this);
+    private final SliderValue tickRange = new SliderValue("Tick range", 3f, 0.1f, 8f, 0.1f, this);
+    private final SliderValue minRange = new SliderValue("Min range", 2.5f, 0.1f, 8f, 0.1f, this);
+    private final SliderValue stopRange = new SliderValue("Stop range", 2.5f, 0.1f, 8f, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 15, 0.1f, this);
     private final SliderValue maxTick = new SliderValue("Max ticks", 4, 1, 20, this);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
-    private final SliderValue selfPredictionTicks = new SliderValue("Self prediction ticks", 4, 0, 20, 1, this);
     private final SliderValue targetPredictionTicks = new SliderValue("Target prediction ticks", 4, 0, 20, 1, this);
     private final BoolValue renderPredictedTargetPos = new BoolValue("Render predicted target pos", false, this);
     private final BoolValue renderPredictedSelfPos = new BoolValue("Render predicted self pos", false, this);
@@ -51,6 +52,7 @@ public class TickBase extends Module {
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
     private EntityPlayer target;
     private boolean firstAnimation = true;
+    private int currentTick;
 
     @Override
     public void onEnable() {
@@ -68,6 +70,8 @@ public class TickBase extends Module {
     @EventTarget
     public void onTimerManipulation(TimerManipulationEvent e) {
         if (mode.is("Past")) {
+            updateTicks();
+
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
             }
@@ -76,9 +80,10 @@ public class TickBase extends Module {
                 shifted += e.getTime() - previousTime;
             }
 
-            if (shifted >= maxTick.get() * 50) {
+            if (shifted >= currentTick * 50L) {
                 shifted = 0;
                 timer.reset();
+                currentTick = (int) maxTick.get();
             }
 
             previousTime = e.getTime();
@@ -91,6 +96,8 @@ public class TickBase extends Module {
         if (mode.is("Future")) {
             if (e.isPre()) return;
 
+            updateTicks();
+
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
             }
@@ -98,7 +105,7 @@ public class TickBase extends Module {
             if (timer.hasTimeElapsed(delay.get())) {
                 if (shouldStart()) {
                     firstAnimation = false;
-                    while (skippedTick < maxTick.get() && !shouldStop()) {
+                    while (skippedTick < currentTick && !shouldStop()) {
                         skippedTick++;
                         try {
                             mc.runTick();
@@ -106,6 +113,7 @@ public class TickBase extends Module {
                             throw new RuntimeException(ex);
                         }
                     }
+                    currentTick = (int) maxTick.get();
                     timer.reset();
                 }
             }
@@ -120,7 +128,7 @@ public class TickBase extends Module {
 
         simulatedSelf.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
 
-        for (int i = 0; i < (int) selfPredictionTicks.get(); i++) {
+        for (int i = 0; i < currentTick; i++) {
             simulatedSelf.tick();
             selfPrediction.add(new PlayerUtils.PredictProcess(
                             simulatedSelf.getPos(),
@@ -157,7 +165,20 @@ public class TickBase extends Module {
         }
     }
 
-    public boolean shouldStart() {
+    private void updateTicks() {
+        if (target == null || shouldStop()) {
+            currentTick = (int) maxTick.get();
+            return;
+        }
+
+        while (currentTick > 0 && currentTick < maxTick.get() && !shouldStart()) {
+            currentTick--;
+        }
+
+        currentTick = (int) Math.max(Math.min(currentTick, maxTick.get()), 0);
+    }
+
+    private boolean shouldStart() {
         Vec3 prediction;
 
         if (useBacktrackPos.get() && getModule(BackTrack.class).isEnabled()) {
@@ -165,7 +186,6 @@ public class TickBase extends Module {
             Vec3 realLastPos = BackTrack.realLastPos;
 
             prediction = realPos.subtract(new Vec3(realLastPos.xCoord, realLastPos.yCoord, realLastPos.zCoord)).multiply(targetPredictionTicks.get());
-
         } else {
             prediction = target.getPositionVector().subtract(new Vec3(target.prevPosX, target.prevPosY, target.prevPosZ)).multiply(targetPredictionTicks.get());
         }
@@ -176,15 +196,17 @@ public class TickBase extends Module {
         double predictedSelfDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.get(selfPrediction.size() - 1).position, target);
 
         return predictedSelfDistance < predictedTargetDistance &&
-                predictedSelfDistance + 0.5657 <= attackRange.get() &&
+                predictedSelfDistance + 0.5657 <= tickRange.get() &&
+                predictedSelfDistance + 0.5657 > minRange.get() &&
                 predictedSelfDistance <= searchRange.get() &&
-                PlayerUtils.getDistanceToEntityBox(target) >= attackRange.get() &&
+                PlayerUtils.getDistanceToEntityBox(target) >= stopRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&
                 target.canEntityBeSeen(mc.thePlayer) &&
-                !selfPrediction.get(selfPrediction.size() - 1).isCollidedHorizontally;
+                !selfPrediction.get(selfPrediction.size() - 1).isCollidedHorizontally &&
+                !mc.thePlayer.isCollidedHorizontally;
     }
 
-    public boolean shouldStop() {
+    private boolean shouldStop() {
         return mc.thePlayer.hurtTime > hurtTimeToStop.get();
     }
 

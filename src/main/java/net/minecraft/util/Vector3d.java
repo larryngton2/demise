@@ -1,5 +1,8 @@
 package net.minecraft.util;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class Vector3d {
     public double x;
     public double y;

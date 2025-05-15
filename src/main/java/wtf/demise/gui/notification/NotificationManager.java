@@ -40,6 +40,7 @@ public class NotificationManager implements InstanceAccess {
 
     public void publish(ScaledResolution sr, boolean shader) {
         float yOffset = 0;
+
         for (Notification notification : getNotifications()) {
             float width = (float) notification.getWidth();
             float height = (float) notification.getHeight();
@@ -61,7 +62,7 @@ public class NotificationManager implements InstanceAccess {
                 y = 10 + Fonts.urbanist.get(38).getHeight() + 5 - yOffset;
 
                 notification.getAnimation().setDuration(150);
-                actualOffset = 10;
+                actualOffset = 7;
 
                 if (!shader) {
                     RoundedUtils.drawRound(x, y, width, height, 7, new Color(anInterface.bgColor(), true));

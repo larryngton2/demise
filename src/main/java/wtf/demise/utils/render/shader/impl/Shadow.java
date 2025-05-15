@@ -67,11 +67,29 @@ public class Shadow implements InstanceAccess {
             bloomShader.setUniformi("inTexture", 0);
             bloomShader.setUniformi("textureToCheck", 16);
             bloomShader.setUniformf("radius", radius);
+            bloomShader.setUniformf("weights", generateGaussianWeights(radius, 4));
             glUniform1fv(bloomShader.getUniform("weights"), weightBuffer);
             prevRadius = radius;
         }
 
         bloomShader.setUniformf("texelSize", 1.0F / (float) mc.displayWidth, 1.0F / (float) mc.displayHeight);
         bloomShader.setUniformf("direction", directionX, directionY);
+    }
+
+    public static float[] generateGaussianWeights(int radius, float sigma) {
+        float[] weights = new float[256];
+        float sum = 0.0f;
+
+        for (int i = 0; i <= radius; i++) {
+            float weight = (float) Math.exp(-((float) i * (float) i) / (2 * sigma * sigma));
+            weights[i] = weight;
+            sum += (i == 0) ? weight : 2 * weight;
+        }
+
+        for (int i = 0; i <= radius; i++) {
+            weights[i] /= sum;
+        }
+
+        return weights;
     }
 }

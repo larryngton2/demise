@@ -198,7 +198,7 @@ public class ShaderUtils implements InstanceAccess {
             
                 alpha /= weightSum;
             
-                alpha *= 0.85;
+                alpha *= 0.8;
             
                 gl_FragColor = vec4(0.0, 0.0, 0.0, alpha);
             }

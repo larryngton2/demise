@@ -46,16 +46,22 @@ public class Interface extends Module {
     ), this);
 
     private final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
+
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
+    public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
+
     private final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
+
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
+
+    public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this, () -> elements.isEnabled("Target HUD"));
+
     private final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
     private final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
-    public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
     public final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
     public final BoolValue healthFix = new BoolValue("Health fix", true, this);
