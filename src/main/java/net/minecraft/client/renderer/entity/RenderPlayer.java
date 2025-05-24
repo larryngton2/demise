@@ -12,8 +12,6 @@ import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.ResourceLocation;
-import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.Camera;
 
 public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
     private final boolean smallArms;
@@ -40,9 +38,6 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
     public void doRender(AbstractClientPlayer entity, double x, double y, double z, float entityYaw, float partialTicks) {
         if (!entity.isUser() || this.renderManager.livingPlayer == entity) {
             double d0 = y;
-
-            if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("Bright Players"))
-                GlStateManager.disableLighting();
 
             if (entity.isSneaking() && !(entity instanceof EntityPlayerSP)) {
                 d0 = y - 0.125D;

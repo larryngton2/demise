@@ -43,6 +43,10 @@ public class GifRenderer implements InstanceAccess {
         this.lastUpdate = System.currentTimeMillis();
     }
 
+    public void drawTexture(float x, float y) {
+        drawTexture(x, y, getWidth(), getHeight());
+    }
+
     public void drawTexture(float x, float y, float width, float height) {
         GlStateManager.enableTexture2D();
 

@@ -42,12 +42,18 @@ public class AutoRod extends Module {
     private final SliderValue fov = new SliderValue("Fov", 90, 0, 360, 1, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this);
     private final SliderValue predictSize = new SliderValue("Predict Size", 2, 0.1f, 10, 0.1f, this, rotate::get);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "None"}, "Linear", this);
-    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, this, rotate::get);
-    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, this, rotate::get);
-    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, this, rotate::get);
-    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, this, rotate::get);
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> rotate.get() && smoothMode.is("Bezier"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Relative", "None"}, "Linear", this);
+    private final BoolValue accelerate = new BoolValue("Accelerate", false, this, () -> !smoothMode.is("None"));
+    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue accelIncrement = new SliderValue("Accel increment", 0.5f, 0.01f, 25, 0.01f, this, accelerate::get);
+    private final SliderValue accelDecrement = new SliderValue("Accel decrement", 0.5f, 0.01f, 25, 0.01f, this, accelerate::get);
+    private final SliderValue minAccel = new SliderValue("Min accel", 10, 0.01f, 180, 0.01f, this, accelerate::get);
+    private final SliderValue maxAccel = new SliderValue("Max accel", 90, 0.01f, 180, 0.01f, this, accelerate::get);
+    private final SliderValue angleDiffToReduce = new SliderValue("Angle diff to reduce", 25, 1, 180, 1, this, accelerate::get);
+    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> smoothMode.is("Bezier"));
     private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
     private final BoolValue onlyOnKillAura = new BoolValue("Only on KillAura", false, this);
 
@@ -185,7 +191,7 @@ public class AutoRod extends Module {
             hSpeed = randYawSpeed * mc.timer.partialTicks;
             vSpeed = randPitchSpeed * mc.timer.partialTicks;
 
-            RotationUtils.setRotation(finalRotation, correction, hSpeed, vSpeed, mode, midpoint.get());
+            RotationUtils.setRotation(finalRotation, correction, hSpeed, vSpeed, midpoint.get(), mode);
         }
     }
 

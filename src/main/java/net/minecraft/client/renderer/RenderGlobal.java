@@ -297,8 +297,6 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
     }
 
     private void renderSky(WorldRenderer worldRendererIn, float posY, boolean reverseX) {
-        int i = 64;
-        int j = 6;
         worldRendererIn.begin(7, DefaultVertexFormats.POSITION);
         int k = (this.renderDistance / 64 + 1) * 64 + 64;
 
@@ -2829,14 +2827,6 @@ public class RenderGlobal implements IWorldAccess, IResourceManagerReloadListene
             this.renderChunk = p_i2_1_;
             this.facing = p_i2_2_;
             this.setFacing = p_i2_3_;
-        }
-
-        public void setFacingBit(byte p_setFacingBit_1_, EnumFacing p_setFacingBit_2_) {
-            this.setFacing = this.setFacing | p_setFacingBit_1_ | 1 << p_setFacingBit_2_.ordinal();
-        }
-
-        public boolean isFacingBit(EnumFacing p_isFacingBit_1_) {
-            return (this.setFacing & 1 << p_isFacingBit_1_.ordinal()) > 0;
         }
 
         private void initialize(EnumFacing p_initialize_1_, int p_initialize_2_) {

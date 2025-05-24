@@ -20,6 +20,7 @@ import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SmoothMode;
@@ -50,10 +51,16 @@ public class AutoWalk extends Module {
         } else {
             EntityLivingBase target = findTarget();
             if (target != null) {
+
+                //nah
+
+                /*
                 if (rotate.get()) {
-                    mc.thePlayer.rotationYaw = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, SmoothMode.Linear)[0];
-                    mc.thePlayer.rotationPitch = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, SmoothMode.Linear)[1];
+                    mc.thePlayer.rotationYaw = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, 90, SmoothMode.Linear)[0];
+                    mc.thePlayer.rotationPitch = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, 90, SmoothMode.Linear)[1];
                 }
+
+                 */
 
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), PlayerUtils.getDistanceToEntityBox(target) > minRange.get());
             }

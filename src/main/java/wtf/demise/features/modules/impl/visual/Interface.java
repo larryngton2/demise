@@ -45,106 +45,94 @@ public class Interface extends Module {
             new BoolValue("Info", true)
     ), this);
 
-    private final ModeValue watemarkMode = new ModeValue("Watermark Mode", new String[]{"Text", "Modern"}, "Modern", this, () -> elements.isEnabled("Watermark"));
-
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
-
-    private final ModeValue armorMode = new ModeValue("Armor Mode", new String[]{"Default"}, "Default", this, () -> elements.isEnabled("Armor"));
-
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
-
     public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this, () -> elements.isEnabled("Target HUD"));
-
     private final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
     private final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
-    public final SliderValue bgAlpha = new SliderValue("Background Alpha", 100, 1, 255, 1, this);
+    public final SliderValue bgAlpha = new SliderValue("Background Alpha", 204, 1, 255, 1, this);
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
-    public final BoolValue healthFix = new BoolValue("Health fix", true, this);
+    public final BoolValue funy = new BoolValue("funy", false, this);
 
     public final DecelerateAnimation decelerateAnimation = new DecelerateAnimation(175, 1);
     public EntityLivingBase target;
+    private ScaledResolution sr;
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
-        if (watemarkMode.canDisplay()) {
-            switch (watemarkMode.get()) {
-                case "Text":
-                    Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, new Color(255, 255, 255, 208).getRGB());
-                    Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
-                    break;
-                case "Modern":
-                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE + " | " + CurrentUser.FINAL_USER + " | " + PlayerUtils.getCurrServer();
-                    int x = 7;
-                    int y = 7;
-                    int width = Fonts.interSemiBold.get(17).getStringWidth("") + Fonts.interSemiBold.get(17).getStringWidth(name) + 5;
-                    int height = Fonts.interSemiBold.get(17).getHeight() + 3;
+        sr = event.scaledResolution();
 
-                    RoundedUtils.drawRound(x, y, width, height, 4, new Color(getModule(Interface.class).bgColor(), true));
-                    Fonts.interSemiBold.get(17).drawStringWithShadow(name, Fonts.interBold.get(17).getStringWidth("") + x + 2, y + 4.5f, new Color(color(1)).getRGB());
-                    break;
-            }
+        if (elements.isEnabled("Watermark")) {
+            Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, new Color(255, 255, 255, 208).getRGB());
+            Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
         }
 
-        if (armorMode.canDisplay()) {
-            if (armorMode.is("Default")) {
-                ArrayList<ItemStack> stuff = new ArrayList<>();
-                boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
-                int split = -3;
-                for (int index = 3; index >= 0; --index) {
-                    ItemStack armor = mc.thePlayer.inventory.armorInventory[index];
-                    if (armor == null) continue;
-                    stuff.add(armor);
-                }
+        if (elements.isEnabled("Armor")) {
+            ArrayList<ItemStack> stuff = new ArrayList<>();
+            boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
+            int split = -3;
+            for (int index = 3; index >= 0; --index) {
+                ItemStack armor = mc.thePlayer.inventory.armorInventory[index];
+                if (armor == null) continue;
+                stuff.add(armor);
+            }
 
-                if (SpoofSlotUtils.getSpoofedStack() != null) {
-                    stuff.add(SpoofSlotUtils.getSpoofedStack());
-                }
+            if (SpoofSlotUtils.getSpoofedStack() != null) {
+                stuff.add(SpoofSlotUtils.getSpoofedStack());
+            }
 
-                for (ItemStack everything : stuff) {
-                    split += 16;
+            for (ItemStack everything : stuff) {
+                split += 16;
 
-                    RenderUtils.renderItemStack(everything, split + (double) event.scaledResolution().getScaledWidth() / 2 - 4, event.scaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
-                }
+                RenderUtils.renderItemStack(everything, split + (double) event.scaledResolution().getScaledWidth() / 2 - 4, event.scaledResolution().getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
             }
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), false);
+            Demise.INSTANCE.getNotificationManager().publish(false);
         }
     }
 
     @EventTarget
     public void onShader2D(Shader2DEvent event) {
         if (elements.isEnabled("Watermark")) {
-            switch (watemarkMode.get()) {
-                case "Text":
-                    Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, Color.black.getRGB());
-                    Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, Color.black.getRGB());
-                    break;
-                case "Modern":
-                    String name = Demise.INSTANCE.getClientName().toLowerCase() + EnumChatFormatting.WHITE + " | " + CurrentUser.FINAL_USER + " | " + PlayerUtils.getCurrServer();
-                    int x = 7;
-                    int y = 7;
-                    int width = Fonts.interSemiBold.get(17).getStringWidth("") + Fonts.interSemiBold.get(17).getStringWidth(name) + 5;
-                    int height = Fonts.interSemiBold.get(17).getHeight() + 3;
+            Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, Color.black.getRGB());
+            Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, Color.black.getRGB());
+        }
 
-                    RoundedUtils.drawShaderRound(x, y, width, height, 4, Color.black);
-                    break;
+        if (elements.isEnabled("Armor")) {
+            ArrayList<ItemStack> stuff = new ArrayList<>();
+            boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
+            int split = -3;
+            for (int index = 3; index >= 0; --index) {
+                ItemStack armor = mc.thePlayer.inventory.armorInventory[index];
+                if (armor == null) continue;
+                stuff.add(armor);
+            }
+
+            if (SpoofSlotUtils.getSpoofedStack() != null) {
+                stuff.add(SpoofSlotUtils.getSpoofedStack());
+            }
+
+            for (ItemStack everything : stuff) {
+                split += 16;
+
+                RenderUtils.renderItemStack(everything, split + (double) sr.getScaledWidth() / 2 - 4, sr.getScaledHeight() - (onWater ? 67 : 57) + (mc.thePlayer.capabilities.isCreativeMode ? 10 : 0), 1, true, 0.5f);
             }
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(new ScaledResolution(mc), true);
+            Demise.INSTANCE.getNotificationManager().publish(true);
         }
     }
 
     @EventTarget
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent e) {
         mainColor.setRainbow(color.is("Rainbow"));
         KillAura aura = getModule(KillAura.class);
 
@@ -226,6 +214,6 @@ public class Interface extends Module {
     }
 
     public int bgColor() {
-        return new Color(0, 0, 0, background.get () ? (int) bgAlpha.get() : 0).getRGB();
+        return new Color(21, 21, 21, background.get () ? (int) bgAlpha.get() : 0).getRGB();
     }
 }

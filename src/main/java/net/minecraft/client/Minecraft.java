@@ -1203,12 +1203,13 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
                 Display.setDisplayMode(new DisplayMode(this.tempDisplayWidth, this.tempDisplayHeight));
                 this.displayWidth = this.tempDisplayWidth;
                 this.displayHeight = this.tempDisplayHeight;
-
             }
-            if (this.displayWidth <= 0) {
+
+            if (this.displayWidth <= 1) {
                 this.displayWidth = 1;
             }
-            if (this.displayHeight <= 0) {
+
+            if (this.displayHeight <= 1) {
                 this.displayHeight = 1;
             }
 

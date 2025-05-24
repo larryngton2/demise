@@ -1,11 +1,12 @@
 package wtf.demise.features.modules.impl.legit;
 
-import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.network.play.server.S18PacketEntityTeleport;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
+import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.MotionEvent;
@@ -19,23 +20,23 @@ import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.animations.ContinualAnimation;
-import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.packet.BadPacketsComponent;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
+import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
+
 @ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach.", category = ModuleCategory.Legit)
 public class BackTrack extends Module {
     private final BoolValue onlyWhenNeeded = new BoolValue("Only when needed", false, this);
-    private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this);
+    private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this, onlyWhenNeeded::get);
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
     private final SliderValue maxRange = new SliderValue("Max range", 6, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
     private final BoolValue extraCheck = new BoolValue("Extra check", true, this);
-    private final SliderValue minMS = new SliderValue("Min ms", 50, 0, 5000, 5, this);
-    private final SliderValue maxMS = new SliderValue("Max ms", 200, 0, 5000, 5, this);
+    private final SliderValue ms = new SliderValue("Delay ms", 50, 0, 5000, 5, this);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
     private final ModeValue esp = new ModeValue("Mode", new String[]{"Off", "Box", "FakePlayer"}, "Box", this);
     private final ColorValue color = new ColorValue("Color", new Color(0, 0, 0, 100), this, () -> esp.is("Box"));
@@ -46,10 +47,7 @@ public class BackTrack extends Module {
     private final ContinualAnimation animatedX = new ContinualAnimation();
     private final ContinualAnimation animatedY = new ContinualAnimation();
     private final ContinualAnimation animatedZ = new ContinualAnimation();
-    private int ping;
     public static boolean shouldLag;
-    private EntityOtherPlayerMP fakePlayer;
-    private boolean addedEntity;
     private boolean dispatched;
     private boolean outOfRange;
 
@@ -61,26 +59,15 @@ public class BackTrack extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        setTag(ping + " ms");
-
-        if (target != null && esp.is("FakePlayer")) {
-            fakePlayer.setPositionAndRotation(realPosition.xCoord, realPosition.yCoord, realPosition.zCoord, target.rotationYaw, target.rotationPitch);
-            fakePlayer.rotationYawHead = target.rotationYawHead;
-            fakePlayer.setSprinting(target.isSprinting());
-            fakePlayer.setInvisible(false);
-            fakePlayer.setSneaking(target.isSneaking());
-            fakePlayer.renderYawOffset = target.renderYawOffset;
-        }
+        setTag((int) ms.get() + " ms");
     }
 
     @EventTarget
     public void onMotion(MotionEvent e) {
-        if (e.isPre()) {
+        if (e.isPost()) {
             if (mc.thePlayer.isDead) return;
 
             target = PlayerUtils.getTarget(8, teamCheck.get());
-
-            if (ping == 0) ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
 
             if (target == null) return;
 
@@ -95,14 +82,19 @@ public class BackTrack extends Module {
                 outOfRange = false;
             }
 
-            boolean distanceCheck = PlayerUtils.getCustomDistanceToEntityBox(target.getPositionVector(), mc.thePlayer) > PlayerUtils.getCustomDistanceToEntityBox(target.getPrevPositionVector(), mc.thePlayer);
+            boolean distanceCheck = PlayerUtils.getCustomDistanceToEntityBox(target.getPositionVector(), mc.thePlayer) >= PlayerUtils.getCustomDistanceToEntityBox(target.getPrevPositionVector(), mc.thePlayer);
             boolean extraCheck = distanceCheck || !this.extraCheck.get();
             boolean onlyNeeded = extraCheck && (realDistance > attackRange.get() || outOfRange) && realDistance < attackRange.get() + 1.5 && clientDistance <= attackRange.get();
             boolean on = extraCheck && realDistance > minRange.get() && realDistance < maxRange.get();
 
+            shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;
+
             if (shouldLag) {
-                ping = MathUtils.randomizeInt(minMS.get(), maxMS.get());
-                PingSpoofComponent.spoof(ping, true, true, true, true, false, false);
+                if (realDistance > 3 && target.hurtTime == 10) {
+                    ChatUtils.sendMessageClient("Attacked from " + realDistance + " blocks");
+                }
+
+                PingSpoofComponent.spoof((int) ms.get(), true, true, true, true, false, false);
                 dispatched = false;
             } else {
                 if (!dispatched) {
@@ -111,18 +103,12 @@ public class BackTrack extends Module {
                     dispatched = true;
                 }
             }
-
-            shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;
         }
     }
 
     @EventTarget
     public void onPacket(PacketEvent e) {
         if (e.getState() == PacketEvent.State.INCOMING) {
-            if (target == null) {
-                return;
-            }
-
             realLastPos = realPosition;
 
             if (e.getPacket() instanceof S14PacketEntity s14PacketEntity) {
@@ -145,12 +131,12 @@ public class BackTrack extends Module {
     @EventTarget
     public void onRender3D(Render3DEvent e) {
         if (target != null) {
+            double x = realPosition.xCoord - mc.getRenderManager().viewerPosX;
+            double y = realPosition.yCoord - mc.getRenderManager().viewerPosY;
+            double z = realPosition.zCoord - mc.getRenderManager().viewerPosZ;
+
             switch (esp.get()) {
                 case "Box": {
-                    double x = realPosition.xCoord - mc.getRenderManager().viewerPosX;
-                    double y = realPosition.yCoord - mc.getRenderManager().viewerPosY;
-                    double z = realPosition.zCoord - mc.getRenderManager().viewerPosZ;
-
                     animatedX.animate((float) x, 20);
                     animatedY.animate((float) y, 20);
                     animatedZ.animate((float) z, 20);
@@ -164,17 +150,17 @@ public class BackTrack extends Module {
                 }
                 break;
                 case "FakePlayer": {
+                    animatedX.animate((float) x, 20);
+                    animatedY.animate((float) y, 20);
+                    animatedZ.animate((float) z, 20);
+
                     if (shouldLag) {
-                        if (!addedEntity) {
-                            fakePlayer = new EntityOtherPlayerMP(mc.theWorld, target.getGameProfile());
-                            mc.theWorld.addEntityToWorld(fakePlayer.getEntityId(), fakePlayer);
-                            addedEntity = true;
-                        }
-                    } else {
-                        if (addedEntity) {
-                            mc.theWorld.removeEntityFromWorld(fakePlayer.getEntityId());
-                            addedEntity = false;
-                        }
+                        GlStateManager.pushMatrix();
+                        GL11.glPushAttrib(GL_ALL_ATTRIB_BITS);
+                        GlStateManager.color(0.6f, 0.6f, 0.6f);
+                        mc.getRenderManager().doRenderEntity(target, animatedX.getOutput(), animatedY.getOutput(), animatedZ.getOutput(), target.rotationYawHead, e.partialTicks(), true);
+                        GlStateManager.popAttrib();
+                        GlStateManager.popMatrix();
                     }
                 }
                 break;

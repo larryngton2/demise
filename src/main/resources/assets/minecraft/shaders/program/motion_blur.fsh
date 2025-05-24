@@ -9,7 +9,6 @@ varying vec2 oneTexel;
 uniform vec2 InSize;
 
 uniform vec3 Phosphor = vec3(0.7, 0.0, 0.0);
-uniform float LerpFactor = 1.0;
 
 void main() {
     vec4 CurrTexel = texture2D(DiffuseSampler, texCoord);

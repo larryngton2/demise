@@ -161,7 +161,9 @@ public class EffectRenderer {
         long i = System.currentTimeMillis();
         int j = entitiesFX.size();
 
-        for (EntityFX entityfx : entitiesFX) {
+        /// DONT REPLACE WITH ENHANCED "FOR"
+        for (int k = 0; k < entitiesFX.size(); ++k) {
+            EntityFX entityfx = entitiesFX.get(k);
             this.tickParticle(entityfx);
 
             if (entityfx.isDead) {

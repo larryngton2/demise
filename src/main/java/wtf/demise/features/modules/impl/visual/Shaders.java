@@ -37,7 +37,9 @@ public class Shaders extends Module {
             stencilFramebuffer.unbindFramebuffer();
             RenderUtils.resetColor();
 
-            Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+            if (stencilFramebuffer.framebufferTexture > 0) {
+                Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
+            }
         }
     }
 }

@@ -2,10 +2,13 @@ package wtf.demise.gui.widget.impl;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import org.joml.Vector4d;
+import org.lwjgl.opengl.GL11;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
@@ -39,17 +42,45 @@ public class TargetHUDWidget extends Widget {
                 TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
                 targetHUD.render();
             } else {
-                //todo
-                Vector4d position = ProjectionComponent.get(setting.target);
-
-                if (position == null) return;
-
-                double x = position.z;
-                double y = position.w - (position.w - position.y) / 2 - 0 / 2f;
-
-                TargetHUD targetHUD = new TargetHUD((float) x, (float) y, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
-                targetHUD.render();
+                renderHUDOnTarget(setting.target, setting.target.posX, setting.target.posY, setting.target.posZ);
             }
+        }
+    }
+
+    //todo... to fucking do
+    protected void renderHUDOnTarget(Entity entityIn, double x, double y, double z) {
+        double d0 = entityIn.getDistanceSqToEntity(mc.getRenderManager().livingPlayer);
+
+        if (d0 <= (double) (64 * 64)) {
+            float f = 1.6F;
+            float f1 = 0.016666668F * f;
+            GlStateManager.pushMatrix();
+            GlStateManager.translate((float) x + 0.0F, (float) y + entityIn.height * 0.85f, (float) z);
+            GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+            GlStateManager.scale(-f1, -f1, f1);
+            GlStateManager.disableLighting();
+            GlStateManager.depthMask(false);
+            GlStateManager.disableDepth();
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            int i = 0;
+
+            int j = (int) (getTHUDWidth() / 2);
+            GlStateManager.disableTexture2D();
+            GlStateManager.enableTexture2D();
+            TargetHUD targetHUD = new TargetHUD(-j, i, (EntityPlayer) entityIn, setting.decelerateAnimation, false);
+            targetHUD.render();
+            //fontrenderer.drawStringWithShadow(str, -j, i, 553648127);
+            GlStateManager.enableDepth();
+            GlStateManager.depthMask(true);
+            targetHUD.render();
+            //fontrenderer.drawStringWithShadow(str, -j, i, -1);
+            GlStateManager.enableLighting();
+            GlStateManager.disableBlend();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
         }
     }
 
@@ -131,14 +162,6 @@ class TargetHUD implements InstanceAccess {
             Fonts.interSemiBold.get(18).drawString(target.getName(), x + 37, y + 6, -1);
 
             RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
-
-                    /*
-                    int redAlpha = (int) ((target.hurtTime - 2) * 10 * 2.55f) - 50;
-
-                    if (redAlpha > 0) {
-                        RoundedUtils.drawRound(x + 3.2f, y + 3.2f, 30.5f, 30.5f, 4.8f, new Color(255, 0, 0, redAlpha));
-                    }
-                    */
         } else {
             RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
         }

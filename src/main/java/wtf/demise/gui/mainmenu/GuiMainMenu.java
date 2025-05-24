@@ -35,13 +35,11 @@ public class GuiMainMenu extends GuiScreen {
     public static boolean fade = true;
     private int alpha = 255;
     private boolean funny;
-    private ScaledResolution sr;
     private final TimerUtils timer = new TimerUtils();
 
     @Override
     public void initGui() {
         buttons.forEach(MenuButton::initGui);
-        sr = new ScaledResolution(mc);
         funny = Math.random() > 0.99;
         timer.reset();
     }
@@ -91,7 +89,7 @@ public class GuiMainMenu extends GuiScreen {
         interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
         interpolatedY = MathUtils.interpolate(interpolatedY, y, 0.25f);
 
-        Fonts.interBold.get(35).drawStringWithShadow(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, Color.lightGray.getRGB());
+        Fonts.urbanist.get(38).drawString(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, new Color(255, 255, 255, 208).getRGB());
 
         if (fade) {
             if (CurrentUser.USER != null) {

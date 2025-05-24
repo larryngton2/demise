@@ -35,7 +35,7 @@ public class Main {
         OptionSpec<Integer> optionspec6 = optionparser.accepts("proxyPort").withRequiredArg().defaultsTo("8080", new String[0]).ofType(Integer.class);
         OptionSpec<String> optionspec7 = optionparser.accepts("proxyUser").withRequiredArg();
         OptionSpec<String> optionspec8 = optionparser.accepts("proxyPass").withRequiredArg();
-        OptionSpec<String> optionspec9 = optionparser.accepts("username").withRequiredArg().defaultsTo("Player" + Minecraft.getSystemTime() % 1000L);
+        OptionSpec<String> optionspec9 = optionparser.accepts("username").withRequiredArg().defaultsTo("Player" + System.currentTimeMillis() % 1000L);
         OptionSpec<String> optionspec10 = optionparser.accepts("uuid").withRequiredArg();
         OptionSpec<String> optionspec11 = optionparser.accepts("accessToken").withRequiredArg().required();
         OptionSpec<String> optionspec12 = optionparser.accepts("version").withRequiredArg().required();

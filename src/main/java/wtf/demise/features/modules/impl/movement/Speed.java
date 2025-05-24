@@ -102,6 +102,9 @@ public class Speed extends Module {
         }
 
         switch (mode.get()) {
+            case "Legit":
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), mc.thePlayer.onGround && MoveUtil.isMoving());
+                break;
             case "NCP":
                 if (ncpMode.is("On tick 4")) {
                     if (mc.thePlayer.offGroundTicks == 4 && mc.thePlayer.posY % 1.0 == 0.16610926093821377) {
@@ -261,7 +264,6 @@ public class Speed extends Module {
                     }
                 }
                 break;
-
             case "NCP":
                 switch (ncpMode.get()) {
                     case "On tick 5":
@@ -313,9 +315,6 @@ public class Speed extends Module {
                         }
                         break;
                 }
-                break;
-            case "Legit":
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), mc.thePlayer.onGround && MoveUtil.isMoving());
                 break;
         }
     }

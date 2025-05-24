@@ -7,14 +7,13 @@ import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.StringUtils;
+import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class KeystrokeWidget extends Widget {
     private final Key w = new Key(new float[]{20, 0}, mc.gameSettings.keyBindForward.getKeyCode());
@@ -43,23 +42,27 @@ public class KeystrokeWidget extends Widget {
     }
 
     private void drawKeystrokes(boolean shader) {
-        for (Key key : keyList) {
-            key.updateState();
+        w.setPressed(mc.thePlayer.movementInput.moveForward > 0);
+        a.setPressed(mc.thePlayer.movementInput.moveStrafe > 0);
+        s.setPressed(mc.thePlayer.movementInput.moveForward < 0);
+        d.setPressed(mc.thePlayer.movementInput.moveStrafe < 0);
+        jump.setPressed(mc.thePlayer.movementInput.jump);
 
+        for (Key key : keyList) {
             float x = renderX + key.getPos()[0];
             float y = renderY + key.getPos()[1];
             float width = key.getWidth();
             float height = key.getHeight();
-            //Color color;
+            Color color;
 
             if (key.isPressed()) {
                 x += 0.85f;
                 y += 0.85f;
                 width -= 1.7f;
                 height -= 1.7f;
-                //color = new Color(46, 46, 46, 178);
+                color = new Color(46, 46, 46, (int) setting.bgAlpha.get());
             } else {
-                //color = new Color(setting.bgColor(), true);
+                color = new Color(setting.bgColor(), true);
             }
 
             key.setInterpolatedX(MathUtils.interpolate(key.getInterpolatedX(), x, 0.25f));
@@ -67,12 +70,11 @@ public class KeystrokeWidget extends Widget {
             key.setInterpolatedWidth(MathUtils.interpolate(key.getInterpolatedWidth(), width, 0.25f));
             key.setInterpolatedHeight(MathUtils.interpolate(key.getInterpolatedHeight(), height, 0.25f));
 
-            //key.setColor(ColorUtils.interpolateColorC(key.getColor(), color, 0.25f));
+            key.setColor(ColorUtils.interpolateColorC(key.getColor(), color, 0.25f));
 
             if (!shader) {
-                //todo interpolate color
-                RoundedUtils.drawRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, new Color(setting.bgColor(), true) /* key.getColor() */);
-                Fonts.interRegular.get(14).drawCenteredString(key.getName(), (key.getInterpolatedX() + key.getInterpolatedWidth() / 2) - 0.5f, (key.getInterpolatedY() + key.getInterpolatedHeight() / 2) - 1, setting.color());
+                RoundedUtils.drawRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, key.getColor());
+                Fonts.interRegular.get(14).drawCenteredString(key.getName(), (key.getInterpolatedX() + key.getInterpolatedWidth() / 2) - 0.5f, (key.getInterpolatedY() + key.getInterpolatedHeight() / 2) - 1.5, setting.color());
             } else {
                 RoundedUtils.drawShaderRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, Color.black);
             }
@@ -100,7 +102,7 @@ class Key {
     private float interpolatedY;
     private float renderX;
     private float renderY;
-    private Color color;
+    private Color color = new Color(0, 0, 0);
 
     public Key(float[] pos, int keyCode) {
         this.pos = pos;
@@ -116,9 +118,5 @@ class Key {
         this.name = StringUtils.capitalizeWords(Keyboard.getKeyName(keyCode));
         this.width = width;
         this.height = 17;
-    }
-
-    public void updateState() {
-        isPressed = Keyboard.isKeyDown(keyCode);
     }
 }

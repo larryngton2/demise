@@ -179,7 +179,7 @@ public class CustomWidgets implements InstanceAccess {
                     interpolatedChatY = height;
                 }
 
-                interpolatedChatY = MathUtils.interpolate(interpolatedChatY, height, 0.1f);
+                interpolatedChatY = MathUtils.interpolate(interpolatedChatY, height, 0.25f);
 
                 GlStateManager.translate(10, interpolatedChatY, 0.0F);
                 GlStateManager.scale(f1, f1, 1.0F);
@@ -201,9 +201,9 @@ public class CustomWidgets implements InstanceAccess {
                 int lineHeight = j * 9;
 
                 if (lineHeight != 0) {
-                    interpolatedChatHeight = MathUtils.interpolate(interpolatedChatHeight, lineHeight, 0.1f);
+                    interpolatedChatHeight = MathUtils.interpolate(interpolatedChatHeight, lineHeight, 0.25f);
                 } else {
-                    interpolatedChatHeight = MathUtils.interpolate(interpolatedChatHeight, -4, 0.1f);
+                    interpolatedChatHeight = MathUtils.interpolate(interpolatedChatHeight, -4, 0.25f);
                 }
 
                 if (chatBackgroundAlpha > 3) {
@@ -333,13 +333,13 @@ public class CustomWidgets implements InstanceAccess {
         float renderY = (sr.getScaledHeight() - 80 - 5);
 
         if (SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) {
-            interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, renderY, 0.05f);
+            interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, renderY, 0.25f);
         } else {
-            interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, sr.getScaledHeight() + height, 0.05f);
+            interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, sr.getScaledHeight() + height, 0.25f);
         }
 
-        interpolatedWidgetWidth = MathUtils.interpolate(interpolatedWidgetWidth, totalWidth, 0.05f);
-        interpolatedWidgetX = MathUtils.interpolate(interpolatedWidgetX, renderX, 0.05f);
+        interpolatedWidgetWidth = MathUtils.interpolate(interpolatedWidgetWidth, totalWidth, 0.25f);
+        interpolatedWidgetX = MathUtils.interpolate(interpolatedWidgetX, renderX, 0.25f);
 
         GL11.glPushMatrix();
 
@@ -390,6 +390,7 @@ public class CustomWidgets implements InstanceAccess {
         for (Score score : collection) {
             ScorePlayerTeam scoreplayerteam = scoreboard.getPlayersTeam(score.getPlayerName());
             String s = ScorePlayerTeam.formatPlayerName(scoreplayerteam, score.getPlayerName());
+            s = s.replace(mc.thePlayer.getName(), CurrentUser.FINAL_USER);
             i = Math.max(i, Fonts.interRegular.get(15).getStringWidth(s));
         }
 
@@ -418,10 +419,10 @@ public class CustomWidgets implements InstanceAccess {
             }
         }
 
-        interpolatedScorebgY = MathUtils.interpolate(interpolatedScorebgY, bgY, 0.15f);
-        interpolatedScoreY = MathUtils.interpolate(interpolatedScoreY, y, 0.15f);
-        interpolatedScoreHeight = MathUtils.interpolate(interpolatedScoreHeight, height, 0.15f);
-        interpolatedScoreWidth = MathUtils.interpolate(interpolatedScoreWidth, width, 0.15f);
+        interpolatedScorebgY = MathUtils.interpolate(interpolatedScorebgY, bgY, 0.25f);
+        interpolatedScoreY = MathUtils.interpolate(interpolatedScoreY, y, 0.25f);
+        interpolatedScoreHeight = MathUtils.interpolate(interpolatedScoreHeight, height, 0.25f);
+        interpolatedScoreWidth = MathUtils.interpolate(interpolatedScoreWidth, width, 0.25f);
 
         y = interpolatedScoreY;
 

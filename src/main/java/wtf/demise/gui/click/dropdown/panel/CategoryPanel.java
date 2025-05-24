@@ -64,7 +64,7 @@ public class CategoryPanel implements IComponent {
         RenderUtils.scaleStart((float) new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth() / 2, (float) new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight() / 2, (float) INSTANCE.getDropdownGUI().getOpeningAnimation().getOutput());
 
         if (!shader) {
-            RoundedUtils.drawRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 7, new Color(0, 0, 0, (int) Math.min(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get() + 50, 255)));
+            RoundedUtils.drawRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 7, new Color(0, 0, 0, (int) Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get()));
             Fonts.interBold.get(18).drawCenteredStringWithShadow(category.getName(), x + width / 2, y + 4.5f, -1);
         } else {
             RoundedUtils.drawShaderRound(x, y - 2, width, (float) (19 + ((height - 19) * openAnimation.getOutput())), 7, Color.black);
@@ -90,7 +90,7 @@ public class CategoryPanel implements IComponent {
                 if (MouseUtils.isHovered(x, y, width, height, mouseX, mouseY) && this.isOpened()) {
                     float strWidth = Fonts.interRegular.get(14).getStringWidth(component.getModule().getDescription()) + 8;
 
-                    RoundedUtils.drawRound(x + width + 5, y + 2, strWidth, height - 4, 5, new Color(0, 0, 0, (int) Math.min(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get() + 50, 255)));
+                    RoundedUtils.drawRound(x + width + 5, y + 2, strWidth, height - 4, 5, new Color(0, 0, 0, (int) Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get()));
                     Fonts.interRegular.get(14).drawStringWithShadow(component.getModule().getDescription(), x + width + 9, y + 5 + (height - 5) / 2 - Fonts.interRegular.get(14).getHeight() / 2, -1);
                 }
             }
@@ -109,7 +109,7 @@ public class CategoryPanel implements IComponent {
                 if (MouseUtils.isHovered(x, y, width, height, mouseX, mouseY) && this.isOpened()) {
                     float strWidth = Fonts.interRegular.get(14).getStringWidth(component.getModule().getDescription()) + 8;
 
-                    RoundedUtils.drawShaderRound(x + width + 5, y + 2, strWidth, height - 4, 5, new Color(0, 0, 0, (int) Math.min(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get() + 50, 255)));
+                    RoundedUtils.drawShaderRound(x + width + 5, y + 2, strWidth, height - 4, 5, new Color(0, 0, 0, (int) Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgAlpha.get()));
                 }
             }
         }

@@ -29,12 +29,12 @@ public class Particles extends Module {
     private EntityLivingBase target;
 
     @EventTarget
-    public void onAttackEvent(final AttackEvent event) {
+    public void onAttackEvent(AttackEvent event) {
         if (event.getTargetEntity() instanceof EntityLivingBase) target = (EntityLivingBase) event.getTargetEntity();
     }
 
     @EventTarget
-    public void onPreMotion(final MotionEvent event) {
+    public void onPreMotion(MotionEvent event) {
         if (event.isPre()) {
             if (target != null && target.hurtTime >= 9 && mc.thePlayer.getDistance(target.posX, target.posY, target.posZ) < 10) {
                 for (int i = 0; i < amount.get(); i++) {
@@ -47,7 +47,7 @@ public class Particles extends Module {
     }
 
     @EventTarget
-    public void onRender3DEvent(final Render3DEvent event) {
+    public void onRender3DEvent(Render3DEvent event) {
         if (particles.isEmpty())
             return;
 

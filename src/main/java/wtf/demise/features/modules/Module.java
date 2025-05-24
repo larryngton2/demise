@@ -18,7 +18,6 @@ import wtf.demise.utils.packet.PacketUtils;
 import java.util.*;
 
 public abstract class Module implements InstanceAccess {
-    private final ModuleInfo moduleInfo;
     @Getter
     private final String name;
     @Getter
@@ -46,7 +45,7 @@ public abstract class Module implements InstanceAccess {
     public final Random rand = new Random();
 
     protected Module() {
-        this.moduleInfo = this.getClass().getAnnotation(ModuleInfo.class);
+        ModuleInfo moduleInfo = this.getClass().getAnnotation(ModuleInfo.class);
         Objects.requireNonNull(moduleInfo, "ModuleInfo annotation is missing on " + getClass().getName());
         this.name = moduleInfo.name();
         this.description = moduleInfo.description();
@@ -74,6 +73,11 @@ public abstract class Module implements InstanceAccess {
      * @param tag The tag to set.
      */
     public void setTag(String tag) {
+        if (getModule(Interface.class).funy.get() && !Objects.equals(tag, "")) {
+            this.tag = "§7 chatgpt pro billionaire bypass india vs pakistan";
+            return;
+        }
+
         if (tag != null && !tag.isEmpty()) {
             String tagStyle = Optional.ofNullable(getModule(Interface.class))
                     .map(m -> m.tags.get())
@@ -199,6 +203,7 @@ public abstract class Module implements InstanceAccess {
      */
     private void playClickSound(float volume) {
         if (mc.thePlayer != null) {
+            //SoundUtil.playSound("random.click", volume);
             mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("random.click"), volume));
         }
     }

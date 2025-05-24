@@ -8,7 +8,6 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -67,12 +66,18 @@ public class KillAura extends Module {
 
     // rotation
     private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Derp"}, "Silent", this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "None"}, "Linear", this);
-    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("Acceleration") && !smoothMode.is("None"));
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> Objects.equals(smoothMode.get(), "Bezier") && !smoothMode.is("None") || smoothMode.is("Test"));
+    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Relative", "None"}, "Linear", this);
+    private final BoolValue accelerate = new BoolValue("Accelerate", false, this, () -> !smoothMode.is("None"));
+    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
+    private final SliderValue accelIncrement = new SliderValue("Accel increment", 0.5f, 0.01f, 25, 0.01f, this, accelerate::get);
+    private final SliderValue accelDecrement = new SliderValue("Accel decrement", 0.5f, 0.01f, 25, 0.01f, this, accelerate::get);
+    private final SliderValue minAccel = new SliderValue("Min accel", 10, 0.01f, 180, 0.01f, this, accelerate::get);
+    private final SliderValue maxAccel = new SliderValue("Max accel", 90, 0.01f, 180, 0.01f, this, accelerate::get);
+    private final SliderValue angleDiffToReduce = new SliderValue("Angle diff to reduce", 25, 1, 180, 1, this, accelerate::get);
+    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> smoothMode.is("Bezier"));
     private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
 
     // aim point
@@ -82,6 +87,8 @@ public class KillAura extends Module {
     private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
     private final BoolValue pauseRotation = new BoolValue("Pause rotation", false, this);
     private final SliderValue pauseChance = new SliderValue("Pause chance", 5, 1, 25, 1, this, pauseRotation::get);
+    private final SliderValue pauseMs = new SliderValue("Pause ms", 100, 1, 500, 1, this, pauseRotation::get);
+    private final SliderValue minMsToRePause = new SliderValue("Min ms to re-pause", 1000, 1, 10000, 1, this, pauseRotation::get);
     private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
     private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
     private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
@@ -101,6 +108,8 @@ public class KillAura extends Module {
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
     private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
     private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final BoolValue interpolateVec = new BoolValue("Interpolate vec", false, this, () -> !offsetMode.is("None"));
+    private final SliderValue amount = new SliderValue("Amount", 0.5f, 0.01f, 1, 0.01f, this, () -> interpolateVec.get() && interpolateVec.canDisplay());
     private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this);
     private final SliderValue yOffset = new SliderValue("Static Y offset", 0, -2, 0.4f, 0.01f, this);
     private final BoolValue onlyUpdateOnMiss = new BoolValue("Only update on miss", false, this);
@@ -146,10 +155,16 @@ public class KillAura extends Module {
     private Vec3 offsetVec = new Vec3(0, 0, 0);
     private float randYawSpeed;
     private float randPitchSpeed;
+    private float currAccel;
+    private final TimerUtils timer = new TimerUtils();
+    private final TimerUtils pauseChanceTimer = new TimerUtils();
+    private final TimerUtils rePauseTimer = new TimerUtils();
+    private float[] prevRot;
 
     @Override
     public void onEnable() {
         lastSwitchTime.reset();
+        currAccel = 0;
     }
 
     @Override
@@ -165,6 +180,7 @@ public class KillAura extends Module {
         currentTarget = null;
         targets.clear();
         positionHistory.clear();
+        currAccel = 0;
     }
 
     private void setRotationToTarget(EntityLivingBase target) {
@@ -178,31 +194,31 @@ public class KillAura extends Module {
 
         if (hurtTime < 1) hurtTime = 1;
 
-        hSpeed = (slowDown.get() ? randYawSpeed / hurtTime : randYawSpeed) * mc.timer.partialTicks;
-        vSpeed = (slowDown.get() ? randPitchSpeed / hurtTime : randPitchSpeed) * mc.timer.partialTicks;
+        if (!accelerate.get()) {
+            hSpeed = randYawSpeed;
+            vSpeed = randPitchSpeed;
+        } else {
+            if (timer.hasTimeElapsed(50)) {
+                if (RotationUtils.getRotationDifference(Objects.requireNonNullElse(RotationUtils.currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}), getRotations(target)) > angleDiffToReduce.get()) {
+                    currAccel += accelIncrement.get();
+                } else {
+                    currAccel -= accelDecrement.get();
+                }
 
-        RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, mode, midpoint.get());
+                timer.reset();
+            }
 
-        /*
-        switch (mode) {
-            case Linear:
-                RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, SmoothMode.Linear, midpoint.get());
-                break;
-            case Lerp:
-                RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, SmoothMode.Lerp, midpoint.get());
-                break;
-            case Bezier:
-                RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, SmoothMode.Bezier, midpoint.get());
-                break;
-            case Exponential:
-                RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, SmoothMode.Exponential, midpoint.get());
-                break;
-            case None:
-                RotationUtils.setRotation(getRotations(target), correction);
-                break;
+            currAccel = MathHelper.clamp_float(currAccel, minAccel.get(), maxAccel.get());
+
+            hSpeed = vSpeed = currAccel;
         }
 
-         */
+        if (slowDown.get()) {
+            hSpeed /= hurtTime;
+            vSpeed /= hurtTime;
+        }
+
+        RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, midpoint.get(), mode);
     }
 
     private EntityLivingBase findNextTarget() {
@@ -291,10 +307,10 @@ public class KillAura extends Module {
                         break;
                     case "HurtTime":
                         EntityLivingBase potentialTarget2 = (EntityLivingBase) entity;
-                        float potentionalHurtTime = potentialTarget2.hurtTime;
-                        if (potentionalHurtTime <= leastHurtTime) {
+                        float potentialHurtTime = potentialTarget2.hurtTime;
+                        if (potentialHurtTime <= leastHurtTime) {
                             target = potentialTarget2;
-                            leastHurtTime = potentionalHurtTime;
+                            leastHurtTime = potentialHurtTime;
                         }
                         break;
                 }
@@ -375,7 +391,7 @@ public class KillAura extends Module {
                         MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
                         derpYaw += (MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()) / 6) / 2;
 
-                        RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, SmoothMode.Linear, midpoint.get());
+                        RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, midpoint.get(), SmoothMode.Linear);
                         break;
                 }
             }
@@ -562,28 +578,28 @@ public class KillAura extends Module {
         switch (aimPos.get()) {
             case "Head": {
                 vec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
-                break;
             }
+            break;
             case "Torso": {
                 vec = entityPos.add(0.0, entity.height * 0.75, 0.0);
-                break;
             }
+            break;
             case "Legs": {
                 vec = entityPos.add(0.0, entity.height * 0.45, 0.0);
-                break;
             }
+            break;
             case "Nearest": {
                 vec = RotationUtils.getBestHitVec(entity);
-                break;
             }
+            break;
             case "Straight": {
                 final double ex = (finalBoundingBox.maxX + finalBoundingBox.minX) / 2;
                 final double ey = MathHelper.clamp_double(playerPos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
                 final double ez = (finalBoundingBox.maxZ + finalBoundingBox.minZ) / 2;
 
                 vec = new Vec3(ex, ey, ez);
-                break;
             }
+            break;
             case "Assist": {
                 final Vec3 pos = playerPos.add(mc.thePlayer.getLookVec());
 
@@ -592,8 +608,8 @@ public class KillAura extends Module {
                 final double ez = MathHelper.clamp_double(pos.zCoord, finalBoundingBox.minZ, finalBoundingBox.maxZ);
 
                 vec = new Vec3(ex, ey, ez);
-                break;
             }
+            break;
             default:
                 vec = entityPos.add(0, 0, 0);
                 break;
@@ -619,13 +635,13 @@ public class KillAura extends Module {
                 double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
 
                 if (shouldRandomize) {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), mc.timer.partialTicks / 2);
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
 
                     lastXOffset = (float) xOffset;
                     lastYOffset = (float) yOffset;
                     lastZOffset = (float) zOffset;
                 } else {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), mc.timer.partialTicks / 2);
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
                 }
             }
             break;
@@ -643,44 +659,42 @@ public class KillAura extends Module {
                 double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
 
                 if (shouldRandomize) {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), mc.timer.partialTicks / 2);
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
 
                     lastXOffset = (float) xOffset;
                     lastYOffset = (float) yOffset;
                     lastZOffset = (float) zOffset;
                 } else {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), mc.timer.partialTicks / 2);
+                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
                 }
             }
             break;
             case "Drift":
-                if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-                    double smoothYawFactor = MathUtils.randomizeDouble(0.4, 0.6);
-                    double smoothPitchFactor = MathUtils.randomizeDouble(0.2, 0.4);
+                double smoothYawFactor = MathUtils.randomizeDouble(0.1, 0.4);
+                double smoothPitchFactor = MathUtils.randomizeDouble(0.05, 0.2);
 
-                    double smoothYawOffset = (rand.nextDouble() - 0.5) * smoothYawFactor;
-                    double smoothPitchOffset = (rand.nextDouble() - 0.5) * smoothPitchFactor;
+                double smoothYawOffset = rand.nextDouble(0.5) * smoothYawFactor;
+                double smoothPitchOffset = rand.nextDouble(0.5) * smoothPitchFactor;
 
-                    float smoothedX = (float) (lastXOffset * 0.75 + smoothYawOffset * 0.25);
-                    float smoothedY = (float) (lastYOffset * 0.75 + smoothPitchOffset * 0.25);
-                    float smoothedZ = (float) (lastZOffset * 0.75 + smoothYawOffset * 0.25);
+                float smoothedX = (float) (lastXOffset * 0.75 + smoothYawOffset * 0.25);
+                float smoothedY = (float) (lastYOffset * 0.75 + smoothPitchOffset * 0.25);
+                float smoothedZ = (float) (lastZOffset * 0.75 + smoothYawOffset * 0.25);
 
-                    currentXOffset += smoothedX;
-                    currentYOffset += smoothedY;
-                    currentZOffset += smoothedZ;
+                currentXOffset += smoothedX;
+                currentYOffset += smoothedY;
+                currentZOffset += smoothedZ;
 
-                    lastXOffset = smoothedX;
-                    lastYOffset = smoothedY;
-                    lastZOffset = smoothedZ;
+                currentXOffset = MathHelper.clamp_double(currentXOffset, -0.4, 0.4);
+                currentYOffset = MathHelper.clamp_double(currentYOffset, -2, 0.4);
+                currentZOffset = MathHelper.clamp_double(currentZOffset, -0.4, 0.4);
 
-                    vec.xCoord += currentXOffset;
-                    vec.yCoord += currentYOffset;
-                    vec.zCoord += currentZOffset;
-                } else {
-                    vec.xCoord += currentXOffset = MathUtils.interpolate(currentXOffset, 0, 0.75f);
-                    vec.yCoord += currentYOffset = MathUtils.interpolate(currentYOffset, 0, 0.75f);
-                    vec.zCoord += currentZOffset = MathUtils.interpolate(currentZOffset, 0, 0.75f);
-                }
+                lastXOffset = smoothedX;
+                lastYOffset = smoothedY;
+                lastZOffset = smoothedZ;
+
+                vec.xCoord += currentXOffset;
+                vec.yCoord += currentYOffset;
+                vec.zCoord += currentZOffset;
                 break;
             default:
                 offsetVec = new Vec3(0, 0, 0);
@@ -724,25 +738,35 @@ public class KillAura extends Module {
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 
-        if (pauseRotation.get() && rand.nextInt(100) <= pauseChance.get() && !pause) {
-            pauseTimer.reset();
-            pause = true;
-        }
+        if (pauseRotation.get()) {
+            if (pauseChanceTimer.hasTimeElapsed(50)) {
+                if (rePauseTimer.hasTimeElapsed(minMsToRePause.get())) {
+                    if (rand.nextInt(100) <= pauseChance.get() && !pause) {
+                        pauseTimer.reset();
+                        pause = true;
+                    }
+                }
 
-        if (pause) {
-            if (!pauseTimer.hasTimeElapsed(100)) {
-                yaw = RotationUtils.previousRotation[0];
-                pitch = RotationUtils.previousRotation[1];
-            } else {
-                pause = false;
+                pauseChanceTimer.reset();
+            }
+
+            if (pause) {
+                if (!pauseTimer.hasTimeElapsed(pauseMs.get())) {
+                    yaw = prevRot[0];
+                    pitch = prevRot[1];
+                } else {
+                    rePauseTimer.reset();
+                    pause = false;
+                }
             }
         }
 
         if (!(mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !onlyRotateOnMiss.get())) {
-            yaw = RotationUtils.previousRotation[0];
-            pitch = RotationUtils.previousRotation[1];
+            yaw = prevRot[0];
+            pitch = prevRot[1];
         }
 
+        prevRot = new float[]{yaw, pitch};
         return new float[]{yaw, pitch};
     }
 

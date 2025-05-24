@@ -3,6 +3,7 @@ package wtf.demise.gui.notification;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
@@ -38,7 +39,7 @@ public class NotificationManager implements InstanceAccess {
         }
     }
 
-    public void publish(ScaledResolution sr, boolean shader) {
+    public void publish(boolean shader) {
         float yOffset = 0;
 
         for (Notification notification : getNotifications()) {
@@ -67,7 +68,7 @@ public class NotificationManager implements InstanceAccess {
                 if (!shader) {
                     RoundedUtils.drawRound(x, y, width, height, 7, new Color(anInterface.bgColor(), true));
                     Fonts.interSemiBold.get(17).drawString(notification.getTitle(), x + 4, y + 5, new Color(255, 255, 255, 255).getRGB());
-                    Fonts.interRegular.get(17).drawString(notification.getDescription(), x + 4, y + 15, new Color(anInterface.color()).brighter().getRGB());
+                    Fonts.interRegular.get(17).drawString(notification.getDescription(), x + 4, y + 15, new Color(170, 170, 170).getRGB());
                 } else {
                     RoundedUtils.drawShaderRound(x, y, width, height, 7, Color.black);
                 }

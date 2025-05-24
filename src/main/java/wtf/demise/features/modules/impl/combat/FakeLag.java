@@ -31,7 +31,7 @@ public class FakeLag extends Module {
     private final SliderValue attackRange = new SliderValue("Attack range", 4, 0, 15, 0.1f, this, () -> !smartRange.get());
     private final BoolValue alwaysSpoof = new BoolValue("Always spoof", false, this);
     private final SliderValue searchRange = new SliderValue("Search range", 6, 1, 15, 0.1f, this, () -> !alwaysSpoof.get());
-    private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 1, 0, 1000, this);
+    //private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 1, 0, 1000, this);
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
@@ -101,9 +101,9 @@ public class FakeLag extends Module {
         switch (mode.get()) {
             case "Pulse":
                 if (shouldLag() && mc.thePlayer.hurtTime == 0) {
-                    if (ever.hasTimeElapsed(recoilTime.get())) {
-                        blinking = true;
-                    }
+                    //if (ever.hasTimeElapsed(recoilTime.get())) {
+                    blinking = true;
+                    //}
 
                     if (delay.hasTimeElapsed(ms) && blinking) {
                         blinking = false;
@@ -118,10 +118,10 @@ public class FakeLag extends Module {
                             picked = true;
                         }
                         BlinkComponent.blinking = true;
-                        ever.reset();
                     } else {
                         BlinkComponent.dispatch(true);
                         picked = false;
+                        ever.reset();
                     }
                 } else {
                     ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
@@ -137,21 +137,21 @@ public class FakeLag extends Module {
                 break;
             case "Spoof":
                 if (shouldLag() && mc.thePlayer.hurtTime == 0) {
-                    if (ever.hasTimeElapsed(recoilTime.get())) {
-                        ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
-                        PingSpoofComponent.spoof(ms, true, false, false, false, true, true);
+                    //if (ever.hasTimeElapsed(recoilTime.get())) {
+                    ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
+                    PingSpoofComponent.spoof(ms, true, false, false, false, true, true, false);
 
-                        if (delay.hasTimeElapsed(ms * 2L)) {
-                            x = PingSpoofComponent.getRealPos().xCoord;
-                            y = PingSpoofComponent.getRealPos().yCoord;
-                            z = PingSpoofComponent.getRealPos().zCoord;
-                        }
-
-                        blinking = true;
-                        dispatched = false;
-                    } else {
-                        blinking = false;
+                    if (delay.hasTimeElapsed(ms * 2L)) {
+                        x = PingSpoofComponent.getRealPos().xCoord;
+                        y = PingSpoofComponent.getRealPos().yCoord;
+                        z = PingSpoofComponent.getRealPos().zCoord;
                     }
+
+                    blinking = true;
+                    dispatched = false;
+//                    } else {
+//                        blinking = false;
+//                    }
                 } else {
                     if (!dispatched) {
                         PingSpoofComponent.disable();

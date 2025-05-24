@@ -101,7 +101,7 @@ public class BPSCounterWidget extends Widget {
 
         if (!shader) {
             RoundedUtils.drawRound(x, localY, width, height, 7, new Color(setting.bgColor(), true));
-            Fonts.interSemiBold.get(18).drawStringWithShadow(finalString, x + (width / 2) - ((float) Fonts.interSemiBold.get(18).getStringWidth(finalString) / 2), localY + (height / 2) - Fonts.interSemiBold.get(18).getHeight() + 8.5f, -1);
+            Fonts.interSemiBold.get(18).drawString(finalString, x + (width / 2) - ((float) Fonts.interSemiBold.get(18).getStringWidth(finalString) / 2), localY + (height / 2) - Fonts.interSemiBold.get(18).getHeight() + 8.5f, -1);
         } else {
             RoundedUtils.drawShaderRound(x, localY, width, height, 7, Color.black);
         }

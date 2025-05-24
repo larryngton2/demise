@@ -109,7 +109,6 @@ public abstract class EntityLivingBase extends Entity {
     private float absorptionAmount;
 
     public ContinualAnimation healthAnimation = new ContinualAnimation();
-    public ContinualAnimation hurtTimeAnimation = new ContinualAnimation();
 
     public void onKillCommand() {
         this.attackEntityFrom(DamageSource.outOfWorld, Float.MAX_VALUE);
@@ -1077,7 +1076,7 @@ public abstract class EntityLivingBase extends Entity {
     }
 
     protected void jump() {
-        final JumpEvent jumpEvent = new JumpEvent(this.getJumpUpwardsMotion(), this.rotationYaw, 0.2f);
+        JumpEvent jumpEvent = new JumpEvent(this.getJumpUpwardsMotion(), this.rotationYaw, 0.2f);
         Demise.INSTANCE.getEventManager().call(jumpEvent);
 
         if (jumpEvent.isCancelled()) return;

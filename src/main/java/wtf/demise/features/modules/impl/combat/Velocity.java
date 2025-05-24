@@ -33,7 +33,7 @@ import java.util.Objects;
 
 @ModuleInfo(name = "Velocity", description = "Minimises or removes knockback.", category = ModuleCategory.Combat)
 public class Velocity extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit packet", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
     public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce"}, "Reduce", this, () -> mode.is("Intave"));
     private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
     private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
@@ -42,14 +42,13 @@ public class Velocity extends Module {
     private final SliderValue mmHurtTime = new SliderValue("Max hurtTime", 10, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
     public final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
     public final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
-    private final SliderValue packets = new SliderValue("Packets", 5, 1, 20, 1, this, () -> Objects.equals(mode.get(), "Legit packet"));
+    private final SliderValue maxAttacks = new SliderValue("Max attacks", 5, 1, 10, 1, this, () -> Objects.equals(mode.get(), "Legit"));
     private final SliderValue ticks = new SliderValue("Ticks", 0, 0, 6, 1, this, () -> mode.is("ReStrafe"));
     private final BoolValue onSwing = new BoolValue("On swing", false, this);
 
     private boolean attacked;
-    private boolean shouldReduce;
-    private Entity currentTarget;
     private boolean velocity;
+    private int sentPackets;
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
@@ -96,21 +95,18 @@ public class Velocity extends Module {
                         }
                     }
                     break;
-                case "Legit packet":
-                    if (Range.between(3, 10).contains(mc.thePlayer.hurtTime)) {
-                        if (shouldReduce && mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY)) {
-                            for (int i = 0; i < packets.get(); i++) {
-                                AttackOrder.sendFixedAttack(mc.thePlayer, currentTarget);
-
-                                ChatUtils.sendMessageClient("Reduced");
-                            }
-
-                            currentTarget = null;
-                            shouldReduce = false;
+                case "Legit":
+                    if (mc.thePlayer.hurtTime != 0) {
+                        if (!attacked && sentPackets < maxAttacks.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && !mc.thePlayer.isUsingItem()) {
+                            ChatUtils.sendMessageClient("Reduced");
+                            mc.clickMouse();
+                            sentPackets++;
                         }
                     } else {
-                        attacked = false;
+                        sentPackets = 0;
                     }
+
+                    attacked = false;
                     break;
             }
         }
@@ -202,10 +198,8 @@ public class Velocity extends Module {
                     }
                 }
                 break;
-            case "Legit packet":
-                if (Range.between(3, 10).contains(mc.thePlayer.hurtTime) && !attacked) {
-                    currentTarget = e.getTargetEntity();
-                    shouldReduce = true;
+            case "Legit":
+                if (e.getTargetEntity() != null) {
                     attacked = true;
                 }
                 break;

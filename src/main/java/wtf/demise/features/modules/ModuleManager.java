@@ -53,7 +53,7 @@ public class ModuleManager {
                 AutoRod.class,
                 AutoWeapon.class,
                 AutoHeal.class,
-                MoreKB.class,
+                SprintReset.class,
                 Reach.class,
                 HitBox.class,
                 CombatHelper.class,
@@ -77,6 +77,7 @@ public class ModuleManager {
                 AutoRegister.class,
                 ExplosionBlock.class,
                 Test.class,
+                FlagDetector.class,
 
                 // Movement
                 Freeze.class,
@@ -108,11 +109,11 @@ public class ModuleManager {
                 FastUse.class,
                 FastBreak.class,
                 Scaffold.class,
+                AntiVoid.class,
 
                 // Visual
                 Atmosphere.class,
                 BlockOverlay.class,
-                Camera.class,
                 ChestESP.class,
                 ClickGUI.class,
                 ESP.class,
@@ -139,7 +140,10 @@ public class ModuleManager {
                 CustomWidgetsModule.class,
                 ImageESP.class,
                 NoRenderOffsetReset.class,
-                BlockOnSwing.class
+                BlockOnSwing.class,
+                MotionBlur.class,
+                ThirdPersonDistance.class,
+                NoHurtCam.class
         );
 
         // Sort modules by name for better organization

@@ -31,7 +31,6 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.visual.BlockOnSwing;
-import wtf.demise.features.modules.impl.visual.Camera;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
@@ -301,7 +300,7 @@ public class ItemRenderer {
             if (itemToRender != null) {
                 if (itemToRender.getItem() instanceof ItemMap) {
                     renderItemMap(abstractclientplayer, f2, f, f1);
-                } else if ((abstractclientplayer.getItemInUseCount() > 0 || (KillAura.isBlocking && PlayerUtils.isHoldingSword()) || (Demise.INSTANCE.getModuleManager().getModule(BlockOnSwing.class).isEnabled() && mc.thePlayer.isSwingInProgress && PlayerUtils.isHoldingSword()))) {
+                } else if ((abstractclientplayer.getItemInUseCount() > 0 || (KillAura.isBlocking && PlayerUtils.isHoldingSword()) || (Demise.INSTANCE.getModuleManager().getModule(BlockOnSwing.class).isEnabled() && mc.thePlayer.isSwingInProgress && SpoofSlotUtils.getSpoofedStack() != null && SpoofSlotUtils.getSpoofedStack().getItem() instanceof ItemSword))) {
                     EnumAction enumaction = itemToRender.getItemUseAction();
 
                     switch (enumaction) {
@@ -437,8 +436,6 @@ public class ItemRenderer {
     }
 
     private void renderFireInFirstPerson(float partialTicks) {
-        if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("No Fire"))
-            return;
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 0.9F);

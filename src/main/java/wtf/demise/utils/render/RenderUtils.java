@@ -527,7 +527,8 @@ public class RenderUtils implements InstanceAccess {
             RenderUtils.color(color);
             GLUtils.startBlend();
             mc.getTextureManager().bindTexture(player.getLocationSkin());
-            Gui.drawScaledCustomSizeModalRect(x, y, (float) 8.0, (float) 8.0, 8, 8, size, size, 64.0F, 64.0F);
+            Gui.drawScaledCustomSizeModalRect(x, y, 8, 8, 8, 8, size, size, 64.0F, 64.0F);
+            Gui.drawScaledCustomSizeModalRect(x, y, 40, 8, 8, 8, size, size, 64.0F, 64.0F);
             GLUtils.endBlend();
             StencilUtils.uninitStencilBuffer();
         }

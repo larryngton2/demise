@@ -7,6 +7,7 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
@@ -99,7 +100,7 @@ public class GuiButton extends Gui {
                         interpolatedHeight = height;
                     }
 
-                    float interpolation = 0.1f;
+                    float interpolation = 0.25f;
 
                     if (hovered) {
                         interpolatedX = MathUtils.interpolate(interpolatedX, xPosition + 1.5f, interpolation);
@@ -116,7 +117,8 @@ public class GuiButton extends Gui {
                     if (shader) {
                         RoundedUtils.drawShaderRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, Color.black);
                     } else {
-                        RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, new Color(0, 0, 0, 75));
+                        Interface anInterface = Demise.INSTANCE.getModuleManager().getModule(Interface.class);
+                        RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, new Color(anInterface.bgColor(), true));
                         Fonts.interRegular.get(15).drawCenteredString(displayString, interpolatedX + interpolatedWidth / 2f, interpolatedY + Fonts.interRegular.get(15).getMiddleOfBox(interpolatedHeight) + 2, enabled ? 14737632 : 10526880);
                     }
 

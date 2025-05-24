@@ -9,7 +9,7 @@ import net.minecraft.util.Vec3;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
 
@@ -24,6 +24,7 @@ public final class PingSpoofComponent implements InstanceAccess {
     static Tuple<Class[], Boolean> blink = new Tuple<>(new Class[]{C02PacketUseEntity.class, C0DPacketCloseWindow.class, C0EPacketClickWindow.class, C0CPacketInput.class, C0BPacketEntityAction.class, C08PacketPlayerBlockPlacement.class, C07PacketPlayerDigging.class, C09PacketHeldItemChange.class, C13PacketPlayerAbilities.class, C15PacketClientSettings.class, C16PacketClientStatus.class, C17PacketCustomPayload.class, C18PacketSpectate.class, C19PacketResourcePackStatus.class, C03PacketPlayer.class, C03PacketPlayer.C04PacketPlayerPosition.class, C03PacketPlayer.C05PacketPlayerLook.class, C03PacketPlayer.C06PacketPlayerPosLook.class, C0APacketAnimation.class}, false);
     static Tuple<Class[], Boolean> movement = new Tuple<>(new Class[]{C03PacketPlayer.class, C03PacketPlayer.C04PacketPlayerPosition.class, C03PacketPlayer.C05PacketPlayerLook.class, C03PacketPlayer.C06PacketPlayerPosLook.class}, false);
     public static Tuple<Class[], Boolean>[] types = new Tuple[]{regular, velocity, teleports, players, blink, movement};
+    private static boolean post;
 
     public static ConcurrentLinkedQueue<TimedPacket> packets = new ConcurrentLinkedQueue<>();
     static TimerUtils enabledTimer = new TimerUtils();
@@ -78,25 +79,27 @@ public final class PingSpoofComponent implements InstanceAccess {
     }
 
     @EventTarget
-    public void onUpdate(UpdateEvent e) {
+    public void onMotion(MotionEvent e) {
+        if ((e.isPre() && post) || (e.isPost() && !post)) {
+            return;
+        }
+
         if (!(enabled = !enabledTimer.hasTimeElapsed(100) && !(mc.currentScreen instanceof GuiDownloadTerrain))) {
             dispatch();
         } else {
             enabled = false;
 
-            if (!BadPacketsComponent.bad()) {
-                packets.forEach(packet -> {
-                    if (packet.getMillis() + amount < System.currentTimeMillis()) {
-                        if (packet.getPacket() instanceof C03PacketPlayer c03PacketPlayer) {
-                            realX = c03PacketPlayer.getPositionX();
-                            realY = c03PacketPlayer.getPositionY();
-                            realZ = c03PacketPlayer.getPositionZ();
-                        }
-                        PacketUtils.queue(packet.getPacket());
-                        packets.remove(packet);
+            packets.forEach(packet -> {
+                if (packet.getMillis() + amount < System.currentTimeMillis()) {
+                    if (packet.getPacket() instanceof C03PacketPlayer c03PacketPlayer) {
+                        realX = c03PacketPlayer.getPositionX();
+                        realY = c03PacketPlayer.getPositionY();
+                        realZ = c03PacketPlayer.getPositionZ();
                     }
-                });
-            }
+                    PacketUtils.queue(packet.getPacket());
+                    packets.remove(packet);
+                }
+            });
 
             enabled = true;
         }
@@ -124,6 +127,10 @@ public final class PingSpoofComponent implements InstanceAccess {
     }
 
     public static void spoof(int amount, boolean regular, boolean velocity, boolean teleports, boolean players, boolean blink, boolean movement) {
+        spoof(amount, regular, velocity, teleports, players, blink, movement, true);
+    }
+
+    public static void spoof(int amount, boolean regular, boolean velocity, boolean teleports, boolean players, boolean blink, boolean movement, boolean post) {
         enabledTimer.reset();
 
         PingSpoofComponent.regular.setSecond(regular);
@@ -132,6 +139,7 @@ public final class PingSpoofComponent implements InstanceAccess {
         PingSpoofComponent.players.setSecond(players);
         PingSpoofComponent.blink.setSecond(blink);
         PingSpoofComponent.movement.setSecond(movement);
+        PingSpoofComponent.post = post;
         PingSpoofComponent.amount = amount;
     }
 

@@ -2,6 +2,8 @@ package wtf.demise.utils.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.misc.Test;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.render.shader.ShaderUtils;
 
@@ -78,10 +80,10 @@ public class RoundedUtils implements InstanceAccess {
     }
 
     public static void drawShaderRound(float x, float y, float width, float height, float radius, boolean blur, Color color) {
-        x += 0.25f;
-        y += 0.25f;
-        width -= 0.5f;
-        height -= 0.5f;
+        x += 0.2f;
+        y += 0.2f;
+        width -= 0.4f;
+        height -= 0.4f;
 
         RenderUtils.resetColor();
         GLUtils.startBlend();

@@ -4,7 +4,6 @@ import lombok.Getter;
 import wtf.demise.utils.animations.impl.SmoothStepAnimation;
 
 public class ContinualAnimation {
-
     private float output, endpoint;
 
     @Getter

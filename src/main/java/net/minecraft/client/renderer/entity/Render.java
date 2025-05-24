@@ -305,8 +305,6 @@ public abstract class Render<T extends Entity> implements IEntityRenderer {
             GlStateManager.disableDepth();
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
             int i = 0;
 
             if (str.equals("deadmau5")) {
@@ -315,17 +313,11 @@ public abstract class Render<T extends Entity> implements IEntityRenderer {
 
             int j = fontrenderer.getStringWidth(str) / 2;
             GlStateManager.disableTexture2D();
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            worldrenderer.pos(-j - 1, -1 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            worldrenderer.pos(-j - 1, 8 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            worldrenderer.pos(j + 1, 8 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            worldrenderer.pos(j + 1, -1 + i, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            tessellator.draw();
             GlStateManager.enableTexture2D();
-            fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127);
+            fontrenderer.drawStringWithShadow(str, -j, i, 553648127);
             GlStateManager.enableDepth();
             GlStateManager.depthMask(true);
-            fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, -1);
+            fontrenderer.drawStringWithShadow(str, -j, i, -1);
             GlStateManager.enableLighting();
             GlStateManager.disableBlend();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

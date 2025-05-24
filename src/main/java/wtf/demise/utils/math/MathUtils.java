@@ -3,12 +3,27 @@ package wtf.demise.utils.math;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
+import wtf.demise.utils.InstanceAccess;
 
 import java.security.SecureRandom;
 
-import static wtf.demise.utils.InstanceAccess.mc;
+public class MathUtils implements InstanceAccess {
+    private static final TimerUtils lerpUpdateTimer = new TimerUtils();
+    private static boolean updateLerp;
 
-public class MathUtils {
+    @EventTarget
+    public void onGameUpdate(GameEvent e) {
+        if (lerpUpdateTimer.hasTimeElapsed(10)) {
+            updateLerp = true;
+            lerpUpdateTimer.reset();
+            return;
+        }
+
+        updateLerp = false;
+    }
+
     public static double roundToHalf(double d) {
         return Math.round(d * 2) / 2.0;
     }
@@ -18,46 +33,91 @@ public class MathUtils {
         return Math.round(val * one) / one;
     }
 
-    public static double interpolate(double old, double now) {
-        return interpolate(old, now, mc.timer.partialTicks);
+    public static float interpolate(float current, float target) {
+        return interpolate(current, target, mc.timer.partialTicks);
     }
 
-    public static double interpolate(double old, double now, float multiple) {
-        return old + (now - old) * multiple;
+    public static float interpolate(float current, float target, float multiple) {
+        if (multiple == mc.timer.partialTicks) {
+            return current + (target - current) * multiple;
+        }
+
+        if (updateLerp) {
+            return current + (target - current) * multiple;
+        }
+        
+        return current;
     }
 
-    public static float interpolate(float old, float now) {
-        return interpolate(old, now, mc.timer.partialTicks);
+    public static double interpolate(double current, double target) {
+        return interpolate(current, target, mc.timer.partialTicks);
     }
 
-    public static float interpolate(float old, float now, float multiple) {
-        return old + (now - old) * multiple;
+    public static double interpolate(double current, double target, float multiple) {
+        return interpolate((float) current, (float) target, multiple);
     }
 
-    public static Vec3 interpolate(Vec3 old, Vec3 now) {
-        return interpolate(old, now, mc.timer.partialTicks);
+    public static Vec3 interpolate(Vec3 current, Vec3 target) {
+        return interpolate(current, target, mc.timer.partialTicks);
     }
 
-    public static Vec3 interpolate(Vec3 old, Vec3 now, float multiple) {
+    public static Vec3 interpolate(Vec3 current, Vec3 target, float multiple) {
+        if (multiple == mc.timer.partialTicks) {
+            return new Vec3(
+                    interpolate(current.xCoord, target.xCoord, multiple),
+                    interpolate(current.yCoord, target.yCoord, multiple),
+                    interpolate(current.zCoord, target.zCoord, multiple));
+        }
+
+        if (updateLerp) {
+            return new Vec3(
+                    interpolate(current.xCoord, target.xCoord, multiple),
+                    interpolate(current.yCoord, target.yCoord, multiple),
+                    interpolate(current.zCoord, target.zCoord, multiple));
+        }
+        
+        return current;
+    }
+
+    public static AxisAlignedBB interpolate(AxisAlignedBB current, AxisAlignedBB target) {
+        return interpolate(current, target, mc.timer.partialTicks);
+    }
+
+    public static AxisAlignedBB interpolate(AxisAlignedBB current, AxisAlignedBB target, float multiple) {
+        if (multiple == mc.timer.partialTicks) {
+            return new AxisAlignedBB(
+                    interpolate(current.minX, target.minX, multiple),
+                    interpolate(current.minY, target.minY, multiple),
+                    interpolate(current.minZ, target.minZ, multiple),
+                    interpolate(current.maxX, target.maxX, multiple),
+                    interpolate(current.maxY, target.maxY, multiple),
+                    interpolate(current.maxZ, target.maxZ, multiple)
+            );
+        }
+
+        if (updateLerp) {
+            return new AxisAlignedBB(
+                    interpolate(current.minX, target.minX, multiple),
+                    interpolate(current.minY, target.minY, multiple),
+                    interpolate(current.minZ, target.minZ, multiple),
+                    interpolate(current.maxX, target.maxX, multiple),
+                    interpolate(current.maxY, target.maxY, multiple),
+                    interpolate(current.maxZ, target.maxZ, multiple)
+            );
+        }
+
+        return current;
+    }
+
+    public static float interpolateNoUpdateCheck(float current, float target, float multiple) {
+        return current + (target - current) * multiple;
+    }
+
+    public static Vec3 interpolateNoUpdateCheck(Vec3 current, Vec3 target, float multiple) {
         return new Vec3(
-                (float) interpolate(old.xCoord, now.xCoord, multiple),
-                (float) interpolate(old.yCoord, now.yCoord, multiple),
-                (float) interpolate(old.zCoord, now.zCoord, multiple));
-    }
-
-    public static AxisAlignedBB interpolate(AxisAlignedBB old, AxisAlignedBB now, float multiple) {
-        return new AxisAlignedBB(
-                interpolate(old.minX, now.minX, multiple),
-                interpolate(old.minY, now.minY, multiple),
-                interpolate(old.minZ, now.minZ, multiple),
-                interpolate(old.maxX, now.maxX, multiple),
-                interpolate(old.maxY, now.maxY, multiple),
-                interpolate(old.maxZ, now.maxZ, multiple)
-        );
-    }
-
-    public static AxisAlignedBB interpolate(AxisAlignedBB old, AxisAlignedBB now) {
-        return interpolate(old, now, mc.timer.partialTicks);
+                interpolate(current.xCoord, target.xCoord, multiple),
+                interpolate(current.yCoord, target.yCoord, multiple),
+                interpolate(current.zCoord, target.zCoord, multiple));
     }
 
     public static float nextSecureFloat(final double origin, final double bound) {

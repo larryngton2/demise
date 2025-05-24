@@ -16,6 +16,7 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 
 import java.util.Objects;
 
@@ -25,12 +26,12 @@ public class RotationUtils implements InstanceAccess {
     public static float[] currentRotation = null, serverRotation = new float[]{}, previousRotation = null;
     public static MovementCorrection currentCorrection = MovementCorrection.None;
     public static boolean enabled;
-    public static float cachedHSpeed;
-    public static float cachedVSpeed;
-    public static float cachedMidpoint;
-    public static SmoothMode smoothMode = SmoothMode.Linear;
-    private boolean angleCalled;
+    private static float cachedHSpeed;
+    private static float cachedVSpeed;
+    private static float cachedMidpoint;
+    private static SmoothMode smoothMode;
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
+    private boolean angleCalled;
 
     public static boolean shouldRotate() {
         return currentRotation != null;
@@ -55,12 +56,6 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed) {
-        hSpeed /= mc.timer.partialTicks;
-        vSpeed /= mc.timer.partialTicks;
-
-        hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
-        vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
-
         if (moduleRotation.silent.get()) {
             currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear);
         } else {
@@ -76,13 +71,7 @@ public class RotationUtils implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, SmoothMode smoothMode, float midpoint) {
-        hSpeed /= mc.timer.partialTicks;
-        vSpeed /= mc.timer.partialTicks;
-
-        hSpeed = MathHelper.clamp_float(hSpeed, 1, 180);
-        vSpeed = MathHelper.clamp_float(vSpeed, 1, 180);
-
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode) {
         if (moduleRotation.silent.get()) {
             currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode);
         } else {
@@ -101,9 +90,11 @@ public class RotationUtils implements InstanceAccess {
 
     @EventTarget
     private void onMove(MoveInputEvent e) {
-        if (currentCorrection == MovementCorrection.Silent) {
-            final float yaw = currentRotation[0];
-            MoveUtil.fixMovement(e, yaw);
+        if (shouldRotate()) {
+            if (currentCorrection == MovementCorrection.Silent) {
+                final float yaw = currentRotation[0];
+                MoveUtil.fixMovement(e, yaw);
+            }
         }
     }
 
@@ -126,11 +117,6 @@ public class RotationUtils implements InstanceAccess {
     }
 
     @EventTarget
-    public void onAngle(AngleEvent e) {
-        angleCalled = true;
-    }
-
-    @EventTarget
     @EventPriority(-100)
     public void onPacket(final PacketEvent e) {
         final Packet<?> packet = e.getPacket();
@@ -150,6 +136,11 @@ public class RotationUtils implements InstanceAccess {
     @EventTarget
     public void onWorld(WorldChangeEvent e) {
         resetRotation();
+    }
+
+    @EventTarget
+    public void onAngle(AngleEvent e) {
+        angleCalled = true;
     }
 
     @EventTarget
@@ -247,17 +238,44 @@ public class RotationUtils implements InstanceAccess {
                 finalRotation = applyGCDFix(currentRotation, smoothedRotation);
             }
 
+            case Relative -> {
+                float[] factor = computeFactor(rotationDifference, hSpeed, vSpeed);
+
+                float straightLineYaw1 = (float) (abs(yawDifference / rotationDifference) * factor[0]);
+                float straightLinePitch1 = (float) (abs(pitchDifference / rotationDifference) * factor[1]);
+
+                float[] smoothedRotation = new float[]{
+                        currentRotation[0] + Math.max(-straightLineYaw1, Math.min(straightLineYaw1, yawDifference)),
+                        currentRotation[1] + Math.max(-straightLinePitch1, Math.min(straightLinePitch1, pitchDifference))
+                };
+
+                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
+            }
+
             default -> finalRotation = targetRotation;
         }
 
         return finalRotation;
     }
 
+    private static float[] computeFactor(double rotationDifference, float hSpeed, float vSpeed) {
+        float turnSpeedH = (float) Math.max(Math.min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
+        float turnSpeedV = (float) Math.max(Math.min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
+
+        return new float[]{turnSpeedH, turnSpeedV};
+    }
+
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
-        final float f = (float) (mc.gameSettings.mouseSensitivity * (1 + Math.random() / 100000) * 0.6F + 0.2F);
-        final double gcd = f * f * f * 8.0F * 0.15D;
-        final float yaw = prevRotation[0] + (float) (Math.round((currentRotation[0] - prevRotation[0]) / gcd) * gcd);
-        final float pitch = prevRotation[1] + (float) (Math.round((currentRotation[1] - prevRotation[1]) / gcd) * gcd);
+        float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+        float gcd = f * f * f * 8.0F * 0.15F;
+        float yawDelta = currentRotation[0] - prevRotation[0];
+        float pitchDelta = currentRotation[1] - prevRotation[1];
+
+        float f1 = (float) Math.round(yawDelta / gcd) * gcd;
+        float f2 = (float) Math.round(pitchDelta / gcd) * gcd;
+
+        float yaw = prevRotation[0] + f1;
+        float pitch = prevRotation[1] + f2;
 
         return new float[]{yaw, pitch};
     }

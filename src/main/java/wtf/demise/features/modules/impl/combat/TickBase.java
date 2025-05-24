@@ -19,6 +19,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
@@ -91,7 +92,6 @@ public class TickBase extends Module {
         if (mode.is("Future")) {
             if (e.isPre()) return;
 
-
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
             }
@@ -107,8 +107,8 @@ public class TickBase extends Module {
                             throw new RuntimeException(ex);
                         }
                     }
+                    timer.reset();
                 }
-                timer.reset();
             }
         }
     }
@@ -127,7 +127,8 @@ public class TickBase extends Module {
                             simulatedSelf.getPos(),
                             simulatedSelf.fallDistance,
                             simulatedSelf.onGround,
-                            simulatedSelf.isCollidedHorizontally
+                            simulatedSelf.isCollidedHorizontally,
+                            simulatedSelf.player
                     )
             );
         }
@@ -174,11 +175,11 @@ public class TickBase extends Module {
         AxisAlignedBB entityBoundingBox = target.getHitbox().offset(getTargetPrediction());
 
         double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(entityBoundingBox.getCenter(), mc.thePlayer);
-        double predictedSelfDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.get(selfPrediction.size() - 1).position, target);
+        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(selfPrediction.size() - 1).player);
 
         return predictedSelfDistance < predictedTargetDistance &&
-                predictedSelfDistance + 0.5657 <= tickRange.get() &&
-                predictedSelfDistance + 0.5657 > minRange.get() &&
+                predictedSelfDistance <= tickRange.get() &&
+                predictedSelfDistance > minRange.get() &&
                 predictedSelfDistance <= searchRange.get() &&
                 PlayerUtils.getDistanceToEntityBox(target) >= stopRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&

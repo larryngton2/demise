@@ -170,10 +170,8 @@ public class ShaderUtils implements InstanceAccess {
             
             uniform sampler2D inTexture;
             uniform sampler2D textureToCheck;
-            
             uniform vec2 texelSize;
             uniform vec2 direction;
-            
             uniform float radius;
             uniform float weights[256];
             
@@ -187,19 +185,16 @@ public class ShaderUtils implements InstanceAccess {
                 float alpha = texture2D(inTexture, uv).a * weights[0];
                 float weightSum = weights[0];
             
-                for (float i = 1.0; i <= radius; i++) {
-                    vec2 offset = texelSize * direction * i;
+                for (int i = 1; i <= int(radius); ++i) {
+                    vec2 offset = texelSize * direction * float(i);
+                    float w = weights[i];
             
-                    float w = weights[int(i)];
                     alpha += texture2D(inTexture, clamp(uv + offset, vec2(0.0), vec2(1.0))).a * w;
                     alpha += texture2D(inTexture, clamp(uv - offset, vec2(0.0), vec2(1.0))).a * w;
                     weightSum += 2.0 * w;
                 }
             
-                alpha /= weightSum;
-            
-                alpha *= 0.8;
-            
+                alpha = (alpha / weightSum) * 0.8;
                 gl_FragColor = vec4(0.0, 0.0, 0.0, alpha);
             }
             """;
@@ -524,21 +519,26 @@ public class ShaderUtils implements InstanceAccess {
             #version 120
             
             uniform sampler2D textureIn;
-            uniform vec2 texelSize, direction;
+            uniform vec2 texelSize;
+            uniform vec2 direction;
             uniform float radius;
-            uniform float weights[256];
+            uniform float weights[128];
             
-            #define offset texelSize * direction
+            #define offset (texelSize * direction)
             
             void main() {
-                vec3 blr = texture2D(textureIn, gl_TexCoord[0].st).rgb * weights[0];
+                vec2 uv = gl_TexCoord[0].st;
+                vec3 color = texture2D(textureIn, uv).rgb * weights[0];
             
-                for (float f = 1.0; f <= radius; f++) {
-                    blr += texture2D(textureIn, gl_TexCoord[0].st + f * offset).rgb * (weights[int(abs(f))]);
-                    blr += texture2D(textureIn, gl_TexCoord[0].st - f * offset).rgb * (weights[int(abs(f))]);
+                for (int i = 1; i < 128; ++i) {
+                    if (i > int(radius)) break;
+            
+                    vec2 delta = float(i) * offset;
+                    color += texture2D(textureIn, uv + delta).rgb * weights[i];
+                    color += texture2D(textureIn, uv - delta).rgb * weights[i];
                 }
             
-                gl_FragColor = vec4(blr, 1.0);
+                gl_FragColor = vec4(color, 1.0);
             }
             """;
 

@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
@@ -73,7 +74,7 @@ public class MenuButton implements Button, InstanceAccess {
                     interpolatedHeight = height;
                 }
 
-                float interpolation = 0.1f;
+                float interpolation = 0.25f;
 
                 if (hovered) {
                     interpolatedX = MathUtils.interpolate(interpolatedX, x + 1.5f, interpolation);
@@ -88,12 +89,12 @@ public class MenuButton implements Button, InstanceAccess {
                 }
 
                 if (!shader) {
-                    RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, new Color(0, 0, 0, 75));
+                    Interface anInterface = Demise.INSTANCE.getModuleManager().getModule(Interface.class);
+                    RoundedUtils.drawRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, new Color(anInterface.bgColor(), true));
+                    Fonts.interRegular.get(15).drawCenteredString(text, interpolatedX + interpolatedWidth / 2f, interpolatedY + Fonts.interRegular.get(15).getMiddleOfBox(interpolatedHeight) + 2, -1);
                 } else {
                     RoundedUtils.drawShaderRound(interpolatedX, interpolatedY, interpolatedWidth, interpolatedHeight, 7, Color.black);
                 }
-
-                Fonts.interRegular.get(15).drawCenteredString(text, interpolatedX + interpolatedWidth / 2f, interpolatedY + Fonts.interRegular.get(15).getMiddleOfBox(interpolatedHeight) + 2, -1);
             }
         }
     }

@@ -80,7 +80,8 @@ import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.impl.visual.Atmosphere;
-import wtf.demise.features.modules.impl.visual.Camera;
+import wtf.demise.features.modules.impl.visual.NoHurtCam;
+import wtf.demise.features.modules.impl.visual.ThirdPersonDistance;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.math.MathUtils;
 
@@ -107,8 +108,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     private Entity pointedEntity;
     private static MouseFilter mouseFilterXAxis = new MouseFilter();
     private static MouseFilter mouseFilterYAxis = new MouseFilter();
-    private final float thirdPersonDistance = 4.0F;
-    private float thirdPersonDistanceTemp = 4.0F;
     private float smoothCamYaw;
     private float smoothCamPitch;
     private float smoothCamFilterX;
@@ -138,11 +137,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     public float fogColorBlue;
     private float fogColor2;
     private float fogColor1;
-    private final int debugViewDirection = 0;
     private static final boolean debugView = false;
-    private final double cameraZoom = 1.0D;
-    private double cameraYaw;
-    private double cameraPitch;
     private ShaderGroup theShaderGroup;
     private static final ResourceLocation[] shaderResourceLocations = new ResourceLocation[]{new ResourceLocation("shaders/post/notch.json"), new ResourceLocation("shaders/post/fxaa.json"), new ResourceLocation("shaders/post/art.json"), new ResourceLocation("shaders/post/bumpy.json"), new ResourceLocation("shaders/post/blobs2.json"), new ResourceLocation("shaders/post/pencil.json"), new ResourceLocation("shaders/post/color_convolve.json"), new ResourceLocation("shaders/post/deconverge.json"), new ResourceLocation("shaders/post/flip.json"), new ResourceLocation("shaders/post/invert.json"), new ResourceLocation("shaders/post/ntsc.json"), new ResourceLocation("shaders/post/outline.json"), new ResourceLocation("shaders/post/phosphor.json"), new ResourceLocation("shaders/post/scan_pincushion.json"), new ResourceLocation("shaders/post/sobel.json"), new ResourceLocation("shaders/post/bits.json"), new ResourceLocation("shaders/post/desaturate.json"), new ResourceLocation("shaders/post/green.json"), new ResourceLocation("shaders/post/blur.json"), new ResourceLocation("shaders/post/wobble.json"), new ResourceLocation("shaders/post/blobs.json"), new ResourceLocation("shaders/post/antialias.json"), new ResourceLocation("shaders/post/creeper.json"), new ResourceLocation("shaders/post/spider.json")};
     public static final int shaderCount = shaderResourceLocations.length;
@@ -151,15 +146,11 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     public int frameCount;
     private boolean initialized = false;
     private World updatedWorld = null;
-    private final boolean showDebugInfo = false;
     public boolean fogStandard = false;
     private float clipDistance = 128.0F;
     private long lastServerTime = 0L;
     private int lastServerTicks = 0;
     private int serverWaitTime = 0;
-    private int serverWaitTimeCurrent = 0;
-    private float avgServerTimeDiff = 0.0F;
-    private float avgServerTickDiff = 0.0F;
     private final ShaderGroup[] fxaaShaders = new ShaderGroup[10];
     private boolean loadVisibleChunks = false;
     private static float interpolatedZoom;
@@ -277,7 +268,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         updateFovModifierHand();
         updateTorchFlicker();
         fogColor2 = fogColor1;
-        thirdPersonDistanceTemp = thirdPersonDistance;
 
         if (mc.gameSettings.smoothCamera) {
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
@@ -479,7 +469,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             boolean flag = false;
 
             if (mc.currentScreen == null) {
-                GameSettings gamesettings = mc.gameSettings;
                 flag = GameSettings.isKeyDown(mc.gameSettings.ofKeyBindZoom);
             }
 
@@ -490,7 +479,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                     mc.gameSettings.smoothCamera = true;
                     mc.renderGlobal.displayListEntitiesDirty = true;
                 } else {
-                    interpolatedZoom = MathUtils.interpolate(interpolatedZoom, mc.gameSettings.fovSetting / 4f, 0.1f);
+                    interpolatedZoom = MathUtils.interpolateNoUpdateCheck(interpolatedZoom, mc.gameSettings.fovSetting / 4f, 0.1f);
                     f = interpolatedZoom;
                 }
             } else if (Config.zoomMode) {
@@ -503,10 +492,10 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
             if (!flag) {
                 if (useFOVSetting) {
-                    interpolatedZoom = MathUtils.interpolate(interpolatedZoom, f2, 0.1f);
+                    interpolatedZoom = MathUtils.interpolateNoUpdateCheck(interpolatedZoom, f2, 0.1f);
                     f = interpolatedZoom;
                 } else {
-                    interpolatedZoom = MathUtils.interpolate(interpolatedZoom, 70, 0.1f);
+                    interpolatedZoom = MathUtils.interpolateNoUpdateCheck(interpolatedZoom, 70, 0.1f);
                 }
             }
 
@@ -527,7 +516,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
     private static void hurtCameraEffect(float partialTicks) {
         if (mc.getRenderViewEntity() instanceof EntityLivingBase entitylivingbase) {
-            if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("No Hurt Cam"))
+            if (Demise.INSTANCE.getModuleManager().getModule(NoHurtCam.class).isEnabled())
                 return;
 
             float f = (float) entitylivingbase.hurtTime - partialTicks;
@@ -563,21 +552,12 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         }
     }
 
-    public double prevRenderX = 0d;
-    public double prevRenderY = 0d;
-    public double prevRenderZ = 0d;
-
     private void orientCamera(float partialTicks) {
         Entity entity = mc.getRenderViewEntity();
-        Camera camera = Demise.INSTANCE.getModuleManager().getModule(Camera.class);
         float f = entity.getEyeHeight();
         double d0 = entity.prevPosX + (entity.posX - entity.prevPosX) * (double) partialTicks;
         double d1 = entity.prevPosY + (entity.posY - entity.prevPosY) * (double) partialTicks + (double) f;
         double d2 = entity.prevPosZ + (entity.posZ - entity.prevPosZ) * (double) partialTicks;
-
-        prevRenderX = prevRenderX + (d0 - prevRenderX) * camera.interpolation.get();
-        prevRenderY = prevRenderY + (d1 - prevRenderY) * camera.interpolation.get();
-        prevRenderZ = prevRenderZ + (d2 - prevRenderZ) * camera.interpolation.get();
 
         if (entity instanceof EntityLivingBase && ((EntityLivingBase) entity).isPlayerSleeping()) {
             f = (float) ((double) f + 1.0D);
@@ -599,7 +579,9 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, -1.0F, 0.0F, 0.0F);
             }
         } else if (mc.gameSettings.thirdPersonView > 0) {
-            double d3 = Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("Third Person Distance") ? Demise.INSTANCE.getModuleManager().getModule(Camera.class).cameraDistance.get() : 4.0;
+            ThirdPersonDistance thirdPersonDistance = Demise.INSTANCE.getModuleManager().getModule(ThirdPersonDistance.class);
+
+            double d3 = thirdPersonDistance.isEnabled() ? thirdPersonDistance.cameraDistance.get() : 4.0;
 
             if (mc.gameSettings.debugCamEnable) {
                 GlStateManager.translate(0.0F, 0.0F, (float) (-d3));
@@ -628,10 +610,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                         double d7 = movingobjectposition.hitVec.distanceTo(new Vec3(d0, d1, d2));
 
                         if (d7 < d3) {
-                            if (!camera.isEnabled() ||
-                                    !camera.setting.isEnabled("View Clip")) {
-                                d3 = d7;
-                            }
+                            d3 = d7;
                         }
                     }
                 }
@@ -645,14 +624,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                 GlStateManager.translate(0.0F, 0.0F, (float) (-d3));
                 GlStateManager.rotate(f1 - entity.rotationYaw, 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotate(f2 - entity.rotationPitch, 1.0F, 0.0F, 0.0F);
-
-
                 GlStateManager.rotate(entity.rotationYaw, 0.0F, 1.0F, 0.0F);
-
-                if (camera.setting.isEnabled("Motion Camera")) {
-                    GlStateManager.translate(prevRenderX - d0, d1 - prevRenderY, prevRenderZ - d2);
-                }
-
                 GlStateManager.rotate(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);
             }
         } else {
@@ -1293,27 +1265,24 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             icamera.setPosition(d0, d1, d2);
         }
 
-        if ((Config.isSkyEnabled() || Config.isSunMoonEnabled() || Config.isStarsEnabled()) && !Shaders.isShadowPass) {
+        if ((Config.isSkyEnabled() || Config.isSunMoonEnabled() || Config.isStarsEnabled() || Config.isCustomSky()) && !Shaders.isShadowPass) {
             setupFog(-1, partialTicks);
-            if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && !Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("Shader Sky") || !Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled()) {
-                mc.mcProfiler.endStartSection("sky");
-            }
+
+            mc.mcProfiler.endStartSection("sky");
             GlStateManager.matrixMode(5889);
             GlStateManager.loadIdentity();
             float aspect = (float) mc.displayWidth / (float) mc.displayHeight;
             Project.gluPerspective(getFOVModifier(partialTicks, true), aspect, 0.05F, clipDistance);
             GlStateManager.matrixMode(5888);
 
-            if (Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled() && !Demise.INSTANCE.getModuleManager().getModule(Camera.class).setting.isEnabled("Shader Sky") || !Demise.INSTANCE.getModuleManager().getModule(Camera.class).isEnabled()) {
-                if (flag) {
-                    Shaders.beginSky();
-                }
+            if (flag) {
+                Shaders.beginSky();
+            }
 
-                renderglobal.renderSky(partialTicks, pass);
+            renderglobal.renderSky(partialTicks, pass);
 
-                if (flag) {
-                    Shaders.endSky();
-                }
+            if (flag) {
+                Shaders.endSky();
             }
 
             GlStateManager.matrixMode(5889);
@@ -1734,11 +1703,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                             l2 = j2;
                         }
 
-                        int i3 = j2;
-
-                        if (j2 < l) {
-                            i3 = l;
-                        }
+                        int i3 = Math.max(j2, l);
 
                         if (k2 != l2) {
                             random.setSeed((long) l1 * l1 * 3121 + l1 * 45238971L ^ (long) k1 * k1 * 418711 + k1 * 13761L);
@@ -1999,11 +1964,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     private void setupFog(int startCoords, float partialTicks) {
         fogStandard = false;
         Entity entity = mc.getRenderViewEntity();
-        boolean flag = false;
-
-        if (entity instanceof EntityPlayer) {
-            flag = ((EntityPlayer) entity).capabilities.isCreativeMode;
-        }
 
         GL11.glFogfv(GL11.GL_FOG_COLOR, setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue));
         GL11.glNormal3f(0.0F, -1.0F, 0.0F);
@@ -2115,8 +2075,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     }
 
     private void waitForServerThread() {
-        serverWaitTimeCurrent = 0;
-
         if (Config.isSmoothWorld() && Config.isSingleProcessor()) {
             if (mc.isIntegratedServerRunning()) {
                 IntegratedServer integratedserver = mc.getIntegratedServer();
@@ -2129,7 +2087,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                             Lagometer.timerServer.start();
                             Config.sleep(serverWaitTime);
                             Lagometer.timerServer.end();
-                            serverWaitTimeCurrent = serverWaitTime;
                         }
 
                         long i = System.nanoTime() / 1000000L;
@@ -2165,8 +2122,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                         } else {
                             lastServerTime = i;
                             lastServerTicks = integratedserver.getTickCounter();
-                            avgServerTickDiff = 1.0F;
-                            avgServerTimeDiff = 50.0F;
                         }
                     } else {
                         if (mc.currentScreen instanceof GuiDownloadTerrain) {
@@ -2256,9 +2211,12 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             String s = null;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(new Date());
-            int i = calendar.get(5);
-            int j = calendar.get(2) + 1;
+            int i = calendar.get(Calendar.DATE);
+            int j = calendar.get(Calendar.MONTH) + 1;
 
+            // fuck y'all
+
+            /*
             if (i == 8 && j == 4) {
                 s = "Happy birthday, OptiFine!";
             }
@@ -2270,6 +2228,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             if (s == null) {
                 return;
             }
+
+             */
 
             Reflector.setFieldValue(p_updateMainMenu_1_, Reflector.GuiMainMenu_splashText, s);
         } catch (Throwable ignored) {

@@ -367,7 +367,7 @@ public class SoundManager {
         }
     }
 
-    static class SoundSystemStarterThread extends SoundSystem {
+    public static class SoundSystemStarterThread extends SoundSystem {
         private SoundSystemStarterThread() {
         }
 

@@ -37,6 +37,7 @@ public class ClickHandler implements InstanceAccess {
     private int clicks;
     private static float swingRange;
     private static boolean forceblahblahblah;
+    private final TimerUtils selfHurtTimer = new TimerUtils();
 
     public enum ClickMode {
         Legit,
@@ -159,7 +160,11 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private boolean shouldClick() {
-        return mc.thePlayer.hurtTime != 0 || target.hurtTime <= 3 || (forceblahblahblah && BackTrack.shouldLag && Demise.INSTANCE.getModuleManager().getModule(BackTrack.class).isEnabled());
+        if (mc.thePlayer.hurtTime != 0) {
+            selfHurtTimer.reset();
+        }
+
+        return !selfHurtTimer.hasTimeElapsed(300) || target.hurtTime <= 3 || (forceblahblahblah && BackTrack.shouldLag && Demise.INSTANCE.getModuleManager().getModule(BackTrack.class).isEnabled());
     }
 
     private void attack() {

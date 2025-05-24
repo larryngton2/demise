@@ -68,6 +68,9 @@ repositories {
     maven {
         url "https://mvnrepository.com/artifact"
     }
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
 javafx {
@@ -146,6 +149,12 @@ dependencies {
     implementation "org.jetbrains:annotations:24.1.0"
 
     implementation "com.madgag:animated-gif-lib:1.4"
+
+    //todo 🤫
+    implementation 'ai.djl:api:0.31.1'
+    implementation 'ai.djl.tensorflow:tensorflow-engine:0.27.0'
+    implementation 'ai.djl.tensorflow:tensorflow-native-auto:2.5.0-SNAPSHOT'
+    implementation 'ai.djl:model-zoo:0.27.0'
 
     implementation fileTree(dir: "libs", include: "*.jar")
     compileOnly fileTree(dir: "libs", include: "*.jar")

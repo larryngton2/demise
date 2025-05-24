@@ -39,7 +39,6 @@ public final class BlinkComponent implements InstanceAccess {
         }
 
         if (event.getState() == PacketEvent.State.OUTGOING) {
-
             if (mc.thePlayer.isDead || mc.isSingleplayer() || !mc.getNetHandler().doneLoadingTerrain) {
                 packets.forEach(PacketUtils::sendPacketNoEvent);
                 packets.clear();
@@ -62,8 +61,7 @@ public final class BlinkComponent implements InstanceAccess {
             }
 
             if (blinking) {
-                if (!event.isCancelled() && exemptedPackets.stream().noneMatch(packetClass ->
-                        packetClass == packet.getClass())) {
+                if (!event.isCancelled() && exemptedPackets.stream().noneMatch(packetClass -> packetClass == packet.getClass())) {
                     packets.add(packet);
                     event.setCancelled(true);
                 }
