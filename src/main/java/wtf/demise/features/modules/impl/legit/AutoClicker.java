@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
@@ -9,6 +10,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.player.ClickHandler;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -32,12 +34,21 @@ public class AutoClicker extends Module {
         rightTimer.reset();
     }
 
-    private boolean isLeftReady() {
-        return leftTimer.hasTimeElapsed(1000 / (ThreadLocalRandom.current().nextInt((int) lminCPS.get(), (int) lmaxCPS.get() + 1) * 1.5));
-    }
-
     private boolean isRightReady() {
         return rightTimer.hasTimeElapsed(1000 / (ThreadLocalRandom.current().nextInt((int) rminCPS.get(), (int) rmaxCPS.get() + 1) * 1.5));
+    }
+
+    @EventTarget
+    public void onGameEvent(GameEvent e) {
+        if (left.get()) {
+            if (breakBlocks.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+                return;
+
+            if (mc.gameSettings.keyBindAttack.isKeyDown()) {
+                // clicking using keybind, don't need raytrace etc. target is mc.thePlayer so you can always attack.
+                ClickHandler.initHandler(lminCPS.get(), lmaxCPS.get(), false, false, false, false, false, 3, 3, ClickHandler.ClickMode.Legit, mc.thePlayer);
+            }
+        }
     }
 
     @EventTarget
@@ -47,16 +58,6 @@ public class AutoClicker extends Module {
                 if (mc.gameSettings.keyBindUseItem.isKeyDown() && isRightReady()) {
                     mc.rightClickMouse();
                     rightTimer.reset();
-                }
-            }
-
-            if (left.get()) {
-                if (breakBlocks.get() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
-                    return;
-
-                if (mc.gameSettings.keyBindAttack.isKeyDown() && isLeftReady() && !mc.thePlayer.isUsingItem()) {
-                    mc.clickMouse();
-                    leftTimer.reset();
                 }
             }
         }

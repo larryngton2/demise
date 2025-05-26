@@ -53,7 +53,6 @@ public class KillAura extends Module {
     private final BoolValue ignoreBlocking = new BoolValue("Ignore blocking", true, this);
     private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
     private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
-    private final SliderValue cpsUpdateDelay = new SliderValue("CPS update delay", 5, 0, 50, 1, this);
     public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
     private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayTrace::get);
     private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
@@ -343,7 +342,7 @@ public class KillAura extends Module {
         if (currentTarget != null) {
             if (!isTargetInvalid()) {
                 ClickHandler.ClickMode mode = ClickHandler.ClickMode.valueOf(clickMode.get());
-                ClickHandler.initHandler(minCPS.get(), maxCPS.get(), cpsUpdateDelay.get(), rayTrace.get() && rayTrace.canDisplay(), smartClicking.get(), forceAttackOnBacktrack.get(), ignoreBlocking.get(), failSwing.get(), attackRange.get(), swingRange.get(), mode, currentTarget);
+                ClickHandler.initHandler(minCPS.get(), maxCPS.get(), rayTrace.get() && rayTrace.canDisplay(), smartClicking.get(), forceAttackOnBacktrack.get(), ignoreBlocking.get(), failSwing.get(), attackRange.get(), swingRange.get(), mode, currentTarget);
 
                 double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 

@@ -29,8 +29,8 @@ public class BooleanComponent extends Component {
 
         Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY() + 2.5f, -1);
 
-        RoundedUtils.drawRound(getX() + getWidth() - 15.5f, getY() + 2.5f, 13f, 5, 2, ColorUtils.interpolateColorC(new Color(128, 128, 128, 255), Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor(), (float) toggleAnimation.getOutput()));
-        RoundedUtils.drawRound(getX() + getWidth() - 15.5f + 5 * (float) toggleAnimation.getOutput(), getY() + 2f, 7f, 5, 2, Color.WHITE);
+        RoundedUtils.drawRound(getX() + getWidth() - 15.5f, getY() + 2.5f, 13f, 5, 2.25f, ColorUtils.interpolateColorC(new Color(128, 128, 128, 255), Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor(), (float) toggleAnimation.getOutput()).darker());
+        RoundedUtils.drawRound(getX() + getWidth() - 15.5f + 8 * (float) toggleAnimation.getOutput(), getY() + 2.5f, 5, 5, 2.25f, Color.WHITE);
         super.drawScreen(mouseX, mouseY);
     }
 

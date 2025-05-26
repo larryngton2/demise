@@ -106,7 +106,7 @@ public class Alt {
     }
 
     private void drawSkull(@NotNull FakeEntityPlayer player, int scrolled, float x) {
-        RenderUtils.renderPlayer2D(player, x, scrolled + 2, AltRepositoryGUI.PLAYER_BOX_HEIGHT - 4, 12, -1);
+        RenderUtils.renderPlayerHead(player, x, scrolled + 2, AltRepositoryGUI.PLAYER_BOX_HEIGHT - 4, 12, -1);
     }
 
     private final TimerUtils timer = new TimerUtils();

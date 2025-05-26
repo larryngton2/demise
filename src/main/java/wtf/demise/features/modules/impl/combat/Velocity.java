@@ -1,8 +1,6 @@
 package wtf.demise.features.modules.impl.combat;
 
-import de.florianmichael.viamcp.fixes.AttackOrder;
 import net.minecraft.block.BlockAir;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
@@ -29,20 +27,18 @@ import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
-import java.util.Objects;
-
 @ModuleInfo(name = "Velocity", description = "Minimises or removes knockback.", category = ModuleCategory.Combat)
 public class Velocity extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
     public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce"}, "Reduce", this, () -> mode.is("Intave"));
-    private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel"));
-    private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> Objects.equals(mode.get(), "Normal") || Objects.equals(mode.get(), "Cancel") || mode.is("ReStrafe"));
+    private final SliderValue horizontal = new SliderValue("Horizontal", 0, 0, 100, 1, this, () -> mode.is("Normal"));
+    private final SliderValue vertical = new SliderValue("Vertical", 100, 0, 100, 1, this, () -> mode.is("Normal") || mode.is("ReStrafe"));
     private final SliderValue chance = new SliderValue("Chance", 100, 0, 100, 1, this);
     private final SliderValue mHurtTime = new SliderValue("Min hurtTime", 9, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
     private final SliderValue mmHurtTime = new SliderValue("Max hurtTime", 10, 1, 10, 1, this, () -> (mode.is("Intave") && intaveMode.is("Tick Reduce")));
     public final SliderValue rFactorMin = new SliderValue("Factor (min)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
     public final SliderValue rFactorMax = new SliderValue("Factor (max)", 0.6f, 0, 1, 0.05f, this, () -> mode.is("Reduce") || (mode.is("Intave") && !intaveMode.is("Test")));
-    private final SliderValue maxAttacks = new SliderValue("Max attacks", 5, 1, 10, 1, this, () -> Objects.equals(mode.get(), "Legit"));
+    private final SliderValue maxAttacks = new SliderValue("Max attacks", 5, 1, 10, 1, this, () -> mode.is("Legit"));
     private final SliderValue ticks = new SliderValue("Ticks", 0, 0, 6, 1, this, () -> mode.is("ReStrafe"));
     private final BoolValue onSwing = new BoolValue("On swing", false, this);
 
@@ -158,18 +154,7 @@ public class Velocity extends Module {
                 }
                 break;
             case "Cancel":
-                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
-                    if (horizontal.get() != 100.0D) {
-                        mc.thePlayer.motionX = ((double) packet.getMotionX() / 8000) * horizontal.get() / 100.0;
-                        mc.thePlayer.motionZ = ((double) packet.getMotionZ() / 8000) * horizontal.get() / 100.0;
-                    }
-
-                    if (vertical.get() != 100.0D) {
-                        mc.thePlayer.motionY = ((double) packet.getMotionY() / 8000) * vertical.get() / 100.0;
-                    }
-
-                    e.setCancelled(true);
-                }
+                e.setCancelled(true);
                 break;
             case "GrimC07":
                 final Packet<?> packet = e.getPacket();

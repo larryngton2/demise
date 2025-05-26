@@ -11,6 +11,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
@@ -29,6 +30,7 @@ public class CombatHelper extends Module {
 
     private boolean isBlocking;
     private EntityLivingBase target;
+    private final TimerUtils hurtTimer = new TimerUtils();
 
     @EventTarget
     public void onGame(GameEvent e) {
@@ -59,8 +61,14 @@ public class CombatHelper extends Module {
     @EventTarget
     public void onMoveInput(MoveInputEvent e) {
         if (target != null) {
-            if (comboBreaker.get() && PlayerUtils.getDistanceToEntityBox(target) >= breakerAttackRange.get() && !mc.thePlayer.onGround && mc.thePlayer.hurtTime != 0 && target.hurtTime == 0) {
-                MoveUtil.holdS(e);
+            if (comboBreaker.get()) {
+                if (mc.thePlayer.hurtTime != 0) {
+                    hurtTimer.reset();
+                }
+
+                if (PlayerUtils.getDistanceToEntityBox(target) >= breakerAttackRange.get() && !mc.thePlayer.onGround && !hurtTimer.hasTimeElapsed(500) && target.hurtTime == 0) {
+                    MoveUtil.holdS(e);
+                }
             }
 
             if (keepCombo.get() && PlayerUtils.getDistanceToEntityBox(target) < keepComboAttackRange.get() && !target.onGround && target.hurtTime != 0 && mc.thePlayer.hurtTime == 0) {

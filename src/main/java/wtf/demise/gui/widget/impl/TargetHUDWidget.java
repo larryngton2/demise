@@ -161,7 +161,7 @@ class TargetHUD implements InstanceAccess {
             Fonts.interSemiBold.get(13).drawString(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
             Fonts.interSemiBold.get(18).drawString(target.getName(), x + 37, y + 6, -1);
 
-            RenderUtils.renderPlayer2D(target, x + 2.5f, y + 2.5f, 32, 10, -1);
+            RenderUtils.renderPlayerHead(target, x + 2.5f, y + 2.5f, 32, 10, -1);
         } else {
             RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
         }

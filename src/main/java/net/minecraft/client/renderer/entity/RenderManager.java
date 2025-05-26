@@ -331,12 +331,15 @@ public class RenderManager {
         }
     }
 
-
     public boolean renderEntityWithPosYaw(Entity entityIn, double x, double y, double z, float entityYaw, float partialTicks) {
         return this.doRenderEntity(entityIn, x, y, z, entityYaw, partialTicks, false);
     }
 
     public boolean doRenderEntity(Entity entity, double x, double y, double z, float entityYaw, float partialTicks, boolean hideDebugBox) {
+        return doRenderEntity(entity, x, y, z, entityYaw, partialTicks, hideDebugBox, false);
+    }
+
+    public boolean doRenderEntity(Entity entity, double x, double y, double z, float entityYaw, float partialTicks, boolean hideDebugBox, boolean forceRenderOutlines) {
         Render<Entity> render = null;
 
         try {
@@ -358,7 +361,7 @@ public class RenderManager {
                 }
 
                 try {
-                    if (!this.renderOutlines) {
+                    if (forceRenderOutlines || !this.renderOutlines) {
                         render.doRenderShadowAndFire(entity, x, y, z, entityYaw, partialTicks);
                     }
                 } catch (Throwable throwable1) {

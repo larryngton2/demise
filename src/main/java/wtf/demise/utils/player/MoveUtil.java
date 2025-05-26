@@ -304,11 +304,15 @@ public class MoveUtil implements InstanceAccess {
         return Math.toRadians(rotationYaw);
     }
 
-    public static void fixMovement(final MoveInputEvent event, final float yaw) {
+    public static void fixMovement(MoveInputEvent event, float yaw) {
+        fixMovement(event, yaw, mc.thePlayer.rotationYaw);
+    }
+
+    public static void fixMovement(MoveInputEvent event, float yaw, float playerYaw) {
         final float forward = event.getForward();
         final float strafe = event.getStrafe();
 
-        final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(mc.thePlayer.rotationYaw, forward, strafe)));
+        final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(playerYaw, forward, strafe)));
 
         if (forward == 0 && strafe == 0) {
             return;

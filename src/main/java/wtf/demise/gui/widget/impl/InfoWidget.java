@@ -48,7 +48,7 @@ public class InfoWidget extends Widget {
             Fonts.interRegular.get(15).drawString(str1, x + 3, textY, -1);
 
             RoundedUtils.drawRound(x1, renderY, width2, height, 3, new Color(setting.bgColor(), true));
-            RenderUtils.renderPlayer2D(mc.thePlayer, x1 + 2, (renderY + height / 2) - 5, 10, 10, -1);
+            RenderUtils.renderPlayerHead(mc.thePlayer, x1 + 2, (renderY + height / 2) - 5, 10, 10, -1);
             Fonts.interRegular.get(15).drawString(mc.thePlayer.getName(), x1 + 14, textY, -1);
         } else {
             RoundedUtils.drawShaderRound(x, renderY, width1, height, 3, Color.black);

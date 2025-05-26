@@ -6,10 +6,13 @@ import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.Vec3;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
+import wtf.demise.events.impl.packet.PacketReleaseEvent;
 import wtf.demise.events.impl.player.MotionEvent;
+import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
 
@@ -24,7 +27,6 @@ public final class PingSpoofComponent implements InstanceAccess {
     static Tuple<Class[], Boolean> blink = new Tuple<>(new Class[]{C02PacketUseEntity.class, C0DPacketCloseWindow.class, C0EPacketClickWindow.class, C0CPacketInput.class, C0BPacketEntityAction.class, C08PacketPlayerBlockPlacement.class, C07PacketPlayerDigging.class, C09PacketHeldItemChange.class, C13PacketPlayerAbilities.class, C15PacketClientSettings.class, C16PacketClientStatus.class, C17PacketCustomPayload.class, C18PacketSpectate.class, C19PacketResourcePackStatus.class, C03PacketPlayer.class, C03PacketPlayer.C04PacketPlayerPosition.class, C03PacketPlayer.C05PacketPlayerLook.class, C03PacketPlayer.C06PacketPlayerPosLook.class, C0APacketAnimation.class}, false);
     static Tuple<Class[], Boolean> movement = new Tuple<>(new Class[]{C03PacketPlayer.class, C03PacketPlayer.C04PacketPlayerPosition.class, C03PacketPlayer.C05PacketPlayerLook.class, C03PacketPlayer.C06PacketPlayerPosLook.class}, false);
     public static Tuple<Class[], Boolean>[] types = new Tuple[]{regular, velocity, teleports, players, blink, movement};
-    private static boolean post;
 
     public static ConcurrentLinkedQueue<TimedPacket> packets = new ConcurrentLinkedQueue<>();
     static TimerUtils enabledTimer = new TimerUtils();
@@ -33,6 +35,7 @@ public final class PingSpoofComponent implements InstanceAccess {
     private static boolean picked;
     private static double x, y, z;
     private static double realX, realY, realZ;
+    private static boolean post;
 
     @EventTarget
     public void onPacketC(PacketEvent event) {
@@ -79,11 +82,24 @@ public final class PingSpoofComponent implements InstanceAccess {
     }
 
     @EventTarget
-    public void onMotion(MotionEvent e) {
-        if ((e.isPre() && post) || (e.isPost() && !post)) {
+    public void onUpdate(UpdateEvent e) {
+        if (post) {
             return;
         }
 
+        sendPackets();
+    }
+
+    @EventTarget
+    public void onMotion(MotionEvent e) {
+        if (e.isPre() || !post) {
+            return;
+        }
+
+        sendPackets();
+    }
+
+    private void sendPackets() {
         if (!(enabled = !enabledTimer.hasTimeElapsed(100) && !(mc.currentScreen instanceof GuiDownloadTerrain))) {
             dispatch();
         } else {
@@ -91,13 +107,14 @@ public final class PingSpoofComponent implements InstanceAccess {
 
             packets.forEach(packet -> {
                 if (packet.getMillis() + amount < System.currentTimeMillis()) {
-                    if (packet.getPacket() instanceof C03PacketPlayer c03PacketPlayer) {
-                        realX = c03PacketPlayer.getPositionX();
-                        realY = c03PacketPlayer.getPositionY();
-                        realZ = c03PacketPlayer.getPositionZ();
+                    PacketReleaseEvent packetReleaseEvent = new PacketReleaseEvent(packet);
+
+                    Demise.INSTANCE.getEventManager().call(packetReleaseEvent);
+
+                    if (!packetReleaseEvent.isCancelled()) {
+                        PacketUtils.queue(packet.getPacket());
+                        packets.remove(packet);
                     }
-                    PacketUtils.queue(packet.getPacket());
-                    packets.remove(packet);
                 }
             });
 
