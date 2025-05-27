@@ -104,6 +104,7 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
+import wtf.demise.features.modules.impl.legit.HitSelect;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -1102,6 +1103,12 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     }
 
     public void clickMouse() {
+        HitSelect hitSelect = Demise.INSTANCE.getModuleManager().getModule(HitSelect.class);
+
+        if (hitSelect.isEnabled() && hitSelect.blockClicking) {
+            return;
+        }
+
         if (this.leftClickCounter <= 0) {
             AttackOrder.sendConditionalSwing(this.objectMouseOver);
 

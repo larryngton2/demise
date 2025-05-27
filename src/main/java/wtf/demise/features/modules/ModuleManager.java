@@ -57,6 +57,7 @@ public class ModuleManager {
                 Reach.class,
                 HitBox.class,
                 CombatHelper.class,
+                HitSelect.class,
 
                 // Exploit
                 Blink.class,
