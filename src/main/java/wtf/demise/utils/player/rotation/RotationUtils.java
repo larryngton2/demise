@@ -1,9 +1,8 @@
-package wtf.demise.utils.player;
+package wtf.demise.utils.player.rotation;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
@@ -14,9 +13,14 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
+import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.player.MovementCorrection;
+import wtf.demise.utils.player.SmoothMode;
 
 import java.util.Objects;
 
@@ -24,14 +28,19 @@ import static java.lang.Math.*;
 
 public class RotationUtils implements InstanceAccess {
     public static float[] currentRotation = null, serverRotation = new float[]{}, previousRotation = null;
+    private static float lastDelta;
+    public static float[] currRotRequireNonNullElse;
+    public static float[] prevRotRequireNonNullElse;
     public static MovementCorrection currentCorrection = MovementCorrection.None;
     public static boolean enabled;
     private static float cachedHSpeed;
     private static float cachedVSpeed;
     private static float cachedMidpoint;
+    private static boolean cachedAccel;
     private static SmoothMode smoothMode;
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
     private boolean angleCalled;
+    private static final TimerUtils tickTimer = new TimerUtils();
 
     public static boolean shouldRotate() {
         return currentRotation != null;
@@ -42,6 +51,8 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction) {
+        prevRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
+
         if (moduleRotation.silent.get()) {
             RotationUtils.currentRotation = applyGCDFix(serverRotation, rotation);
         } else {
@@ -53,39 +64,55 @@ public class RotationUtils implements InstanceAccess {
         cachedHSpeed = 180;
         cachedVSpeed = 180;
         enabled = true;
+        currRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
     }
 
     public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed) {
+        prevRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
+
         if (moduleRotation.silent.get()) {
-            currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear);
+            currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, false, SmoothMode.Linear);
         } else {
-            mc.thePlayer.rotationYaw = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear)[0];
-            mc.thePlayer.rotationPitch = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, SmoothMode.Linear)[1];
+            mc.thePlayer.rotationYaw = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, false, SmoothMode.Linear)[0];
+            mc.thePlayer.rotationPitch = limitRotations(serverRotation, rotation, hSpeed, vSpeed, 1, false, SmoothMode.Linear)[1];
         }
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         RotationUtils.smoothMode = SmoothMode.Linear;
-
         enabled = true;
+        currRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
     }
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode) {
+    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed, float midpoint, boolean accel, SmoothMode smoothMode) {
+        prevRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
+
+        if (tickTimer.hasTimeElapsed(50)) {
+            if (currentRotation != null && previousRotation != null) {
+                lastDelta = getRotationDifference(currentRotation, previousRotation);
+            } else {
+                lastDelta = getRotationDifference(new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, new float[]{mc.thePlayer.prevRotationYaw, mc.thePlayer.prevRotationPitch});
+            }
+
+            tickTimer.reset();
+        }
+
         if (moduleRotation.silent.get()) {
-            currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode);
+            currentRotation = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, accel, smoothMode);
         } else {
-            mc.thePlayer.rotationYaw = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode)[0];
-            mc.thePlayer.rotationPitch = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, smoothMode)[1];
+            mc.thePlayer.rotationYaw = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, accel, smoothMode)[0];
+            mc.thePlayer.rotationPitch = limitRotations(serverRotation, rotation, hSpeed, vSpeed, midpoint, accel, smoothMode)[1];
         }
 
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
         cachedMidpoint = midpoint;
+        cachedAccel = accel;
         RotationUtils.smoothMode = smoothMode;
-
         enabled = true;
+        currRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
     }
 
     @EventTarget
@@ -119,15 +146,21 @@ public class RotationUtils implements InstanceAccess {
     @EventTarget
     @EventPriority(-100)
     public void onPacket(final PacketEvent e) {
-        final Packet<?> packet = e.getPacket();
+        if (!(e.getPacket() instanceof C03PacketPlayer packetPlayer)) return;
 
-        if (!(packet instanceof C03PacketPlayer packetPlayer)) return;
-
-        if (!packetPlayer.rotating) return;
+        if (!packetPlayer.rotating) {
+            KillAura.rotDiffBuildUp = 0;
+            return;
+        }
 
         if (shouldRotate()) {
             packetPlayer.yaw = currentRotation[0];
             packetPlayer.pitch = currentRotation[1];
+        }
+
+        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isEnabled()) {
+            float diff = getAngleDifference(packetPlayer.getYaw(), serverRotation[0]);
+            KillAura.rotDiffBuildUp += diff;
         }
 
         serverRotation = new float[]{packetPlayer.yaw, packetPlayer.pitch};
@@ -158,7 +191,7 @@ public class RotationUtils implements InstanceAccess {
                     float finalHSpeed = (cachedHSpeed / 2) * mc.timer.partialTicks;
                     float finalVSpeed = (cachedVSpeed / 2) * mc.timer.partialTicks;
 
-                    RotationUtils.currentRotation = limitRotations(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint, smoothMode);
+                    RotationUtils.currentRotation = limitRotations(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint, cachedAccel, smoothMode);
                 }
             }
 
@@ -181,7 +214,7 @@ public class RotationUtils implements InstanceAccess {
         currentCorrection = MovementCorrection.None;
     }
 
-    public static float[] limitRotations(float[] currentRotation, float[] targetRotation, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode) {
+    public static float[] limitRotations(float[] currentRotation, float[] targetRotation, float hSpeed, float vSpeed, float midpoint, boolean accel, SmoothMode smoothMode) {
         float[] finalRotation;
 
         float yawDifference = getAngleDifference(targetRotation[0], currentRotation[0]);
@@ -192,9 +225,32 @@ public class RotationUtils implements InstanceAccess {
         float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * hSpeed);
         float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * vSpeed);
 
+        if (accel) {
+            float[] rangeYaw = {0, 0};
+            float[] rangePitch = {0, 0};
+
+            if (lastDelta == 0) {
+                float incYaw = 0.2f * MathHelper.clamp_float(straightLineYaw / 50, 0, 1);
+                rangeYaw[0] = 0.1f + incYaw;
+                rangeYaw[1] = 0.5f + incYaw;
+
+                float incPitch = 0.2f * MathHelper.clamp_float(straightLinePitch / 50, 0, 1);
+                rangePitch[0] = 0.1f + incPitch;
+                rangePitch[1] = 0.5f + incPitch;
+            } else {
+                rangeYaw[0] = rangePitch[0] = 0.3f;
+                rangeYaw[1] = rangePitch[1] = 0.7f;
+            }
+
+            float[] newRot = new float[]{MathUtils.interpolateNoUpdateCheck(lastDelta, straightLineYaw, MathUtils.randomizeFloat(rangeYaw[0], rangeYaw[1])), MathUtils.interpolateNoUpdateCheck(lastDelta, straightLinePitch, MathUtils.randomizeFloat(rangePitch[0], rangePitch[1]))};
+
+            straightLineYaw = newRot[0];
+            straightLinePitch = newRot[1];
+        }
+
         float[] finalTargetRotation = new float[]{
-                currentRotation[0] + Math.max(-straightLineYaw, Math.min(straightLineYaw, yawDifference)),
-                currentRotation[1] + Math.max(-straightLinePitch, Math.min(straightLinePitch, pitchDifference))
+                currentRotation[0] + max(-straightLineYaw, min(straightLineYaw, yawDifference)),
+                currentRotation[1] + max(-straightLinePitch, min(straightLinePitch, pitchDifference))
         };
 
         switch (smoothMode) {
@@ -227,8 +283,8 @@ public class RotationUtils implements InstanceAccess {
             }
 
             case Exponential -> {
-                float smoothedYaw = currentRotation[0] + yawDifference * (1 - (float) Math.exp(-(hSpeed / 180)));
-                float smoothedPitch = currentRotation[1] + pitchDifference * (1 - (float) Math.exp(-(vSpeed / 180)));
+                float smoothedYaw = currentRotation[0] + yawDifference * (1 - (float) exp(-(hSpeed / 180)));
+                float smoothedPitch = currentRotation[1] + pitchDifference * (1 - (float) exp(-(vSpeed / 180)));
 
                 float[] smoothedRotation = new float[]{
                         smoothedYaw,
@@ -245,8 +301,8 @@ public class RotationUtils implements InstanceAccess {
                 float straightLinePitch1 = (float) (abs(pitchDifference / rotationDifference) * factor[1]);
 
                 float[] smoothedRotation = new float[]{
-                        currentRotation[0] + Math.max(-straightLineYaw1, Math.min(straightLineYaw1, yawDifference)),
-                        currentRotation[1] + Math.max(-straightLinePitch1, Math.min(straightLinePitch1, pitchDifference))
+                        currentRotation[0] + max(-straightLineYaw1, min(straightLineYaw1, yawDifference)),
+                        currentRotation[1] + max(-straightLinePitch1, min(straightLinePitch1, pitchDifference))
                 };
 
                 finalRotation = applyGCDFix(currentRotation, smoothedRotation);
@@ -259,8 +315,8 @@ public class RotationUtils implements InstanceAccess {
     }
 
     private static float[] computeFactor(double rotationDifference, float hSpeed, float vSpeed) {
-        float turnSpeedH = (float) Math.max(Math.min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
-        float turnSpeedV = (float) Math.max(Math.min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
+        float turnSpeedH = (float) max(min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
+        float turnSpeedV = (float) max(min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
 
         return new float[]{turnSpeedH, turnSpeedV};
     }
@@ -271,8 +327,8 @@ public class RotationUtils implements InstanceAccess {
         float yawDelta = currentRotation[0] - prevRotation[0];
         float pitchDelta = currentRotation[1] - prevRotation[1];
 
-        float f1 = (float) Math.round(yawDelta / gcd) * gcd;
-        float f2 = (float) Math.round(pitchDelta / gcd) * gcd;
+        float f1 = round(yawDelta / gcd) * gcd;
+        float f2 = round(pitchDelta / gcd) * gcd;
 
         float yaw = prevRotation[0] + f1;
         float pitch = prevRotation[1] + f2;
@@ -325,8 +381,8 @@ public class RotationUtils implements InstanceAccess {
         double d2 = blockPos.getZ() + 0.5 - mc.thePlayer.posZ + enumFacing.getFrontOffsetZ() * xz;
         double d3 = mc.thePlayer.posY + mc.thePlayer.getEyeHeight() - blockPos.getY() - enumFacing.getFrontOffsetY() * y;
         double d4 = MathHelper.sqrt_double(d * d + d2 * d2);
-        float f = (float) (Math.atan2(d2, d) * 180.0 / Math.PI) - 90.0f;
-        float f2 = (float) (Math.atan2(d3, d4) * 180.0 / Math.PI);
+        float f = (float) (atan2(d2, d) * 180.0 / PI) - 90.0f;
+        float f2 = (float) (atan2(d3, d4) * 180.0 / PI);
         return new float[]{MathHelper.wrapAngleTo180_float(f), f2};
     }
 
@@ -335,8 +391,8 @@ public class RotationUtils implements InstanceAccess {
         double y = rotY - startY;
         double z = rotZ - startZ;
         double dist = MathHelper.sqrt_double(x * x + z * z);
-        float yaw = (float) (Math.atan2(z, x) * 180.0 / Math.PI) - 90.0F;
-        float pitch = (float) (-(Math.atan2(y, dist) * 180.0 / Math.PI));
+        float yaw = (float) (atan2(z, x) * 180.0 / PI) - 90.0F;
+        float pitch = (float) (-(atan2(y, dist) * 180.0 / PI));
         return new float[]{yaw, pitch};
     }
 
@@ -361,9 +417,9 @@ public class RotationUtils implements InstanceAccess {
         double deltaY = centerY - playerY;
         double deltaZ = centerZ - playerZ;
 
-        double distanceXZ = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-        float yaw = (float) (Math.toDegrees(Math.atan2(deltaZ, deltaX)) - 90.0F);
-        float pitch = (float) -Math.toDegrees(Math.atan2(deltaY, distanceXZ));
+        double distanceXZ = sqrt(deltaX * deltaX + deltaZ * deltaZ);
+        float yaw = (float) (toDegrees(atan2(deltaZ, deltaX)) - 90.0F);
+        float pitch = (float) -toDegrees(atan2(deltaY, distanceXZ));
 
         return new float[]{yaw, pitch};
     }
@@ -384,7 +440,7 @@ public class RotationUtils implements InstanceAccess {
     public static float getYaw(@NotNull AbstractClientPlayer from, @NotNull Vec3 pos) {
         return from.rotationYaw +
                 MathHelper.wrapAngleTo180_float(
-                        (float) Math.toDegrees(Math.atan2(pos.zCoord - from.posZ, pos.xCoord - from.posX)) - 90f - from.rotationYaw
+                        (float) toDegrees(atan2(pos.zCoord - from.posZ, pos.xCoord - from.posX)) - 90f - from.rotationYaw
                 );
     }
 
@@ -401,9 +457,9 @@ public class RotationUtils implements InstanceAccess {
         double diffY = pos.yCoord - (from.posY + from.getEyeHeight());
         double diffZ = pos.zCoord - from.posZ;
 
-        double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
+        double diffXZ = sqrt(diffX * diffX + diffZ * diffZ);
 
-        return from.rotationPitch + MathHelper.wrapAngleTo180_float((float) -Math.toDegrees(Math.atan2(diffY, diffXZ)) - from.rotationPitch);
+        return from.rotationPitch + MathHelper.wrapAngleTo180_float((float) -toDegrees(atan2(diffY, diffXZ)) - from.rotationPitch);
     }
 
     public static float getPitch(@NotNull Vec3 pos) {
@@ -416,15 +472,15 @@ public class RotationUtils implements InstanceAccess {
         double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (player.posX + (predict ? player.posX - player.prevPosX : 0.0));
         double posY = target.getEntityBoundingBox().minY + (predict ? (target.getEntityBoundingBox().minY - target.prevPosY) * predictSize : 0.0) + target.getEyeHeight() - 0.15 - (player.getEntityBoundingBox().minY + (predict ? player.posY - player.prevPosY : 0.0)) - player.getEyeHeight();
         double posZ = target.posZ + (predict ? (target.posZ - target.prevPosZ) * predictSize : 0.0) - (player.posZ + (predict ? player.posZ - player.prevPosZ : 0.0));
-        double posSqrt = Math.sqrt(posX * posX + posZ * posZ);
+        double posSqrt = sqrt(posX * posX + posZ * posZ);
 
-        velocity = Math.min((velocity * velocity + velocity * 2) / 3, 1f);
+        velocity = min((velocity * velocity + velocity * 2) / 3, 1f);
 
         float gravityModifier = 0.12f * gravity;
 
         return new float[]{
-                (float) Math.toDegrees(Math.atan2(posZ, posX)) - 90f,
-                (float) -Math.toDegrees(Math.atan((velocity * velocity - Math.sqrt(
+                (float) toDegrees(atan2(posZ, posX)) - 90f,
+                (float) -toDegrees(atan((velocity * velocity - sqrt(
                         velocity * velocity * velocity * velocity - gravityModifier * (gravityModifier * posSqrt * posSqrt + 2 * posY * velocity * velocity)
                 )) / (gravityModifier * posSqrt)))
         };

@@ -13,6 +13,7 @@ import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
 

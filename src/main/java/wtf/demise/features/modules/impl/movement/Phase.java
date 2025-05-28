@@ -23,7 +23,7 @@ import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 @ModuleInfo(name = "Phase", description = "Allows you to phase through blocks.", category = ModuleCategory.Movement)
 public class Phase extends Module {

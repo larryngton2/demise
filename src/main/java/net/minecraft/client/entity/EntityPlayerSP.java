@@ -34,7 +34,7 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 public class EntityPlayerSP extends AbstractClientPlayer {
     public final NetHandlerPlayClient sendQueue;

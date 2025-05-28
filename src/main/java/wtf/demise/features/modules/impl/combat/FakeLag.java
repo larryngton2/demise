@@ -29,7 +29,7 @@ import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;

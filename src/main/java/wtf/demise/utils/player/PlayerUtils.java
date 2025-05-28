@@ -22,8 +22,8 @@ import net.optifine.reflect.Reflector;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.List;
 

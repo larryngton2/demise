@@ -27,7 +27,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 

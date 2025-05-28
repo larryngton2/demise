@@ -47,7 +47,7 @@ import net.minecraft.world.*;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.features.modules.impl.combat.Velocity;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Collection;
 import java.util.List;

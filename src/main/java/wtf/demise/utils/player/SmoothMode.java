@@ -6,5 +6,6 @@ public enum SmoothMode {
     Bezier,
     Exponential,
     Relative,
+    LinearAcceleration,
     None
 }

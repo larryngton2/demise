@@ -28,7 +28,7 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BadPacketsComponent;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

@@ -20,10 +20,7 @@ import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.RotationUtils;
-import wtf.demise.utils.player.SmoothMode;
 
 import java.util.Arrays;
 

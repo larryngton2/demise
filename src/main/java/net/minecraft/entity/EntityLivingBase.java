@@ -40,7 +40,7 @@ import wtf.demise.features.modules.impl.visual.NoRenderOffsetReset;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.*;
 
