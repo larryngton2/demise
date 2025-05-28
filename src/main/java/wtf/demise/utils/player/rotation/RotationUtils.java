@@ -13,7 +13,6 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
-import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
@@ -41,6 +40,7 @@ public class RotationUtils implements InstanceAccess {
     private static final Rotation moduleRotation = Demise.INSTANCE.getModuleManager().getModule(Rotation.class);
     private boolean angleCalled;
     private static final TimerUtils tickTimer = new TimerUtils();
+    public static float rotDiffBuildUp;
 
     public static boolean shouldRotate() {
         return currentRotation != null;
@@ -149,7 +149,7 @@ public class RotationUtils implements InstanceAccess {
         if (!(e.getPacket() instanceof C03PacketPlayer packetPlayer)) return;
 
         if (!packetPlayer.rotating) {
-            KillAura.rotDiffBuildUp = 0;
+            rotDiffBuildUp = 0;
             return;
         }
 
@@ -158,9 +158,9 @@ public class RotationUtils implements InstanceAccess {
             packetPlayer.pitch = currentRotation[1];
         }
 
-        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isEnabled()) {
+        if (serverRotation != null && enabled) {
             float diff = getAngleDifference(packetPlayer.getYaw(), serverRotation[0]);
-            KillAura.rotDiffBuildUp += diff;
+            rotDiffBuildUp += diff;
         }
 
         serverRotation = new float[]{packetPlayer.yaw, packetPlayer.pitch};

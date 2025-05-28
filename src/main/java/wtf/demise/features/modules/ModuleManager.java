@@ -42,7 +42,6 @@ public class ModuleManager {
                 Criticals.class,
                 FakeLag.class,
                 TimerRange.class,
-                TPAura.class,
 
                 // Legit
                 AutoClicker.class,
@@ -58,6 +57,7 @@ public class ModuleManager {
                 HitBox.class,
                 CombatHelper.class,
                 HitSelect.class,
+                AimAssist.class,
 
                 // Exploit
                 Blink.class,

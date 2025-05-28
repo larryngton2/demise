@@ -20,16 +20,13 @@ import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
-import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
-import wtf.demise.utils.player.SmoothMode;
 
 import java.util.Arrays;
 
@@ -42,14 +39,7 @@ public class AutoRod extends Module {
     private final SliderValue fov = new SliderValue("Fov", 90, 0, 360, 1, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this);
     private final SliderValue predictSize = new SliderValue("Predict Size", 2, 0.1f, 10, 0.1f, this, rotate::get);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Relative", "None"}, "Linear", this);
-    private final BoolValue accelerate = new BoolValue("Accelerate", false, this, () -> !smoothMode.is("None"));
-    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
-    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
-    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
-    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None") && !accelerate.get());
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> smoothMode.is("Bezier"));
-    private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
+    private final RotationHandler rotationHandler = new RotationHandler(this);
     private final BoolValue onlyOnKillAura = new BoolValue("Only on KillAura", false, this);
 
     private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
@@ -69,6 +59,8 @@ public class AutoRod extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
+        rotationHandler.updateRotSpeed(e);
+
         currentTarget = findTarget();
 
         if (currentTarget == null || !mc.thePlayer.canEntityBeSeen(currentTarget) || mc.thePlayer.isUsingItem() || (!getModule(KillAura.class).isEnabled() && onlyOnKillAura.get())) {
@@ -174,19 +166,7 @@ public class AutoRod extends Module {
         if (rotate.get() && KillAura.currentTarget == null && range > minRange.get() && range <= maxRange.get()) {
             float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.get(), 0.03f, 2f);
 
-            SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
-            MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
-
-            float hSpeed;
-            float vSpeed;
-
-            float randYawSpeed = MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get());
-            float randPitchSpeed = MathUtils.randomizeFloat(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get());
-
-            hSpeed = randYawSpeed * mc.timer.partialTicks;
-            vSpeed = randPitchSpeed * mc.timer.partialTicks;
-
-            RotationUtils.setRotation(finalRotation, correction, hSpeed, vSpeed, midpoint.get(), false, mode);
+            rotationHandler.setRotation(finalRotation);
         }
     }
 

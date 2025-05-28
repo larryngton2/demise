@@ -21,16 +21,15 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.RotationHandler;
 
 import java.util.Arrays;
 
-/**
- * YES, I am using code from KillAura. FUCK YOU
- */
 @ModuleInfo(name = "AutoWalk", description = "w a l k", category = ModuleCategory.Movement)
 public class AutoWalk extends Module {
     private final BoolValue target = new BoolValue("Target player", false, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this, target::get);
+    private final RotationHandler rotationHandler = new RotationHandler(this);
     private final SliderValue minRange = new SliderValue("Min range", 1.5f, 0, 15, 0.1f, this, target::get);
     private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
             new BoolValue("Players", true),
@@ -48,16 +47,11 @@ public class AutoWalk extends Module {
         } else {
             EntityLivingBase target = findTarget();
             if (target != null) {
+                rotationHandler.updateRotSpeed(e);
 
-                //nah
-
-                /*
                 if (rotate.get()) {
-                    mc.thePlayer.rotationYaw = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, 90, SmoothMode.Linear)[0];
-                    mc.thePlayer.rotationPitch = RotationUtils.limitRotations(RotationUtils.serverRotation, calcToEntity(target), 25, 45, 1, 90, SmoothMode.Linear)[1];
+                    rotationHandler.setRotation(rotationHandler.getSimpleRotationsToEntity(target));
                 }
-
-                 */
 
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), PlayerUtils.getDistanceToEntityBox(target) > minRange.get());
             }
@@ -99,32 +93,5 @@ public class AutoWalk extends Module {
         }
 
         return target;
-    }
-
-    public float[] calcToEntity(EntityLivingBase entity) {
-        float yaw;
-        float pitch;
-        Vec3 currentVec;
-
-        Vec3 playerPos = mc.thePlayer.getPositionEyes(1);
-
-        AxisAlignedBB entityBoundingBox = entity.getEntityBoundingBox();
-
-        final double ex = (entityBoundingBox.maxX + entityBoundingBox.minX) / 2;
-        final double ey = MathHelper.clamp_double(playerPos.yCoord, entityBoundingBox.minY, entityBoundingBox.maxY);
-        final double ez = (entityBoundingBox.maxZ + entityBoundingBox.minZ) / 2;
-
-        currentVec = new Vec3(ex, ey, ez);
-
-        double deltaX = currentVec.xCoord - playerPos.xCoord;
-        double deltaY = currentVec.yCoord - playerPos.yCoord;
-        double deltaZ = currentVec.zCoord - playerPos.zCoord;
-
-        yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
-        pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
-
-        pitch = MathHelper.clamp_float(pitch, -90, 90);
-
-        return new float[]{yaw, pitch};
     }
 }

@@ -1239,4 +1239,60 @@ public class RenderUtils implements InstanceAccess {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);
     }
+
+    public static void drawTargetCircle(Entity entity) {
+        GL11.glPushMatrix();
+        GL11.glDisable(3553);
+        GL11.glEnable(2848);
+        GL11.glEnable(2832);
+        GL11.glEnable(3042);
+        GL11.glBlendFunc(770, 771);
+        GL11.glHint(3154, 4354);
+        GL11.glHint(3155, 4354);
+        GL11.glHint(3153, 4354);
+        GL11.glDepthMask(false);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0F);
+        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.disableCull();
+        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+
+        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * mc.timer.renderPartialTicks - (mc.getRenderManager()).renderPosX;
+        final double y = (entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * mc.timer.renderPartialTicks - (mc.getRenderManager()).renderPosY) + Math.sin(System.currentTimeMillis() / 2E+2) + 0.8;
+        final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * mc.timer.renderPartialTicks - (mc.getRenderManager()).renderPosZ;
+
+        Color c;
+
+        for (float i = 0; i < Math.PI * 2; i += (float) (Math.PI * 2 / 64.F)) {
+            final double vecX = x + 0.67 * Math.cos(i);
+            final double vecZ = z + 0.67 * Math.sin(i);
+
+            c = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
+
+            GL11.glColor4f(c.getRed() / 255.F,
+                    c.getGreen() / 255.F,
+                    c.getBlue() / 255.F,
+                    0
+            );
+            GL11.glVertex3d(vecX, y - Math.cos(System.currentTimeMillis() / 2E+2) / 2.0F, vecZ);
+            GL11.glColor4f(c.getRed() / 255.F,
+                    c.getGreen() / 255.F,
+                    c.getBlue() / 255.F,
+                    0.85F
+            );
+            GL11.glVertex3d(vecX, y, vecZ);
+        }
+
+        GL11.glEnd();
+        GL11.glShadeModel(GL11.GL_FLAT);
+        GL11.glDepthMask(true);
+        GL11.glEnable(2929);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.enableCull();
+        GL11.glDisable(2848);
+        GL11.glDisable(2848);
+        GL11.glEnable(2832);
+        GL11.glEnable(3553);
+        GL11.glPopMatrix();
+        GL11.glColor3f(255, 255, 255);
+    }
 }

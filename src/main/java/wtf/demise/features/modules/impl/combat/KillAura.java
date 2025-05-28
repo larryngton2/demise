@@ -1,6 +1,5 @@
 package wtf.demise.features.modules.impl.combat;
 
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,7 +11,6 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.*;
-import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
@@ -22,8 +20,8 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.ClickHandler;
-import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
@@ -32,9 +30,10 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.*;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
+import wtf.demise.utils.render.RenderUtils;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Queue;
 import java.util.*;
@@ -65,27 +64,12 @@ public class KillAura extends Module {
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
-    private final ModeValue rotationMode = new ModeValue("Rotation mode", new String[]{"Silent", "Derp"}, "Silent", this);
-    private final ModeValue smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Relative", "LinearAcceleration", "None"}, "Linear", this);
-    private final BoolValue accelerate = new BoolValue("Accelerate", false, this, () -> !smoothMode.is("None"));
-    private final BoolValue imperfectCorrelation = new BoolValue("Imperfect correlation", false, this, () -> !smoothMode.is("None"));
-    private final SliderValue yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None"));
-    private final SliderValue yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None"));
-    private final SliderValue pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None"));
-    private final SliderValue pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 1, 0.01f, 180, 0.01f, this, () -> !smoothMode.is("None"));
-    private final SliderValue midpoint = new SliderValue("Midpoint", 0.3f, 0.01f, 1, 0.01f, this, () -> smoothMode.is("Bezier"));
-    private final ModeValue movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", this);
+    private final RotationHandler rotationHandler = new RotationHandler(this);
 
     // aim point
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this);
     private final BoolValue setMinAimPoint = new BoolValue("Set min aim point", true, this, () -> aimPos.is("Straight"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-    private final BoolValue slowDown = new BoolValue("Slow down", false, this);
-    private final SliderValue hurtTimeSubtraction = new SliderValue("HurtTime subtraction", 4, 0, 10, 1, this, () -> slowDown.canDisplay() && slowDown.get());
-    private final BoolValue shortStop = new BoolValue("Short stop", false, this);
-    private final SliderValue shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, this, shortStop::get);
-    private final SliderValue rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, this, shortStop::get);
-    private final SliderValue maxThresholdAttemptsToStop = new SliderValue("Max threshold attempts to stop", 1, 0, 5, 1, this, shortStop::get);
     private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
     private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
     private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
@@ -100,11 +84,11 @@ public class KillAura extends Module {
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift"}, "None", this);
-    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
-    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
-    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
-    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
-    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> rotationMode.canDisplay() && offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
+    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
     private final BoolValue interpolateVec = new BoolValue("Interpolate vec", false, this, () -> !offsetMode.is("None"));
     private final SliderValue amount = new SliderValue("Amount", 0.5f, 0.01f, 1, 0.01f, this, () -> interpolateVec.get() && interpolateVec.canDisplay());
     private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this);
@@ -141,18 +125,12 @@ public class KillAura extends Module {
     private double lastXOffset;
     private double lastYOffset;
     private double lastZOffset;
-    private float derpYaw;
     private float currentYawOffset;
     private float currentPitchOffset;
     private float currentMissOffset;
     private boolean shouldRandomize;
     private Vec3 offsetVec = new Vec3(0, 0, 0);
-    private float randYawSpeed;
-    private float randPitchSpeed;
     private float[] prevRot;
-    public static float rotDiffBuildUp;
-    private int maxThresholdReachAttempts;
-    private final TimerUtils shortStopTimer = new TimerUtils();
 
     @Override
     public void onEnable() {
@@ -172,52 +150,6 @@ public class KillAura extends Module {
         currentTarget = null;
         targets.clear();
         positionHistory.clear();
-    }
-
-    private void setRotationToTarget(EntityLivingBase target) {
-        SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
-        MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
-
-        float hSpeed = randYawSpeed;
-        float vSpeed = randPitchSpeed;
-
-        float hurtTime = Math.max(target.hurtTime - hurtTimeSubtraction.get(), 1);
-
-        if (slowDown.get()) {
-            hSpeed /= hurtTime;
-            vSpeed /= hurtTime;
-        }
-
-        if (shortStop.get() && shouldShortStop()) {
-            hSpeed = MathUtils.randomizeFloat(0, 0.1f);
-            vSpeed = MathUtils.randomizeFloat(0, 0.1f);
-        }
-
-        if (imperfectCorrelation.get()) {
-            hSpeed *= MathUtils.randomizeFloat(0.9F, 1.1F);
-            vSpeed *= MathUtils.randomizeFloat(0.9F, 1.1F);
-        }
-
-        hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
-        vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
-
-        RotationUtils.setRotation(getRotations(target), correction, hSpeed, vSpeed, midpoint.get(), accelerate.get(), mode);
-    }
-
-    private boolean shouldShortStop() {
-        if (!shortStopTimer.hasTimeElapsed(shortStopDuration.get())) {
-            return true;
-        }
-
-        if (Math.abs(rotDiffBuildUp) < rotationDiffBuildUpToStop.get()) return false;
-
-        if (maxThresholdReachAttempts < maxThresholdAttemptsToStop.get()) {
-            maxThresholdReachAttempts++;
-            return false;
-        }
-
-        shortStopTimer.reset();
-        return true;
     }
 
     private EntityLivingBase findNextTarget() {
@@ -382,17 +314,7 @@ public class KillAura extends Module {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
             if (distance <= searchRange.get()) {
-                switch (rotationMode.get()) {
-                    case "Silent":
-                        setRotationToTarget(currentTarget);
-                        break;
-                    case "Derp":
-                        MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
-                        derpYaw += (MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get()) / 6) / 2;
-
-                        RotationUtils.setRotation(new float[]{derpYaw, mc.thePlayer.rotationPitch}, correction, 180, 180, midpoint.get(), false, SmoothMode.Linear);
-                        break;
-                }
+                rotationHandler.setRotation(getRotations(currentTarget));
             }
         }
     }
@@ -401,8 +323,7 @@ public class KillAura extends Module {
     public void onUpdate(UpdateEvent e) {
         shouldRandomize = rand.nextInt(100) <= oChance.get();
 
-        randYawSpeed = MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get());
-        randPitchSpeed = MathUtils.randomizeFloat(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get());
+        rotationHandler.updateRotSpeed(e);
     }
 
     @EventTarget
@@ -412,7 +333,7 @@ public class KillAura extends Module {
         }
 
         if (currentTarget != null && targetESP.get()) {
-            drawCircle(currentTarget);
+            RenderUtils.drawTargetCircle(currentTarget);
         }
     }
 
@@ -667,7 +588,6 @@ public class KillAura extends Module {
             }
             break;
             case "Drift":
-                //todo fix this bullshit
                 MovingObjectPosition intercept = bb.calculateIntercept(playerPos, playerPos.add(mc.thePlayer.getVectorForRotation(RotationUtils.prevRotRequireNonNullElse[0], RotationUtils.prevRotRequireNonNullElse[1])).multiply(attackRange.get()));
 
                 float yawMovement = RotationUtils.getAngleDifference(RotationUtils.currRotRequireNonNullElse[0], RotationUtils.prevRotRequireNonNullElse[0]);
@@ -734,6 +654,11 @@ public class KillAura extends Module {
             pitch += currentPitchOffset;
         }
 
+        if (mc.thePlayer.getEntityBoundingBox().intersectsWith(entity.getEntityBoundingBox().contract(0.2, 0.75, 0.2))) {
+            yaw = prevRot[0];
+            pitch = prevRot[1];
+        }
+
         prevRot = new float[]{yaw, pitch};
         return new float[]{yaw, pitch};
     }
@@ -757,61 +682,5 @@ public class KillAura extends Module {
                     )
             );
         }
-    }
-
-    public static void drawCircle(final Entity entity) {
-        GL11.glPushMatrix();
-        GL11.glDisable(3553);
-        GL11.glEnable(2848);
-        GL11.glEnable(2832);
-        GL11.glEnable(3042);
-        GL11.glBlendFunc(770, 771);
-        GL11.glHint(3154, 4354);
-        GL11.glHint(3155, 4354);
-        GL11.glHint(3153, 4354);
-        GL11.glDepthMask(false);
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0F);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
-        GlStateManager.disableCull();
-        GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-
-        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * mc.timer.renderPartialTicks - (mc.getRenderManager()).renderPosX;
-        final double y = (entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * mc.timer.renderPartialTicks - (mc.getRenderManager()).renderPosY) + Math.sin(System.currentTimeMillis() / 2E+2) + 0.8;
-        final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * mc.timer.renderPartialTicks - (mc.getRenderManager()).renderPosZ;
-
-        Color c;
-
-        for (float i = 0; i < Math.PI * 2; i += (float) (Math.PI * 2 / 64.F)) {
-            final double vecX = x + 0.67 * Math.cos(i);
-            final double vecZ = z + 0.67 * Math.sin(i);
-
-            c = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1));
-
-            GL11.glColor4f(c.getRed() / 255.F,
-                    c.getGreen() / 255.F,
-                    c.getBlue() / 255.F,
-                    0
-            );
-            GL11.glVertex3d(vecX, y - Math.cos(System.currentTimeMillis() / 2E+2) / 2.0F, vecZ);
-            GL11.glColor4f(c.getRed() / 255.F,
-                    c.getGreen() / 255.F,
-                    c.getBlue() / 255.F,
-                    0.85F
-            );
-            GL11.glVertex3d(vecX, y, vecZ);
-        }
-
-        GL11.glEnd();
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDepthMask(true);
-        GL11.glEnable(2929);
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-        GlStateManager.enableCull();
-        GL11.glDisable(2848);
-        GL11.glDisable(2848);
-        GL11.glEnable(2832);
-        GL11.glEnable(3553);
-        GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
     }
 }

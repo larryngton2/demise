@@ -31,8 +31,8 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -53,15 +53,12 @@ public class Scaffold extends Module {
     private final ModeValue clutchRotMode = new ModeValue("Clutch rotation mode", new String[]{"Normal", "Center"}, "Center", this, clutch::get);
     private final SliderValue minCSearch = new SliderValue("Min C search", 0.1f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
     private final SliderValue maxCSearch = new SliderValue("Max C search", 0.9f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
-    private final SliderValue minYawRotSpeed = new SliderValue("Min Yaw Rotation Speed", 180, 0, 180, 1, this);
-    private final SliderValue maxYawRotSpeed = new SliderValue("Max Yaw Rotation Speed", 180, 0, 180, 1, this);
-    private final SliderValue minPitchRotSpeed = new SliderValue("Min Pitch Rotation Speed", 180, 0, 180, 1, this);
-    private final SliderValue maxPitchRotSpeed = new SliderValue("Max Pitch Rotation Speed", 180, 0, 180, 1, this);
+    private final RotationHandler rotationHandler = new RotationHandler(this);
+
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
             new BoolValue("Sprint", true),
             new BoolValue("Swing", true),
             new BoolValue("Ignore tick cycle", false),
-            new BoolValue("Movement Fix", true),
             new BoolValue("Ray Trace", true),
             new BoolValue("Keep Y", false),
             new BoolValue("Speed Keep Y", false),
@@ -293,7 +290,7 @@ public class Scaffold extends Module {
         }
 
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            RotationUtils.setRotation(new float[]{yaw, pitch}, addons.isEnabled("Movement Fix") ? MovementCorrection.Silent : MovementCorrection.None, MathUtils.randomizeInt(minYawRotSpeed.get(), maxYawRotSpeed.get()), MathUtils.randomizeInt(minPitchRotSpeed.get(), maxPitchRotSpeed.get()));
+            rotationHandler.setRotation(new float[]{yaw, pitch});
 
             if (place) {
                 place(data.blockPos, data.facing, getVec3(data));
@@ -304,6 +301,8 @@ public class Scaffold extends Module {
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());
+
+        rotationHandler.updateRotSpeed(e);
 
         if (!addons.isEnabled("Ignore tick cycle") || (startClutch || !clutchTime.hasTimeElapsed(200))) {
             handleScaffolding(true);
