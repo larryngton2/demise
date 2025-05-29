@@ -257,7 +257,7 @@ public class PlayerUtils implements InstanceAccess {
 
     public static class PredictProcess {
         public final Vec3 position;
-        private final float fallDistance;
+        public final float fallDistance;
         private final boolean onGround;
         public final boolean isCollidedHorizontally;
         public final EntityPlayerSP player;

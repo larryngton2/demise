@@ -79,6 +79,7 @@ public class ModuleManager {
                 ExplosionBlock.class,
                 Test.class,
                 FlagDetector.class,
+                AnnoyUtils.class,
 
                 // Movement
                 Freeze.class,
@@ -99,6 +100,7 @@ public class ModuleManager {
                 Jesus.class,
                 TargetStrafe.class,
                 WallClimb.class,
+                MoveHelper.class,
 
                 // Player
                 AutoTool.class,
@@ -111,6 +113,7 @@ public class ModuleManager {
                 FastBreak.class,
                 Scaffold.class,
                 AntiVoid.class,
+                FastBow.class,
 
                 // Visual
                 Atmosphere.class,

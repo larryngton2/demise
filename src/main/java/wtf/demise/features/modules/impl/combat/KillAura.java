@@ -61,6 +61,8 @@ public class KillAura extends Module {
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
     public final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
     public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "Force", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
+    private final SliderValue blockTicks = new SliderValue("Block ticks", 1, 1, 5, 1, this, autoBlock::get);
+    private final BoolValue alwaysRenderBlocking = new BoolValue("Always render blocking", false, this, autoBlock::get);
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
@@ -131,6 +133,7 @@ public class KillAura extends Module {
     private boolean shouldRandomize;
     private Vec3 offsetVec = new Vec3(0, 0, 0);
     private float[] prevRot;
+    private int totalBlockingTicks;
 
     @Override
     public void onEnable() {
@@ -142,6 +145,8 @@ public class KillAura extends Module {
         if (isBlocking) {
             setBlocking(false);
         }
+
+        isBlocking = false;
 
         if (BlinkComponent.blinking) {
             BlinkComponent.dispatch(true);
@@ -355,6 +360,8 @@ public class KillAura extends Module {
 
     public void preAttack() {
         if (extraCheck() && canAutoBlock()) {
+            totalBlockingTicks++;
+
             switch (autoBlockMode.get()) {
                 case "None", "Release":
                     if (isBlocking) {
@@ -365,7 +372,7 @@ public class KillAura extends Module {
                     isBlocking = true;
                     break;
                 case "Vanilla":
-                    setBlocking(true);
+                    setBlocking(totalBlockingTicks % blockTicks.get() == 0);
                     break;
                 case "Blink":
                     BlinkComponent.blinking = true;
@@ -376,6 +383,8 @@ public class KillAura extends Module {
             }
         } else if (isBlocking) {
             setBlocking(false);
+            totalBlockingTicks = 0;
+            isBlocking = false;
         }
     }
 
@@ -427,20 +436,36 @@ public class KillAura extends Module {
     }
 
     private void setBlocking(boolean state) {
+        if (mc.currentScreen != null) return;
+
         switch (autoBlockMode.get()) {
             case "Blink", "Release", "NCP", "Force":
                 if (state) {
-                    sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    if (totalBlockingTicks % blockTicks.get() == 0) {
+                        sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        if (!alwaysRenderBlocking.get()) isBlocking = true;
+                    }
                 } else {
                     sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    if (!alwaysRenderBlocking.get()) isBlocking = false;
                 }
                 break;
             default:
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), state);
+                if (state) {
+                    if (totalBlockingTicks % blockTicks.get() == 0) {
+                        KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), true);
+                        if (!alwaysRenderBlocking.get()) isBlocking = true;
+                    }
+                } else {
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
+                    if (!alwaysRenderBlocking.get()) isBlocking = false;
+                }
                 break;
         }
 
-        isBlocking = state;
+        if (alwaysRenderBlocking.get()) {
+            isBlocking = state;
+        }
     }
 
     @EventTarget

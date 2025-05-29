@@ -9,6 +9,7 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
@@ -110,12 +111,12 @@ public class ClickHandler implements InstanceAccess {
     }
 
     @EventTarget
-    public void onPlayerTickEvent(PlayerTickEvent e) {
+    public void onTickEvent(TickEvent e) {
         if (mc.thePlayer == null || mc.theWorld == null) {
             return;
         }
 
-        if (e.getState() == PlayerTickEvent.State.PRE && target != null && initialized) {
+        if (target != null && initialized) {
             KillAura killAura = Demise.INSTANCE.getModuleManager().getModule(KillAura.class);
 
             if (killAura.isEnabled()) {

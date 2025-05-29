@@ -130,6 +130,10 @@ public class SimulatedPlayer implements InstanceAccess {
     private static final float SPEED_IN_AIR = 0.02F;
 
     public static SimulatedPlayer fromClientPlayer(MovementInput input, float motionMulti) {
+        return fromClientPlayer(input, motionMulti, mc.thePlayer.jumpTicks);
+    }
+
+    public static SimulatedPlayer fromClientPlayer(MovementInput input, float motionMulti, float jumpTicks) {
         EntityPlayerSP player = mc.thePlayer;
 
         PlayerCapabilities capabilities = createCapabilitiesCopy(player);

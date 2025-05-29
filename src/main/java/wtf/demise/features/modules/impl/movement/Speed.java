@@ -29,12 +29,13 @@ public class Speed extends Module {
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));
     private final BoolValue air = new BoolValue("Air", true, this, () -> mode.is("Strafe Hop"));
     private final ModeValue ncpMode = new ModeValue("NCP mode", new String[]{"On tick 4", "On tick 5", "Old Hop", "BHop"}, "On tick 5", this, () -> mode.is("NCP"));
-    private final ModeValue verusMode = new ModeValue("Verus mode", new String[]{"Low"}, "Low", this, () -> mode.is("Verus"));
     private final SliderValue speedMulti = new SliderValue("Extra speed multiplier", 0.4f, 0f, 1f, 0.01f, this, () -> ncpMode.is("Old Hop") && ncpMode.canDisplay());
+    private final ModeValue verusMode = new ModeValue("Verus mode", new String[]{"Low"}, "Low", this, () -> mode.is("Verus"));
     private final BoolValue customGravity = new BoolValue("Custom gravity", false, this, () -> mode.is("Intave"));
     private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Safe", "Fast"}, "Safe", this, () -> mode.is("Intave"));
     private final BoolValue timer = new BoolValue("Timer", false, this, () -> mode.is("Intave") && intaveMode.is("Fast"));
     private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave") && intaveMode.is("Safe"));
+    private final ModeValue bmcMode = new ModeValue("BMC mode", new String[]{"Low", "Ground"}, "Low", this, () -> mode.is("BMC"));
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.01f, this, minSpeedLimiter::get);
@@ -128,40 +129,56 @@ public class Speed extends Module {
                 }
                 break;
             case "BMC":
-                if (mc.thePlayer.offGroundTicks == 4 && mc.thePlayer.posY % 1.0 == 0.16610926093821377) {
-                    if (MoveUtil.getSpeedEffect() == 0 || getModule(Scaffold.class).isEnabled()) {
-                        mc.thePlayer.motionX *= 0.93;
-                        mc.thePlayer.motionZ *= 0.93;
-                    }
+                switch (bmcMode.get()) {
+                    case "Low":
+                        if (mc.thePlayer.offGroundTicks == 4 && mc.thePlayer.posY % 1.0 == 0.16610926093821377) {
+                            if (MoveUtil.getSpeedEffect() == 0 || getModule(Scaffold.class).isEnabled()) {
+                                mc.thePlayer.motionX *= 0.93;
+                                mc.thePlayer.motionZ *= 0.93;
+                            }
 
-                    if (!getModule(Scaffold.class).isEnabled()) {
-                        mc.thePlayer.motionY = -0.09800000190734863;
-                    }
-                }
+                            if (!getModule(Scaffold.class).isEnabled()) {
+                                mc.thePlayer.motionY = -0.09800000190734863;
+                            }
+                        }
 
-                if (!mc.thePlayer.onGround) {
-                    MoveUtil.strafe();
-                } else {
-                    mc.thePlayer.jump();
-                }
+                        if (!mc.thePlayer.onGround) {
+                            MoveUtil.strafe();
+                        } else {
+                            mc.thePlayer.jump();
+                        }
 
-                switch (MoveUtil.getSpeedEffect()) {
-                    case 0 -> MoveUtil.strafe(Math.max(0.23, MoveUtil.getSpeed()));
-                    case 1 -> MoveUtil.strafe(Math.max(0.27, MoveUtil.getSpeed()));
-                    case 2 -> MoveUtil.strafe(Math.max(0.3, MoveUtil.getSpeed()));
-                }
+                        switch (MoveUtil.getSpeedEffect()) {
+                            case 0 -> MoveUtil.strafe(Math.max(0.23, MoveUtil.getSpeed()));
+                            case 1 -> MoveUtil.strafe(Math.max(0.27, MoveUtil.getSpeed()));
+                            case 2 -> MoveUtil.strafe(Math.max(0.3, MoveUtil.getSpeed()));
+                        }
 
-                if (MoveUtil.getSpeedEffect() > 0 && mc.thePlayer.offGroundTicks == 3) {
-                    switch (MoveUtil.getSpeedEffect()) {
-                        case 1:
-                            mc.thePlayer.motionX *= 1.07;
-                            mc.thePlayer.motionZ *= 1.07;
-                            break;
-                        case 2:
-                            mc.thePlayer.motionX *= 1.15;
-                            mc.thePlayer.motionZ *= 1.15;
-                            break;
-                    }
+                        if (MoveUtil.getSpeedEffect() > 0 && mc.thePlayer.offGroundTicks == 3) {
+                            switch (MoveUtil.getSpeedEffect()) {
+                                case 1:
+                                    mc.thePlayer.motionX *= 1.07;
+                                    mc.thePlayer.motionZ *= 1.07;
+                                    break;
+                                case 2:
+                                    mc.thePlayer.motionX *= 1.15;
+                                    mc.thePlayer.motionZ *= 1.15;
+                                    break;
+                            }
+                        }
+                        break;
+                    case "Ground":
+                        if (mc.thePlayer.onGroundTicks % 15 == 0) {
+                            MoveUtil.strafe(0.2);
+                        }
+                        if (mc.thePlayer.onGroundTicks % 15 == 1) {
+                            mc.thePlayer.motionX *= 0.1822;
+                            mc.thePlayer.motionZ *= 0.1822;
+                        }
+                        if (mc.thePlayer.hurtTime > 0) {
+                            MoveUtil.strafe(0.5);
+                        }
+                        break;
                 }
                 break;
             case "Intave":
@@ -321,13 +338,9 @@ public class Speed extends Module {
 
     @EventTarget
     public void onMove(MoveEvent e) {
-        if (!MoveUtil.isMoving() && !mode.is("NCP") && !ncpMode.is("BHop")) {
-            return;
-        }
-
         switch (mode.get()) {
             case "Verus":
-                if (verusMode.is("Low")) {
+                if (verusMode.is("Low") && MoveUtil.isMoving()) {
                     if (ticks % 12 == 0 && mc.thePlayer.onGround) {
                         MoveUtil.strafe(0.69);
                         e.setY(0.42F);

@@ -354,6 +354,11 @@ public class RotationUtils implements InstanceAccess {
         return (float) hypot(abs(getAngleDifference(target[0], shouldRotate() ? currentRotation[0] : mc.thePlayer.rotationYaw)), abs(target[1] - (shouldRotate() ? currentRotation[1] : mc.thePlayer.rotationYaw)));
     }
 
+    public static float getRotationDifferenceClientRot(final Entity entity) {
+        float[] target = RotationUtils.getRotations(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
+        return (float) hypot(abs(getAngleDifference(target[0], mc.thePlayer.rotationYaw)), abs(target[1] - mc.thePlayer.rotationYaw));
+    }
+
     public static float getRotationDifference(final float[] a, final float[] b) {
         return (float) hypot(abs(getAngleDifference(a[0], b[0])), abs(a[1] - b[1]));
     }

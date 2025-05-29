@@ -25,6 +25,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.MoveUtil;
@@ -47,6 +48,7 @@ public class FakeLag extends Module {
     private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 50, 0, 1000, this);
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
+    private final SliderValue criticalPing = new SliderValue("Critical Ping", 100, 0, 500, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
     private final ModeValue renderMode = new ModeValue("Render mode", new String[]{"Box", "FakePlayer"}, "FakePlayer", this, realPos::get);
     private final BoolValue onlyOnGround = new BoolValue("Only onGround", false, this);
@@ -64,6 +66,7 @@ public class FakeLag extends Module {
     private boolean dispatched;
     private float yaw;
     private final TimerUtils hurtTimer = new TimerUtils();
+    private boolean forceWTap;
 
     @Override
     public void onEnable() {
@@ -141,7 +144,7 @@ public class FakeLag extends Module {
                         picked = false;
                     }
                 } else {
-                    ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
+                    ms = calculateDynamicDelay();
                     if (blinking) {
                         BlinkComponent.dispatch(true);
                     }
@@ -156,7 +159,7 @@ public class FakeLag extends Module {
             case "Spoof":
                 if (shouldLag()) {
                     if (recoilTimer.hasTimeElapsed((long) recoilTime.get())) {
-                        ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
+                        ms = calculateDynamicDelay();
                         PingSpoofComponent.spoof(ms, true, false, false, false, true, true, false);
                         blinking = true;
                         dispatched = false;
@@ -236,12 +239,12 @@ public class FakeLag extends Module {
         }
     }
 
-    private boolean attemptingToStrafe() {
-        return mc.thePlayer.movementInput.moveStrafe != 0;
-    }
-
     private boolean shouldLag() {
         return target != null && smart.get() ? smartCriteria() : simpleCriteria() && mc.thePlayer.canEntityBeSeen(target);
+    }
+
+    private boolean attemptingToStrafe() {
+        return mc.thePlayer.movementInput.moveStrafe != 0 || RotationUtils.getRotationDifferenceClientRot(target) > 25;
     }
 
     private boolean smartCriteria() {
@@ -268,10 +271,21 @@ public class FakeLag extends Module {
                 attacked = false;
             }
         }
+        */
 
-         */
+        if (attacked && !forceWTap && mc.thePlayer.hurtTime == 0 && PlayerUtils.getDistanceToEntityBox(target) > 2.5) {
+            forceWTap = true;
+        }
 
         return !attacked && rangeCheck && selfHurtTimeCheck; //&& minDistanceCheck;
+    }
+
+    @EventTarget
+    public void onMoveInput(MoveInputEvent e) {
+        if (forceWTap) {
+            e.setForward(0);
+            forceWTap = false;
+        }
     }
 
     public static float getYaw(EntityPlayer from, Vec3 pos) {
@@ -312,5 +326,12 @@ public class FakeLag extends Module {
                 }
             }
         }
+    }
+
+    private int calculateDynamicDelay() {
+        if (target.swingProgress > 0 && PlayerUtils.getDistanceToEntityBox(target) < 3) {
+            return (int) (criticalPing.get() * 0.75);
+        }
+        return MathUtils.randomizeInt(delayMin.get(), delayMax.get());
     }
 }
