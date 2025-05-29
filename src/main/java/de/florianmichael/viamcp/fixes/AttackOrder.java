@@ -33,21 +33,11 @@ public class AttackOrder {
     }
 
     public static void sendFixedAttack(EntityPlayer entityIn, Entity target) {
-        if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
+        if (ViaLoadingBase.getInstance().getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(entityIn, target);
         } else {
             mc.playerController.attackEntity(entityIn, target);
-            mc.thePlayer.swingItem();
-        }
-    }
-
-    public static void sendFixedAttackNoPacketEvent(EntityPlayer entityIn, Entity target) {
-        if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
-            mc.thePlayer.swingItem();
-            mc.playerController.attackEntityNoPacketEvent(entityIn, target);
-        } else {
-            mc.playerController.attackEntityNoPacketEvent(entityIn, target);
             mc.thePlayer.swingItem();
         }
     }

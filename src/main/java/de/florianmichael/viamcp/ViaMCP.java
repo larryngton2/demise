@@ -18,19 +18,17 @@
 
 package de.florianmichael.viamcp;
 
-import com.viaversion.viabackwards.protocol.protocol1_16_4to1_17.Protocol1_16_4To1_17;
+import com.viaversion.viabackwards.protocol.v1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
-import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
+import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
+import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import de.florianmichael.viamcp.gui.AsyncVersionSlider;
-import lombok.Getter;
 
 import java.io.File;
 
-@Getter
 public class ViaMCP {
     public final static int NATIVE_VERSION = 47;
     public static ViaMCP INSTANCE;
@@ -42,9 +40,9 @@ public class ViaMCP {
     private AsyncVersionSlider asyncVersionSlider;
 
     public ViaMCP() {
-        ViaLoadingBase.ViaLoadingBaseBuilder.create().runDirectory(new File("ViaMCP")).nativeVersion(NATIVE_VERSION).onProtocolReload(comparableProtocolVersion -> {
+        ViaLoadingBase.ViaLoadingBaseBuilder.create().runDirectory(new File("ViaMCP")).nativeVersion(NATIVE_VERSION).onProtocolReload(protocolVersion -> {
             if (getAsyncVersionSlider() != null) {
-                getAsyncVersionSlider().setVersion(comparableProtocolVersion.getVersion());
+                getAsyncVersionSlider().setVersion(protocolVersion.getVersion());
             }
         }).build();
 
@@ -53,10 +51,10 @@ public class ViaMCP {
 
     private void fixTransactions() {
         // We handle the differences between those versions in the net code, so we can make the Via handlers pass through
-        final Protocol1_16_4To1_17 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_16_4To1_17.class);
-        protocol.registerClientbound(ClientboundPackets1_17.PING, ClientboundPackets1_16_2.WINDOW_CONFIRMATION, wrapper -> {
+        final Protocol1_17To1_16_4 protocol = Via.getManager().getProtocolManager().getProtocol(Protocol1_17To1_16_4.class);
+        protocol.registerClientbound(ClientboundPackets1_17.PING, ClientboundPackets1_16_2.CONTAINER_ACK, wrapper -> {
         }, true);
-        protocol.registerServerbound(ServerboundPackets1_16_2.WINDOW_CONFIRMATION, ServerboundPackets1_17.PONG, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_16_2.CONTAINER_ACK, ServerboundPackets1_17.PONG, wrapper -> {
         }, true);
     }
 
@@ -66,5 +64,9 @@ public class ViaMCP {
 
     public void initAsyncSlider(int x, int y, int width, int height) {
         asyncVersionSlider = new AsyncVersionSlider(-1, x, y, Math.max(width, 110), height);
+    }
+
+    public AsyncVersionSlider getAsyncVersionSlider() {
+        return asyncVersionSlider;
     }
 }

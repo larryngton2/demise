@@ -20,16 +20,16 @@ package de.florianmichael.vialoadingbase.platform;
 
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
-import net.minecraft.item.ItemSword;
-import wtf.demise.utils.InstanceAccess;
 
 import java.io.File;
 import java.util.logging.Logger;
 
-public class ViaRewindPlatformImpl implements ViaRewindPlatform, InstanceAccess {
+public class ViaRewindPlatformImpl implements ViaRewindPlatform {
+
+    private final File directory;
 
     public ViaRewindPlatformImpl(final File directory) {
-        this.init(new File(directory, "viarewind.yml"));
+        this.init(new File(this.directory = directory, "viarewind.yml"));
     }
 
     @Override
@@ -38,11 +38,7 @@ public class ViaRewindPlatformImpl implements ViaRewindPlatform, InstanceAccess 
     }
 
     @Override
-    public boolean isSword() {
-        if (mc.thePlayer == null || mc.theWorld == null) {
-            return false;
-        } else {
-            return mc.thePlayer.getCurrentEquippedItem() != null && mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemSword;
-        }
+    public File getDataFolder() {
+        return this.directory;
     }
 }

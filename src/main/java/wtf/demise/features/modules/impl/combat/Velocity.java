@@ -154,7 +154,9 @@ public class Velocity extends Module {
                 }
                 break;
             case "Cancel":
-                e.setCancelled(true);
+                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
+                    e.setCancelled(true);
+                }
                 break;
             case "GrimC07":
                 final Packet<?> packet = e.getPacket();

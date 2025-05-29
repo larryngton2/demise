@@ -183,7 +183,7 @@ public class ClickHandler implements InstanceAccess {
                     if (mc.currentScreen == null) mc.clickMouse();
                     break;
                 case Packet:
-                    if (ViaLoadingBase.getInstance().getTargetVersion().isOlderThanOrEqualTo(ProtocolVersion.v1_8)) {
+                    if (ViaLoadingBase.getInstance().getTargetVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
                         mc.thePlayer.swingItem();
                         PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
                     } else {
