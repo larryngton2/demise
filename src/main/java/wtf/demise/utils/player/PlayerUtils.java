@@ -321,7 +321,6 @@ public class PlayerUtils implements InstanceAccess {
         return mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
     }
 
-    // bigger name pls
     public static double getDistToTargetFromMouseOver(Entity thePlayer) {
         Vec3 vec3 = thePlayer.getPositionEyes(1);
         Vec3 vec31 = thePlayer.getLook(1);

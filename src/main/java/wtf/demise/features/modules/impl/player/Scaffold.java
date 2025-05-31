@@ -92,7 +92,6 @@ public class Scaffold extends Module {
     private float yaw, pitch;
     private boolean startClutch;
     private final TimerUtils clutchTime = new TimerUtils();
-    private boolean rotate;
 
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
             Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
@@ -798,7 +797,7 @@ public class Scaffold extends Module {
         return bestRot;
     }
 
-    public static class PlaceData {
+    private static class PlaceData {
         public EnumFacing facing;
         public BlockPos blockPos;
 

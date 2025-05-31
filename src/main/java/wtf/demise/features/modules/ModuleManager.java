@@ -114,6 +114,7 @@ public class ModuleManager {
                 Scaffold.class,
                 AntiVoid.class,
                 FastBow.class,
+                AutoClutch.class,
 
                 // Visual
                 Atmosphere.class,

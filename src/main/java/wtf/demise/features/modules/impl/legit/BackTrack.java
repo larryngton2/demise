@@ -55,6 +55,7 @@ public class BackTrack extends Module {
     public void onDisable() {
         PingSpoofComponent.disable();
         PingSpoofComponent.dispatch();
+        shouldLag = false;
     }
 
     @EventTarget

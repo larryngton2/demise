@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.MovingObjectPosition;
 import org.lwjglx.input.Mouse;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
@@ -49,7 +50,7 @@ public class AimAssist extends Module {
             return;
         }
 
-        if (angleCalled) {
+        if (angleCalled && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
             rotationHandler.setRotation(rotationHandler.getSimpleRotationsToEntity(target));
         }
 

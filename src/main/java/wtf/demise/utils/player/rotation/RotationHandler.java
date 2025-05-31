@@ -10,6 +10,7 @@ import org.apache.commons.lang3.Range;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.player.AutoClutch;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -44,12 +45,12 @@ public class RotationHandler implements InstanceAccess {
     final SliderValue rotationDiffBuildUpToStop;
     final SliderValue maxThresholdAttemptsToStop;
     private EntityLivingBase target;
-    private Module module;
+    private final Module module;
 
     public RotationHandler(Module module) {
         this.module = module;
 
-        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Lerp", "Bezier", "Exponential", "Relative", "LinearAcceleration", "None"}, "Linear", module);
+        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Bezier", "None"}, "Linear", module);
         accelerate = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None"));
         imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None"));
         yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
@@ -67,9 +68,8 @@ public class RotationHandler implements InstanceAccess {
         maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
         decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
 
-
         // who the fuck will use strict strafe on scaffold anyway
-        if (module.getClass() == Scaffold.class) {
+        if (module.getClass() == Scaffold.class || module.getClass() == AutoClutch.class) {
             movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent"}, "None", module);
         } else {
             movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", module);

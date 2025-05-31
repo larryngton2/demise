@@ -3,14 +3,12 @@ package wtf.demise.features.modules.impl.combat;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.*;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import org.apache.commons.lang3.Range;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.packet.PacketReleaseEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
@@ -19,6 +17,7 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -41,14 +40,20 @@ import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 public class FakeLag extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Pulse", "Spoof"}, "Pulse", this);
     private final BoolValue smart = new BoolValue("Smart", true, this);
-    private final BoolValue modifyMovementYaw = new BoolValue("Modify movement yaw", true, this, smart::get);
+    private final BoolValue modifyMovementYaw = new BoolValue("Modify movement yaw", false, this, smart::get);
     private final SliderValue attackRange = new SliderValue("Attack range", 4, 0, 15, 0.1f, this, () -> !smart.get());
     private final BoolValue alwaysSpoof = new BoolValue("Always spoof", false, this);
     private final SliderValue searchRange = new SliderValue("Search range", 6, 1, 15, 0.1f, this, () -> !alwaysSpoof.get());
     private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 50, 0, 1000, this);
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
-    private final SliderValue delayMax = new SliderValue("Delay (max ms)", 250, 1, 1000, this);
-    private final SliderValue criticalPing = new SliderValue("Critical Ping", 100, 0, 500, this);
+    private final SliderValue delayMax = new SliderValue("Delay (max ms)", 100, 1, 1000, this);
+    private final SliderValue delayOnOpponentAttack = new SliderValue("Delay on opponent attack", 200, 0, 500, this, () -> mode.is("Spoof"));
+    private final ModeValue keepRangeMode = new ModeValue("Keep range mode", new String[]{"None", "WTap", "Timer down"}, "None", this, smart::get);
+    private final SliderValue timer = new SliderValue("Timer", 0.75f, 0.01f, 1, 0.01f, this, () -> keepRangeMode.get().equals("Timer down"));
+    private final SliderValue timerTicks = new SliderValue("Timer ticks", 1, 1, 10, 1, this, () -> keepRangeMode.get().equals("Timer down"));
+    private final BoolValue experimentalDynamicHurtTime = new BoolValue("Experimental dynamic hurt time", false, this, smart::get);
+    private final BoolValue pauseOnBacktrack = new BoolValue("Pause on backtrack", false, this);
+    private final BoolValue forceFirstHit = new BoolValue("Force first hit", false, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
     private final ModeValue renderMode = new ModeValue("Render mode", new String[]{"Box", "FakePlayer"}, "FakePlayer", this, realPos::get);
     private final BoolValue onlyOnGround = new BoolValue("Only onGround", false, this);
@@ -67,6 +72,12 @@ public class FakeLag extends Module {
     private float yaw;
     private final TimerUtils hurtTimer = new TimerUtils();
     private boolean forceWTap;
+    private boolean isFirstHit = true;
+    private boolean shouldTimer;
+    private int targetHits;
+
+    //lol
+    private final TimerUtils timerTimer = new TimerUtils();
 
     @Override
     public void onEnable() {
@@ -77,6 +88,7 @@ public class FakeLag extends Module {
 
         delay.reset();
         recoilTimer.reset();
+        isFirstHit = true;
     }
 
     @Override
@@ -100,7 +112,7 @@ public class FakeLag extends Module {
 
         if (ms == 0) ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
 
-        if ((onlyOnGround.get() && !mc.thePlayer.onGround) || (onlyKillAura.get() && !getModule(KillAura.class).isEnabled())) {
+        if (target == null || (onlyOnGround.get() && !mc.thePlayer.onGround) || (onlyKillAura.get() && !getModule(KillAura.class).isEnabled()) || (pauseOnBacktrack.get() && getModule(BackTrack.class).isEnabled() && BackTrack.shouldLag)) {
             if (blinking) {
                 switch (mode.get()) {
                     case "Pulse":
@@ -116,6 +128,10 @@ public class FakeLag extends Module {
 
             if (picked) picked = false;
             return;
+        }
+
+        if (PlayerUtils.getDistanceToEntityBox(target) > 3) {
+            isFirstHit = true;
         }
 
         switch (mode.get()) {
@@ -144,7 +160,7 @@ public class FakeLag extends Module {
                         picked = false;
                     }
                 } else {
-                    ms = calculateDynamicDelay();
+                    ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
                     if (blinking) {
                         BlinkComponent.dispatch(true);
                     }
@@ -159,7 +175,12 @@ public class FakeLag extends Module {
             case "Spoof":
                 if (shouldLag()) {
                     if (recoilTimer.hasTimeElapsed((long) recoilTime.get())) {
-                        ms = calculateDynamicDelay();
+                        if (isTargetAimingAtServerPos() && target.isSwingInProgress && smart.get()) {
+                            ms = (int) delayOnOpponentAttack.get();
+                        } else {
+                            ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
+                        }
+
                         PingSpoofComponent.spoof(ms, true, false, false, false, true, true, false);
                         blinking = true;
                         dispatched = false;
@@ -199,28 +220,20 @@ public class FakeLag extends Module {
     }
 
     @EventTarget
+    public void onTick(TickEvent e) {
+        if (target != null && forceFirstHit.get() && isFirstHit && !mc.thePlayer.isUsingItem() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            mc.clickMouse();
+            ChatUtils.sendMessageClient("forced first hit");
+            isFirstHit = false;
+        }
+    }
+
+    @EventTarget
     public void onPacketRelease(PacketReleaseEvent e) {
         if (e.getTimedPacket().getPacket() instanceof C03PacketPlayer c03) {
             x = c03.getPositionX();
             y = c03.getPositionY();
             z = c03.getPositionZ();
-
-            /*
-            if (attacked) {
-                e.setCancelled(true);
-
-                //kinda shit but ok
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ignored) {}
-
-                    ChatUtils.sendMessageClient("did the αστείο");
-                    PacketUtils.queue(c03);
-                    PingSpoofComponent.packets.remove(e.getTimedPacket());
-                }).start();
-            }
-            */
         }
     }
 
@@ -234,7 +247,7 @@ public class FakeLag extends Module {
 
     @EventTarget
     public void onAttack(AttackEvent e) {
-        if (e.getTargetEntity() != null && mc.objectMouseOver.entityHit == e.getTargetEntity()) {
+        if (e.getTargetEntity() != null && mc.objectMouseOver.entityHit == e.getTargetEntity() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && target != null && target.hurtTime <= 3) {
             attacked = true;
         }
     }
@@ -247,12 +260,16 @@ public class FakeLag extends Module {
         return mc.thePlayer.movementInput.moveStrafe != 0 || RotationUtils.getRotationDifferenceClientRot(target) > 25;
     }
 
-    private boolean smartCriteria() {
+    private boolean isTargetAimingAtServerPos() {
         float calcYawClientPos = (float) (MathHelper.atan2(mc.thePlayer.posZ - target.posZ, mc.thePlayer.posX - target.posX) * 180.0 / Math.PI - 90.0);
         float diffXClientPos = Math.abs(MathHelper.wrapAngleTo180_float(calcYawClientPos - target.rotationYaw));
         float calcYawRealPos = (float) (MathHelper.atan2(z - target.posZ, x - target.posX) * 180.0 / Math.PI - 90.0);
         float diffXRealPos = Math.abs(MathHelper.wrapAngleTo180_float(calcYawRealPos - target.rotationYaw));
 
+        return diffXClientPos > 25 && diffXRealPos < 25;
+    }
+
+    private boolean smartCriteria() {
         boolean attacked = this.attacked && target.hurtTime <= 3;
         boolean rangeCheck = PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get());
 
@@ -261,23 +278,65 @@ public class FakeLag extends Module {
         }
 
         boolean selfHurtTimeCheck = hurtTimer.hasTimeElapsed(100);
+        boolean distanceDiffCheck = mc.thePlayer.getDistanceToEntity(target) < mc.thePlayer.getCustomDistanceToEntity(new Vec3(x, y, z), target);
 
         //boolean minDistanceCheck = PlayerUtils.getDistanceToEntityBox(target) > 2.5;
-        boolean isTargetAimingAtServerPos = !attemptingToStrafe() || diffXClientPos > 25 && diffXRealPos < 25;
+        //boolean isTargetAimingAtServerPos1 = !attemptingToStrafe() || diffXClientPos > 25 && diffXRealPos < 25;
 
         /*
         if (blinking) {
-            if (attacked && !isTargetAimingAtServerPos) {
+            if (attacked && !isTargetAimingAtServerPos1) {
                 attacked = false;
             }
         }
         */
 
-        if (attacked && !forceWTap && mc.thePlayer.hurtTime == 0 && PlayerUtils.getDistanceToEntityBox(target) > 2.5) {
-            forceWTap = true;
+        if (attacked && mc.thePlayer.hurtTime == 0 && PlayerUtils.getDistanceToEntityBox(target) > 2.5 && PlayerUtils.getDistanceToEntityBox(target) <= 3) {
+            switch (keepRangeMode.get()) {
+                case "WTap":
+                    forceWTap = true;
+                    break;
+                case "Timer down":
+                    timerTimer.reset();
+                    shouldTimer = true;
+                    break;
+            }
         }
 
-        return !attacked && rangeCheck && selfHurtTimeCheck; //&& minDistanceCheck;
+        if (experimentalDynamicHurtTime.get()) {
+            // hurtTime == 10 doesn't add at all,
+            // hurtTime == 9 adds twice
+            // fuck
+            if (mc.thePlayer.hurtTime == 9) {
+                targetHits++;
+            }
+
+            if (target.hurtTime == 10) {
+                targetHits = 0;
+            }
+
+            if (PlayerUtils.getDistanceToEntityBox(target) > 4.5) {
+                targetHits = 0;
+            }
+
+            if (targetHits > 2 && PlayerUtils.getDistToTargetFromMouseOver(mc.thePlayer) > 3) {
+                return true;
+            }
+        }
+
+        return !attacked && rangeCheck && selfHurtTimeCheck && distanceDiffCheck; //&& minDistanceCheck;
+    }
+
+    @EventTarget
+    public void onUpdate1(UpdateEvent e) {
+        if (smart.get() && shouldTimer) {
+            if (!timerTimer.hasTimeElapsed(timerTicks.get() * 50L)) {
+                mc.timer.timerSpeed = timer.get();
+            } else {
+                mc.timer.timerSpeed = 1;
+                shouldTimer = false;
+            }
+        }
     }
 
     @EventTarget
@@ -326,12 +385,5 @@ public class FakeLag extends Module {
                 }
             }
         }
-    }
-
-    private int calculateDynamicDelay() {
-        if (target.swingProgress > 0 && PlayerUtils.getDistanceToEntityBox(target) < 3) {
-            return (int) (criticalPing.get() * 0.75);
-        }
-        return MathUtils.randomizeInt(delayMin.get(), delayMax.get());
     }
 }

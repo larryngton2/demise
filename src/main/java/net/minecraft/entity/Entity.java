@@ -957,6 +957,13 @@ public abstract class Entity implements ICommandSender {
         return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
     }
 
+    public float getCustomDistanceToEntity(Vec3 playerPos, Entity entityIn) {
+        float f = (float) (playerPos.xCoord - entityIn.posX);
+        float f1 = (float) (playerPos.yCoord - entityIn.posY);
+        float f2 = (float) (playerPos.zCoord - entityIn.posZ);
+        return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
+    }
+
     public double getDistanceSq(double x, double y, double z) {
         double d0 = this.posX - x;
         double d1 = this.posY - y;

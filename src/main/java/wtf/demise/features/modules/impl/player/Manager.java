@@ -133,10 +133,10 @@ public class Manager extends Module {
             if (armorReady && this.equipArmor(true)) {
                 busy = true;
                 resetTimings();
-            } else if (sortReady && this.sortItems(true)) {
+            } else if (dropReady && this.dropItem(this.trash)) {
                 busy = true;
                 resetTimings();
-            } else if (dropReady && this.dropItem(this.trash)) {
+            } else if (sortReady && this.sortItems(true)) {
                 busy = true;
                 resetTimings();
             }
@@ -163,12 +163,12 @@ public class Manager extends Module {
 
     private void resetTimings() {
         armorTimer.reset();
-        sortTimer.reset();
         dropTimer.reset();
+        sortTimer.reset();
 
         armorWait = MathUtils.randomizeInt(minArmorDelay.get(), maxArmorDelay.get());
-        sortWait = MathUtils.randomizeInt(minSortDelay.get(), maxSortDelay.get());
         dropWait = MathUtils.randomizeInt(minDropDelay.get(), maxDropDelay.get());
+        sortWait = MathUtils.randomizeInt(minSortDelay.get(), maxSortDelay.get());
     }
 
     private boolean sortItems(final boolean moveItems) {

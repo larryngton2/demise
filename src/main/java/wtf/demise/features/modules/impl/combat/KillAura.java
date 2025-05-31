@@ -20,7 +20,6 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -61,7 +60,7 @@ public class KillAura extends Module {
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
     public final SliderValue autoBlockRange = new SliderValue("AutoBlock range", 3.5f, 1, 8, 0.1f, this, autoBlock::get);
     public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "Force", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
-    private final SliderValue blockTicks = new SliderValue("Block ticks", 1, 1, 5, 1, this, autoBlock::get);
+    private final SliderValue reblockTicks = new SliderValue("Reblock ticks", 0, 0, 5, 1, this, autoBlock::get);
     private final BoolValue alwaysRenderBlocking = new BoolValue("Always render blocking", false, this, autoBlock::get);
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
@@ -86,6 +85,7 @@ public class KillAura extends Module {
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift"}, "None", this);
+    private final BoolValue notOnFirstHit = new BoolValue("Not on first hit", false, this, () -> !offsetMode.is("None"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> offsetMode.is("Gaussian") || offsetMode.is("Noise"));
@@ -134,10 +134,12 @@ public class KillAura extends Module {
     private Vec3 offsetVec = new Vec3(0, 0, 0);
     private float[] prevRot;
     private int totalBlockingTicks;
+    private boolean firstHit = true;
 
     @Override
     public void onEnable() {
         lastSwitchTime.reset();
+        firstHit = true;
     }
 
     @Override
@@ -278,6 +280,10 @@ public class KillAura extends Module {
 
         if (currentTarget != null) {
             if (!isTargetInvalid()) {
+                if (notOnFirstHit.get() && PlayerUtils.getDistanceToEntityBox(currentTarget) > attackRange.get() && mc.thePlayer.hurtTime == 0 && currentTarget.hurtTime == 0) {
+                    firstHit = true;
+                }
+
                 ClickHandler.ClickMode mode = ClickHandler.ClickMode.valueOf(clickMode.get());
                 ClickHandler.initHandler(minCPS.get(), maxCPS.get(), rayTrace.get() && rayTrace.canDisplay(), smartClicking.get(), forceAttackOnBacktrack.get(), ignoreBlocking.get(), failSwing.get(), attackRange.get(), swingRange.get(), mode, currentTarget);
 
@@ -351,6 +357,10 @@ public class KillAura extends Module {
         if (canAutoBlock()) {
             onAttack();
         }
+
+        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            firstHit = false;
+        }
     }
 
     @EventTarget
@@ -372,7 +382,7 @@ public class KillAura extends Module {
                     isBlocking = true;
                     break;
                 case "Vanilla":
-                    setBlocking(totalBlockingTicks % blockTicks.get() == 0);
+                    setBlocking(shouldBlock());
                     break;
                 case "Blink":
                     BlinkComponent.blinking = true;
@@ -409,7 +419,7 @@ public class KillAura extends Module {
                     }
                     break;
                 case "Blink":
-                    //interact();
+                    interact();
                     if (!isBlocking) {
                         setBlocking(true);
                     }
@@ -441,7 +451,7 @@ public class KillAura extends Module {
         switch (autoBlockMode.get()) {
             case "Blink", "Release", "NCP", "Force":
                 if (state) {
-                    if (totalBlockingTicks % blockTicks.get() == 0) {
+                    if (shouldBlock()) {
                         sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         if (!alwaysRenderBlocking.get()) isBlocking = true;
                     }
@@ -452,7 +462,7 @@ public class KillAura extends Module {
                 break;
             default:
                 if (state) {
-                    if (totalBlockingTicks % blockTicks.get() == 0) {
+                    if (shouldBlock()) {
                         KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), true);
                         if (!alwaysRenderBlocking.get()) isBlocking = true;
                     }
@@ -466,6 +476,10 @@ public class KillAura extends Module {
         if (alwaysRenderBlocking.get()) {
             isBlocking = state;
         }
+    }
+
+    private boolean shouldBlock() {
+        return totalBlockingTicks % (reblockTicks.get() + 1) == 0;
     }
 
     @EventTarget
@@ -558,77 +572,81 @@ public class KillAura extends Module {
                 break;
         }
 
-        switch (offsetMode.get()) {
-            case "Gaussian": {
-                double minXZ = -0.4;
-                double maxXZ = 0.4;
-                double minY = -2;
-                double maxY = 0.4;
+        if (!firstHit || !notOnFirstHit.get()) {
+            switch (offsetMode.get()) {
+                case "Gaussian": {
+                    double minXZ = -0.4;
+                    double maxXZ = 0.4;
+                    double minY = -2;
+                    double maxY = 0.4;
 
-                double meanXZ = (minXZ + maxXZ) / 2;
-                double stdDevXZ = (maxXZ - minXZ) / 4;
-                double meanY = (minY + maxY) / 2;
-                double stdDevY = (maxY - minY) / 4;
+                    double meanXZ = (minXZ + maxXZ) / 2;
+                    double stdDevXZ = (maxXZ - minXZ) / 4;
+                    double meanY = (minY + maxY) / 2;
+                    double stdDevY = (maxY - minY) / 4;
 
-                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
-                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
+                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
+                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
 
-                double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
-                double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
-                double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+                    double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
+                    double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
+                    double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
 
-                if (shouldRandomize) {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                    if (shouldRandomize) {
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
 
-                    lastXOffset = (float) xOffset;
-                    lastYOffset = (float) yOffset;
-                    lastZOffset = (float) zOffset;
-                } else {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-                }
-            }
-            break;
-            case "Noise": {
-                double minXZ = -0.4;
-                double maxXZ = 0.4;
-                double minY = -2;
-                double maxY = 0.4;
-
-                double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
-                double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
-
-                double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
-                double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
-                double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
-
-                if (shouldRandomize) {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-
-                    lastXOffset = (float) xOffset;
-                    lastYOffset = (float) yOffset;
-                    lastZOffset = (float) zOffset;
-                } else {
-                    offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-                }
-            }
-            break;
-            case "Drift":
-                MovingObjectPosition intercept = bb.calculateIntercept(playerPos, playerPos.add(mc.thePlayer.getVectorForRotation(RotationUtils.prevRotRequireNonNullElse[0], RotationUtils.prevRotRequireNonNullElse[1])).multiply(attackRange.get()));
-
-                float yawMovement = RotationUtils.getAngleDifference(RotationUtils.currRotRequireNonNullElse[0], RotationUtils.prevRotRequireNonNullElse[0]);
-                float pitchMovement = Math.signum(RotationUtils.getAngleDifference(RotationUtils.currRotRequireNonNullElse[1], RotationUtils.prevRotRequireNonNullElse[1]));
-
-                if (pitchMovement == 0) {
-                    pitchMovement = MathUtils.randomizeFloat(-1, 1);
-                }
-
-                if (intercept != null && intercept.hitVec == null) {
-                    currentYawOffset = yawMovement;
-                    currentPitchOffset = pitchMovement;
+                        lastXOffset = (float) xOffset;
+                        lastYOffset = (float) yOffset;
+                        lastZOffset = (float) zOffset;
+                    } else {
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                    }
                 }
                 break;
-            default:
-                offsetVec = new Vec3(0, 0, 0);
+                case "Noise": {
+                    double minXZ = -0.4;
+                    double maxXZ = 0.4;
+                    double minY = -2;
+                    double maxY = 0.4;
+
+                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
+                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
+
+                    double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
+                    double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
+                    double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
+
+                    if (shouldRandomize) {
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+
+                        lastXOffset = (float) xOffset;
+                        lastYOffset = (float) yOffset;
+                        lastZOffset = (float) zOffset;
+                    } else {
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                    }
+                }
+                break;
+                case "Drift":
+                    MovingObjectPosition intercept = bb.calculateIntercept(playerPos, playerPos.add(mc.thePlayer.getVectorForRotation(RotationUtils.prevRotRequireNonNullElse[0], RotationUtils.prevRotRequireNonNullElse[1])).multiply(attackRange.get()));
+
+                    float yawMovement = RotationUtils.getAngleDifference(RotationUtils.currRotRequireNonNullElse[0], RotationUtils.prevRotRequireNonNullElse[0]);
+                    float pitchMovement = Math.signum(RotationUtils.getAngleDifference(RotationUtils.currRotRequireNonNullElse[1], RotationUtils.prevRotRequireNonNullElse[1]));
+
+                    if (pitchMovement == 0) {
+                        pitchMovement = MathUtils.randomizeFloat(-1, 1);
+                    }
+
+                    if (intercept != null && intercept.hitVec == null) {
+                        currentYawOffset = yawMovement;
+                        currentPitchOffset = pitchMovement;
+                    }
+                    break;
+                default:
+                    offsetVec = new Vec3(0, 0, 0);
+            }
+        } else {
+            offsetVec = new Vec3(0, 0, 0);
         }
 
         if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !onlyUpdateOnMiss.get()) {

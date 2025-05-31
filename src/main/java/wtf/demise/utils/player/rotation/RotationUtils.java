@@ -256,6 +256,23 @@ public class RotationUtils implements InstanceAccess {
         switch (smoothMode) {
             case Linear -> finalRotation = applyGCDFix(currentRotation, finalTargetRotation);
 
+            case Relative -> {
+                float factorH = (float) max(min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
+                float factorV = (float) max(min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
+
+                float[] factor = new float[]{factorH, factorV};
+
+                float straightLineYaw1 = (float) (abs(yawDifference / rotationDifference) * factor[0]);
+                float straightLinePitch1 = (float) (abs(pitchDifference / rotationDifference) * factor[1]);
+
+                float[] smoothedRotation = new float[]{
+                        currentRotation[0] + max(-straightLineYaw1, min(straightLineYaw1, yawDifference)),
+                        currentRotation[1] + max(-straightLinePitch1, min(straightLinePitch1, pitchDifference))
+                };
+
+                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
+            }
+
             case Bezier -> {
                 float yawDirection = yawDifference / (float) rotationDifference;
                 float pitchDirection = pitchDifference / (float) rotationDifference;
@@ -273,52 +290,10 @@ public class RotationUtils implements InstanceAccess {
                 finalRotation = applyGCDFix(currentRotation, smoothedRotation);
             }
 
-            case Lerp -> {
-                float newYaw = currentRotation[0] + (yawDifference * hSpeed / 180);
-                float newPitch = currentRotation[1] + (pitchDifference * vSpeed / 180);
-
-                float[] smoothedRotation = new float[]{newYaw, newPitch};
-
-                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
-            }
-
-            case Exponential -> {
-                float smoothedYaw = currentRotation[0] + yawDifference * (1 - (float) exp(-(hSpeed / 180)));
-                float smoothedPitch = currentRotation[1] + pitchDifference * (1 - (float) exp(-(vSpeed / 180)));
-
-                float[] smoothedRotation = new float[]{
-                        smoothedYaw,
-                        smoothedPitch
-                };
-
-                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
-            }
-
-            case Relative -> {
-                float[] factor = computeFactor(rotationDifference, hSpeed, vSpeed);
-
-                float straightLineYaw1 = (float) (abs(yawDifference / rotationDifference) * factor[0]);
-                float straightLinePitch1 = (float) (abs(pitchDifference / rotationDifference) * factor[1]);
-
-                float[] smoothedRotation = new float[]{
-                        currentRotation[0] + max(-straightLineYaw1, min(straightLineYaw1, yawDifference)),
-                        currentRotation[1] + max(-straightLinePitch1, min(straightLinePitch1, pitchDifference))
-                };
-
-                finalRotation = applyGCDFix(currentRotation, smoothedRotation);
-            }
-
             default -> finalRotation = targetRotation;
         }
 
         return finalRotation;
-    }
-
-    private static float[] computeFactor(double rotationDifference, float hSpeed, float vSpeed) {
-        float turnSpeedH = (float) max(min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
-        float turnSpeedV = (float) max(min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
-
-        return new float[]{turnSpeedH, turnSpeedV};
     }
 
     public static float[] applyGCDFix(float[] prevRotation, float[] currentRotation) {
