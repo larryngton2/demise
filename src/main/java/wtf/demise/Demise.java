@@ -22,7 +22,6 @@ import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.gui.notification.NotificationManager;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.gui.widget.WidgetManager;
-import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.discord.DiscordInfo;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BadPacketsComponent;
@@ -36,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.Objects;
 
 @Getter
@@ -44,10 +44,10 @@ public class Demise {
     public static final Demise INSTANCE = new Demise();
     public final String clientName = "demise";
     public final String version = "alpha";
+    public final String cloud = "https://larryngton2.github.io/demise-online-cfgs/";
 
     private final File mainDir = new File(Minecraft.getMinecraft().mcDataDir, clientName);
 
-    // Managers and GUI components
     private EventManager eventManager;
     private NotificationManager notificationManager;
     private ModuleManager moduleManager;
@@ -59,7 +59,6 @@ public class Demise {
     private SkeetUI skeetGUI;
     private AltRepositoryGUI altRepositoryGUI;
     private DiscordInfo discordRP;
-    private CurrentUser currentUser;
 
     // System Tray icon
     private TrayIcon trayIcon;
@@ -130,7 +129,6 @@ public class Demise {
         dropdownGUI = new DropdownGUI();
         skeetGUI = new SkeetUI();
         altRepositoryGUI = new AltRepositoryGUI(this);
-        currentUser = new CurrentUser();
     }
 
     private void registerEventHandlers() {
@@ -208,5 +206,29 @@ public class Demise {
         }
         configManager.saveConfigs();
         LOGGER.info("All configurations saved.");
+    }
+
+    public static class HWID {
+        public static String getHWID() {
+            try {
+                String toEncrypt = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                md.update(toEncrypt.getBytes());
+                StringBuilder hexString = new StringBuilder();
+
+                byte[] byteData = md.digest();
+
+                for (byte aByteData : byteData) {
+                    String hex = Integer.toHexString(0xff & aByteData);
+                    if (hex.length() == 1) hexString.append('0');
+                    hexString.append(hex);
+                }
+
+                return hexString.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Error";
+            }
+        }
     }
 }

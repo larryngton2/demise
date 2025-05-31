@@ -14,7 +14,7 @@ public final class HelpCommand extends Command {
 
     @Override
     public void execute(final String[] arguments) {
-        for (final Command command : Demise.INSTANCE.getCommandManager().cmd) {
+        for (Command command : Demise.INSTANCE.getCommandManager().cmd) {
             if (!(command instanceof ModuleCommand))
                 ChatUtils.sendMessageClient(Arrays.toString(command.getAliases()) + ": " + command.getUsage());
         }

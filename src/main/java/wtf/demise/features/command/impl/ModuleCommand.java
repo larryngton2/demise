@@ -7,24 +7,32 @@ import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.utils.misc.ChatUtils;
 
-import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.awt.Color;
+import java.util.*;
 
 public class ModuleCommand extends Command {
     private final Module module;
-    private final List<Value> values;
+    private final Map<Class<? extends Value>, ValueHandler> valueHandlers;
 
     public ModuleCommand(Module module, List<Value> values) {
         this.module = module;
-        this.values = values;
+        this.valueHandlers = initializeValueHandlers();
+    }
+
+    private Map<Class<? extends Value>, ValueHandler> initializeValueHandlers() {
+        Map<Class<? extends Value>, ValueHandler> handlers = new HashMap<>();
+        handlers.put(BoolValue.class, this::handleBoolValue);
+        handlers.put(ColorValue.class, this::handleColorValue);
+        handlers.put(SliderValue.class, this::handleSliderValue);
+        handlers.put(MultiBoolValue.class, this::handleMultiBoolValue);
+        handlers.put(ModeValue.class, this::handleModeValue);
+        handlers.put(TextValue.class, this::handleTextValue);
+        return handlers;
     }
 
     @Override
     public String getUsage() {
-        return module.getName().toLowerCase(Locale.getDefault()) + " <setting> <value>";
+        return String.format("%s <setting> <value>", module.getName().toLowerCase(Locale.getDefault()));
     }
 
     @Override
@@ -40,45 +48,86 @@ public class ModuleCommand extends Command {
         }
 
         Value value = module.getValue(args[1]);
-
         if (value == null) return;
 
-        if (value instanceof BoolValue boolValue) {
-            boolean newValue = !boolValue.get();
-            boolValue.set(newValue);
+        ValueHandler handler = valueHandlers.get(value.getClass());
+        if (handler != null) {
+            handler.handle(value, args);
+        }
+    }
 
-            ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was toggled " + (newValue ? "§8on" : "§8off") + ".");
-        } else {
-            if (args.length < 3) {
-                if (value instanceof SliderValue || value instanceof ColorValue)
-                    ChatUtils.sendMessageClient(args[1].toLowerCase() + " <value>");
-                else if (value instanceof ModeValue modeValue)
-                    ChatUtils.sendMessageClient(args[1].toLowerCase() + " <" + Arrays.stream(modeValue.getModes())
-                            .map(String::toLowerCase).reduce((s1, s2) -> s1 + "/" + s2).orElse("") + ">");
-                return;
-            }
+    private void handleBoolValue(Value value, String[] args) {
+        BoolValue boolValue = (BoolValue) value;
+        boolean newValue = !boolValue.get();
+        boolValue.set(newValue);
+        sendToggleMessage(args[1], newValue);
+    }
 
-            if (value instanceof ColorValue colorValue) {
-                colorValue.set(new Color(Integer.parseInt(args[2])));
-                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + colorValue.get() + ".");
-            } else if (value instanceof SliderValue sliderValue) {
-                sliderValue.setValue(Float.parseFloat(args[2]));
-                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + sliderValue.get() + ".");
-            } else if (value instanceof MultiBoolValue multiBoolValue) {
-                multiBoolValue.getValues().forEach(boolValue -> {
-                    if (Objects.equals(boolValue.getName(), args[2])) {
+    private void handleColorValue(Value value, String[] args) {
+        if (requiresAdditionalValue(args)) {
+            ColorValue colorValue = (ColorValue) value;
+            colorValue.set(new Color(Integer.parseInt(args[2])));
+            sendValueSetMessage(args[1], colorValue.get());
+        }
+    }
+
+    private void handleSliderValue(Value value, String[] args) {
+        if (requiresAdditionalValue(args)) {
+            SliderValue sliderValue = (SliderValue) value;
+            sliderValue.setValue(Float.parseFloat(args[2]));
+            sendValueSetMessage(args[1], sliderValue.get());
+        }
+    }
+
+    private void handleMultiBoolValue(Value value, String[] args) {
+        if (requiresAdditionalValue(args)) {
+            MultiBoolValue multiBoolValue = (MultiBoolValue) value;
+            multiBoolValue.getValues().stream().filter(
+                    boolValue -> Objects.equals(boolValue.getName(), args[2])).findFirst().ifPresent(
+                    boolValue -> {
                         boolean newValue = !boolValue.get();
                         boolValue.set(newValue);
-                        ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + boolValue.get() + ".");
-                    }
-                });
-            } else if (value instanceof ModeValue modeValue) {
-                modeValue.set(args[2]);
-                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + modeValue.get() + ".");
-            } else if (value instanceof TextValue textValue) {
-                textValue.setText(args[2]);
-                ChatUtils.sendMessageClient(module.getName() + " " + args[1] + " was set to " + textValue.get() + ".");
-            }
+                        sendValueSetMessage(args[1], boolValue.get());
+                    });
         }
+    }
+
+    private void handleModeValue(Value value, String[] args) {
+        if (requiresAdditionalValue(args)) {
+            ModeValue modeValue = (ModeValue) value;
+            modeValue.set(args[2]);
+            sendValueSetMessage(args[1], modeValue.get());
+        }
+    }
+
+    private void handleTextValue(Value value, String[] args) {
+        if (requiresAdditionalValue(args)) {
+            TextValue textValue = (TextValue) value;
+            textValue.setText(args[2]);
+            sendValueSetMessage(args[1], textValue.get());
+        }
+    }
+
+    private boolean requiresAdditionalValue(String[] args) {
+        if (args.length < 3) {
+            ChatUtils.sendMessageClient(args[1].toLowerCase() + " <value>");
+            return false;
+        }
+        return true;
+    }
+
+    private void sendToggleMessage(String setting, boolean newValue) {
+        String message = String.format("%s %s was set to %s.", module.getName(), setting, newValue ? "§8true" : "§8false");
+        ChatUtils.sendMessageClient(message);
+    }
+
+    private void sendValueSetMessage(String setting, Object value) {
+        String message = String.format("%s %s was set to %s.", module.getName(), setting, value);
+        ChatUtils.sendMessageClient(message);
+    }
+
+    @FunctionalInterface
+    private interface ValueHandler {
+        void handle(Value value, String[] args);
     }
 }

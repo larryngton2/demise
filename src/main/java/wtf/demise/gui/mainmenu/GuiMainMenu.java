@@ -5,10 +5,8 @@ import net.minecraft.client.gui.*;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 import wtf.demise.features.modules.impl.visual.Shaders;
-import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.gui.button.MenuButton;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.userinfo.HWID;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -56,8 +54,6 @@ public class GuiMainMenu extends GuiScreen {
             default -> 0;
         };
 
-        Fonts.interMedium.get(14).drawStringWithShadow("Welcome, " + CurrentUser.USER, width - 5 - (Fonts.interMedium.get(14).getStringWidth("Welcome, " + CurrentUser.USER)), height - (2 + Fonts.interMedium.get(14).getHeight()), -1);
-
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
             MenuButton.shader = true;
             Blur.startBlur();
@@ -92,9 +88,7 @@ public class GuiMainMenu extends GuiScreen {
         Fonts.urbanist.get(38).drawString(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, new Color(255, 255, 255, 208).getRGB());
 
         if (fade) {
-            if (CurrentUser.USER != null) {
-                RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
-            }
+            RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());
 
             alpha -= 2;
 
@@ -104,7 +98,7 @@ public class GuiMainMenu extends GuiScreen {
         }
 
         mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
-        mc.fontRendererObj.drawStringWithShadow(HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
+        mc.fontRendererObj.drawStringWithShadow(Demise.HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
         mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
 
         super.drawScreen(mouseX, mouseY, partialTicks);

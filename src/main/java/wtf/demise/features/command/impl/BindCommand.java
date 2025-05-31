@@ -18,42 +18,68 @@ public final class BindCommand extends Command {
     @Override
     public void execute(final String[] arguments) throws CommandExecutionException {
         if (arguments.length == 3) {
-            final String moduleName = arguments[1];
-            final String keyName = arguments[2];
-            boolean foundModule = false;
-
-            for (final Module module : Demise.INSTANCE.getModuleManager().getModules()) {
-                if (module.getName().equalsIgnoreCase(moduleName)) {
-                    module.setKeyBind(Keyboard.getKeyIndex(keyName.toUpperCase()));
-                    final String string = "Set " + module.getName() + " to " + StringUtils.upperSnakeCaseToPascal(Keyboard.getKeyName(module.getKeyBind())) + ".";
-                    ChatUtils.sendMessageClient(string);
-                    foundModule = true;
-                    break;
-                }
-            }
-
-            if (!foundModule) {
-                ChatUtils.sendMessageClient("Cound not find module.");
-            }
+            handleModuleBinding(arguments[1], arguments[2]);
+        } else if (arguments.length == 2) {
+            handleSpecialCommands(arguments[1]);
         } else {
-            if (arguments.length != 2) {
-                throw new CommandExecutionException(this.getUsage());
-            }
-
-            if (arguments[1].equalsIgnoreCase("clear")) {
-                for (final Module module2 : Demise.INSTANCE.getModuleManager().getModules()) {
-                    module2.setKeyBind(0);
-                    ChatUtils.sendMessageClient("Cleared all binds.");
-                }
-            } else if (arguments[1].equalsIgnoreCase("list")) {
-                ChatUtils.sendMessageClient("Binds");
-                for (final Module module2 : Demise.INSTANCE.getModuleManager().getModules()) {
-                    if (module2.getKeyBind() != 0) {
-                        ChatUtils.sendMessageClient(EnumChatFormatting.GRAY + "- " + EnumChatFormatting.RED + module2.getName() + ": " + Keyboard.getKeyName(module2.getKeyBind()));
-                    }
-                }
-            }
+            throw new CommandExecutionException(getUsage());
         }
+    }
+
+    private void handleModuleBinding(String moduleName, String keyName) {
+        Module targetModule = findModuleByName(moduleName);
+        if (targetModule == null) {
+            ChatUtils.sendMessageClient("Could not find module.");
+            return;
+        }
+
+        int keyBind = Keyboard.getKeyIndex(keyName.toUpperCase());
+        targetModule.setKeyBind(keyBind);
+        String message = formatBindingMessage(targetModule);
+        ChatUtils.sendMessageClient(message);
+    }
+
+    private void handleSpecialCommands(String action) {
+        if (action.equalsIgnoreCase("clear")) {
+            clearAllBindings();
+        } else if (action.equalsIgnoreCase("list")) {
+            listAllBindings();
+        }
+    }
+
+    private Module findModuleByName(String moduleName) {
+        return Demise.INSTANCE.getModuleManager().getModules().stream()
+                .filter(module -> module.getName().equalsIgnoreCase(moduleName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void clearAllBindings() {
+        Demise.INSTANCE.getModuleManager().getModules()
+                .forEach(module -> module.setKeyBind(0));
+        ChatUtils.sendMessageClient("Cleared all binds.");
+    }
+
+    private void listAllBindings() {
+        ChatUtils.sendMessageClient("Binds: ");
+        Demise.INSTANCE.getModuleManager().getModules().stream()
+                .filter(module -> module.getKeyBind() != 0)
+                .forEach(this::displayModuleBinding);
+    }
+
+    private void displayModuleBinding(Module module) {
+        String bindingInfo = String.format("%s- %s%s: %s",
+                EnumChatFormatting.GRAY,
+                EnumChatFormatting.RED,
+                module.getName(),
+                Keyboard.getKeyName(module.getKeyBind()));
+        ChatUtils.sendMessageClient(bindingInfo);
+    }
+
+    private String formatBindingMessage(Module module) {
+        return String.format("Set %s to %s.",
+                module.getName(),
+                StringUtils.upperSnakeCaseToPascal(Keyboard.getKeyName(module.getKeyBind())));
     }
 
     @Override

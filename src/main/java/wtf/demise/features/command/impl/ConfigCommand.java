@@ -5,24 +5,45 @@ import wtf.demise.features.command.Command;
 import wtf.demise.features.config.impl.ModuleConfig;
 import wtf.demise.utils.misc.ChatUtils;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ConfigCommand extends Command {
-
     private enum Action {
         LOAD, SAVE, LIST, CREATE, REMOVE, OPENFOLDER, CURRENT;
 
-        public static Action fromString(String action) {
+        public static Optional<Action> fromString(String action) {
             try {
-                return Action.valueOf(action.toUpperCase());
+                return Optional.of(Action.valueOf(action.toUpperCase()));
             } catch (IllegalArgumentException e) {
-                return null;
+                return Optional.empty();
             }
+        }
+    }
+
+    private record ConfigRequest(Action action, String configName) {
+        public static ConfigRequest parse(String[] args) throws ConfigurationException {
+            if (args.length < 2) {
+                throw new ConfigurationException("Insufficient arguments");
+            }
+
+            Action action = Action.fromString(args[1]).orElseThrow(() -> new ConfigurationException("Invalid action"));
+
+            String configName = args.length > 2 ? args[2] : null;
+            if (requiresConfigName(action) && configName == null) {
+                throw new ConfigurationException("Config name required for " + action.name().toLowerCase());
+            }
+
+            return new ConfigRequest(action, configName);
+        }
+
+        private static boolean requiresConfigName(Action action) {
+            return action != Action.LIST && action != Action.OPENFOLDER && action != Action.CURRENT;
         }
     }
 
@@ -38,84 +59,51 @@ public class ConfigCommand extends Command {
 
     @Override
     public void execute(String[] args) {
-        if (args.length < 2) {
-            ChatUtils.sendMessageClient("Usage: " + getUsage());
-            return;
+        try {
+            ConfigRequest request = ConfigRequest.parse(args);
+            handleRequest(request);
+        } catch (ConfigurationException e) {
+            ChatUtils.sendMessageClient(e.getMessage() + ". Usage: " + getUsage());
         }
+    }
 
-        Action action = Action.fromString(args[1]);
-        if (action == null) {
-            ChatUtils.sendMessageClient("Invalid action. Usage: " + getUsage());
-            return;
-        }
-
-        switch (action) {
-            case LIST:
-                handleList();
-                break;
-            case OPENFOLDER:
-                handleOpenFolder();
-                break;
-            case CURRENT:
-                handleCurrent();
-                break;
-            default:
-                if (args.length < 3) {
-                    ChatUtils.sendMessageClient("Action '" + action.name().toLowerCase() + "' requires an additional argument. Usage: " + getUsage());
-                    return;
-                }
-                String configName = args[2];
-                switch (action) {
-                    case LOAD:
-                        handleLoad(configName);
-                        break;
-                    case SAVE:
-                        handleSave(configName, true);
-                        break;
-                    case CREATE:
-                        handleCreate(configName);
-                        break;
-                    case REMOVE:
-                        handleRemove(configName);
-                        break;
-                    default:
-                        ChatUtils.sendMessageClient("Unknown action. Usage: " + getUsage());
-                }
-                break;
+    private void handleRequest(ConfigRequest request) {
+        switch (request.action()) {
+            case LIST -> handleList();
+            case OPENFOLDER -> handleOpenFolder();
+            case CURRENT -> handleCurrent();
+            case LOAD -> handleLoad(request.configName());
+            case SAVE -> handleSave(request.configName(), true);
+            case CREATE -> handleCreate(request.configName());
+            case REMOVE -> handleRemove(request.configName());
         }
     }
 
     private void handleList() {
         List<String> configs = getConfigList();
-        if (configs.isEmpty()) {
-            ChatUtils.sendMessageClient("No configurations found.");
-        } else {
-            ChatUtils.sendMessageClient("Configs: " + String.join(", ", configs));
-        }
+        String message = configs.isEmpty() ? "No configurations found." : "Configs: " + String.join(", ", configs);
+        ChatUtils.sendMessageClient(message);
     }
 
     private void handleOpenFolder() {
-        File directory = Demise.INSTANCE.getMainDir();
-        if (Desktop.isDesktopSupported()) {
-            try {
-                Desktop.getDesktop().open(directory);
-                ChatUtils.sendMessageClient("Opened config folder.");
-            } catch (IOException e) {
-                ChatUtils.sendMessageClient("Failed to open config folder.");
-                e.printStackTrace();
-            }
-        } else {
+        if (!Desktop.isDesktopSupported()) {
             ChatUtils.sendMessageClient("Opening folder is not supported on this system.");
+            return;
+        }
+
+        try {
+            Desktop.getDesktop().open(Demise.INSTANCE.getMainDir());
+            ChatUtils.sendMessageClient("Opened config folder.");
+        } catch (IOException e) {
+            ChatUtils.sendMessageClient("Failed to open config folder.");
+            e.printStackTrace();
         }
     }
 
     private void handleCurrent() {
         String currentConfig = Demise.INSTANCE.getConfigManager().getCurrentConfig();
-        if (currentConfig != null) {
-            ChatUtils.sendMessageClient("Current config: " + currentConfig);
-        } else {
-            ChatUtils.sendMessageClient("No config is currently loaded.");
-        }
+        String message = currentConfig != null ? "Current config: " + currentConfig : "No config is currently loaded.";
+        ChatUtils.sendMessageClient(message);
     }
 
     private void handleLoad(String configName) {
@@ -128,41 +116,25 @@ public class ConfigCommand extends Command {
         }
     }
 
-    private void handleSave(String configName) {
-        handleSave(configName, true);
-    }
-
-    /**
-     * Saves the current configuration.
-     *
-     * @param configName The name of the configuration to save.
-     * @param notify     Whether to send a success/failure message.
-     */
     private void handleSave(String configName, boolean notify) {
         ModuleConfig cfg = new ModuleConfig(configName);
-        if (Demise.INSTANCE.getConfigManager().saveConfig(cfg)) {
-            if (notify) {
-                ChatUtils.sendMessageClient("Saved config: " + configName);
-            }
-        } else {
-            if (notify) {
-                ChatUtils.sendMessageClient("Failed to save config: " + configName);
-            }
+        boolean success = Demise.INSTANCE.getConfigManager().saveConfig(cfg);
+        if (notify) {
+            ChatUtils.sendMessageClient(success ? "Saved config: " + configName : "Failed to save config: " + configName);
         }
     }
 
     private void handleCreate(String configName) {
         File configFile = new File(Demise.INSTANCE.getMainDir(), configName + ".json");
         try {
-            if (configFile.createNewFile()) {
-                Demise.INSTANCE.getConfigManager().setCurrentConfig(configName);
-                ChatUtils.sendMessageClient("Created config and set as current: " + configName);
-                // Automatically save the newly created config
-                handleSave(configName, false); // Pass false to avoid duplicate messages
-                ChatUtils.sendMessageClient("Automatically saved config: " + configName);
-            } else {
+            if (!configFile.createNewFile()) {
                 ChatUtils.sendMessageClient("Config already exists: " + configName);
+                return;
             }
+
+            Demise.INSTANCE.getConfigManager().setCurrentConfig(configName);
+            handleSave(configName, false);
+            ChatUtils.sendMessageClient("Created and saved config: " + configName);
         } catch (IOException e) {
             ChatUtils.sendMessageClient("Failed to create config: " + configName);
             e.printStackTrace();
@@ -171,15 +143,13 @@ public class ConfigCommand extends Command {
 
     private void handleRemove(String configName) {
         File configFile = new File(Demise.INSTANCE.getMainDir(), configName + ".json");
-        if (configFile.exists()) {
-            if (configFile.delete()) {
-                ChatUtils.sendMessageClient("Removed config: " + configName);
-            } else {
-                ChatUtils.sendMessageClient("Failed to remove config: " + configName);
-            }
-        } else {
+        if (!configFile.exists()) {
             ChatUtils.sendMessageClient("Config does not exist: " + configName);
+            return;
         }
+
+        String message = configFile.delete() ? "Removed config: " + configName : "Failed to remove config: " + configName;
+        ChatUtils.sendMessageClient(message);
     }
 
     private List<String> getConfigList() {
@@ -188,9 +158,13 @@ public class ConfigCommand extends Command {
         if (files == null) {
             return List.of();
         }
-        return Arrays.stream(files)
-                .filter(File::isFile)
-                .map(file -> file.getName().replaceFirst("\\.json$", ""))
-                .collect(Collectors.toList());
+
+        return Arrays.stream(files).filter(File::isFile).map(file -> file.getName().replace(".json", "")).collect(Collectors.toList());
+    }
+
+    private static class ConfigurationException extends RuntimeException {
+        public ConfigurationException(String message) {
+            super(message);
+        }
     }
 }

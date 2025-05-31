@@ -14,17 +14,31 @@ public final class ToggleCommand extends Command {
 
     @Override
     public void execute(final String[] arguments) throws CommandExecutionException {
-        if (arguments.length == 2) {
-            final String moduleName = arguments[1];
-            for (final Module module : Demise.INSTANCE.getModuleManager().getModules()) {
-                if (module.getName().replaceAll(" ", "").equalsIgnoreCase(moduleName)) {
-                    module.toggle();
-                    ChatUtils.sendMessageClient(module.getName() + " has been " + (module.isEnabled() ? "\u00a7AEnabled\u00a77." : "\u00a7CDisabled\u00a77."));
-                    return;
-                }
-            }
+        if (arguments.length != 2) {
+            throw new CommandExecutionException(getUsage());
         }
-        throw new CommandExecutionException(this.getUsage());
+
+        String targetModuleName = arguments[1];
+        Module module = findModuleByName(targetModuleName);
+
+        if (module == null) {
+            throw new CommandExecutionException(getUsage());
+        }
+
+        toggleModuleAndNotify(module);
+    }
+
+    private Module findModuleByName(String moduleName) {
+        return Demise.INSTANCE.getModuleManager().getModules().stream()
+                .filter(module -> module.getName().replaceAll(" ", "").equalsIgnoreCase(moduleName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void toggleModuleAndNotify(Module module) {
+        module.toggle();
+        String status = module.isEnabled() ? "§AEnabled" : "§CDisabled.";
+        ChatUtils.sendMessageClient(module.getName() + " has been " + status);
     }
 
     @Override

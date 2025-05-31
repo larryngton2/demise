@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @Getter
 public class ConfigManager {
-
     private final ModuleConfig setting = new ModuleConfig("default");
     private final WidgetConfig elements = new WidgetConfig("elements");
 

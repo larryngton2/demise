@@ -5,19 +5,16 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
-import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.*;
+import wtf.demise.features.modules.impl.exploit.Timer;
 import wtf.demise.features.modules.impl.legit.*;
 import wtf.demise.features.modules.impl.misc.*;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages all modules within the client.
@@ -25,221 +22,127 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @Getter
 public class ModuleManager {
-    private final List<Module> modules = new CopyOnWriteArrayList<>();
+    private static final Set<Class<? extends Module>> COMBAT_MODULES = Set.of(
+            AntiBot.class, Criticals.class, FakeLag.class, KeepSprint.class, KillAura.class, TickBase.class,
+            TimerRange.class, Velocity.class
+    );
 
-    /**
-     * Initializes the ModuleManager by adding all available modules,
-     * sorting them by name, and registering event listeners.
-     */
+    private static final Set<Class <? extends Module>> LEGIT_MODULES = Set.of(
+            AimAssist.class, AutoClicker.class, AutoHeal.class, AutoRod.class, AutoWeapon.class, BackTrack.class,
+            CombatHelper.class, HitBox.class, HitSelect.class, JumpReset.class, LegitScaffold.class, NoHitDelay.class,
+            Reach.class, SprintReset.class
+    );
+
+    private static final Set<Class<? extends Module>> MOVEMENT_MODULES = Set.of(
+            AutoWalk.class, Fly.class, Freeze.class, InvMove.class, Jesus.class, JumpDelay.class, LongJump.class,
+            MotionModifier.class, MoveHelper.class, NoSlow.class, Phase.class, SafeWalk.class, Sneak.class, Speed.class,
+            Sprint.class, Step.class, Strafe.class, TargetStrafe.class, WallClimb.class
+    );
+
+    private static final Set<Class<? extends Module>> PLAYER_MODULES = Set.of(
+        AntiVoid.class, AutoClutch.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class,
+            FastPlace.class, FastUse.class, Manager.class, NoFall.class, Scaffold.class, Stealer.class
+    );
+
+    private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
+        AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
+            InventorySync.class, MurderMystery.class, Test.class, Twerk.class
+    );
+
+    private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
+        AutoBan.class, Blink.class, ClientSpoofer.class, ComboOneHit.class, Disabler.class, NoGuiClose.class,
+            Regen.class, ResetVL.class, Timer.class
+    );
+
+    private static final Set<Class<? extends Module>> VISUAL_MODULES = Set.of(
+        Atmosphere.class, BlockOnSwing.class, BlockOverlay.class, Breadcrumbs.class, BreakProgress.class, Cape.class,
+            ChestESP.class, ChinaHat.class, ClickGUI.class, CustomSkin.class, CustomWidgetsModule.class, ESP.class,
+            ForceDinnerbone.class, FreeCam.class, FullBright.class, ImageESP.class, Interface.class, ItemESP.class,
+            ItemGlow.class, ItemPhysics.class, MainMenuOptions.class, MotionBlur.class, MoveStatus.class,
+            NoHurtCam.class, NoRenderOffsetReset.class, Particles.class, Rotation.class, Shaders.class,
+            ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class, VisualAimPoint.class
+    );
+
+    private final Map<ModuleCategory, List<Module>> modulesByCategory;
+    private final List<Module> allModules;
+
     public ModuleManager() {
-        addModules(
-                // Combat
-                AntiBot.class,
-                KeepSprint.class,
-                KillAura.class,
-                TickBase.class,
-                Velocity.class,
-                Criticals.class,
-                FakeLag.class,
-                TimerRange.class,
+        this.modulesByCategory = new ConcurrentHashMap<>();
+        this.allModules = new ArrayList<>();
 
-                // Legit
-                AutoClicker.class,
-                NoHitDelay.class,
-                LegitScaffold.class,
-                BackTrack.class,
-                JumpReset.class,
-                AutoRod.class,
-                AutoWeapon.class,
-                AutoHeal.class,
-                SprintReset.class,
-                Reach.class,
-                HitBox.class,
-                CombatHelper.class,
-                HitSelect.class,
-                AimAssist.class,
-
-                // Exploit
-                Blink.class,
-                ClientSpoofer.class,
-                Disabler.class,
-                Timer.class,
-                NoGuiClose.class,
-                Regen.class,
-                ResetVL.class,
-                ComboOneHit.class,
-                AutoBan.class,
-
-                // Misc
-                Twerk.class,
-                MurderMystery.class,
-                InventorySync.class,
-                AutoQueue.class,
-                AutoRegister.class,
-                ExplosionBlock.class,
-                Test.class,
-                FlagDetector.class,
-                AnnoyUtils.class,
-
-                // Movement
-                Freeze.class,
-                InvMove.class,
-                LongJump.class,
-                JumpDelay.class,
-                NoSlow.class,
-                SafeWalk.class,
-                Speed.class,
-                Sprint.class,
-                Step.class,
-                Strafe.class,
-                Fly.class,
-                Phase.class,
-                Sneak.class,
-                MotionModifier.class,
-                AutoWalk.class,
-                Jesus.class,
-                TargetStrafe.class,
-                WallClimb.class,
-                MoveHelper.class,
-
-                // Player
-                AutoTool.class,
-                FastPlace.class,
-                Manager.class,
-                NoFall.class,
-                Stealer.class,
-                BedNuker.class,
-                FastUse.class,
-                FastBreak.class,
-                Scaffold.class,
-                AntiVoid.class,
-                FastBow.class,
-                AutoClutch.class,
-
-                // Visual
-                Atmosphere.class,
-                BlockOverlay.class,
-                ChestESP.class,
-                ClickGUI.class,
-                ESP.class,
-                FullBright.class,
-                Interface.class,
-                Rotation.class,
-                Shaders.class,
-                Trajectories.class,
-                Breadcrumbs.class,
-                ChinaHat.class,
-                Particles.class,
-                MoveStatus.class,
-                ItemPhysics.class,
-                ItemESP.class,
-                FreeCam.class,
-                ViewBobbing.class,
-                BreakProgress.class,
-                VisualAimPoint.class,
-                MainMenuOptions.class,
-                ItemGlow.class,
-                Cape.class,
-                CustomSkin.class,
-                ForceDinnerbone.class,
-                CustomWidgetsModule.class,
-                ImageESP.class,
-                NoRenderOffsetReset.class,
-                BlockOnSwing.class,
-                MotionBlur.class,
-                ThirdPersonDistance.class,
-                NoHurtCam.class
-        );
-
-        // Sort modules by name for better organization
-        modules.sort(Comparator.comparing(Module::getName));
-
-        // Register the ModuleManager to listen for events
-        Demise.INSTANCE.getEventManager().register(this);
-        //  Demise.LOGGER.INFO("ModuleManager initialized with {} modules.", modules.size());
+        initializeModules();
+        sortModules();
+        registerEventListener();
     }
 
-    /**
-     * Adds multiple modules to the manager by instantiating their classes.
-     *
-     * @param moduleClasses Varargs of module classes to add.
-     */
-    @SafeVarargs
-    public final void addModules(Class<? extends Module>... moduleClasses) {
-        for (Class<? extends Module> moduleClass : moduleClasses) {
-            try {
-                Module module = moduleClass.getDeclaredConstructor().newInstance();
-                modules.add(module);
-                //  Demise.LOGGER.INFO("Added module: {}", module.getName());
-            } catch (Exception e) {
-                //  Demise.LOGGER.INFO("Failed to instantiate module: {}", moduleClass.getSimpleName(), e);
-            }
+    private void initializeModules() {
+        Arrays.stream(ModuleCategory.values()).forEach(category -> modulesByCategory.put(category, new ArrayList<>()));
+
+        initializeCategoryModules(COMBAT_MODULES, ModuleCategory.Combat);
+        initializeCategoryModules(LEGIT_MODULES, ModuleCategory.Legit);
+        initializeCategoryModules(MOVEMENT_MODULES, ModuleCategory.Movement);
+        initializeCategoryModules(PLAYER_MODULES, ModuleCategory.Player);
+        initializeCategoryModules(MISC_MODULES, ModuleCategory.Misc);
+        initializeCategoryModules(EXPLOIT_MODULES, ModuleCategory.Exploit);
+        initializeCategoryModules(VISUAL_MODULES, ModuleCategory.Visual);
+    }
+
+    private void initializeCategoryModules(Set<Class<? extends Module>> moduleClasses, ModuleCategory category) {
+        moduleClasses.stream()
+                .map(this::instantiateModule)
+                .filter(Objects::nonNull)
+                .forEach(module -> {
+                    modulesByCategory.get(category).add(module);
+                    allModules.add(module);
+                });
+    }
+
+    private Module instantiateModule(Class<? extends Module> moduleClass) {
+        try {
+            return moduleClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            Demise.LOGGER.error("Failed to instantiate module: {}", moduleClass.getSimpleName(), e);
+            return null;
         }
     }
 
-    /**
-     * Retrieves a module instance based on its class type.
-     *
-     * @param moduleClass The class of the module to retrieve.
-     * @param <T>         The type of the module.
-     * @return An instance of the requested module or null if not found.
-     */
-    public <T extends Module> T getModule(Class<T> moduleClass) {
-        Optional<Module> module = modules.stream()
-                .filter(m -> m.getClass().equals(moduleClass))
-                .findFirst();
-
-        return module.map(moduleClass::cast).orElse(null);
+    private void sortModules() {
+        allModules.sort(Comparator.comparing(Module::getName));
+        modulesByCategory.values()
+                .forEach(modules -> modules.sort(Comparator.comparing(Module::getName)));
     }
 
-    /**
-     * Retrieves a module instance based on its name.
-     *
-     * @param name The name of the module to retrieve.
-     * @return The module instance if found, otherwise null.
-     */
+    private void registerEventListener() {
+        Demise.INSTANCE.getEventManager().register(this);
+    }
+
+    public <T extends Module> T getModule(Class<T> moduleClass) {
+        return allModules.stream()
+                .filter(m -> m.getClass().equals(moduleClass))
+                .map(moduleClass::cast)
+                .findFirst()
+                .orElse(null);
+    }
+
     public Module getModule(String name) {
-        return modules.stream()
+        return allModules.stream()
                 .filter(m -> m.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
     }
 
-    /**
-     * Retrieves all modules that belong to a specific category.
-     *
-     * @param category The category to filter modules by.
-     * @return A list of modules within the specified category.
-     */
     public List<Module> getModulesByCategory(ModuleCategory category) {
-        List<Module> categorizedModules = new ArrayList<>();
-        for (Module module : modules) {
-            if (module.getCategory() == category) {
-                categorizedModules.add(module);
-            }
-        }
-        return categorizedModules;
+        return Collections.unmodifiableList(modulesByCategory.getOrDefault(category, Collections.emptyList()));
     }
 
-    /**
-     * Event handler for key press events.
-     * Toggles the corresponding module if its keybind matches the pressed key.
-     *
-     * @param event The key press event.
-     */
     @EventTarget
     public void onKey(KeyPressEvent event) {
-        modules.stream()
+        allModules.stream()
                 .filter(module -> module.getKeyBind() == event.getKey())
                 .forEach(Module::toggle);
     }
 
-    /**
-     * Retrieves all modules managed by this manager.
-     *
-     * @return An unmodifiable list of all modules.
-     */
-    public List<Module> getAllModules() {
-        return List.copyOf(modules);
+    public List<Module> getModules() {
+        return Collections.unmodifiableList(allModules);
     }
 }

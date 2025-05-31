@@ -19,14 +19,11 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.misc.SpoofSlotUtils;
-import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
-import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.*;
@@ -46,7 +43,6 @@ public class Interface extends Module {
     ), this);
 
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
-    public final ModeValue tags = new ModeValue("Suffix", new String[]{"None", "Simple", "Bracket", "Dash"}, "Simple", this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));

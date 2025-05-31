@@ -17,31 +17,37 @@ public final class HideCommand extends Command {
 
     @Override
     public void execute(final String[] arguments) throws CommandExecutionException {
-        if (arguments.length == 2) {
-            final String arg = arguments[1];
-            if (arg.equalsIgnoreCase("clear")) {
-                for (final Module module : Demise.INSTANCE.getModuleManager().getModules()) {
-                    module.setHidden(false);
-                }
-                ChatUtils.sendMessageClient("Cleared all hidden module.");
-            } else if (arg.equalsIgnoreCase("list")) {
-                ChatUtils.sendMessageClient("Hidden Modules");
-                for (final Module module : Demise.INSTANCE.getModuleManager().getModules()) {
-                    if (module.isHidden()) {
-                        ChatUtils.sendMessageClient(EnumChatFormatting.GRAY + "- " + EnumChatFormatting.RED + module.getName());
-                    }
-                }
-            } else {
-                final Optional<Module> module2 = Optional.ofNullable(Demise.INSTANCE.getModuleManager().getModule(arg));
-                if (module2.isPresent()) {
-                    final Module m = module2.get();
-                    m.setHidden(!m.isHidden());
-                    ChatUtils.sendMessageClient(m.getName() + " is now " + (m.isHidden() ? "\u00a7Chidden\u00a77." : "\u00a7Ashown\u00a77."));
-                }
-            }
-            return;
+        if (arguments.length != 2) {
+            throw new CommandExecutionException(this.getUsage());
         }
-        throw new CommandExecutionException(this.getUsage());
+
+        final String subCommand = arguments[1].toLowerCase();
+        switch (subCommand) {
+            case "clear" -> handleClearCommand();
+            case "list" -> handleListCommand();
+            default -> handleToggleModuleVisibility(subCommand);
+        }
+    }
+
+    private void handleClearCommand() {
+        Demise.INSTANCE.getModuleManager().getModules().forEach(module -> module.setHidden(false));
+        ChatUtils.sendMessageClient("Cleared all hidden module.");
+    }
+
+    private void handleListCommand() {
+        ChatUtils.sendMessageClient("Hidden modules: ");
+        Demise.INSTANCE.getModuleManager().getModules().stream()
+                .filter(Module::isHidden)
+                .forEach(module -> ChatUtils.sendMessageClient(EnumChatFormatting.GRAY + "- " + EnumChatFormatting.RED + module.getName()));
+    }
+
+    private void handleToggleModuleVisibility(String moduleName) {
+        Optional.ofNullable(Demise.INSTANCE.getModuleManager().getModule(moduleName))
+                .ifPresent(module -> {
+                    module.setHidden(!module.isHidden());
+                    String status = module.isHidden() ? "§Chidden§7." : "§Ashown§7.";
+                    ChatUtils.sendMessageClient(String.format("%s is now %s", module.getName(), status));
+                });
     }
 
     @Override

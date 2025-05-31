@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class CommandManager {
-
     public List<Command> cmd = new ArrayList<>();
 
     public CommandManager() {
@@ -22,12 +21,12 @@ public final class CommandManager {
                 new HideCommand(),
                 new FriendCommand(),
                 new ConfigCommand(),
-                new HWIDCommand()
+                new HWIDCommand(),
+                new OnlineConfigCommand()
         );
 
         Demise.INSTANCE.getModuleManager().getModules().forEach(module -> {
-            if (!module.getValues().isEmpty())
-                cmd.add(new ModuleCommand(module, module.getValues()));
+            if (!module.getValues().isEmpty()) cmd.add(new ModuleCommand(module, module.getValues()));
         });
 
         Demise.INSTANCE.getEventManager().register(this);

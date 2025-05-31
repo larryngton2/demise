@@ -28,7 +28,6 @@ import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.gui.widget.impl.ModuleListWidget;
-import wtf.demise.userinfo.CurrentUser;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
@@ -239,8 +238,6 @@ public class CustomWidgets implements InstanceAccess {
                                 int j2 = -i1 * 9;
                                 String s = chatline.getChatComponent().getFormattedText();
 
-                                s = s.replace(mc.thePlayer.getNameClear(), CurrentUser.FINAL_USER);
-
                                 GlStateManager.enableBlend();
                                 mc.fontRendererObj.drawStringWithShadow(s, (float) i2, (float) (j2 - 8), 16777215 + (l1 << 24));
                                 GlStateManager.disableAlpha();
@@ -390,7 +387,6 @@ public class CustomWidgets implements InstanceAccess {
         for (Score score : collection) {
             ScorePlayerTeam scoreplayerteam = scoreboard.getPlayersTeam(score.getPlayerName());
             String s = ScorePlayerTeam.formatPlayerName(scoreplayerteam, score.getPlayerName());
-            s = s.replace(mc.thePlayer.getName(), CurrentUser.FINAL_USER);
             i = Math.max(i, Fonts.interRegular.get(15).getStringWidth(s));
         }
 
@@ -436,8 +432,6 @@ public class CustomWidgets implements InstanceAccess {
 
                 ScorePlayerTeam scoreplayerteam1 = scoreboard.getPlayersTeam(score1.getPlayerName());
                 String s1 = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score1.getPlayerName());
-
-                s1 = s1.replace(mc.thePlayer.getName(), CurrentUser.FINAL_USER);
 
                 final Matcher linkMatcher = LINK_PATTERN.matcher(s1);
 
