@@ -3,7 +3,6 @@ package wtf.demise.utils.player;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import de.florianmichael.viamcp.fixes.AttackOrder;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.util.MovingObjectPosition;
@@ -11,7 +10,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.AttackEvent;
-import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.utils.InstanceAccess;
@@ -40,6 +38,7 @@ public class ClickHandler implements InstanceAccess {
     private final TimerUtils selfHurtTimer = new TimerUtils();
     private final TimerUtils patternUpdateTimer = new TimerUtils();
     private final TimerUtils blockTimer = new TimerUtils();
+    public static boolean clickingNow;
 
     public enum ClickMode {
         Legit,
@@ -107,6 +106,7 @@ public class ClickHandler implements InstanceAccess {
             handleFailSwing();
         } else {
             attack();
+            clickingNow = true;
         }
     }
 
@@ -123,7 +123,7 @@ public class ClickHandler implements InstanceAccess {
                 killAura.preAttack();
             }
 
-            if (target != null && initialized && shouldClickThisTick()) {
+            if (shouldClickThisTick()) {
                 lastTargetTime.reset();
 
                 if (!ignoreBlocking && mc.thePlayer.isUsingItem()) {
@@ -140,6 +140,8 @@ public class ClickHandler implements InstanceAccess {
                 } else {
                     sendAttack();
                 }
+            } else {
+                clickingNow = false;
             }
 
             if (killAura.isEnabled()) {
@@ -147,6 +149,8 @@ public class ClickHandler implements InstanceAccess {
             }
 
             initialized = false;
+        } else {
+            clickingNow = false;
         }
     }
 

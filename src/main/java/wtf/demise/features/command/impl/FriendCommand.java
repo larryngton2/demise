@@ -3,72 +3,60 @@ package wtf.demise.features.command.impl;
 import wtf.demise.Demise;
 import wtf.demise.features.command.Command;
 import wtf.demise.features.command.CommandExecutionException;
-import wtf.demise.features.friend.FriendManager;
 import wtf.demise.utils.misc.ChatUtils;
+
 import static wtf.demise.utils.InstanceAccess.mc;
 
 public class FriendCommand extends Command {
-    private final FriendManager friendManager = Demise.INSTANCE.getFriendManager();
-
     @Override
     public String[] getAliases() {
         return new String[]{"friend", "f", "fr"};
     }
 
     @Override
-    public void execute(final String[] args) throws CommandExecutionException {
-        if (args.length < 2) {
-            showUsage();
+    public void execute(final String[] arguments) throws CommandExecutionException {
+        if (arguments.length == 1) {
+            ChatUtils.sendMessageClient("Usage: " + getUsage());
             return;
         }
-
-        String operation = args[1].toLowerCase();
-        switch (operation) {
-            case "clear" -> handleClear();
-            case "list" -> handleList();
-            case "add", "remove" -> {
-                if (args.length != 3) {
-                    throw new CommandExecutionException(getUsage());
+        final String lowerCase = arguments[1].toLowerCase();
+        if (arguments.length == 2) {
+            switch (lowerCase) {
+                case "clear": {
+                    ChatUtils.sendMessageClient("Cleared all friended players");
+                    Demise.INSTANCE.getFriendManager().getFriends().clear();
+                    break;
                 }
-                handlePlayerOperation(operation, args[2]);
+                case "list": {
+                    if (!Demise.INSTANCE.getFriendManager().getFriends().isEmpty()) {
+                        ChatUtils.sendMessageClient("Friend§7[§f" + Demise.INSTANCE.getFriendManager().getFriends().size() + "§7]§f : §a" + Demise.INSTANCE.getFriendManager().getFriendsName());
+                        break;
+                    }
+                    ChatUtils.sendMessageClient("The friend list is empty");
+                    break;
+                }
             }
-            default -> throw new CommandExecutionException(getUsage());
-        }
-    }
-
-    private void showUsage() {
-        ChatUtils.sendMessageClient("Usage: " + getUsage());
-    }
-
-    private void handleClear() {
-        friendManager.getFriends().clear();
-        ChatUtils.sendMessageClient("Cleared all friended players");
-    }
-
-    private void handleList() {
-        if (friendManager.getFriends().isEmpty()) {
-            ChatUtils.sendMessageClient("The friend list is empty");
-            return;
-        }
-
-        String message = String.format("Friend§7[§f%d§7]§f : §a%s",
-                friendManager.getFriends().size(),
-                friendManager.getFriendsName());
-        ChatUtils.sendMessageClient(message);
-    }
-
-    private void handlePlayerOperation(String operation, String playerName) {
-        if (playerName.contains(mc.thePlayer.getName())) {
-            ChatUtils.sendMessageClient("§c§lNO");
-            return;
-        }
-
-        if (operation.equalsIgnoreCase("list")) {
-            friendManager.add(playerName);
-            ChatUtils.sendMessageClient("§b" + playerName + " §7has been §2friended");
         } else {
-            friendManager.remove(playerName);
-            ChatUtils.sendMessageClient("§b" + playerName + " §7has been §2unfriended");
+            if (arguments.length != 3) {
+                throw new CommandExecutionException(this.getUsage());
+            }
+            if (arguments[2].contains(mc.thePlayer.getName())) {
+                ChatUtils.sendMessageClient("§c§lNO");
+                return;
+            }
+            final String lowerCase2 = arguments[1].toLowerCase();
+            switch (lowerCase2) {
+                case "add": {
+                    ChatUtils.sendMessageClient("§b" + arguments[2] + " §7has been §2friended");
+                    Demise.INSTANCE.getFriendManager().add(arguments[2]);
+                    break;
+                }
+                case "remove": {
+                    ChatUtils.sendMessageClient("§b" + arguments[2] + " §7has been §2unfriended");
+                    Demise.INSTANCE.getFriendManager().remove(arguments[2]);
+                    break;
+                }
+            }
         }
     }
 

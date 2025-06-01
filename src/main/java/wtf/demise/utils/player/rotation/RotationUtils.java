@@ -17,6 +17,7 @@ import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.SmoothMode;
@@ -338,18 +339,46 @@ public class RotationUtils implements InstanceAccess {
         return (float) hypot(abs(getAngleDifference(a[0], b[0])), abs(a[1] - b[1]));
     }
 
-    public static MovingObjectPosition rayTrace(float[] rot, double blockReachDistance, float partialTicks) {
-        Vec3 vec3 = mc.thePlayer.getPositionEyes(partialTicks);
-        Vec3 vec31 = mc.thePlayer.getLookCustom(rot[0], rot[1]);
-        Vec3 vec32 = vec3.addVector(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance);
-        return mc.theWorld.rayTraceBlocks(vec3, vec32, false, true, true);
+    public static MovingObjectPosition rayTraceSafe(float[] rot, double reach, float partialTicks) {
+        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
+        Vec3 direction = mc.thePlayer.getLookCustom(rot[0], rot[1]);
+        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
+
+        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+
+        if (result == null) {
+            return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
+        }
+
+        return result;
     }
 
-    public static MovingObjectPosition rayTrace(double blockReachDistance, float partialTicks) {
-        Vec3 vec3 = mc.thePlayer.getPositionEyes(partialTicks);
-        Vec3 vec31 = mc.thePlayer.getLookCustom(currentRotation[0], currentRotation[1]);
-        Vec3 vec32 = vec3.addVector(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance);
-        return mc.theWorld.rayTraceBlocks(vec3, vec32, false, true, true);
+    public static MovingObjectPosition rayTraceSafe(double reach, float partialTicks) {
+        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
+        Vec3 direction = mc.thePlayer.getLookCustom(currentRotation[0], currentRotation[1]);
+        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
+
+        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+
+        if (result == null) {
+            return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
+        }
+
+        return result;
+    }
+
+    public static MovingObjectPosition rayTrace(float[] rot, double reach, float partialTicks) {
+        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
+        Vec3 direction = mc.thePlayer.getLookCustom(rot[0], rot[1]);
+        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
+        return mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+    }
+
+    public static MovingObjectPosition rayTrace(double reach, float partialTicks) {
+        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
+        Vec3 direction = mc.thePlayer.getLookCustom(currentRotation[0], currentRotation[1]);
+        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
+        return mc.theWorld.rayTraceBlocks(from, to, false, true, true);
     }
 
     public static float[] getRotations(BlockPos blockPos, EnumFacing enumFacing) {

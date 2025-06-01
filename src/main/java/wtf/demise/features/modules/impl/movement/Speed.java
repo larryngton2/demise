@@ -24,7 +24,7 @@ import static wtf.demise.utils.player.MoveUtil.getBaseMoveSpeed;
 
 @ModuleInfo(name = "Speed", description = "Makes you go faster.", category = ModuleCategory.Movement)
 public class Speed extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC"}, "Strafe Hop", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC", "Miniblox"}, "Strafe Hop", this);
     private final BoolValue smooth = new BoolValue("Smooth", false, this, () -> mode.is("Strafe Hop"));
     private final BoolValue ground = new BoolValue("Ground", true, this, () -> mode.is("Strafe Hop"));
     private final BoolValue air = new BoolValue("Air", true, this, () -> mode.is("Strafe Hop"));
@@ -36,6 +36,7 @@ public class Speed extends Module {
     private final BoolValue timer = new BoolValue("Timer", false, this, () -> mode.is("Intave") && intaveMode.is("Fast"));
     private final SliderValue iBoostMulti = new SliderValue("Boost multiplier", 1, 0f, 1, 0.1f, this, () -> mode.is("Intave") && intaveMode.is("Safe"));
     private final ModeValue bmcMode = new ModeValue("BMC mode", new String[]{"Low", "Ground"}, "Low", this, () -> mode.is("BMC"));
+    private final SliderValue hopTicks = new SliderValue("Hop ticks", 5, 1, 6, 1, this, () -> mode.is("Miniblox"));
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.01f, this, minSpeedLimiter::get);
@@ -240,6 +241,43 @@ public class Speed extends Module {
                     MoveUtil.strafe(0.221);
                 }
                 break;
+            case "Miniblox": {
+                if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
+                    mc.thePlayer.jump();
+                }
+
+                switch (mc.thePlayer.offGroundTicks) {
+                    case 1: {
+                        switch ((int) hopTicks.get()) {
+                            case 1:
+                                mc.thePlayer.motionY -= 0.76;
+                                break;
+                            case 2:
+                                mc.thePlayer.motionY -= 0.52;
+                                break;
+                            case 3:
+                                mc.thePlayer.motionY -= 0.452335182447;
+                                break;
+                            case 4:
+                                mc.thePlayer.motionY -= 0.322335182447;
+                                break;
+                            case 5:
+                                mc.thePlayer.motionY -= 0.232335182447;
+                                break;
+                            case 6:
+                                mc.thePlayer.motionY -= 0.162335182447;
+                                break;
+                        }
+                    }
+                    break;
+
+                    case 3: {
+                        mc.thePlayer.motionY -= 0.1523351824467155;
+                    }
+                    break;
+                }
+            }
+            break;
         }
     }
 
@@ -252,10 +290,43 @@ public class Speed extends Module {
 
     @EventTarget
     public void onMotion(MotionEvent e) {
-        if (mode.is("NCP") && ncpMode.is("BHop")) {
-            double xDist = mc.thePlayer.posX - mc.thePlayer.prevPosX;
-            double zDist = mc.thePlayer.posZ - mc.thePlayer.prevPosZ;
-            lastDist = Math.sqrt(xDist * xDist + zDist * zDist);
+        switch (mode.get()) {
+            case "NCP":
+                if (ncpMode.is("BHop")) {
+                    double xDist = mc.thePlayer.posX - mc.thePlayer.prevPosX;
+                    double zDist = mc.thePlayer.posZ - mc.thePlayer.prevPosZ;
+                    lastDist = Math.sqrt(xDist * xDist + zDist * zDist);
+                }
+                break;
+            case "Miniblox": {
+                if (MoveUtil.isMoving()) {
+                    if (mc.thePlayer.onGround) {
+                        switch ((int) hopTicks.get()) {
+                            case 1:
+                                MoveUtil.strafe(0.07);
+                                break;
+                            case 2:
+                                MoveUtil.strafe(0.08);
+                                break;
+                            case 3:
+                                MoveUtil.strafe(0.09);
+                                break;
+                            case 4:
+                                MoveUtil.strafe(0.1);
+                                break;
+                            case 5:
+                                MoveUtil.strafe(0.115);
+                                break;
+                            case 6:
+                                MoveUtil.strafe(0.13);
+                                break;
+                        }
+                    } else {
+                        MoveUtil.strafe(0.35);
+                    }
+                }
+            }
+            break;
         }
     }
 

@@ -44,7 +44,7 @@ public class Demise {
     public static final Demise INSTANCE = new Demise();
     public final String clientName = "demise";
     public final String version = "alpha";
-    public final String cloud = "https://larryngton2.github.io/demise-online-cfgs/";
+    public final String cloud = "https://larryngton2.github.io/demise-cloud/";
 
     private final File mainDir = new File(Minecraft.getMinecraft().mcDataDir, clientName);
 

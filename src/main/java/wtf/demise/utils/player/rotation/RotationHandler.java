@@ -1,6 +1,7 @@
 package wtf.demise.utils.player.rotation;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
@@ -10,7 +11,6 @@ import org.apache.commons.lang3.Range;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.player.AutoClutch;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -18,7 +18,6 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SmoothMode;
@@ -69,7 +68,7 @@ public class RotationHandler implements InstanceAccess {
         decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
 
         // who the fuck will use strict strafe on scaffold anyway
-        if (module.getClass() == Scaffold.class || module.getClass() == AutoClutch.class) {
+        if (module.getClass() == Scaffold.class) {
             movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent"}, "None", module);
         } else {
             movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", module);
@@ -82,8 +81,10 @@ public class RotationHandler implements InstanceAccess {
     }
 
     private final TimerUtils shortStopTimer = new TimerUtils();
-    private float randPitchSpeed;
+    @Setter
     private float randYawSpeed;
+    @Setter
+    private float randPitchSpeed;
     private int maxThresholdReachAttempts;
 
     /**

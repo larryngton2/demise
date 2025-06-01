@@ -1,5 +1,6 @@
 package wtf.demise.features.modules.impl.player;
 
+import lombok.AllArgsConstructor;
 import net.minecraft.block.*;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.init.Blocks;
@@ -28,7 +29,6 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
@@ -49,10 +49,10 @@ public class Scaffold extends Module {
     private final SliderValue minSearch = new SliderValue("Min search", 0.1f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final SliderValue maxSearch = new SliderValue("Max search", 0.9f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final BoolValue clutch = new BoolValue("Clutch", false, this);
-    private final BoolValue sneak = new BoolValue("Sneak", false, this, clutch::get);
     private final ModeValue clutchRotMode = new ModeValue("Clutch rotation mode", new String[]{"Normal", "Center"}, "Center", this, clutch::get);
     private final SliderValue minCSearch = new SliderValue("Min C search", 0.1f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
     private final SliderValue maxCSearch = new SliderValue("Max C search", 0.9f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
+    private final BoolValue instantRots = new BoolValue("Instant clutch rots", false, this, clutch::get);
     private final RotationHandler rotationHandler = new RotationHandler(this);
 
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
@@ -74,8 +74,8 @@ public class Scaffold extends Module {
     private final SliderValue blocksToSneak = new SliderValue("Blocks To Sneak", 7, 1, 8, this, () -> addons.isEnabled("Sneak"));
     private final SliderValue sneakDistance = new SliderValue("Sneak Distance", 0, 0, 0.5f, 0.01f, this, () -> addons.isEnabled("Sneak"));
     private final BoolValue onlySneakOnGround = new BoolValue("Only sneak on ground", true, this, () -> addons.isEnabled("Sneak"));
-    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
-    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "Watchdog", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
+    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> !mode.is("Telly"));
     private final SliderValue pullDownMotion = new SliderValue("PullDown motion", 0.95f, 0.5f, 1, 0.01f, this, () -> towerMove.is("PullDown"));
 
     private BlockPos previousBlock;
@@ -90,8 +90,7 @@ public class Scaffold extends Module {
     private float hypixelRandomYaw;
     private boolean isOnRightSide;
     private float yaw, pitch;
-    private boolean startClutch;
-    private final TimerUtils clutchTime = new TimerUtils();
+    private boolean clutching;
 
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
             Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
@@ -127,7 +126,7 @@ public class Scaffold extends Module {
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
     }
 
-    private void handleScaffolding(boolean place) {
+    private void updateTarget() {
         mc.thePlayer.inventory.currentItem = getBlockSlot();
         SpoofSlotUtils.startSpoofing(oldSlot);
 
@@ -155,17 +154,8 @@ public class Scaffold extends Module {
 
         data = findBlock(targetBlock);
 
-        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
+        if (isEnabled(KillAura.class) && KillAura.currentTarget != null)
             return;
-
-        if (tower.canDisplay() && towering() && tower.is("Watchdog") && !placing) {
-            BlockPos xPos = data.blockPos.add(1, 0, 0), zPos = data.blockPos.add(0, 0, 1);
-            if (!PlayerUtils.isAir(xPos)) {
-                data.blockPos = xPos;
-            } else if (!PlayerUtils.isAir(zPos)) {
-                data.blockPos = zPos;
-            }
-        }
 
         if (mode.is("Telly") && mc.thePlayer.onGround) {
             tellyTicks = MathUtils.randomizeInt((int) minTellyTicks.get(), (int) maxTellyTicks.get());
@@ -181,14 +171,12 @@ public class Scaffold extends Module {
         if (tower.canDisplay() && (!tower.is("Jump") && towering() || !towerMove.is("Jump") && towerMoving())) {
             blocksPlaced = 0;
         }
+    }
 
-        boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
-        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
-        boolean shouldCorrect = isLeaningOffBlock && nextBlockIsAir;
-
+    private void updateRotations() {
         mc.entityRenderer.getMouseOver(1);
 
-        if (!mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
+        if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
             switch (rotations.get()) {
                 case "Normal": {
                     this.yaw = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[0];
@@ -239,61 +227,67 @@ public class Scaffold extends Module {
                     this.pitch = staticify.get() ? 77 : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
                 }
                 break;
-                case "Derp": {
-                    this.yaw += 30;
-                    this.pitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
-                }
-                break;
                 case "Reverse": {
                     this.yaw = MoveUtil.getYawFromKeybind() - 180;
                     this.pitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
                 }
                 break;
+                case "Derp": {
+                    this.yaw += 30;
+                    this.pitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                }
+                break;
             }
         }
+
+        float[] rotation = new float[]{yaw, pitch};
 
         if (clutch.get()) {
-            if (shouldCorrect) {
-                startClutch = true;
-            } else if (startClutch) {
-                clutchTime.reset();
-                startClutch = false;
-            }
+            MovingObjectPosition ray = RotationUtils.rayTraceSafe(rotation, 4.5f, 1);
 
-            if (startClutch || !clutchTime.hasTimeElapsed(200)) {
+            if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving()) {
                 Vec3 hitVec = getVec3(data);
 
-                if (PlayerUtils.blockNear(1)) {
-                    switch (clutchRotMode.get()) {
-                        case "Normal": {
-                            this.yaw = getBestRotation(data.blockPos, data.facing, minCSearch.get(), maxCSearch.get())[0];
-                            this.pitch = getBestRotation(data.blockPos, data.facing, minCSearch.get(), maxCSearch.get())[1];
-                        }
-                        break;
-                        case "Center": {
-                            this.yaw = RotationUtils.getRotations(hitVec)[0];
-                            this.pitch = RotationUtils.getRotations(hitVec)[1];
-                        }
-                        break;
-                    }
-                } else {
-                    this.yaw = RotationUtils.getRotations(hitVec)[0];
-                    this.pitch = RotationUtils.getRotations(hitVec)[1];
+                if (instantRots.get()) {
+                    rotationHandler.setRandYawSpeed(180);
+                    rotationHandler.setRandPitchSpeed(180);
                 }
-            }
-        }
 
-        if (tower.canDisplay() && tower.is("Watchdog") && towering()) {
-            yaw = RotationUtils.getRotations(getVec3(data))[0];
-            pitch = RotationUtils.getRotations(getVec3(data))[1];
+                switch (clutchRotMode.get()) {
+                    case "Normal": {
+                        this.yaw = getBestRotation(data.blockPos, data.facing, minCSearch.get(), maxCSearch.get())[0];
+                        this.pitch = getBestRotation(data.blockPos, data.facing, minCSearch.get(), maxCSearch.get())[1];
+                    }
+                    break;
+                    case "Center": {
+                        this.yaw = RotationUtils.getRotations(hitVec)[0];
+                        this.pitch = RotationUtils.getRotations(hitVec)[1];
+                    }
+                    break;
+                }
+
+                clutching = true;
+            } else {
+                clutching = false;
+            }
+        } else {
+            clutching = false;
         }
 
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
             rotationHandler.setRotation(new float[]{yaw, pitch});
+        }
+    }
 
-            if (place) {
-                place(data.blockPos, data.facing, getVec3(data));
-            }
+    @EventTarget
+    public void onAngle(AngleEvent e) {
+        updateTarget();
+        updateRotations();
+    }
+
+    private void place() {
+        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
+            place(data.blockPos, data.facing, getVec3(data));
         }
     }
 
@@ -303,8 +297,8 @@ public class Scaffold extends Module {
 
         rotationHandler.updateRotSpeed(e);
 
-        if (!addons.isEnabled("Ignore tick cycle") || (startClutch || !clutchTime.hasTimeElapsed(200))) {
-            handleScaffolding(true);
+        if (!addons.isEnabled("Ignore tick cycle") || (clutching && addons.isEnabled("Ray Trace"))) {
+            place();
         }
     }
 
@@ -318,12 +312,11 @@ public class Scaffold extends Module {
 
         if (addons.isEnabled("Ignore tick cycle")) {
             if (addons.isEnabled("Ray Trace")) {
-                if (!(startClutch || !clutchTime.hasTimeElapsed(200))) {
+                if (!clutching) {
                     placeAlternative();
-                    handleScaffolding(false);
                 }
             } else {
-                handleScaffolding(true);
+                place();
             }
         }
     }
@@ -396,10 +389,6 @@ public class Scaffold extends Module {
             } else {
                 e.setStrafe(-1.0f);
             }
-        }
-
-        if (mc.thePlayer.onGround && sneak.get() && (startClutch || !clutchTime.hasTimeElapsed(500))) {
-            e.setSneaking(true);
         }
 
         if (addons.isEnabled("Sneak")) {
@@ -489,22 +478,6 @@ public class Scaffold extends Module {
             return;
 
         if (tower.canDisplay()) {
-            if (tower.is("Watchdog")) {
-                if (!mc.thePlayer.isPotionActive(Potion.jump) && placed) {
-                    if (towering()) {
-                        MoveUtil.stopXZ();
-                        int valY = (int) Math.round((event.y % 1) * 10000);
-                        if (valY == 0) {
-                            mc.thePlayer.motionY = 0.42F;
-                        } else if (valY > 4000 && valY < 4300) {
-                            mc.thePlayer.motionY = 0.33;
-                        } else if (valY > 7000) {
-                            mc.thePlayer.motionY = 1 - mc.thePlayer.posY % 1;
-                        }
-                    }
-                }
-            }
-
             if (tower.is("NCP") && towering()) {
                 sendPacketNoEvent(new C08PacketPlayerBlockPlacement(null));
 
@@ -519,23 +492,6 @@ public class Scaffold extends Module {
         }
 
         if (towerMove.canDisplay()) {
-            if (towerMove.is("Watchdog")) {
-                if (MoveUtil.isMoving() && MoveUtil.getSpeed() > 0.1 && !mc.thePlayer.isPotionActive(Potion.jump)) {
-                    if (towerMoving()) {
-                        int valY = (int) Math.round((event.y % 1) * 10000);
-                        if (valY == 0) {
-                            mc.thePlayer.motionY = 0.42F;
-                            MoveUtil.strafe((float) 0.26 + MoveUtil.getSpeedEffect() * 0.03);
-                        } else if (valY > 4000 && valY < 4300) {
-                            mc.thePlayer.motionY = 0.33;
-                            MoveUtil.strafe((float) 0.26 + MoveUtil.getSpeedEffect() * 0.03);
-                        } else if (valY > 7000) {
-                            mc.thePlayer.motionY = 1 - mc.thePlayer.posY % 1;
-                        }
-                    }
-                }
-            }
-
             if (towerMove.is("NCP") && towerMoving()) {
                 sendPacketNoEvent(new C08PacketPlayerBlockPlacement(null));
 
@@ -735,7 +691,7 @@ public class Scaffold extends Module {
         return null;
     }
 
-    public static float[] getBestRotation(BlockPos blockPos, EnumFacing face, float min, float max) {
+    private float[] getBestRotation(BlockPos blockPos, EnumFacing face, float min, float max) {
         Vec3i faceVec = face.getDirectionVec();
 
         float minX, maxX, minY, maxY, minZ, maxZ;
@@ -776,7 +732,7 @@ public class Scaffold extends Module {
             maxZ = max;
         }
 
-        float[] bestRot = RotationUtils.getRotations(blockPos, face);
+        float[] bestRot = RotationUtils.getRotations(getVec3(data));
         double bestDist = RotationUtils.getRotationDifference(bestRot);
 
         for (float x = minX; x <= maxX; x += 0.01f) {
@@ -797,13 +753,9 @@ public class Scaffold extends Module {
         return bestRot;
     }
 
+    @AllArgsConstructor
     private static class PlaceData {
         public EnumFacing facing;
         public BlockPos blockPos;
-
-        PlaceData(EnumFacing enumFacing, BlockPos blockPos) {
-            this.facing = enumFacing;
-            this.blockPos = blockPos;
-        }
     }
 }

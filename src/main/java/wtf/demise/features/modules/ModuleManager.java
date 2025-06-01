@@ -9,6 +9,7 @@ import wtf.demise.features.modules.impl.exploit.*;
 import wtf.demise.features.modules.impl.exploit.Timer;
 import wtf.demise.features.modules.impl.legit.*;
 import wtf.demise.features.modules.impl.misc.*;
+import wtf.demise.features.modules.impl.misc.bloxdphysics.BloxdPhysics;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
@@ -40,13 +41,13 @@ public class ModuleManager {
     );
 
     private static final Set<Class<? extends Module>> PLAYER_MODULES = Set.of(
-        AntiVoid.class, AutoClutch.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class,
+        AntiVoid.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class,
             FastPlace.class, FastUse.class, Manager.class, NoFall.class, Scaffold.class, Stealer.class
     );
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
         AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
-            InventorySync.class, MurderMystery.class, Test.class, Twerk.class
+            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
