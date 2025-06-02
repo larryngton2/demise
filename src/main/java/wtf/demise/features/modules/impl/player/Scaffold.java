@@ -29,6 +29,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
@@ -44,8 +45,8 @@ public class Scaffold extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly"}, "Normal", this);
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));
     private final SliderValue maxTellyTicks = new SliderValue("Max Telly Ticks", 4, 1, 5, this, () -> mode.is("Telly"));
-    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "Hypixel", "GodBridge", "Derp", "Reverse"}, "Normal", this);
-    private final BoolValue staticify = new BoolValue("Static-ify", false, this, () -> !rotations.is("Normal") && !rotations.is("Center") && !rotations.is("Hypixel"));
+    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "GodBridge", "Derp", "Reverse"}, "Normal", this);
+    private final BoolValue staticify = new BoolValue("Static-ify", false, this, () -> !rotations.is("Normal") && !rotations.is("Center"));
     private final SliderValue minSearch = new SliderValue("Min search", 0.1f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final SliderValue maxSearch = new SliderValue("Max search", 0.9f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final BoolValue clutch = new BoolValue("Clutch", false, this);
@@ -83,11 +84,9 @@ public class Scaffold extends Module {
     private double onGroundY;
     private int oldSlot = -1;
     private int blocksPlaced;
-    private boolean placing;
     private int tellyTicks;
     public boolean placed;
     public PlaceData data;
-    private float hypixelRandomYaw;
     private boolean isOnRightSide;
     private float yaw, pitch;
     private boolean clutching;
@@ -120,9 +119,7 @@ public class Scaffold extends Module {
         SpoofSlotUtils.stopSpoofing();
 
         blocksPlaced = 0;
-        placing = false;
         tellyTicks = 0;
-        hypixelRandomYaw = 0;
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
     }
 
@@ -190,29 +187,6 @@ public class Scaffold extends Module {
                     this.pitch = RotationUtils.getRotations(hitVec)[1];
                 }
                 break;
-                case "Hypixel": {
-                    this.yaw = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0];
-                    this.pitch = getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
-
-                    if (MoveUtil.isMovingStraight()) {
-                        if (Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() - 126)) < Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() + 126))) {
-                            this.yaw = MoveUtil.getRawDirection() + (116 - hypixelRandomYaw);
-                        } else {
-                            this.yaw = MoveUtil.getRawDirection() - (116 - hypixelRandomYaw);
-                        }
-                    } else {
-                        if (Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() - 135)) < Math.abs(MathHelper.wrapAngleTo180_double(getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[0] - MoveUtil.getRawDirection() + 135))) {
-                            this.yaw = MoveUtil.getRawDirection() + (125 + hypixelRandomYaw);
-                        } else {
-                            this.yaw = MoveUtil.getRawDirection() - (125 + hypixelRandomYaw);
-                        }
-                    }
-                }
-
-                if (placing) {
-                    hypixelRandomYaw = MathUtils.randomizeFloat(0, 15);
-                }
-                break;
                 case "GodBridge": {
                     float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
 
@@ -243,7 +217,7 @@ public class Scaffold extends Module {
         float[] rotation = new float[]{yaw, pitch};
 
         if (clutch.get()) {
-            MovingObjectPosition ray = RotationUtils.rayTraceSafe(rotation, 4.5f, 1);
+            MovingObjectPosition ray = RotationUtils.rayTraceSafe(rotation, 4.5, 1);
 
             if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving()) {
                 Vec3 hitVec = getVec3(data);
@@ -335,7 +309,6 @@ public class Scaffold extends Module {
                         mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
                     }
 
-                    placing = true;
                     blocksPlaced += 1;
                     placed = true;
                 }
@@ -590,8 +563,6 @@ public class Scaffold extends Module {
     }
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
-        placing = false;
-
         if (!addons.isEnabled("Ray Trace")) {
             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, facing, hitVec)) {
                 if (addons.isEnabled("Swing")) {
@@ -600,7 +571,6 @@ public class Scaffold extends Module {
                 } else {
                     mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
                 }
-                placing = true;
                 blocksPlaced += 1;
                 placed = true;
             }
@@ -616,7 +586,6 @@ public class Scaffold extends Module {
                     } else {
                         mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
                     }
-                    placing = true;
                     blocksPlaced += 1;
                     placed = true;
                 }
@@ -734,6 +703,7 @@ public class Scaffold extends Module {
 
         float[] bestRot = RotationUtils.getRotations(getVec3(data));
         double bestDist = RotationUtils.getRotationDifference(bestRot);
+        boolean picked = false;
 
         for (float x = minX; x <= maxX; x += 0.01f) {
             for (float y = minY; y <= maxY; y += 0.01f) {
@@ -742,12 +712,17 @@ public class Scaffold extends Module {
                     Vec3 candidateWorld = candidateLocal.add(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
 
                     double diff = RotationUtils.getRotationDifference(candidateWorld);
-                    if (diff < bestDist) {
+                    if (diff < bestDist && RotationUtils.rayTraceSafe(bestRot, 4.5, 1).typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                         bestDist = diff;
                         bestRot = RotationUtils.getRotations(candidateWorld);
+                        picked = true;
                     }
                 }
             }
+        }
+
+        if (!picked) {
+            return RotationUtils.getRotations(getVec3(data));
         }
 
         return bestRot;

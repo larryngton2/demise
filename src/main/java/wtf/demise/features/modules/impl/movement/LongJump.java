@@ -53,21 +53,22 @@ public class LongJump extends Module {
                         jumped = true;
                     } else {
                         int maxTimer = 0;
+                        float yaw = (float) Math.toRadians(mc.thePlayer.rotationYaw);
 
                         switch (pauseTimes) {
                             case 0:
-                                mc.thePlayer.motionX = 1.9 * -Math.sin(MoveUtil.getDirection());
-                                mc.thePlayer.motionZ = 1.9 * Math.cos(MoveUtil.getDirection());
+                                mc.thePlayer.motionX = 1.9 * -Math.sin(yaw);
+                                mc.thePlayer.motionZ = 1.9 * Math.cos(yaw);
                                 maxTimer = 10;
                                 break;
                             case 1:
-                                mc.thePlayer.motionX = 1.285 * -Math.sin(MoveUtil.getDirection());
-                                mc.thePlayer.motionZ = 1.285 * Math.cos(MoveUtil.getDirection());
+                                mc.thePlayer.motionX = 1.285 * -Math.sin(yaw);
+                                mc.thePlayer.motionZ = 1.285 * Math.cos(yaw);
                                 maxTimer = 15;
                                 break;
                             case 2:
-                                mc.thePlayer.motionX = 1.1625 * -Math.sin(MoveUtil.getDirection());
-                                mc.thePlayer.motionZ = 1.1625 * Math.cos(MoveUtil.getDirection());
+                                mc.thePlayer.motionX = 1.1625 * -Math.sin(yaw);
+                                mc.thePlayer.motionZ = 1.1625 * Math.cos(yaw);
                                 maxTimer = 5;
                                 break;
                         }

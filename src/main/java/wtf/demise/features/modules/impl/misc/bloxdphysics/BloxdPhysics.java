@@ -11,12 +11,15 @@ import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "BloxdPhysics", category = ModuleCategory.Misc)
 public class BloxdPhysics extends Module {
+    private final BoolValue keepSprint = new BoolValue("KeepSprint", true, this);
+
     private final NoaPhysics bloxdPhysics = new NoaPhysics();
     private double jumpfunny = 0;
     private long jumpticks = System.currentTimeMillis();
@@ -64,9 +67,9 @@ public class BloxdPhysics extends Module {
         e.setStrafe(0);
         //e.setFriction(0);
 
-        mc.thePlayer.motionX = 0;
-        mc.thePlayer.motionZ = 0;
-        bloxdPhysics.gravityMul = ClickHandler.clickingNow && bloxdPhysics.velocityVector.y >= 0 ? 4d : 2d;
+        //mc.thePlayer.motionX = 0;
+        //mc.thePlayer.motionZ = 0;
+        bloxdPhysics.gravityMul = ClickHandler.clickingNow && !keepSprint.get() && bloxdPhysics.velocityVector.y >= 0 ? 4d : 2d;
 
         if (mc.theWorld.isBlockLoaded(mc.thePlayer.getPosition())) {
             mc.thePlayer.motionY = bloxdPhysics.getMotionForTick().y * (1 / 30d);

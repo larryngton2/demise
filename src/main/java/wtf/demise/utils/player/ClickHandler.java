@@ -106,8 +106,9 @@ public class ClickHandler implements InstanceAccess {
             handleFailSwing();
         } else {
             attack();
-            clickingNow = true;
         }
+
+        clickingNow = true;
     }
 
     @EventTarget
