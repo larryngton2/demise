@@ -29,6 +29,7 @@ import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -241,7 +242,7 @@ public class FakeLag extends Module {
     @EventTarget
     public void onMove(MoveInputEvent e) {
         if (smart.get() && shouldLag() && attemptingToStrafe() && modifyMovementYaw.get()) {
-            MoveUtil.fixMovement(e, RotationUtils.shouldRotate() ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw, yaw);
+            MoveUtil.fixMovement(e, RotationManager.shouldRotate() ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw, yaw);
         }
     }
 

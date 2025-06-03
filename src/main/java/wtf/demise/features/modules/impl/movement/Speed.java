@@ -90,16 +90,16 @@ public class Speed extends Module {
         switch (yawOffsetMode.get()) {
             case "Ground":
                 if (mc.thePlayer.onGround) {
-                    RotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                    //RotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
                 }
                 break;
             case "Air":
                 if (!mc.thePlayer.onGround) {
-                    RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                    //RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
                 }
                 break;
             case "Constant":
-                RotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                //RotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
                 break;
         }
 

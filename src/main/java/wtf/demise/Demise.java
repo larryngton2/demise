@@ -27,7 +27,9 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BadPacketsComponent;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.PingSpoofComponent;
+import wtf.demise.utils.player.rotation.OldRotationUtils;
 import wtf.demise.utils.player.rotation.RotationUtils;
+import wtf.demise.utils.player.rotation.RotationManager;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -140,6 +142,8 @@ public class Demise {
         eventManager.register(new CustomWidgets());
         eventManager.register(new ClickHandler());
         eventManager.register(new MathUtils());
+        eventManager.register(new RotationManager());
+        eventManager.register(new OldRotationUtils());
 
         LOGGER.info("Event handlers registered.");
     }

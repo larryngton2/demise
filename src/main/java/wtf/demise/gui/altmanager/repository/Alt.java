@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.altmanager.login.AltLoginThread;
 import wtf.demise.gui.altmanager.login.AltType;
 import wtf.demise.gui.altmanager.login.SessionUpdatingAltLoginListener;
@@ -320,17 +321,13 @@ public class Alt {
         repository.selectAlt(selected, this, null);
     }
 
-    private static final float MODEL_SCALE_FACTOR = 0.71F;
-    private static final int MODEL_BOTTOM_MARGIN = 24;
-
     static final float FHD_ANIMATION_STEP = 5;
     private static final int UPDATES_PER_SECOND = 100;
 
     private static final int UPDATE_MILLIS_DELAY = 1_000 / UPDATES_PER_SECOND;
 
-    private static final int DEFAULT_COLOR = new Color(0, 0, 0, 75).getRGB();
-    private static final int SELECTED_COLOR = new Color(0, 0, 0, 100).getRGB();
-    private static final int TEXT_DEFAULT_COLOR = 0xFF868386;
+    private static final int DEFAULT_COLOR = Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor();
+    private static final int SELECTED_COLOR = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor()).darker().getRGB();
     private static final int TEXT_SELECTED_COLOR = new Color(198, 198, 198).getRGB();
     private static final int SUCCESS_LOGIN_COLOR = 0x6E8D3D;
     private static final int FAILED_LOGIN_COLOR = 0x9E3939;

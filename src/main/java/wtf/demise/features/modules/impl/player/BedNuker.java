@@ -90,7 +90,7 @@ public class BedNuker extends Module {
         if (bedPos != null) {
             if (rotate) {
                 float[] rot = RotationUtils.getRotationToBlock(bedPos, getEnumFacing(bedPos));
-                RotationUtils.setRotation(rot);
+                //RotationUtils.setRotation(rot);
                 rotate = false;
             }
             mine(bedPos);

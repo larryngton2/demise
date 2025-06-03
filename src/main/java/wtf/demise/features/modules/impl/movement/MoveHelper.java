@@ -15,6 +15,7 @@ import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -22,6 +23,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+//todo yeah
 @ModuleInfo(name = "MoveHelper", description = "Assists you with movement in combat.", category = ModuleCategory.Movement)
 public class MoveHelper extends Module {
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
@@ -39,7 +41,7 @@ public class MoveHelper extends Module {
 
         SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(movementInput, 1, 11);
 
-        simulatedSelf.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < 11; i++) {
             simulatedSelf.tick();

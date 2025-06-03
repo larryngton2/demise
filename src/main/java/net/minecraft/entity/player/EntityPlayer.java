@@ -47,6 +47,7 @@ import net.minecraft.world.*;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.features.modules.impl.combat.Velocity;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Collection;
@@ -931,7 +932,7 @@ public abstract class EntityPlayer extends EntityLivingBase {
                         Velocity velocity = Demise.INSTANCE.getModuleManager().getModule(Velocity.class);
 
                         if (i > 0 || (velocity.isEnabled() && velocity.mode.is("Intave") && velocity.intaveMode.is("Reduce") && this == Minecraft.getMinecraft().thePlayer && this.hurtTime != 0)) {
-                            float yaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : this.rotationYaw;
+                            float yaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : this.rotationYaw;
 
                             targetEntity.addVelocity(-MathHelper.sin(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F, 0.1D, MathHelper.cos(yaw * (float) Math.PI / 180.0F) * (float) i * 0.5F);
 

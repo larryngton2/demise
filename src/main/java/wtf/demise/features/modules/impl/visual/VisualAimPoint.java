@@ -14,6 +14,7 @@ import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -59,7 +60,7 @@ public class VisualAimPoint extends Module {
 
     @EventTarget
     public void onRender3D(Render3DEvent e) {
-        if (onlySilent.get() && !RotationUtils.shouldRotate()) {
+        if (onlySilent.get() && !RotationManager.shouldRotate()) {
             return;
         }
 

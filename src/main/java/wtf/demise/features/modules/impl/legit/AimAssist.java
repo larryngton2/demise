@@ -16,6 +16,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -65,7 +66,7 @@ public class AimAssist extends Module {
     @EventTarget
     public void onGameEvent(GameEvent e) {
         if (target != null) {
-            RotationUtils.enabled = true;
+            RotationManager.enabled = true;
         }
     }
 

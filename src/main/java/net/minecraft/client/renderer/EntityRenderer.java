@@ -77,6 +77,7 @@ import org.lwjglx.opengl.GLContext;
 import org.lwjglx.util.glu.Project;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.MouseOverEvent;
+import wtf.demise.events.impl.player.MouseMoveEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.events.impl.render.ViewBobbingEvent;
 import wtf.demise.features.modules.impl.visual.Atmosphere;
@@ -1005,8 +1006,12 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             mc.mouseHelper.mouseXYChange();
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
-            float f2 = (float) mc.mouseHelper.deltaX * f1;
-            float f3 = (float) mc.mouseHelper.deltaY * f1;
+
+            MouseMoveEvent mouseMoveEvent = new MouseMoveEvent(mc.mouseHelper.deltaX, mc.mouseHelper.deltaY);
+            Demise.INSTANCE.getEventManager().call(mouseMoveEvent);
+
+            float f2 = (float) mouseMoveEvent.getDeltaX() * f1;
+            float f3 = (float) mouseMoveEvent.getDeltaY() * f1;
             int i = 1;
 
             if (mc.gameSettings.invertMouse) {

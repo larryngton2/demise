@@ -29,7 +29,6 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
@@ -249,7 +248,7 @@ public class Scaffold extends Module {
         }
 
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            rotationHandler.setRotation(new float[]{yaw, pitch});
+            rotationHandler.setRotation(new float[]{yaw, pitch}, true);
         }
     }
 
@@ -278,12 +277,6 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onGameUpdate(GameEvent e) {
-        // this is needed because when you rotate onUpdate mc.objectMouseOver breaks
-        // because RotationUtils tries to rotate back to your camera yaw/pitch
-        if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            RotationUtils.enabled = true;
-        }
-
         if (addons.isEnabled("Ignore tick cycle")) {
             if (addons.isEnabled("Ray Trace")) {
                 if (!clutching) {

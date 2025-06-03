@@ -34,7 +34,10 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
+
+import java.util.Objects;
 
 public class EntityPlayerSP extends AbstractClientPlayer {
     public final NetHandlerPlayClient sendQueue;
@@ -159,12 +162,15 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             float yaw = motionEvent.getYaw();
             float pitch = motionEvent.getPitch();
 
-            if (RotationUtils.currentRotation != null) {
-                RotationUtils.previousRotation = RotationUtils.currentRotation;
-                yaw = RotationUtils.currentRotation[0];
-                pitch = RotationUtils.currentRotation[1];
+            if (RotationManager.shouldRotate()) {
+                RotationManager.previousRotation = RotationManager.currentRotation;
+
+                float[] rot = Objects.requireNonNullElse(RotationManager.currentRotation, mc.thePlayer.getRotation());
+
+                yaw = rot[0];
+                pitch = rot[1];
             } else {
-                RotationUtils.previousRotation = new float[]{yaw, pitch};
+                RotationManager.previousRotation = new float[]{yaw, pitch};
             }
 
             double d3 = (yaw - this.lastReportedYaw);
@@ -670,5 +676,9 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             this.capabilities.isFlying = false;
             this.sendPlayerAbilities();
         }
+    }
+
+    public float[] getRotation() {
+        return new float[] {this.rotationYaw, this.rotationPitch};
     }
 }

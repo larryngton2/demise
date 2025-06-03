@@ -31,6 +31,7 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.*;
 import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -85,7 +86,7 @@ public class KillAura extends Module {
     private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
-    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift", "Dynamic"}, "None", this);
+    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift"}, "None", this);
     private final BoolValue notOnFirstHit = new BoolValue("Not on first hit", false, this, () -> !offsetMode.is("None"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
@@ -715,65 +716,13 @@ public class KillAura extends Module {
         return new float[]{yaw, pitch};
     }
 
-    private void gaussian() {
-        double minXZ = -0.4;
-        double maxXZ = 0.4;
-        double minY = -2;
-        double maxY = 0.4;
-
-        double meanXZ = (minXZ + maxXZ) / 2;
-        double stdDevXZ = (maxXZ - minXZ) / 4;
-        double meanY = (minY + maxY) / 2;
-        double stdDevY = (maxY - minY) / 4;
-
-        double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
-        double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
-
-        double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
-        double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
-        double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
-
-        if (shouldRandomize) {
-            offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-
-            lastXOffset = (float) xOffset;
-            lastYOffset = (float) yOffset;
-            lastZOffset = (float) zOffset;
-        } else {
-            offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-        }
-    }
-
-    private void noise() {
-        double minXZ = -0.4;
-        double maxXZ = 0.4;
-        double minY = -2;
-        double maxY = 0.4;
-
-        double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
-        double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
-
-        double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
-        double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
-        double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
-
-        if (shouldRandomize) {
-            offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-
-            lastXOffset = (float) xOffset;
-            lastYOffset = (float) yOffset;
-            lastZOffset = (float) zOffset;
-        } else {
-            offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
-        }
-    }
     @EventTarget
     public void onMove(MoveEvent e) {
         predictProcesses.clear();
 
         SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, simulatedMotionMulti.get());
 
-        simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedPlayer.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < predictTicks.get(); i++) {
             simulatedPlayer.tick();

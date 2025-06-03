@@ -22,8 +22,6 @@ import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SmoothMode;
 
-import static wtf.demise.utils.player.rotation.RotationUtils.rotDiffBuildUp;
-
 @Getter
 public class RotationHandler implements InstanceAccess {
     final ModeValue smoothMode;
@@ -38,17 +36,19 @@ public class RotationHandler implements InstanceAccess {
     final SliderValue maxRange;
     final SliderValue decrementPerCycle;
     final SliderValue midpoint;
-    final ModeValue movementFix;
+    final BoolValue movementFix;
     final BoolValue shortStop;
     final SliderValue shortStopDuration;
     final SliderValue rotationDiffBuildUpToStop;
     final SliderValue maxThresholdAttemptsToStop;
+    final BoolValue silent;
     private EntityLivingBase target;
     private final Module module;
 
     public RotationHandler(Module module) {
         this.module = module;
 
+        silent = new BoolValue("Silent", true, module);
         smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Bezier", "None"}, "Linear", module);
         accelerate = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None"));
         imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None"));
@@ -57,23 +57,11 @@ public class RotationHandler implements InstanceAccess {
         pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         midpoint = new SliderValue("Midpoint", 0.8f, 0.01f, 1, 0.01f, module, () -> smoothMode.is("Bezier"));
-
-        if (module.getClass() == KillAura.class) {
-            target = KillAura.currentTarget;
-        }
-
         distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> !smoothMode.is("None") && module.getClass() == KillAura.class);
         minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
         maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
         decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
-
-        // who the fuck will use strict strafe on scaffold anyway
-        if (module.getClass() == Scaffold.class) {
-            movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent"}, "None", module);
-        } else {
-            movementFix = new ModeValue("Movement fix", new String[]{"None", "Silent", "Strict"}, "None", module);
-        }
-
+        movementFix = new BoolValue("Movement fix", false, module);
         shortStop = new BoolValue("Short stop", false, module);
         shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, shortStop::get);
         rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, shortStop::get);
@@ -87,12 +75,12 @@ public class RotationHandler implements InstanceAccess {
     private float randPitchSpeed;
     private int maxThresholdReachAttempts;
 
-    /**
-     * best to call on AngleEvent
-     */
     public void setRotation(float[] targetRotation) {
+        setRotation(targetRotation, false);
+    }
+
+    public void setRotation(float[] targetRotation, boolean old) {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
-        MovementCorrection correction = MovementCorrection.valueOf(movementFix.get());
 
         float hSpeed = randYawSpeed;
         float vSpeed = randPitchSpeed;
@@ -123,7 +111,11 @@ public class RotationHandler implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
-        RotationUtils.setRotation(targetRotation, correction, hSpeed, vSpeed, midpoint.get(), accelerate.get(), mode);
+        if (!old) {
+            RotationManager.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed, midpoint.get(), accelerate.get(), mode, silent.get());
+        } else {
+            OldRotationUtils.setRotation(targetRotation, movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None, hSpeed, vSpeed, midpoint.get(), accelerate.get(), mode);
+        }
     }
 
     public float[] getSimpleRotationsToEntity(Entity entity) {
@@ -157,7 +149,7 @@ public class RotationHandler implements InstanceAccess {
             return true;
         }
 
-        if (Math.abs(rotDiffBuildUp) < rotationDiffBuildUpToStop.get()) return false;
+        if (Math.abs(RotationManager.rotDiffBuildUp) < rotationDiffBuildUpToStop.get()) return false;
 
         if (maxThresholdReachAttempts < maxThresholdAttemptsToStop.get()) {
             maxThresholdReachAttempts++;

@@ -86,7 +86,7 @@ public class Phase extends Module {
                             setY = true;
                         }
 
-                        RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw, 89.9f}, MovementCorrection.Silent);
+                        //RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw, 89.9f}, MovementCorrection.Silent);
 
                         if (startY - mc.thePlayer.posY > 2) {
                             timer.reset();

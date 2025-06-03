@@ -40,6 +40,7 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.InventoryUtils;
 import wtf.demise.utils.player.MovementCorrection;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
@@ -83,7 +84,7 @@ public class Stealer extends Module {
     public void rotate(BlockPos blockPos, EnumFacing enumFacing) {
         rotation = RotationUtils.getRotations(blockPos, enumFacing);
 
-        RotationUtils.setRotation(rotation, MovementCorrection.Silent, 180, 180);
+        //RotationUtils.setRotation(rotation, MovementCorrection.Silent, 180, 180);
     }
 
     @Override
@@ -110,7 +111,7 @@ public class Stealer extends Module {
                     for (TileEntity chest : tileEntityList()) {
                         if (!posList.contains(chest.getPos()) && timerAura.hasTimeElapsed(300)) {
                             rotate(chest.getPos(), Block.getFacingDirection(chest.getPos()));
-                            if (RotationUtils.rayTrace(RotationUtils.currentRotation, range.get(), 1).getBlockPos().equals(chest.getPos()) && (chest instanceof TileEntityChest || brewingStand.get() && chest instanceof TileEntityBrewingStand || furnace.get() && chest instanceof TileEntityFurnace)) {
+                            if (RotationUtils.rayTrace(RotationManager.currentRotation, range.get(), 1).getBlockPos().equals(chest.getPos()) && (chest instanceof TileEntityChest || brewingStand.get() && chest instanceof TileEntityBrewingStand || furnace.get() && chest instanceof TileEntityFurnace)) {
                                 mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), chest.getPos(), Block.getFacingDirection(chest.getPos()), getVec3(chest.getPos()));
                                 posList.add(chest.getPos());
                                 timerAura.reset();
@@ -129,7 +130,7 @@ public class Stealer extends Module {
                                         prevItem = mc.thePlayer.inventory.currentItem;
                                         mc.thePlayer.inventory.currentItem = getBlockSlot();
                                         rotate(posList.get(chestIndex), Block.getFacingDirection(posList.get(chestIndex)));
-                                        if (RotationUtils.rayTrace(RotationUtils.currentRotation, range.get(), 1).getBlockPos().equals(posList.get(chestIndex))) {
+                                        if (RotationUtils.rayTrace(RotationManager.currentRotation, range.get(), 1).getBlockPos().equals(posList.get(chestIndex))) {
                                             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), posList.get(chestIndex).add(0, 1, 0), Block.getFacingDirection(posList.get(chestIndex).add(0, 1, 0)), getVec3(posList.get(chestIndex).add(0, 1, 0)))) {
                                                 mc.thePlayer.swingItem();
                                             }

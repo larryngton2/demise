@@ -19,6 +19,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
 
@@ -164,7 +165,7 @@ public class TimerRange extends Module {
 
         SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
 
-        simulatedPlayer.rotationYaw = RotationUtils.currentRotation != null ? RotationUtils.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedPlayer.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < (int) (Math.max(attackTimer.get(), 1)); i++) {
             simulatedPlayer.tick();

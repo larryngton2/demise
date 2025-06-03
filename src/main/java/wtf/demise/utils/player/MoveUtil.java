@@ -13,6 +13,7 @@ import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
@@ -507,7 +508,7 @@ public class MoveUtil implements InstanceAccess {
         final float forward = e.getForward();
         final float strafe = e.getStrafe();
 
-        final double angle = MathHelper.wrapAngleTo180_double(RotationUtils.currentRotation[0] - 180);
+        final double angle = MathHelper.wrapAngleTo180_double(RotationManager.currentRotation[0] - 180);
         if (forward == 0 && strafe == 0) {
             return;
         }
