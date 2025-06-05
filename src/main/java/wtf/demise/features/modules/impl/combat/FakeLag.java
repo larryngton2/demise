@@ -320,7 +320,7 @@ public class FakeLag extends Module {
                 targetHits = 0;
             }
 
-            if (targetHits > 2 && PlayerUtils.getDistToTargetFromMouseOver(mc.thePlayer) > 3) {
+            if (targetHits > 2 && PlayerUtils.getDistToTargetFromMouseOver(target) > 3) {
                 return true;
             }
         }

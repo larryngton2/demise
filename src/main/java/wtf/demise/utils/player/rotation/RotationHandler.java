@@ -11,7 +11,6 @@ import org.apache.commons.lang3.Range;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;

@@ -34,7 +34,7 @@ public class AntiBot extends Module {
             new BoolValue("Matrix Armor", false),
             new BoolValue("HYT Get Name", false),
             new BoolValue("Hypixel", false),
-            new BoolValue("Miniblox", false))
+            new BoolValue("Simple", false))
             , this);
     private final ModeValue hytGetNameModes = new ModeValue("GetName Mode", new String[]{"Bw4v4", "Bw1v1", "Bw32", "Bw16"}, "Bw4v4", this, () -> options.isEnabled("HYT Get Name"));
     public final ArrayList<EntityPlayer> bots = new ArrayList<>();
@@ -179,9 +179,9 @@ public class AntiBot extends Module {
             }
         }
 
-        if (options.isEnabled("Miniblox")) {
+        if (options.isEnabled("Simple")) {
             for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
-                return this.nameEqualsTo(player, "BOT");
+                return info.getDisplayName().getFormattedText().contains("BOT") || info.getDisplayName().getFormattedText().contains("NPC");
             }
         }
 

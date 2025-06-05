@@ -21,7 +21,6 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
-import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -33,6 +32,7 @@ import java.util.List;
 @ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TickBase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
+    public final BoolValue passthroughClicking = new BoolValue("Passthrough clicking", true, this, () -> mode.is("Future"));
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue tickRange = new SliderValue("Tick range", 3f, 0.1f, 8f, 0.1f, this);
     private final SliderValue minRange = new SliderValue("Min range", 2.5f, 0.1f, 8f, 0.1f, this);
@@ -175,7 +175,7 @@ public class TickBase extends Module {
         AxisAlignedBB entityBoundingBox = target.getHitbox().offset(getTargetPrediction());
 
         double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(entityBoundingBox.getCenter(), mc.thePlayer);
-        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(selfPrediction.size() - 1).player);
+        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(selfPrediction.size() - 1).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
 
         return predictedSelfDistance < predictedTargetDistance &&
                 predictedSelfDistance <= tickRange.get() &&

@@ -63,30 +63,12 @@ public class OldRotationUtils implements InstanceAccess {
         cachedMidpoint = midpoint;
         cachedAccel = accel;
         OldRotationUtils.smoothMode = smoothMode;
+        if (smoothMode != SmoothMode.None) {
+            cachedCorrection = true;
+        }
         enabled = true;
         RotationManager.enabled = true;
         currRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
-    }
-
-    @EventTarget
-    private void onMove(MoveInputEvent e) {
-        if (enabled && currentCorrection == MovementCorrection.Silent) {
-            MoveUtil.fixMovement(e, currentRotation[0]);
-        }
-    }
-
-    @EventTarget
-    private void onStrafe(StrafeEvent e) {
-        if (enabled && currentCorrection == MovementCorrection.Silent) {
-            e.setYaw(currentRotation[0]);
-        }
-    }
-
-    @EventTarget
-    private void onJump(JumpEvent event) {
-        if (enabled && currentCorrection == MovementCorrection.Silent) {
-            event.setYaw(currentRotation[0]);
-        }
     }
 
     @EventPriority(Integer.MIN_VALUE)
@@ -109,26 +91,24 @@ public class OldRotationUtils implements InstanceAccess {
 
     @EventTarget
     public void onGameUpdate(GameEvent e) {
-        if (currentRotation != null) {
-            double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
+        double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
-            if (!enabled && angleCalled) {
-                if (distanceToPlayerRotation < 1) {
-                    resetRotation();
-                    return;
-                }
-
-                if (distanceToPlayerRotation > 0) {
-                    float finalHSpeed = (cachedHSpeed / 2) * mc.timer.partialTicks;
-                    float finalVSpeed = (cachedVSpeed / 2) * mc.timer.partialTicks;
-
-                    currentRotation = limitRotations(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint, cachedAccel, smoothMode);
-                }
+        if (!enabled && angleCalled && RotationManager.reset) {
+            if (distanceToPlayerRotation < 1) {
+                resetRotation();
+                return;
             }
 
-            enabled = false;
-            angleCalled = false;
+            if (distanceToPlayerRotation > 0) {
+                float finalHSpeed = (cachedHSpeed / 2) * mc.timer.partialTicks;
+                float finalVSpeed = (cachedVSpeed / 2) * mc.timer.partialTicks;
+
+                currentRotation = limitRotations(Objects.requireNonNullElse(currentRotation, serverRotation), new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, finalHSpeed, finalVSpeed, cachedMidpoint, cachedAccel, smoothMode);
+            }
         }
+
+        enabled = false;
+        angleCalled = false;
     }
 
     private static void resetRotation() {

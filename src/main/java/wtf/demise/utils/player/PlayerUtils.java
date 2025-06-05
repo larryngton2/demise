@@ -3,11 +3,9 @@ package wtf.demise.utils.player;
 import com.google.common.base.Predicates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,7 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
-import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.*;
 import net.optifine.reflect.Reflector;
@@ -49,22 +46,6 @@ public class PlayerUtils implements InstanceAccess {
         for (int y = (int) mc.thePlayer.posY; y >= (int) mc.thePlayer.posY - distance; --y) {
             if (!(mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, y, mc.thePlayer.posZ)).getBlock() instanceof BlockAir)) {
                 return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean blockNear(final int range) {
-        for (int x = -range; x <= range; ++x) {
-            for (int y = -range; y <= range; ++y) {
-                for (int z = -range; z <= range; ++z) {
-                    final Block block = blockRelativeToPlayer(x, y, z);
-
-                    if (!(block instanceof BlockAir)) {
-                        return true;
-                    }
-                }
             }
         }
 
@@ -197,25 +178,6 @@ public class PlayerUtils implements InstanceAccess {
         return getBlock(blockPos).isReplaceable(mc.theWorld, blockPos);
     }
 
-    public static String getName(final NetworkPlayerInfo networkPlayerInfoIn) {
-        return networkPlayerInfoIn.getDisplayName() != null ? networkPlayerInfoIn.getDisplayName().getFormattedText() :
-                ScorePlayerTeam.formatPlayerName(networkPlayerInfoIn.getPlayerTeam(), networkPlayerInfoIn.getGameProfile().getName());
-    }
-
-    public static boolean isFullBlock(BlockPos blockPos) {
-        AxisAlignedBB axisAlignedBB = getBlock(blockPos) != null ? getBlock(blockPos).getCollisionBoundingBox(mc.theWorld, blockPos, mc.theWorld.getBlockState(blockPos)) : null;
-        if (axisAlignedBB == null) {
-            return false;
-        } else {
-            return axisAlignedBB.maxX - axisAlignedBB.minX == 1.0D && axisAlignedBB.maxY - axisAlignedBB.minY == 1.0D && axisAlignedBB.maxZ - axisAlignedBB.minZ == 1.0D;
-        }
-    }
-
-    public static boolean isAir(BlockPos blockPos) {
-        Material material = getBlock(blockPos).getMaterial();
-        return material == Material.air;
-    }
-
     private static final String[] healthSubstrings = {"hp", "health", "lives", "❤"};
 
     public static Float getActualHealth(EntityLivingBase entity) {
@@ -321,54 +283,37 @@ public class PlayerUtils implements InstanceAccess {
         return mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
     }
 
-    public static double getDistToTargetFromMouseOver(Entity thePlayer) {
-        Vec3 vec3 = thePlayer.getPositionEyes(1);
-        Vec3 vec31 = thePlayer.getLook(1);
-        double blockReachDistance = 12;
-        double distance = blockReachDistance;
-        Vec3 vec32 = vec3.addVector(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance);
+    public static double getDistToTargetFromMouseOver(Entity target) {
+        return getDistToTargetFromMouseOver(mc.thePlayer.getPositionEyes(1), mc.thePlayer.getLook(1), target, target.getHitbox());
+    }
 
-        if (mc.objectMouseOver != null) {
-            distance = mc.objectMouseOver.hitVec.distanceTo(vec3);
-        }
+    public static double getDistToTargetFromMouseOver(Vec3 playerPos, Vec3 look, Entity target, AxisAlignedBB targetBB) {
+        double blockReachDistance = 64;
+        Vec3 vec32 = playerPos.addVector(look.xCoord * blockReachDistance, look.yCoord * blockReachDistance, look.zCoord * blockReachDistance);
 
         Vec3 vec33 = null;
-        final float f = 1.0F;
-        final List<Entity> list = mc.theWorld.getEntitiesInAABBexcluding(thePlayer, thePlayer.getEntityBoundingBox().addCoord(vec31.xCoord * blockReachDistance, vec31.yCoord * blockReachDistance, vec31.zCoord * blockReachDistance).expand(f, f, f), Predicates.and(EntitySelectors.NOT_SPECTATING, Entity::canBeCollidedWith));
-        double d2 = distance;
 
-        for (final Entity entity1 : list) {
-            final float f1 = entity1.getCollisionBorderSize();
-            final AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand(f1, f1, f1);
-            final MovingObjectPosition movingobjectposition = axisalignedbb.calculateIntercept(vec3, vec32);
+        final MovingObjectPosition movingobjectposition = targetBB.calculateIntercept(playerPos, vec32);
 
-            if (axisalignedbb.isVecInside(vec3)) {
-                if (d2 >= 0.0D) {
-                    vec33 = movingobjectposition == null ? vec3 : movingobjectposition.hitVec;
-                    d2 = 0.0D;
+        if (targetBB.isVecInside(playerPos)) {
+            vec33 = movingobjectposition == null ? playerPos : movingobjectposition.hitVec;
+        } else if (movingobjectposition != null) {
+            double d3 = playerPos.distanceTo(movingobjectposition.hitVec);
+
+            if (d3 < blockReachDistance) {
+                boolean flag1 = false;
+
+                if (Reflector.ForgeEntity_canRiderInteract.exists()) {
+                    flag1 = Reflector.callBoolean(target, Reflector.ForgeEntity_canRiderInteract);
                 }
-            } else if (movingobjectposition != null) {
-                double d3 = vec3.distanceTo(movingobjectposition.hitVec);
 
-                if (d3 < d2 || d2 == 0.0D) {
-                    boolean flag1 = false;
-
-                    if (Reflector.ForgeEntity_canRiderInteract.exists()) {
-                        flag1 = Reflector.callBoolean(entity1, Reflector.ForgeEntity_canRiderInteract);
-                    }
-
-                    if (!flag1 && entity1 == thePlayer.ridingEntity) {
-                        if (d2 == 0.0D) {
-                            vec33 = movingobjectposition.hitVec;
-                        }
-                    } else {
-                        vec33 = movingobjectposition.hitVec;
-                        d2 = d3;
-                    }
+                if (!(!flag1 && target == mc.thePlayer.ridingEntity)) {
+                    vec33 = movingobjectposition.hitVec;
                 }
             }
+
         }
 
-        return vec33 == null ? Double.MAX_VALUE : vec3.distanceTo(vec33) - 0.5657;
+        return vec33 == null ? Double.MAX_VALUE : playerPos.distanceTo(vec33);
     }
 }

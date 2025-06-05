@@ -20,7 +20,6 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -67,6 +66,7 @@ public class KillAura extends Module {
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
+    private final BoolValue rotateLegit = new BoolValue("Rotate legit", false, this);
     private final RotationHandler rotationHandler = new RotationHandler(this);
 
     // aim point
@@ -129,8 +129,6 @@ public class KillAura extends Module {
     private double lastXOffset;
     private double lastYOffset;
     private double lastZOffset;
-    private float currentYawOffset;
-    private float currentPitchOffset;
     private float currentMissOffset;
     private boolean shouldRandomize;
     private Vec3 offsetVec = new Vec3(0, 0, 0);
@@ -327,7 +325,7 @@ public class KillAura extends Module {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
             if (distance <= searchRange.get()) {
-                rotationHandler.setRotation(getRotations(currentTarget));
+                rotationHandler.setRotation(getRotations(currentTarget), !rotateLegit.get());
             }
         }
     }
@@ -702,12 +700,7 @@ public class KillAura extends Module {
             pitch = prevRot[1];
         }
 
-        if (offsetMode.is("Drift")) {
-            yaw += currentYawOffset;
-            pitch += currentPitchOffset;
-        }
-
-        if (mc.thePlayer.getEntityBoundingBox().intersectsWith(entity.getEntityBoundingBox().contract(0.2, 0.75, 0.2))) {
+        if (mc.thePlayer.getEntityBoundingBox().intersectsWith(entity.getEntityBoundingBox()) && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             yaw = prevRot[0];
             pitch = prevRot[1];
         }

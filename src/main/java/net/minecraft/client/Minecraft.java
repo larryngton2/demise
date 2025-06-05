@@ -784,6 +784,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
             if (tickBase.skipTick()) {
+                if (tickBase.passthroughClicking.get()) {
+                    handleMouse();
+                }
                 continue;
             }
 
@@ -1633,6 +1636,58 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         this.mcProfiler.endSection();
         this.systemTime = getSystemTime();
+    }
+
+    private void handleMouse() throws IOException {
+        if (this.currentScreen == null || this.currentScreen.allowUserInput) {
+            this.mcProfiler.endStartSection("mouse");
+
+            while (Mouse.next()) {
+                int i = Mouse.getEventButton();
+                KeyBinding.setKeyBindState(i - 100, Mouse.getEventButtonState());
+
+                if (Mouse.getEventButtonState()) {
+                    if (this.thePlayer.isSpectator() && i == 2) {
+                        this.ingameGUI.getSpectatorGui().func_175261_b();
+                    } else {
+                        KeyBinding.onTick(i - 100);
+                    }
+                }
+
+                long i1 = getSystemTime() - this.systemTime;
+
+                if (i1 <= 200L) {
+                    int j = Mouse.getEventDWheel();
+
+                    if (j != 0) {
+                        if (this.thePlayer.isSpectator()) {
+                            j = j < 0 ? -1 : 1;
+
+                            if (this.ingameGUI.getSpectatorGui().func_175262_a()) {
+                                this.ingameGUI.getSpectatorGui().func_175259_b(-j);
+                            } else {
+                                float f = MathHelper.clamp_float(this.thePlayer.capabilities.getFlySpeed() + (float) j * 0.005F, 0.0F, 0.2F);
+                                this.thePlayer.capabilities.setFlySpeed(f);
+                            }
+                        } else {
+                            this.thePlayer.inventory.changeCurrentItem(j);
+                        }
+                    }
+
+                    if (this.currentScreen == null) {
+                        if (!this.inGameHasFocus && Mouse.getEventButtonState()) {
+                            this.setIngameFocus();
+                        }
+                    } else {
+                        this.currentScreen.handleMouseInput();
+                    }
+                }
+            }
+
+            if (this.leftClickCounter > 0) {
+                --this.leftClickCounter;
+            }
+        }
     }
 
     public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) {

@@ -13,6 +13,8 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.SmoothMode;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import static java.lang.Math.*;
 import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
 import static wtf.demise.utils.player.rotation.RotationUtils.getRotationDifference;
@@ -28,8 +30,9 @@ public class RotationManager implements InstanceAccess {
     private static float cachedMidpoint;
     private static boolean cachedAccel;
     private static SmoothMode smoothMode;
-    private static boolean cachedCorrection;
+    public static boolean cachedCorrection;
     public static float rotDiffBuildUp;
+    public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
 
     public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, boolean accel, SmoothMode smoothMode, boolean silent) {
@@ -55,7 +58,7 @@ public class RotationManager implements InstanceAccess {
     }
 
     private boolean shouldCorrect() {
-        return shouldRotate() && silent && cachedCorrection;
+        return shouldRotate() && cachedCorrection;
     }
 
     @EventTarget
@@ -125,9 +128,10 @@ public class RotationManager implements InstanceAccess {
         if (enabled) {
             handleRotation(e, targetRotation);
         } else {
-            if (abs(RotationUtils.getRotationDifference(currentRotation, mc.thePlayer.getRotation())) < 1) {
+            if (abs(RotationUtils.getRotationDifference(currentRotation, mc.thePlayer.getRotation())) < 1 || reset) {
                 currentRotation = mc.thePlayer.getRotation();
                 targetRotation = null;
+                reset = true;
             } else {
                 handleRotation(e, mc.thePlayer.getRotation());
             }
@@ -161,6 +165,8 @@ public class RotationManager implements InstanceAccess {
             //currentRotation[0] = MathHelper.wrapAngleTo180_float(currentRotation[0]);
             currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
         }
+
+        reset = false;
     }
 
     private int[] limitRotations(float[] current, float[] target) {

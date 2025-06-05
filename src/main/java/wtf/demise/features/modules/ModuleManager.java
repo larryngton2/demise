@@ -47,7 +47,7 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
         AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
-            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class
+            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
