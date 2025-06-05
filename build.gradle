@@ -14,27 +14,6 @@ ext {
 project.ext.lwjglVersion = "3.3.5"
 project.ext.lwjglNatives = "natives-linux"
 
-/*
-if (OperatingSystem.isLinux()) {
-    project.ext.lwjglNatives = "natives-linux"
-    def osArch = System.getProperty("os.arch")
-    if (osArch.startsWith("arm") || osArch.startsWith("aarch64")) {
-        project.ext.lwjglNatives += osArch.contains("64") || osArch.startsWith("armv8") ? "-arm64" : "-arm32"
-    } else if (osArch.startsWith("ppc")) {
-        project.ext.lwjglNatives += "-ppc64le"
-    } else if (osArch.startsWith("riscv")) {
-        project.ext.lwjglNatives += "-riscv64"
-    }
-} else if (OperatingSystem.isMacOsX()) {
-    project.ext.lwjglNatives = System.getProperty("os.arch").startsWith("aarch64") ? "natives-macos-arm64" : "natives-macos"
-} else if (OperatingSystem.isWindows()) {
-    def osArch = System.getProperty("os.arch")
-    project.ext.lwjglNatives = osArch.contains("64")
-            ? "natives-windows${osArch.startsWith("aarch64") ? "-arm64" : ""}"
-            : "natives-windows-x86"
-}
- */
-
 repositories {
     mavenCentral()
 }
@@ -147,12 +126,6 @@ dependencies {
     implementation "org.jetbrains:annotations:24.1.0"
 
     implementation "com.madgag:animated-gif-lib:1.4"
-
-    //todo 🤫
-    implementation 'ai.djl:api:0.31.1'
-    implementation 'ai.djl.tensorflow:tensorflow-engine:0.27.0'
-    implementation 'ai.djl.tensorflow:tensorflow-native-auto:2.5.0-SNAPSHOT'
-    implementation 'ai.djl:model-zoo:0.27.0'
 
     implementation fileTree(dir: "libs", include: "*.jar")
     compileOnly fileTree(dir: "libs", include: "*.jar")

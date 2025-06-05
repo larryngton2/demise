@@ -1,8 +1,18 @@
 package net.minecraft.util;
 
+import java.io.IOException;
+
 public class StatCollector {
     private static final StringTranslate localizedName = StringTranslate.getInstance();
-    private static final StringTranslate fallbackTranslator = new StringTranslate();
+    private static final StringTranslate fallbackTranslator;
+
+    static {
+        try {
+            fallbackTranslator = new StringTranslate();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static String translateToLocal(String key) {
         return localizedName.translateKey(key);

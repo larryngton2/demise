@@ -15,11 +15,20 @@ import java.util.regex.Pattern;
 public class StringTranslate {
     private static final Pattern numericVariablePattern = Pattern.compile("%(\\d+\\$)?[\\d\\.]*[df]");
     private static final Splitter equalSignSplitter = Splitter.on('=').limit(2);
-    private static final StringTranslate instance = new StringTranslate();
+    private static final StringTranslate instance;
+
+    static {
+        try {
+            instance = new StringTranslate();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final Map<String, String> languageList = Maps.newHashMap();
     private long lastUpdateTimeInMilliseconds;
 
-    public StringTranslate() {
+    public StringTranslate() throws IOException {
         InputStream inputstream = StringTranslate.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
 
         for (String s : IOUtils.readLines(inputstream, Charsets.UTF_8)) {
