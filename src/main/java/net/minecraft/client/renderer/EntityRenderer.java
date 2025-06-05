@@ -965,8 +965,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                     int k = (int) (f8 * 255.0F);
                     int l = (int) (f9 * 255.0F);
                     int i1 = (int) (f10 * 255.0F);
-                    Atmosphere atmosphere = Demise.INSTANCE.getModuleManager().getModule(Atmosphere.class);
-                    lightmapColors[i] = atmosphere.isEnabled() && atmosphere.worldColor.get() ? atmosphere.worldColorRGB.get().getRGB() : j << 24 | k << 16 | l << 8 | i1;
+                    lightmapColors[i] = j << 24 | k << 16 | l << 8 | i1;
                 }
 
                 lightmapTexture.updateDynamicTexture();

@@ -73,7 +73,7 @@ public class BackTrack extends Module {
             if (target == null) return;
 
             double realDistance = PlayerUtils.getCustomDistanceToEntityBox(realPosition, mc.thePlayer);
-            double clientDistance = PlayerUtils.getDistanceToEntityBox(target);
+            double clientDistance = PlayerUtils.getDistToTargetFromMouseOver(target);
 
             if (clientDistance > attackRange.get() && target.hurtTime != 0) {
                 outOfRange = true;

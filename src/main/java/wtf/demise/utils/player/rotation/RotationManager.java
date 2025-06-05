@@ -238,6 +238,7 @@ public class RotationManager implements InstanceAccess {
                 float finalPitch = (1 - t[1]) * (1 - t[1]) * current[1] + 2 * (1 - t[1]) * t[1] * controlPitch + t[1] * t[1] * finalTargetRotation[1];
 
                 //shitty way to get the delta
+                //todo fix bezier rots having down syndrome
                 finalYaw -= current[0];
                 finalPitch -= current[1];
 

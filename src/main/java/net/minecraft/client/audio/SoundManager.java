@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -376,7 +377,14 @@ public class SoundManager {
                 if (this.soundLibrary == null) {
                     return false;
                 } else {
-                    Source source = this.soundLibrary.getSources().get(p_playing_1_);
+                    HashMap<String, Source> getSources = this.soundLibrary.getSources();
+
+                    if (getSources == null) {
+                        return false;
+                    }
+
+                    Source source = getSources.get(p_playing_1_);
+
                     return source != null && (source.playing() || source.paused() || source.preLoad);
                 }
             }
