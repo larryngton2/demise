@@ -1,6 +1,6 @@
 # demise
 A Minecraft client based around bypassing strict anticheats.
-    <img src="https://img.shields.io/github/downloads/larryngton2/demise/total?label=Github%20Downloads" alt="Downloads">
+<br> <img src="https://img.shields.io/github/downloads/larryngton2/demise/total?label=Github%20Downloads" alt="Downloads">
 
 ### how to install?
 1) download the .jar from releases that match your os, and rename it to `demise` (keep the file extension the same plz)
