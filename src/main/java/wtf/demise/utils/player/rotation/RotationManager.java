@@ -13,8 +13,6 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.SmoothMode;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import static java.lang.Math.*;
 import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
 import static wtf.demise.utils.player.rotation.RotationUtils.getRotationDifference;
@@ -93,7 +91,7 @@ public class RotationManager implements InstanceAccess {
     @EventTarget
     public void onWorldChange(WorldChangeEvent e) {
         currentRotation = mc.thePlayer.getRotation();
-        targetRotation = null;
+        targetRotation = mc.thePlayer.getRotation();
     }
 
     @EventTarget
