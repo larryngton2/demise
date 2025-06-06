@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovementInput;
 import net.minecraft.util.Vec3;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -90,21 +91,23 @@ public class TickBase extends Module {
     @EventTarget
     public void onMotion(MotionEvent e) {
         if (mode.is("Future")) {
-            if (e.isPre()) return;
-
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
             }
 
-            if (timer.hasTimeElapsed(delay.get())) {
+            if (timer.hasTimeElapsed(delay.get()) && e.isPost()) {
                 if (shouldStart()) {
                     firstAnimation = false;
                     while (skippedTick < maxTick.get() && !shouldStop()) {
-                        skippedTick++;
                         try {
                             mc.runTick();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
+                        }
+                        skippedTick++;
+
+                        if (!shouldStart()) {
+                            break;
                         }
                     }
                     timer.reset();
@@ -117,7 +120,14 @@ public class TickBase extends Module {
     public void onGameEvent(GameEvent e) {
         selfPrediction.clear();
 
-        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
+        MovementInput movementInput = new MovementInput();
+
+        movementInput.moveForward = mc.thePlayer.movementInput.moveForward;
+        movementInput.moveStrafe = 0;
+        movementInput.jump = mc.thePlayer.movementInput.jump;
+        movementInput.sneak = mc.thePlayer.movementInput.sneak;
+
+        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(movementInput, 1);
 
         simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
 

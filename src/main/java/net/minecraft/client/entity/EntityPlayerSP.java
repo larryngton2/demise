@@ -31,6 +31,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.SendMessageEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.utils.player.MoveUtil;
@@ -95,28 +96,19 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             PlayerTickEvent event = new PlayerTickEvent(PlayerTickEvent.State.PRE);
             Demise.INSTANCE.getEventManager().call(event);
 
-            if (event.isCancelled())
-                return;
+            if (!event.isCancelled()) {
+                super.onUpdate();
+            }
 
-            super.onUpdate();
-
-            final PlayerTickEvent postTickEvent = new PlayerTickEvent(PlayerTickEvent.State.POST);
+            PlayerTickEvent postTickEvent = new PlayerTickEvent(PlayerTickEvent.State.POST);
             Demise.INSTANCE.getEventManager().call(postTickEvent);
 
             if (this.isRiding()) {
                 this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(this.rotationYaw, this.rotationPitch, this.onGround));
                 this.sendQueue.addToSendQueue(new C0CPacketInput(this.moveStrafing, this.moveForward, this.movementInput.jump, this.movementInput.sneak));
-            } else {
+            } else if (!postTickEvent.isCancelled()) {
                 this.onUpdateWalkingPlayer();
             }
-        }
-
-        AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(1.0, 1.0, 1.0);
-
-        for (Entity entity : mc.theWorld.loadedEntityList) {
-            AxisAlignedBB entityBox = entity.getEntityBoundingBox();
-            recentlyCollided = entity != mc.thePlayer && entity instanceof EntityLivingBase
-                    && !(entity instanceof EntityArmorStand) && box.intersectsWith(entityBox);
         }
     }
 

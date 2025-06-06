@@ -23,6 +23,7 @@ import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.OldRotationUtils;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 @ModuleInfo(name = "Phase", description = "Allows you to phase through blocks.", category = ModuleCategory.Movement)
@@ -86,7 +87,7 @@ public class Phase extends Module {
                             setY = true;
                         }
 
-                        //RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw, 89.9f}, MovementCorrection.Silent);
+                        OldRotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw, 89.9f}, MovementCorrection.Silent, 180, 180);
 
                         if (startY - mc.thePlayer.posY > 2) {
                             timer.reset();

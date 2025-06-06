@@ -15,6 +15,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
+import wtf.demise.utils.player.rotation.OldRotationUtils;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.math.BigDecimal;
@@ -90,16 +91,16 @@ public class Speed extends Module {
         switch (yawOffsetMode.get()) {
             case "Ground":
                 if (mc.thePlayer.onGround) {
-                    //RotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                    OldRotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
                 }
                 break;
             case "Air":
                 if (!mc.thePlayer.onGround) {
-                    //RotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                    OldRotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
                 }
                 break;
             case "Constant":
-                //RotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                OldRotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
                 break;
         }
 
@@ -147,6 +148,10 @@ public class Speed extends Module {
                             MoveUtil.strafe();
                         } else {
                             mc.thePlayer.jump();
+                        }
+
+                        if (mc.thePlayer.offGroundTicks == 6) {
+                            MoveUtil.strafe(Math.max(MoveUtil.getSpeed(), 0.281));
                         }
 
                         switch (MoveUtil.getSpeedEffect()) {

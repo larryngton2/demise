@@ -73,31 +73,6 @@ public abstract class GuiContainer extends GuiScreen {
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        Stealer stealer = Demise.INSTANCE.getModuleManager().getModule(Stealer.class);
-        if (stealer.isStealing) {
-            if (stealer.silent.get()) {
-                Minecraft mc = Minecraft.getMinecraft();
-                GuiScreen guiScreen = mc.currentScreen;
-                String text = "Stealing";
-
-                if (guiScreen instanceof GuiChest chest) {
-                    if (chest.lowerChestInventory != null) {
-                        mc.setIngameFocus();
-                        mc.currentScreen = guiScreen;
-                        Fonts.interSemiBold.get(15).drawString(text, (float) width / 2.0F - Fonts.interSemiBold.get(15).getStringWidth(text) / 2.0F, (float) height / 2.0F + 40.0F, -1, false);
-
-                        return;
-                    }
-                }
-
-                if (guiScreen instanceof GuiFurnace || guiScreen instanceof GuiBrewingStand) {
-                    mc.setIngameFocus();
-                    mc.currentScreen = guiScreen;
-                    Fonts.interSemiBold.get(15).drawString(text, (float) width / 2.0F - Fonts.interSemiBold.get(15).getStringWidth(text) / 2.0F, (float) height / 2.0F + 40.0F, -1, false);
-                    return;
-                }
-            }
-        }
         this.drawDefaultBackground();
         int i = this.guiLeft;
         int j = this.guiTop;
@@ -119,12 +94,13 @@ public abstract class GuiContainer extends GuiScreen {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         Manager manager = Demise.INSTANCE.getModuleManager().getModule(Manager.class);
+        Stealer stealer = Demise.INSTANCE.getModuleManager().getModule(Stealer.class);
 
         for (int i1 = 0; i1 < this.inventorySlots.inventorySlots.size(); ++i1) {
             Slot slot = this.inventorySlots.inventorySlots.get(i1);
             this.drawSlot(slot);
 
-            if (this.isMouseOverSlot(slot, mouseX, mouseY) && slot.canBeHovered() || manager.display.get() && manager.slot == i1) {
+            if (this.isMouseOverSlot(slot, mouseX, mouseY) && slot.canBeHovered() || (manager.isEnabled() && manager.slot == i1) || (stealer.isEnabled() && stealer.slot == i1)) {
                 this.theSlot = slot;
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepth();

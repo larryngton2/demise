@@ -65,7 +65,6 @@ public abstract class Entity implements ICommandSender {
     public boolean isCollidedHorizontally;
     public boolean isCollidedVertically;
     public boolean isCollided;
-    public boolean recentlyCollided = false;
     public boolean velocityChanged;
     public boolean isInWeb;
     private boolean isOutsideBorder;

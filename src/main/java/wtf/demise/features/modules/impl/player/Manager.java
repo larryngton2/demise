@@ -25,6 +25,8 @@ import java.util.*;
 public class Manager extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Open Inventory", "Spoof"}, "Open Inventory", this);
 
+    private final SliderValue startDelay = new SliderValue("Start delay", 1, 0, 10, 1, this);
+
     private final BoolValue autoArmor = new BoolValue("Auto armor", true, this);
     private final SliderValue minArmorDelay = new SliderValue("Min armor delay", 1, 0, 10, 1, this, autoArmor::get);
     private final SliderValue maxArmorDelay = new SliderValue("Max armor delay", 1, 0, 10, 1, this, autoArmor::get);
@@ -37,10 +39,6 @@ public class Manager extends Module {
     private final SliderValue minDropDelay = new SliderValue("Min drop delay", 1, 0, 10, 1, this, dropItems::get);
     private final SliderValue maxDropDelay = new SliderValue("Max drop delay", 1, 0, 10, 1, this, dropItems::get);
 
-    private final BoolValue startDelay = new BoolValue("Start Delay", true, this);
-    public final BoolValue display = new BoolValue("Display", true, this);
-
-    private final TimerUtils timer = new TimerUtils();
     private final int[] bestArmorPieces = new int[4];
     private final List<Integer> trash = new ArrayList<>();
     private final int[] bestToolSlots = new int[3];
@@ -58,13 +56,13 @@ public class Manager extends Module {
     private int sortWait;
     private final TimerUtils dropTimer = new TimerUtils();
     private int dropWait;
+    private final TimerUtils startDelayTimer = new TimerUtils();
 
     @EventTarget
     public void onPacketSend(PacketEvent event) {
         final Packet<?> packet = event.getPacket();
         if (packet instanceof C16PacketClientStatus clientStatus) {
             if (clientStatus.getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
-                if (startDelay.get()) timer.reset();
                 this.clientOpen = true;
                 this.serverOpen = true;
             }
@@ -94,49 +92,34 @@ public class Manager extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        if (this.clientOpen || (mc.currentScreen == null && !Objects.equals(this.mode.get(), "Open Inventory"))) {
+        if (!clientOpen) {
+            startDelayTimer.reset();
+        }
+
+        if ((this.clientOpen && startDelayTimer.hasTimeElapsed(startDelay.get() * 50L)) || (mc.currentScreen == null && !Objects.equals(this.mode.get(), "Open Inventory"))) {
             this.clear();
 
             for (int slot = InventoryUtils.INCLUDE_ARMOR_BEGIN; slot < InventoryUtils.END; slot++) {
                 final ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(slot).getStack();
 
                 if (stack != null) {
-                    if (stack.getItem() instanceof ItemSword && InventoryUtils.isBestSword(stack)) {
-                        this.bestSwordSlot = slot;
-                    } else if (stack.getItem() instanceof ItemBow && InventoryUtils.isBestBow(stack)) {
-                        this.bestBowSlot = slot;
-                    } else if (stack.getItem() instanceof ItemTool && InventoryUtils.isBestTool(mc.thePlayer, stack)) {
-                        final int toolType = InventoryUtils.getToolType(stack);
-                        if (toolType != -1 && slot != this.bestToolSlots[toolType])
-                            this.bestToolSlots[toolType] = slot;
-                    } else if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(mc.thePlayer, stack)) {
-                        final int pieceSlot = this.bestArmorPieces[armor.armorType];
-
-                        if (pieceSlot == -1 || slot != pieceSlot)
-                            this.bestArmorPieces[armor.armorType] = slot;
-                    } else if (stack.getItem() instanceof ItemBlock && slot == InventoryUtils.findBestBlockStack()) {
-                        this.blockSlot.add(slot);
-                    } else if (stack.getItem() instanceof ItemAppleGold) {
-                        this.gappleStackSlots.add(slot);
-                    } else if (!this.trash.contains(slot) && !InventoryUtils.isValidStack(stack)) {
-                        this.trash.add(slot);
-                    }
+                    processInventoryItem(slot, stack);
                 }
             }
 
-            final boolean armorReady = armorTimer.hasTimeElapsed(armorWait * 50L);
-            final boolean sortReady = sortTimer.hasTimeElapsed(sortWait * 50L);
-            final boolean dropReady = dropTimer.hasTimeElapsed(dropWait * 50L);
+            boolean armorReady = armorTimer.hasTimeElapsed(armorWait * 50L);
+            boolean sortReady = sortTimer.hasTimeElapsed(sortWait * 50L);
+            boolean dropReady = dropTimer.hasTimeElapsed(dropWait * 50L);
 
             boolean busy = false;
 
-            if (armorReady && this.equipArmor(true)) {
+            if (armorReady && this.equipArmor()) {
                 busy = true;
                 resetTimings();
             } else if (dropReady && this.dropItem(this.trash)) {
                 busy = true;
                 resetTimings();
-            } else if (sortReady && this.sortItems(true)) {
+            } else if (sortReady && this.sortItems()) {
                 busy = true;
                 resetTimings();
             }
@@ -149,15 +132,72 @@ public class Manager extends Module {
                     this.nextTickCloseInventory = true;
                 }
             } else {
-                boolean waitUntilNextTick = !this.serverOpen;
-
                 this.open();
 
-                if (this.nextTickCloseInventory)
-                    this.nextTickCloseInventory = false;
-
-                if (waitUntilNextTick) return;
+                if (this.nextTickCloseInventory) this.nextTickCloseInventory = false;
             }
+        }
+    }
+
+    private void processInventoryItem(int slot, ItemStack stack) {
+        if (stack == null) return;
+
+        if (processCombatItems(slot, stack)) return;
+        if (processToolsAndArmor(slot, stack)) return;
+        if (processUtilityItems(slot, stack)) return;
+
+        if (!trash.contains(slot) && !InventoryUtils.isValidStack(stack)) {
+            trash.add(slot);
+        }
+    }
+
+    private boolean processCombatItems(int slot, ItemStack stack) {
+        if (stack.getItem() instanceof ItemSword && InventoryUtils.isBestSword(stack)) {
+            bestSwordSlot = slot;
+            return true;
+        }
+        if (stack.getItem() instanceof ItemBow && InventoryUtils.isBestBow(stack)) {
+            bestBowSlot = slot;
+            return true;
+        }
+        if (stack.getItem() instanceof ItemAppleGold) {
+            gappleStackSlots.add(slot);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean processToolsAndArmor(int slot, ItemStack stack) {
+        if (stack.getItem() instanceof ItemTool && InventoryUtils.isBestTool(mc.thePlayer, stack)) {
+            updateBestTool(slot, stack);
+            return true;
+        }
+        if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(mc.thePlayer, stack)) {
+            updateBestArmor(slot, armor);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean processUtilityItems(int slot, ItemStack stack) {
+        if (stack.getItem() instanceof ItemBlock && slot == InventoryUtils.findBestBlockStack()) {
+            blockSlot.add(slot);
+            return true;
+        }
+        return false;
+    }
+
+    private void updateBestTool(int slot, ItemStack stack) {
+        int toolType = InventoryUtils.getToolType(stack);
+        if (toolType != -1 && slot != bestToolSlots[toolType]) {
+            bestToolSlots[toolType] = slot;
+        }
+    }
+
+    private void updateBestArmor(int slot, ItemArmor armor) {
+        int currentBestSlot = bestArmorPieces[armor.armorType];
+        if (currentBestSlot == -1 || slot != currentBestSlot) {
+            bestArmorPieces[armor.armorType] = slot;
         }
     }
 
@@ -171,25 +211,21 @@ public class Manager extends Module {
         sortWait = MathUtils.randomizeInt(minSortDelay.get(), maxSortDelay.get());
     }
 
-    private boolean sortItems(final boolean moveItems) {
+    private boolean sortItems() {
         if (this.sortItems.get()) {
 
             if (this.bestSwordSlot != -1) {
                 if (this.bestSwordSlot != 36) {
-                    if (moveItems) {
-                        this.putItemInSlot(36, this.bestSwordSlot);
-                        this.bestSwordSlot = 36;
-                    }
+                    this.putItemInSlot(36, this.bestSwordSlot);
+                    this.bestSwordSlot = 36;
                     return true;
                 }
             }
 
             if (this.bestBowSlot != -1) {
                 if (this.bestBowSlot != 38) {
-                    if (moveItems) {
-                        this.putItemInSlot(38, this.bestBowSlot);
-                        this.bestBowSlot = 38;
-                    }
+                    this.putItemInSlot(38, this.bestBowSlot);
+                    this.bestBowSlot = 38;
                     return true;
                 }
             }
@@ -200,10 +236,8 @@ public class Manager extends Module {
                 final int bestGappleSlot = this.gappleStackSlots.get(0);
 
                 if (bestGappleSlot != 37) {
-                    if (moveItems) {
-                        this.putItemInSlot(37, bestGappleSlot);
-                        this.gappleStackSlots.set(0, 37);
-                    }
+                    this.putItemInSlot(37, bestGappleSlot);
+                    this.gappleStackSlots.set(0, 37);
                     return true;
                 }
             }
@@ -214,10 +248,8 @@ public class Manager extends Module {
                 final int blockSlot = this.blockSlot.get(0);
 
                 if (blockSlot != 42) {
-                    if (moveItems) {
-                        this.putItemInSlot(42, blockSlot);
-                        this.blockSlot.set(0, 42);
-                    }
+                    this.putItemInSlot(42, blockSlot);
+                    this.blockSlot.set(0, 42);
                     return true;
                 }
             }
@@ -230,9 +262,7 @@ public class Manager extends Module {
 
                     if (type != -1) {
                         if (toolSlot != toolSlots[type]) {
-                            if (moveItems) {
-                                this.putToolsInSlot(type, toolSlots);
-                            }
+                            this.putToolsInSlot(type, toolSlots);
                             return true;
                         }
                     }
@@ -243,7 +273,7 @@ public class Manager extends Module {
         return false;
     }
 
-    private boolean equipArmor(boolean moveItems) {
+    private boolean equipArmor() {
         if (this.autoArmor.get()) {
             for (int i = 0; i < this.bestArmorPieces.length; i++) {
                 final int piece = this.bestArmorPieces[i];
@@ -254,8 +284,7 @@ public class Manager extends Module {
                     if (stack != null)
                         continue;
 
-                    if (moveItems)
-                        windowClick(piece, 0, 1);
+                    windowClick(piece, 0, 1);
 
                     return true;
                 }
@@ -268,7 +297,6 @@ public class Manager extends Module {
     public void windowClick(int slotId, int mouseButtonClicked, int mode) {
         slot = slotId;
         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slotId, mouseButtonClicked, mode, mc.thePlayer);
-        timer.reset();
     }
 
     private void putItemInSlot(final int slot, final int slotIn) {
