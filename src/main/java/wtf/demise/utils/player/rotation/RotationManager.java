@@ -26,14 +26,14 @@ public class RotationManager implements InstanceAccess {
     private static float cachedHSpeed;
     private static float cachedVSpeed;
     private static float cachedMidpoint;
-    private static boolean cachedAccel;
+    private static boolean cachedPredictionFlick;
     private static SmoothMode smoothMode;
     public static boolean cachedCorrection;
     public static float rotDiffBuildUp;
     public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
 
-    public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, boolean accel, SmoothMode smoothMode, boolean silent) {
+    public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, boolean predictionFlick, SmoothMode smoothMode, boolean silent) {
         if (tickTimer.hasTimeElapsed(50)) {
             if (currentRotation != null && previousRotation != null) {
                 lastDelta = getRotationDifference(currentRotation, previousRotation);
@@ -49,7 +49,7 @@ public class RotationManager implements InstanceAccess {
         RotationManager.cachedHSpeed = hSpeed;
         RotationManager.cachedVSpeed = vSpeed;
         RotationManager.cachedMidpoint = midpoint;
-        RotationManager.cachedAccel = accel;
+        RotationManager.cachedPredictionFlick = predictionFlick;
         RotationManager.smoothMode = smoothMode;
         RotationManager.cachedCorrection = correction;
         enabled = true;
@@ -160,7 +160,6 @@ public class RotationManager implements InstanceAccess {
             currentRotation[0] += yawStep;
             currentRotation[1] -= pitchStep;
 
-            //currentRotation[0] = MathHelper.wrapAngleTo180_float(currentRotation[0]);
             currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
         }
 
@@ -179,7 +178,7 @@ public class RotationManager implements InstanceAccess {
         float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
 
-        if (cachedAccel) {
+        if (cachedPredictionFlick) {
             float[] rangeYaw = {0, 0};
             float[] rangePitch = {0, 0};
 
@@ -192,8 +191,8 @@ public class RotationManager implements InstanceAccess {
                 rangePitch[0] = 0.1f + incPitch;
                 rangePitch[1] = 0.5f + incPitch;
             } else {
-                rangeYaw[0] = rangePitch[0] = 0.3f;
-                rangeYaw[1] = rangePitch[1] = 0.7f;
+                rangeYaw[0] = rangePitch[0] = 0.9f;
+                rangeYaw[1] = rangePitch[1] = 1f;
             }
 
             float[] newRot = new float[]{MathUtils.interpolateNoUpdateCheck(lastDelta, straightLineYaw, MathUtils.randomizeFloat(rangeYaw[0], rangeYaw[1])), MathUtils.interpolateNoUpdateCheck(lastDelta, straightLinePitch, MathUtils.randomizeFloat(rangePitch[0], rangePitch[1]))};
@@ -216,12 +215,12 @@ public class RotationManager implements InstanceAccess {
 
                 float[] factor = new float[]{factorH, factorV};
 
-                float straightLineYaw1 = (float) (abs(yawDifference / rotationDifference) * factor[0]);
-                float straightLinePitch1 = (float) (abs(pitchDifference / rotationDifference) * factor[1]);
+                straightLineYaw = straightLineYaw / cachedHSpeed * factor[0];
+                straightLinePitch = straightLinePitch / cachedVSpeed * factor[1];
 
                 delta = new int[]{
-                        (int) (max(-straightLineYaw1, min(straightLineYaw1, yawDifference)) / f1),
-                        (int) -(max(-straightLinePitch1, min(straightLinePitch1, pitchDifference)) / f1)
+                        (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
+                        (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
                 };
             }
 
@@ -237,12 +236,11 @@ public class RotationManager implements InstanceAccess {
                 float finalYaw = (1 - t[0]) * (1 - t[0]) * current[0] + 2 * (1 - t[0]) * t[0] * controlYaw + t[0] * t[0] * finalTargetRotation[0];
                 float finalPitch = (1 - t[1]) * (1 - t[1]) * current[1] + 2 * (1 - t[1]) * t[1] * controlPitch + t[1] * t[1] * finalTargetRotation[1];
 
-                //shitty way to get the delta
                 //todo fix bezier rots having down syndrome
-                finalYaw -= current[0];
-                finalPitch -= current[1];
-
-                delta = new int[]{(int) finalYaw, (int) finalPitch};
+                delta = new int[]{
+                        (int) ((finalYaw - current[0]) / f1),
+                        (int) -((finalPitch - current[1]) / f1)
+                };
             }
 
             default -> delta = finalTargetRotation;

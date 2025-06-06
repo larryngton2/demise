@@ -66,7 +66,6 @@ public class KillAura extends Module {
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
-    private final BoolValue rotateLegit = new BoolValue("Rotate legit", false, this);
     private final RotationHandler rotationHandler = new RotationHandler(this);
 
     // aim point
@@ -325,7 +324,7 @@ public class KillAura extends Module {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
             if (distance <= searchRange.get()) {
-                rotationHandler.setRotation(getRotations(currentTarget), !rotateLegit.get());
+                rotationHandler.setRotation(getRotations(currentTarget));
             }
         }
     }

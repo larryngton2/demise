@@ -248,7 +248,7 @@ public class Scaffold extends Module {
         }
 
         if (addons.isEnabled("Snap") && PlayerUtils.getBlock(targetBlock) instanceof BlockAir || !addons.isEnabled("Snap") && !mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            rotationHandler.setRotation(new float[]{yaw, pitch}, true);
+            rotationHandler.setRotation(new float[]{yaw, pitch});
         }
     }
 

@@ -6,7 +6,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
@@ -51,7 +50,9 @@ public class Interface extends Module {
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
     private final SliderValue fadeSpeed = new SliderValue("Fade Speed", 1, 1, 10, 1, this, () -> color.is("Dynamic") || color.is("Fade"));
-    public final SliderValue bgAlpha = new SliderValue("Background Alpha", 204, 1, 255, 1, this);
+    private final ModeValue bgStyle = new ModeValue("Background style", new String[]{"Transparent", "Opaque", "Custom"}, "Transparent", this, () -> elements.isEnabled("Module List"));
+    private final ColorValue bgColor = new ColorValue("Background Color", new Color(21, 21, 21), this, () -> bgStyle.is("Custom"));
+    public final SliderValue bgAlpha = new SliderValue("Background Alpha", 204, 1, 255, 1, this, () -> bgStyle.is("Custom"));
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
     public final BoolValue funy = new BoolValue("funy", false, this);
 
@@ -210,6 +211,11 @@ public class Interface extends Module {
     }
 
     public int bgColor() {
-        return new Color(21, 21, 21, background.get () ? (int) bgAlpha.get() : 0).getRGB();
+        return switch (bgStyle.get()) {
+            case "Transparent" -> new Color(0, 0, 0, 120).getRGB();
+            case "Opaque" -> new Color(21, 21, 21, 204).getRGB();
+            case "Custom" -> new Color(bgColor.get().getRGB(), true).getRGB();
+            default -> -1;
+        };
     }
 }

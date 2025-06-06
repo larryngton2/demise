@@ -24,7 +24,7 @@ import wtf.demise.utils.player.SmoothMode;
 @Getter
 public class RotationHandler implements InstanceAccess {
     final ModeValue smoothMode;
-    final BoolValue accelerate;
+    final BoolValue predictionFlick;
     final BoolValue imperfectCorrelation;
     final SliderValue yawRotationSpeedMin;
     final SliderValue yawRotationSpeedMax;
@@ -41,6 +41,7 @@ public class RotationHandler implements InstanceAccess {
     final SliderValue rotationDiffBuildUpToStop;
     final SliderValue maxThresholdAttemptsToStop;
     final BoolValue silent;
+    final BoolValue rotateLegit;
     private EntityLivingBase target;
     private final Module module;
 
@@ -48,23 +49,24 @@ public class RotationHandler implements InstanceAccess {
         this.module = module;
 
         silent = new BoolValue("Silent", true, module);
-        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Bezier", "None"}, "Linear", module);
-        accelerate = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None"));
-        imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None"));
+        rotateLegit = new BoolValue("Rotate legit", false, module);
+        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Bezier", "None"}, "Linear", module, rotateLegit::get);
+        predictionFlick = new BoolValue("Prediction flick", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
+        imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
         yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         midpoint = new SliderValue("Midpoint", 0.8f, 0.01f, 1, 0.01f, module, () -> smoothMode.is("Bezier"));
-        distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> !smoothMode.is("None") && module.getClass() == KillAura.class);
-        minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
-        maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
-        decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && module.getClass() == KillAura.class);
+        distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> !smoothMode.is("None") && module.getClass() == KillAura.class && rotateLegit.get());
+        minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
+        maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
+        decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         movementFix = new BoolValue("Movement fix", false, module);
-        shortStop = new BoolValue("Short stop", false, module);
-        shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, shortStop::get);
-        rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, shortStop::get);
-        maxThresholdAttemptsToStop = new SliderValue("Max threshold attempts to stop", 1, 0, 5, 1, module, shortStop::get);
+        shortStop = new BoolValue("Short stop", false, module, rotateLegit::get);
+        shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, () -> shortStop.get() && shortStop.canDisplay());
+        rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, () -> shortStop.get() && shortStop.canDisplay());
+        maxThresholdAttemptsToStop = new SliderValue("Max threshold attempts to stop", 1, 0, 5, 1, module, () -> shortStop.get() && shortStop.canDisplay());
     }
 
     private final TimerUtils shortStopTimer = new TimerUtils();
@@ -75,10 +77,6 @@ public class RotationHandler implements InstanceAccess {
     private int maxThresholdReachAttempts;
 
     public void setRotation(float[] targetRotation) {
-        setRotation(targetRotation, false);
-    }
-
-    public void setRotation(float[] targetRotation, boolean old) {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
 
         float hSpeed = randYawSpeed;
@@ -97,7 +95,7 @@ public class RotationHandler implements InstanceAccess {
         if (module.getClass() == KillAura.class) {
             target = KillAura.currentTarget;
 
-            if (distanceBasedRotationSpeed.get() && target != null) {
+            if (distanceBasedRotationSpeed.get() && rotateLegit.get() && target != null) {
                 float distance = (float) PlayerUtils.getDistanceToEntityBox(target);
                 if (Range.between(minRange.get(), maxRange.get()).contains(distance)) {
                     float decreaseAmount = ((distance - minRange.get()) / 0.01f) * decrementPerCycle.get();
@@ -107,13 +105,17 @@ public class RotationHandler implements InstanceAccess {
             }
         }
 
+        if (!rotateLegit.get() && !smoothMode.is("Linear")) {
+            smoothMode.set("Linear");
+        }
+
         hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
-        if (!old) {
-            RotationManager.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed, midpoint.get(), accelerate.get(), mode, silent.get());
+        if (rotateLegit.get()) {
+            RotationManager.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed, midpoint.get(), predictionFlick.get(), mode, silent.get());
         } else {
-            OldRotationUtils.setRotation(targetRotation, movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None, hSpeed, vSpeed, midpoint.get(), accelerate.get(), mode);
+            OldRotationUtils.setRotation(targetRotation, movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None, hSpeed, vSpeed);
         }
     }
 
@@ -144,6 +146,8 @@ public class RotationHandler implements InstanceAccess {
     }
 
     private boolean shouldShortStop() {
+        if (!rotateLegit.get()) return false;
+
         if (!shortStopTimer.hasTimeElapsed(shortStopDuration.get())) {
             return true;
         }
