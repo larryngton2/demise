@@ -8,7 +8,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.TimerManipulationEvent;
-import wtf.demise.events.impl.player.MotionEvent;
+import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
@@ -53,6 +53,7 @@ public class TickBase extends Module {
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
     private EntityPlayer target;
     private boolean firstAnimation = true;
+    public boolean working;
 
     @Override
     public void onEnable() {
@@ -89,35 +90,35 @@ public class TickBase extends Module {
     }
 
     @EventTarget
-    public void onMotion(MotionEvent e) {
+    public void onGame(GameEvent e) {
         if (mode.is("Future")) {
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
                 return;
             }
 
-            if (timer.hasTimeElapsed(delay.get()) && e.isPost()) {
+            //if (timer.hasTimeElapsed(delay.get()) && e.isPost()) {
+            if (timer.hasTimeElapsed(delay.get())) {
                 if (shouldStart()) {
                     firstAnimation = false;
                     while (skippedTick < maxTick.get() && !shouldStop()) {
+                        working = true;
+                        skippedTick++;
                         try {
                             mc.runTick();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
-                        skippedTick++;
-
-                        if (!shouldStart()) {
-                            break;
-                        }
                     }
                     timer.reset();
                 }
             }
+
+            working = false;
         }
     }
 
     @EventTarget
-    public void onGameEvent(GameEvent e) {
+    public void onMoveInput(MoveInputEvent e) {
         selfPrediction.clear();
 
         MovementInput movementInput = new MovementInput();
@@ -204,7 +205,7 @@ public class TickBase extends Module {
 
     public boolean skipTick() {
         if (mode.is("Future")) {
-            if (skippedTick < 0) return true;
+            if (working || skippedTick < 0) return true;
             if (isEnabled() && skippedTick > 0) {
                 --skippedTick;
                 return true;

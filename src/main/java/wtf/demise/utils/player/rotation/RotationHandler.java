@@ -24,7 +24,6 @@ import wtf.demise.utils.player.SmoothMode;
 @Getter
 public class RotationHandler implements InstanceAccess {
     final ModeValue smoothMode;
-    final BoolValue predictionFlick;
     final BoolValue imperfectCorrelation;
     final SliderValue yawRotationSpeedMin;
     final SliderValue yawRotationSpeedMax;
@@ -51,7 +50,6 @@ public class RotationHandler implements InstanceAccess {
         silent = new BoolValue("Silent", true, module);
         rotateLegit = new BoolValue("Rotate legit", false, module);
         smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Bezier", "None"}, "Linear", module, rotateLegit::get);
-        predictionFlick = new BoolValue("Prediction flick", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
         imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
         yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
@@ -113,7 +111,7 @@ public class RotationHandler implements InstanceAccess {
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
         if (rotateLegit.get()) {
-            RotationManager.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed, midpoint.get(), predictionFlick.get(), mode, silent.get());
+            RotationManager.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed, midpoint.get(), mode, silent.get());
         } else {
             OldRotationUtils.setRotation(targetRotation, movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None, hSpeed, vSpeed);
         }

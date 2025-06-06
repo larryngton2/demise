@@ -26,20 +26,15 @@ public class RotationManager implements InstanceAccess {
     private static float cachedHSpeed;
     private static float cachedVSpeed;
     private static float cachedMidpoint;
-    private static boolean cachedPredictionFlick;
     private static SmoothMode smoothMode;
     public static boolean cachedCorrection;
     public static float rotDiffBuildUp;
     public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
 
-    public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, boolean predictionFlick, SmoothMode smoothMode, boolean silent) {
+    public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode, boolean silent) {
         if (tickTimer.hasTimeElapsed(50)) {
-            if (currentRotation != null && previousRotation != null) {
-                lastDelta = getRotationDifference(currentRotation, previousRotation);
-            } else {
-                lastDelta = getRotationDifference(new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch}, new float[]{mc.thePlayer.prevRotationYaw, mc.thePlayer.prevRotationPitch});
-            }
+            lastDelta = getRotationDifference(currentRotation, previousRotation);
 
             tickTimer.reset();
         }
@@ -49,7 +44,6 @@ public class RotationManager implements InstanceAccess {
         RotationManager.cachedHSpeed = hSpeed;
         RotationManager.cachedVSpeed = vSpeed;
         RotationManager.cachedMidpoint = midpoint;
-        RotationManager.cachedPredictionFlick = predictionFlick;
         RotationManager.smoothMode = smoothMode;
         RotationManager.cachedCorrection = correction;
         enabled = true;
@@ -143,7 +137,7 @@ public class RotationManager implements InstanceAccess {
     }
 
     private void handleRotation(MouseMoveEvent e, float[] target) {
-        int[] delta = limitRotations(silent ? currentRotation : mc.thePlayer.getRotation(), target);
+        int[] delta = limitRotations(currentRotation, target);
 
         if (!silent) {
             e.setDeltaX(delta[0]);
@@ -154,11 +148,11 @@ public class RotationManager implements InstanceAccess {
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
 
-            float yawStep = (delta[0] * f1) * 0.15f;
-            float pitchStep = (delta[1] * f1) * 0.15f;
+            float yawStep = delta[0] * f1;
+            float pitchStep = delta[1] * f1;
 
-            currentRotation[0] += yawStep;
-            currentRotation[1] -= pitchStep;
+            currentRotation[0] += yawStep * 0.15f;
+            currentRotation[1] -= pitchStep * 0.15f;
 
             currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
         }
@@ -177,29 +171,6 @@ public class RotationManager implements InstanceAccess {
 
         float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
-
-        if (cachedPredictionFlick) {
-            float[] rangeYaw = {0, 0};
-            float[] rangePitch = {0, 0};
-
-            if (lastDelta == 0) {
-                float incYaw = 0.2f * MathHelper.clamp_float(straightLineYaw / 50, 0, 1);
-                rangeYaw[0] = 0.1f + incYaw;
-                rangeYaw[1] = 0.5f + incYaw;
-
-                float incPitch = 0.2f * MathHelper.clamp_float(straightLinePitch / 50, 0, 1);
-                rangePitch[0] = 0.1f + incPitch;
-                rangePitch[1] = 0.5f + incPitch;
-            } else {
-                rangeYaw[0] = rangePitch[0] = 0.9f;
-                rangeYaw[1] = rangePitch[1] = 1f;
-            }
-
-            float[] newRot = new float[]{MathUtils.interpolateNoUpdateCheck(lastDelta, straightLineYaw, MathUtils.randomizeFloat(rangeYaw[0], rangeYaw[1])), MathUtils.interpolateNoUpdateCheck(lastDelta, straightLinePitch, MathUtils.randomizeFloat(rangePitch[0], rangePitch[1]))};
-
-            straightLineYaw = newRot[0];
-            straightLinePitch = newRot[1];
-        }
 
         int[] finalTargetRotation = new int[]{
                 (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),

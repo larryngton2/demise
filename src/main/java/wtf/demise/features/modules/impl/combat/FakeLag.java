@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
+import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.packet.PacketReleaseEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
@@ -246,13 +247,6 @@ public class FakeLag extends Module {
         }
     }
 
-    @EventTarget
-    public void onAttack(AttackEvent e) {
-        if (e.getTargetEntity() != null && mc.objectMouseOver.entityHit == e.getTargetEntity() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && target != null && target.hurtTime <= 3) {
-            attacked = true;
-        }
-    }
-
     private boolean shouldLag() {
         return target != null && smart.get() ? smartCriteria() : simpleCriteria() && mc.thePlayer.canEntityBeSeen(target);
     }
@@ -326,6 +320,17 @@ public class FakeLag extends Module {
         }
 
         return !attacked && rangeCheck && selfHurtTimeCheck && distanceDiffCheck; //&& minDistanceCheck;
+    }
+
+    @EventTarget
+    public void onPacket(PacketEvent e) {
+        if (e.getPacket() instanceof C02PacketUseEntity c02) {
+            if (c02.getAction() == C02PacketUseEntity.Action.ATTACK) {
+                if (target.hurtTime <= 3) {
+                    attacked = true;
+                }
+            }
+        }
     }
 
     @EventTarget
