@@ -11,7 +11,7 @@ import wtf.demise.features.values.impl.SliderValue;
 @ModuleInfo(name = "Gambling", description = "I LOVE GAMBLING :money_mouth:", category = ModuleCategory.Misc)
 public class Gambling extends Module {
     private final SliderValue betAmount = new SliderValue("Bet Amount", 100, 1, 1000, 1, this);
-    private final BoolValue bet = new BoolValue("Bet", false, this);
+    private final BoolValue bet = new BoolValue("Bet (this is a button btw)", false, this);
     private double money = 1000;
     private int losses = 0;
 
@@ -29,7 +29,7 @@ public class Gambling extends Module {
         }
 
         if (this.bet.get()) {
-            if (Math.random() < 0.45) { // 45% win chance
+            if (Math.random() < 0.45) {
                 money += bet;
                 losses = 0;
             } else {

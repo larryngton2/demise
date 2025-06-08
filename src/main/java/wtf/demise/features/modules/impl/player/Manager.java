@@ -134,7 +134,7 @@ public class Manager extends Module {
             } else {
                 this.open();
 
-                if (this.nextTickCloseInventory) this.nextTickCloseInventory = false;
+                this.nextTickCloseInventory = false;
             }
         }
     }
@@ -213,7 +213,6 @@ public class Manager extends Module {
 
     private boolean sortItems() {
         if (this.sortItems.get()) {
-
             if (this.bestSwordSlot != -1) {
                 if (this.bestSwordSlot != 36) {
                     this.putItemInSlot(36, this.bestSwordSlot);
@@ -269,7 +268,6 @@ public class Manager extends Module {
                 }
             }
         }
-
         return false;
     }
 
@@ -290,7 +288,6 @@ public class Manager extends Module {
                 }
             }
         }
-
         return false;
     }
 

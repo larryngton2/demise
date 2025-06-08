@@ -154,15 +154,12 @@ public class Velocity extends Module {
                 }
                 break;
             case "Cancel":
-                if (e.getPacket() instanceof S12PacketEntityVelocity packet) {
+                if (e.getPacket() instanceof S12PacketEntityVelocity) {
                     e.setCancelled(true);
                 }
                 break;
             case "GrimC07":
-                final Packet<?> packet = e.getPacket();
-                if (e.isCancelled()) return;
-
-                if (packet instanceof S12PacketEntityVelocity wrapper) {
+                if (e.getPacket() instanceof S12PacketEntityVelocity wrapper) {
                     if (wrapper.getEntityID() == mc.thePlayer.getEntityId()) {
                         e.setCancelled(true);
 

@@ -280,13 +280,9 @@ public class ShaderUtils implements InstanceAccess {
                 return length(max(abs(p) - b, 0.0)) - r;
             }
             
-            
             void main() {
-                vec2 rectHalf = rectSize * .5;
-                // Smooth the result (free antialiasing).
-                float smoothedAlpha =  (1.0-smoothstep(0.0, 1.0, roundSDF(rectHalf - (gl_TexCoord[0].st * rectSize), rectHalf - radius - 1., radius))) * color.a;
-                gl_FragColor = vec4(color.rgb, smoothedAlpha);// mix(quadColor, shadowColor, 0.0);
-            
+                vec2 rectHalf = rectSize * 0.5;
+                gl_FragColor = vec4(color.rgb, (1.0-smoothstep(0.0, 1.0, roundSDF(rectHalf - (gl_TexCoord[0].st * rectSize), rectHalf - radius - 1.0, radius))) * color.a);
             }""";
     private final String kawaseUpBloom = """
             #version 120

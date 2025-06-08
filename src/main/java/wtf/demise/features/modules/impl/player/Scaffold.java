@@ -521,7 +521,7 @@ public class Scaffold extends Module {
         for (int i = 0; i < 9; ++i) {
             final ItemStack itemStack = mc.thePlayer.inventory.mainInventory[i];
 
-            if (itemStack != null) {
+            if (itemStack != null && itemStack.stackSize > 0) {
                 final Item item = itemStack.getItem();
 
                 if (item instanceof ItemBlock && !blacklistedBlocks.contains(((ItemBlock) item).getBlock())) {

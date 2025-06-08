@@ -13,6 +13,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
+//sucks ass
 @ModuleInfo(name = "HitSelect", description = "Automatically hit selects in order to start combos.", category = ModuleCategory.Legit)
 public class HitSelect extends Module {
     private final SliderValue maxWaitTime = new SliderValue("Max wait time", 500, 100, 1000, this);

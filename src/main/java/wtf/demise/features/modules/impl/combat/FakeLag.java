@@ -114,7 +114,7 @@ public class FakeLag extends Module {
 
         if (ms == 0) ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
 
-        if (target == null || (onlyOnGround.get() && !mc.thePlayer.onGround) || (onlyKillAura.get() && !getModule(KillAura.class).isEnabled()) || (pauseOnBacktrack.get() && getModule(BackTrack.class).isEnabled() && BackTrack.shouldLag)) {
+        if (target == null || (onlyOnGround.get() && !mc.thePlayer.onGround) || (onlyKillAura.get() && !getModule(KillAura.class).isEnabled()) || (pauseOnBacktrack.get() && getModule(BackTrack.class).isEnabled() && BackTrack.shouldLag) || mc.thePlayer.isDead) {
             if (blinking) {
                 switch (mode.get()) {
                     case "Pulse":

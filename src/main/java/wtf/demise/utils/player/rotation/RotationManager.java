@@ -31,6 +31,8 @@ public class RotationManager implements InstanceAccess {
     public static float rotDiffBuildUp;
     public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
+    private long lastFrameTime = System.nanoTime();
+    private float timeScale;
 
     public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode, boolean silent) {
         if (tickTimer.hasTimeElapsed(50)) {
@@ -74,7 +76,6 @@ public class RotationManager implements InstanceAccess {
         }
     }
 
-    @EventPriority(Integer.MIN_VALUE)
     @EventTarget
     public void onLook(LookEvent e) {
         if (shouldRotate()) {
@@ -117,6 +118,19 @@ public class RotationManager implements InstanceAccess {
             currentRotation = mc.thePlayer.getRotation();
         }
 
+        if (e.getState() == MouseMoveEvent.State.PRE) {
+            if (lastFrameTime == 0L) {
+                lastFrameTime = System.nanoTime();
+            }
+
+            long currentTime = System.nanoTime();
+            float deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
+            lastFrameTime = currentTime;
+
+            timeScale = deltaTime * 120;
+            return;
+        }
+
         if (enabled) {
             handleRotation(e, targetRotation);
         } else {
@@ -140,16 +154,16 @@ public class RotationManager implements InstanceAccess {
         int[] delta = limitRotations(currentRotation, target);
 
         if (!silent) {
-            e.setDeltaX(delta[0]);
-            e.setDeltaY(delta[1]);
+            e.setDeltaX((int) (delta[0] * timeScale));
+            e.setDeltaY((int) (delta[1] * timeScale));
 
             currentRotation = mc.thePlayer.getRotation();
         } else {
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
 
-            float yawStep = delta[0] * f1;
-            float pitchStep = delta[1] * f1;
+            int yawStep = (int) (delta[0] * f1 * timeScale);
+            int pitchStep = (int) (delta[1] * f1 * timeScale);
 
             currentRotation[0] += yawStep * 0.15f;
             currentRotation[1] -= pitchStep * 0.15f;

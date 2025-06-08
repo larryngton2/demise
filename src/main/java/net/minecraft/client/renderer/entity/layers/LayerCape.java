@@ -16,7 +16,6 @@ import java.util.Iterator;
 
 public class LayerCape implements LayerRenderer<AbstractClientPlayer> {
     private final RenderPlayer playerRenderer;
-    private float f;
 
     public LayerCape(RenderPlayer playerRendererIn) {
         this.playerRenderer = playerRendererIn;

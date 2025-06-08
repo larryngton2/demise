@@ -3,10 +3,7 @@ package wtf.demise.utils.player;
 import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.AtomicDouble;
 import lombok.Getter;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.BlockFalling;
-import net.minecraft.block.BlockTNT;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.enchantment.Enchantment;
@@ -235,7 +232,7 @@ public class InventoryUtils implements InstanceAccess {
     }
 
     public static boolean isValidBlock(final Block block, final boolean toPlace) {
-        if (block instanceof BlockContainer || block instanceof BlockTNT || !block.isFullBlock() || !block.isFullCube() || (toPlace && block instanceof BlockFalling)) {
+        if (block instanceof BlockContainer || block instanceof BlockTNT || !block.isFullBlock() || (!block.isFullCube() && !(block instanceof BlockGlass)) || (toPlace && block instanceof BlockFalling)) {
             return false;
         }
         final Material material = block.getMaterial();

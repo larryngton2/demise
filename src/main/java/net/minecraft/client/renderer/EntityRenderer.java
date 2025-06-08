@@ -85,6 +85,7 @@ import wtf.demise.features.modules.impl.visual.NoHurtCam;
 import wtf.demise.features.modules.impl.visual.ThirdPersonDistance;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -1001,12 +1002,14 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             Mouse.setGrabbed(true);
         }
 
+        Demise.INSTANCE.getEventManager().call(new MouseMoveEvent(mc.mouseHelper.deltaX, mc.mouseHelper.deltaY, MouseMoveEvent.State.PRE));
+
         if (mc.inGameHasFocus && flag) {
             mc.mouseHelper.mouseXYChange();
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
 
-            MouseMoveEvent mouseMoveEvent = new MouseMoveEvent(mc.mouseHelper.deltaX, mc.mouseHelper.deltaY);
+            MouseMoveEvent mouseMoveEvent = new MouseMoveEvent(mc.mouseHelper.deltaX, mc.mouseHelper.deltaY, MouseMoveEvent.State.UPDATE);
             Demise.INSTANCE.getEventManager().call(mouseMoveEvent);
 
             float f2 = (float) mouseMoveEvent.getDeltaX() * f1;

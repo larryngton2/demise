@@ -74,7 +74,13 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     }
 
     protected float interpolateRotation(float par1, float par2, float par3) {
-        return MathUtils.interpolateNoUpdateCheck(par1, par2, par3);
+        float f = par2 - par1;
+
+        while (f >= 180.0F) {
+            f -= 360.0F;
+        }
+
+        return par1 + par3 * f;
     }
 
     public void transformHeldFull3DItemLayer() {
