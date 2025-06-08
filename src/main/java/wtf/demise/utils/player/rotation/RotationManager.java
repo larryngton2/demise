@@ -162,8 +162,8 @@ public class RotationManager implements InstanceAccess {
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
 
-            int yawStep = (int) (delta[0] * f1 * timeScale);
-            int pitchStep = (int) (delta[1] * f1 * timeScale);
+            float yawStep = delta[0] * f1 * timeScale;
+            float pitchStep = delta[1] * f1 * timeScale;
 
             currentRotation[0] += yawStep * 0.15f;
             currentRotation[1] -= pitchStep * 0.15f;
