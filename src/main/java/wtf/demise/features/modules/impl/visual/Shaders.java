@@ -20,8 +20,7 @@ public class Shaders extends Module {
     public void renderShaders() {
         if (!this.isEnabled()) return;
 
-        if (this.blur.get()) {
-            RenderUtils.resetColor();
+        if (blur.get()) {
             Blur.startBlur();
             INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.BLUR));
             Blur.endBlur(25, 1);

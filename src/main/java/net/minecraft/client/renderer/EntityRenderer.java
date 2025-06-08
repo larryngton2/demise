@@ -85,7 +85,6 @@ import wtf.demise.features.modules.impl.visual.NoHurtCam;
 import wtf.demise.features.modules.impl.visual.ThirdPersonDistance;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.misc.ChatUtils;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;

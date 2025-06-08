@@ -2,12 +2,14 @@ package wtf.demise.gui.click.dropdown;
 
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.shader.Framebuffer;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Shaders;
+import wtf.demise.gui.click.dropdown.configs.GuiConfig;
 import wtf.demise.gui.click.dropdown.panel.CategoryPanel;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
@@ -46,7 +48,14 @@ public class DropdownGUI extends GuiScreen {
     public void initGui() {
         closing = false;
         openingAnimation.setDirection(Direction.FORWARDS);
-        super.initGui();
+        this.buttonList.clear();
+        this.buttonList.add(new GuiButton(0, 10, height - 30, 100, 20, "Configs"));
+    }
+
+    protected void actionPerformed(GuiButton button) {
+        if (button.enabled && button.id == 0) {
+            mc.displayGuiScreen(new GuiConfig());
+        }
     }
 
     @Override
@@ -60,12 +69,10 @@ public class DropdownGUI extends GuiScreen {
             }
         }
 
-        int finalMouseY = mouseY;
-
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
             CategoryPanel.shader = true;
             Blur.startBlur();
-            panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
+            panels.forEach(panel -> panel.drawScreen(mouseX, mouseY));
             Blur.endBlur(25, 1);
         }
 
@@ -74,13 +81,13 @@ public class DropdownGUI extends GuiScreen {
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer, true);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
-            panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
+            panels.forEach(panel -> panel.drawScreen(mouseX, mouseY));
             stencilFramebuffer.unbindFramebuffer();
             Shadow.renderBloom(stencilFramebuffer.framebufferTexture, 50, 1);
         }
 
         CategoryPanel.shader = false;
-        panels.forEach(panel -> panel.drawScreen(mouseX, finalMouseY));
+        panels.forEach(panel -> panel.drawScreen(mouseX, mouseY));
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

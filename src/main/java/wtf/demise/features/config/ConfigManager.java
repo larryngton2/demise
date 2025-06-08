@@ -10,9 +10,13 @@ import wtf.demise.Demise;
 import wtf.demise.features.config.impl.ModuleConfig;
 import wtf.demise.features.config.impl.WidgetConfig;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class ConfigManager {
@@ -98,5 +102,15 @@ public class ConfigManager {
         if (!loadConfig(elements)) {
             Demise.LOGGER.warn("Failed to load elements config.");
         }
+    }
+
+    public List<String> getConfigList() {
+        File directory = Demise.INSTANCE.getMainDir();
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(".json"));
+        if (files == null) {
+            return List.of();
+        }
+
+        return Arrays.stream(files).filter(File::isFile).map(file -> file.getName().replace(".json", "")).collect(Collectors.toList());
     }
 }

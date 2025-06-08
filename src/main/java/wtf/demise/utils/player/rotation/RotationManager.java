@@ -151,19 +151,20 @@ public class RotationManager implements InstanceAccess {
     }
 
     private void handleRotation(MouseMoveEvent e, float[] target) {
-        int[] delta = limitRotations(currentRotation, target);
+        float[] delta = toFloat(limitRotations(currentRotation, target));
+        int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
 
         if (!silent) {
-            e.setDeltaX((int) (delta[0] * timeScale));
-            e.setDeltaY((int) (delta[1] * timeScale));
+            e.setDeltaX(scaledDelta[0]);
+            e.setDeltaY(scaledDelta[1]);
 
             currentRotation = mc.thePlayer.getRotation();
         } else {
             float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
             float f1 = f * f * f * 8.0F;
 
-            float yawStep = delta[0] * f1 * timeScale;
-            float pitchStep = delta[1] * f1 * timeScale;
+            float yawStep = scaledDelta[0] * f1;
+            float pitchStep = scaledDelta[1] * f1;
 
             currentRotation[0] += yawStep * 0.15f;
             currentRotation[1] -= pitchStep * 0.15f;
@@ -232,5 +233,9 @@ public class RotationManager implements InstanceAccess {
         }
 
         return delta;
+    }
+
+    private float[] toFloat(int[] ints) {
+        return new float[]{ints[0], ints[1]};
     }
 }

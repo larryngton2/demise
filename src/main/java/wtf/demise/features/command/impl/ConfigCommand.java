@@ -8,10 +8,8 @@ import wtf.demise.utils.misc.ChatUtils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ConfigCommand extends Command {
     private enum Action {
@@ -80,7 +78,7 @@ public class ConfigCommand extends Command {
     }
 
     private void handleList() {
-        List<String> configs = getConfigList();
+        List<String> configs = Demise.INSTANCE.getConfigManager().getConfigList();
         String message = configs.isEmpty() ? "No configurations found." : "Configs: " + String.join(", ", configs);
         ChatUtils.sendMessageClient(message);
     }
@@ -150,16 +148,6 @@ public class ConfigCommand extends Command {
 
         String message = configFile.delete() ? "Removed config: " + configName : "Failed to remove config: " + configName;
         ChatUtils.sendMessageClient(message);
-    }
-
-    private List<String> getConfigList() {
-        File directory = Demise.INSTANCE.getMainDir();
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".json"));
-        if (files == null) {
-            return List.of();
-        }
-
-        return Arrays.stream(files).filter(File::isFile).map(file -> file.getName().replace(".json", "")).collect(Collectors.toList());
     }
 
     private static class ConfigurationException extends RuntimeException {

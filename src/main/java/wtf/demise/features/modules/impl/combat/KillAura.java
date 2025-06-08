@@ -101,7 +101,7 @@ public class KillAura extends Module {
 
     // target
     private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch"}, "Single", this);
-    private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health", "HurtTime"}, "Distance", this, () -> targetMode.is("Single"));
+    private final ModeValue targetPriority = new ModeValue("Target Priority", new String[]{"None", "Distance", "Health", "HurtTime", "Angle"}, "Distance", this, () -> targetMode.is("Single"));
     private final SliderValue targetSwitchDelay = new SliderValue("Target Switch Delay (ms)", 500, 50, 1000, 50, this, () -> targetMode.is("Switch"));
 
     // visual
@@ -203,8 +203,11 @@ public class KillAura extends Module {
         double closestDistance = searchRange.get() + 0.4;
         double leastHealth = Float.MAX_VALUE;
         double leastHurtTime = 10;
+        double closestAngle = Double.MAX_VALUE;
 
-        for (Entity entity : mc.theWorld.loadedEntityList) {
+        for (Entity e : mc.theWorld.loadedEntityList) {
+            if (!(e instanceof EntityLivingBase entity)) continue;
+
             double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
 
             if (entity != mc.thePlayer && distanceToEntity <= searchRange.get()) {
@@ -230,24 +233,26 @@ public class KillAura extends Module {
                 switch (targetPriority.get()) {
                     case "Distance":
                         if (distanceToEntity < closestDistance) {
-                            target = (EntityLivingBase) entity;
+                            target = entity;
                             closestDistance = distanceToEntity;
                         }
                         break;
                     case "Health":
-                        EntityLivingBase potentialTarget = (EntityLivingBase) entity;
-                        float potentialHealth = PlayerUtils.getActualHealth(potentialTarget);
-                        if (potentialHealth < leastHealth) {
-                            target = potentialTarget;
-                            leastHealth = potentialHealth;
+                        if (PlayerUtils.getActualHealth(entity) < leastHealth) {
+                            target = entity;
+                            leastHealth = PlayerUtils.getActualHealth(entity);
                         }
                         break;
                     case "HurtTime":
-                        EntityLivingBase potentialTarget2 = (EntityLivingBase) entity;
-                        float potentialHurtTime = potentialTarget2.hurtTime;
-                        if (potentialHurtTime <= leastHurtTime) {
-                            target = potentialTarget2;
-                            leastHurtTime = potentialHurtTime;
+                        if (entity.hurtTime <= leastHurtTime) {
+                            target = entity;
+                            leastHurtTime = entity.hurtTime;
+                        }
+                        break;
+                    case "Angle":
+                        if (RotationUtils.getRotationDifferenceClientRot(entity) < closestAngle) {
+                            target = entity;
+                            closestAngle = RotationUtils.getRotationDifferenceClientRot(entity);
                         }
                         break;
                 }

@@ -23,7 +23,7 @@ public class Shadow implements InstanceAccess {
     private static final int MAX_RADIUS = 128;
     private static final int CACHE_LIMIT = 16;
 
-    private static final Map<Integer, float[]> gaussianCache = new LinkedHashMap<Integer, float[]>(CACHE_LIMIT, 0.75f, true) {
+    private static final Map<Integer, float[]> gaussianCache = new LinkedHashMap<>(CACHE_LIMIT, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<Integer, float[]> eldest) {
             return size() > CACHE_LIMIT;

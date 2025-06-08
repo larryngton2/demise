@@ -21,6 +21,7 @@ public class InfoWidget extends Widget {
 
     public InfoWidget() {
         super("Info");
+        Demise.INSTANCE.getEventManager().unregister(this);
         Demise.INSTANCE.getEventManager().register(this);
     }
 
