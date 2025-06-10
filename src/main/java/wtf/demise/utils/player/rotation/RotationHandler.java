@@ -43,6 +43,9 @@ public class RotationHandler implements InstanceAccess {
     final BoolValue rotateLegit;
     private EntityLivingBase target;
     private final Module module;
+    final BoolValue accel;
+    final SliderValue yawAccelFactor;
+    final SliderValue pitchAccelFactor;
 
     public RotationHandler(Module module) {
         this.module = module;
@@ -50,6 +53,9 @@ public class RotationHandler implements InstanceAccess {
         silent = new BoolValue("Silent", true, module);
         rotateLegit = new BoolValue("Rotate legit", false, module);
         smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Bezier", "None"}, "Linear", module, rotateLegit::get);
+        accel = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
+        yawAccelFactor = new SliderValue("Yaw accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
+        pitchAccelFactor = new SliderValue("Pitch accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
         imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
         yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
         yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None"));
@@ -111,7 +117,7 @@ public class RotationHandler implements InstanceAccess {
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
         if (rotateLegit.get()) {
-            RotationManager.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed, midpoint.get(), mode, silent.get());
+            RotationManager.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, midpoint.get(), accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get());
         } else {
             OldRotationUtils.setRotation(targetRotation, movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None, hSpeed, vSpeed);
         }

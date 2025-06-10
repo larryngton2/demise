@@ -11,7 +11,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.packet.PacketReleaseEvent;
-import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;

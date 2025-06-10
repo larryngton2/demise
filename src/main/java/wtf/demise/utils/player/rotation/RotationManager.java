@@ -31,10 +31,18 @@ public class RotationManager implements InstanceAccess {
     public static float rotDiffBuildUp;
     public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
+    private static final TimerUtils tickTimer1 = new TimerUtils();
     private long lastFrameTime = System.nanoTime();
     private float timeScale;
+    private int previousDeltaYaw = 0;
+    private int previousDeltaPitch = 0;
+    private static boolean cachedAccel;
+    private static float cachedAccelFactorYaw;
+    private static float cachedAccelFactorPitch;
+    private int interpolatedAccelDeltaYaw;
+    private int interpolatedAccelDeltaPitch;
 
-    public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed, float midpoint, SmoothMode smoothMode, boolean silent) {
+    public static void setRotation(float[] rotation, boolean correction, float[] speed, float midpoint, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
 
@@ -43,11 +51,14 @@ public class RotationManager implements InstanceAccess {
 
         RotationManager.targetRotation = rotation;
         RotationManager.silent = silent;
-        RotationManager.cachedHSpeed = hSpeed;
-        RotationManager.cachedVSpeed = vSpeed;
+        RotationManager.cachedHSpeed = speed[0];
+        RotationManager.cachedVSpeed = speed[1];
         RotationManager.cachedMidpoint = midpoint;
         RotationManager.smoothMode = smoothMode;
         RotationManager.cachedCorrection = correction;
+        RotationManager.cachedAccel = accel;
+        RotationManager.cachedAccelFactorYaw = accelFactor[0];
+        RotationManager.cachedAccelFactorPitch = accelFactor[1];
         enabled = true;
     }
 
@@ -138,6 +149,7 @@ public class RotationManager implements InstanceAccess {
                 currentRotation = mc.thePlayer.getRotation();
                 targetRotation = null;
                 reset = true;
+                previousDeltaYaw = previousDeltaPitch = 0;
             } else {
                 handleRotation(e, mc.thePlayer.getRotation());
             }
@@ -151,7 +163,7 @@ public class RotationManager implements InstanceAccess {
     }
 
     private void handleRotation(MouseMoveEvent e, float[] target) {
-        float[] delta = toFloat(limitRotations(currentRotation, target));
+        float[] delta = toFloats(limitRotations(currentRotation, target));
         int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
 
         if (!silent) {
@@ -232,10 +244,29 @@ public class RotationManager implements InstanceAccess {
             default -> delta = finalTargetRotation;
         }
 
+        if (cachedAccel) {
+            float[] factors = new float[]{cachedAccelFactorYaw, cachedAccelFactorPitch};
+
+            // nothing else worked ok
+            // 16.67 is roughly the frame delay of 60 fps
+            // if you don't get > 60 fps, please don't consider using this client
+            if (tickTimer1.hasTimeElapsed((long) 16.67)) {
+                interpolatedAccelDeltaYaw = (int) (delta[0] * (1 - factors[0]) + previousDeltaYaw * factors[0]);
+                interpolatedAccelDeltaPitch = (int) (delta[1] * (1 - factors[1]) + previousDeltaPitch * factors[1]);
+                tickTimer1.reset();
+            }
+
+            delta[0] = interpolatedAccelDeltaYaw;
+            delta[1] = interpolatedAccelDeltaPitch;
+        }
+
+        previousDeltaYaw = delta[0];
+        previousDeltaPitch = delta[1];
+
         return delta;
     }
 
-    private float[] toFloat(int[] ints) {
+    private float[] toFloats(int[] ints) {
         return new float[]{ints[0], ints[1]};
     }
 }

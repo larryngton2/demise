@@ -8,6 +8,7 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.utils.InstanceAccess;
 
 import java.security.SecureRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtils implements InstanceAccess {
     private static final TimerUtils lerpUpdateTimer = new TimerUtils();
@@ -120,15 +121,6 @@ public class MathUtils implements InstanceAccess {
                 interpolate(current.zCoord, target.zCoord, multiple));
     }
 
-    public static float nextSecureFloat(final double origin, final double bound) {
-        if (origin == bound) {
-            return (float) origin;
-        }
-        final SecureRandom secureRandom = new SecureRandom();
-        final float difference = (float) (bound - origin);
-        return (float) (origin + secureRandom.nextFloat() * difference);
-    }
-
     public static float calculateGaussianValue(float x, float sigma) {
         double PI = Math.PI;
         double output = 1.0 / Math.sqrt(2.0 * PI * (sigma * sigma));
@@ -165,11 +157,11 @@ public class MathUtils implements InstanceAccess {
     }
 
     public static double randomizeDouble(double min, double max) {
-        return Math.random() * (max - min) + min;
+        return ThreadLocalRandom.current().nextDouble(min, max + 1);
     }
 
     public static float randomizeFloat(float min, float max) {
-        return (float) (Math.random() * (max - min) + min);
+        return (float) randomizeDouble(min, max);
     }
 
     public static boolean inBetween(double min, double max, double value) {
@@ -178,54 +170,5 @@ public class MathUtils implements InstanceAccess {
 
     public static double wrappedDifference(double number1, double number2) {
         return Math.min(Math.abs(number1 - number2), Math.min(Math.abs(number1 - 360) - Math.abs(number2 - 0), Math.abs(number2 - 360) - Math.abs(number1 - 0)));
-    }
-
-    public static float getAdvancedRandom(float min, float max) {
-        SecureRandom random = new SecureRandom();
-
-        long finalSeed = System.nanoTime();
-
-        for (int i = 0; i < 3; ++i) {
-            long seed = (long) (Math.random() * 1_000_000_000);
-
-            seed ^= (seed << 13);
-            seed ^= (seed >>> 17);
-            seed ^= (seed << 15);
-
-            finalSeed += seed;
-        }
-
-        random.setSeed(finalSeed);
-
-        return random.nextFloat() * (max - min) + min;
-    }
-
-    public static Vec3 closestPointOnFace(AxisAlignedBB aabb, EnumFacing face, double x, double y, double z) {
-        double closestX, closestY, closestZ;
-
-        switch (face) {
-            case DOWN, UP -> {
-                closestX = Math.max(aabb.minX, Math.min(x, aabb.maxX));
-                closestY = face == EnumFacing.DOWN ? aabb.minY : aabb.maxY;
-                closestZ = Math.max(aabb.minZ, Math.min(z, aabb.maxZ));
-            }
-            case NORTH, SOUTH -> {
-                closestX = Math.max(aabb.minX, Math.min(x, aabb.maxX));
-                closestY = Math.max(aabb.minY, Math.min(y, aabb.maxY));
-                closestZ = face == EnumFacing.NORTH ? aabb.minZ : aabb.maxZ;
-            }
-            case WEST, EAST -> {
-                closestX = face == EnumFacing.WEST ? aabb.minX : aabb.maxX;
-                closestY = Math.max(aabb.minY, Math.min(y, aabb.maxY));
-                closestZ = Math.max(aabb.minZ, Math.min(z, aabb.maxZ));
-            }
-            default -> throw new IllegalArgumentException("Invalid face: " + face);
-        }
-
-        return new Vec3(closestX, closestY, closestZ);
-    }
-
-    public static Vec3 closestPointOnFace(AxisAlignedBB aabb, EnumFacing face, Vec3 vec) {
-        return closestPointOnFace(aabb, face, vec.xCoord, vec.yCoord, vec.zCoord);
     }
 }

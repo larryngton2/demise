@@ -20,6 +20,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.SimulatedPlayer;
@@ -40,6 +41,7 @@ public class TickBase extends Module {
     private final SliderValue stopRange = new SliderValue("Stop range", 2.5f, 0.1f, 8f, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 15, 0.1f, this);
     private final SliderValue maxTick = new SliderValue("Max ticks", 4, 1, 20, this);
+    private final BoolValue prioritiseCrits = new BoolValue("Prioritise crits", false, this);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final SliderValue targetPredictionTicks = new SliderValue("Target prediction ticks", 4, 0, 20, 1, this);
     private final BoolValue renderPredictedTargetPos = new BoolValue("Render predicted target pos", false, this);
@@ -54,6 +56,7 @@ public class TickBase extends Module {
     private EntityPlayer target;
     private boolean firstAnimation = true;
     public boolean working;
+    private int ticksToSkip;
 
     @Override
     public void onEnable() {
@@ -79,7 +82,7 @@ public class TickBase extends Module {
                 shifted += e.getTime() - previousTime;
             }
 
-            if (shifted >= maxTick.get() * 50L) {
+            if (shifted >= ticksToSkip * 50L) {
                 shifted = 0;
                 timer.reset();
             }
@@ -96,11 +99,10 @@ public class TickBase extends Module {
                 return;
             }
 
-            //if (timer.hasTimeElapsed(delay.get()) && e.isPost()) {
             if (timer.hasTimeElapsed(delay.get())) {
                 if (shouldStart()) {
                     firstAnimation = false;
-                    while (skippedTick < maxTick.get() && !shouldStop()) {
+                    while (skippedTick < ticksToSkip && !shouldStop()) {
                         working = true;
                         skippedTick++;
                         try {
@@ -134,14 +136,18 @@ public class TickBase extends Module {
 
         for (int i = 0; i < maxTick.get(); i++) {
             simulatedSelf.tick();
-            selfPrediction.add(new PlayerUtils.PredictProcess(
-                            simulatedSelf.getPos(),
-                            simulatedSelf.fallDistance,
-                            simulatedSelf.onGround,
-                            simulatedSelf.isCollidedHorizontally,
-                            simulatedSelf.player
-                    )
+
+            PlayerUtils.PredictProcess predictProcess = new PlayerUtils.PredictProcess(
+                    simulatedSelf.getPos(),
+                    simulatedSelf.fallDistance,
+                    simulatedSelf.onGround,
+                    simulatedSelf.isCollidedHorizontally,
+                    simulatedSelf.player
             );
+
+            predictProcess.tick = i;
+
+            selfPrediction.add(predictProcess);
         }
     }
 
@@ -183,10 +189,33 @@ public class TickBase extends Module {
     }
 
     private boolean shouldStart() {
+        boolean picked = false;
+
+        for (PlayerUtils.PredictProcess predictProcess : selfPrediction) {
+            if (criteria(predictProcess.tick)) {
+                ticksToSkip = predictProcess.tick;
+                picked = true;
+
+                if (predictProcess.fallDistance > 0 && prioritiseCrits.get()) {
+                    break;
+                }
+            }
+        }
+
+        if (!picked) {
+            ticksToSkip = (int) maxTick.get() - 1;
+        }
+
+        ChatUtils.sendMessageClient(ticksToSkip + " / " + criteria(ticksToSkip));
+
+        return criteria(ticksToSkip);
+    }
+
+    private boolean criteria(int tick) {
         AxisAlignedBB entityBoundingBox = target.getHitbox().offset(getTargetPrediction());
 
         double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(entityBoundingBox.getCenter(), mc.thePlayer);
-        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(selfPrediction.size() - 1).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
+        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(tick).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
 
         return predictedSelfDistance < predictedTargetDistance &&
                 predictedSelfDistance <= tickRange.get() &&
@@ -195,7 +224,7 @@ public class TickBase extends Module {
                 PlayerUtils.getDistanceToEntityBox(target) >= stopRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&
                 target.canEntityBeSeen(mc.thePlayer) &&
-                !selfPrediction.get(selfPrediction.size() - 1).isCollidedHorizontally &&
+                !selfPrediction.get(tick).isCollidedHorizontally &&
                 !mc.thePlayer.isCollidedHorizontally;
     }
 

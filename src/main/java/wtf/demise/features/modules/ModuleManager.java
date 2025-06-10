@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModuleManager {
     private static final Set<Class<? extends Module>> COMBAT_MODULES = Set.of(
             AntiBot.class, Criticals.class, FakeLag.class, KeepSprint.class, KillAura.class, TickBase.class,
-            TimerRange.class, Velocity.class
+            TimerRange.class, Velocity.class, LagRange.class
     );
 
     private static final Set<Class <? extends Module>> LEGIT_MODULES = Set.of(
@@ -47,7 +47,7 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
         AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
-            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class
+            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class, AutoMeow.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
