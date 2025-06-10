@@ -46,6 +46,6 @@ public class FlagDetector extends Module {
     }
 
     private void alert(String flagType) {
-        Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "FlagDetector", "Detected " + flagType + " (" + totalFlags + "x)");
+        Demise.INSTANCE.getNotificationManager().post(NotificationType.ERROR, "FlagDetector", "Detected " + flagType + " (" + totalFlags + "x)");
     }
 }

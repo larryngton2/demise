@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.player;
 
 import lombok.AllArgsConstructor;
 import net.minecraft.block.*;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -492,14 +493,14 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    public void onRender3D(Render3DEvent event) {
+    public void onRender3D(Render3DEvent e) {
         if (addons.isEnabled("Target Block ESP")) {
             RenderUtils.renderBlock(data.blockPos.offset(data.facing), getModule(Interface.class).color(0, 100), false, true);
         }
     }
 
     @EventTarget
-    public void onWorld(WorldChangeEvent event) {
+    public void onWorld(WorldChangeEvent e) {
         setEnabled(false);
     }
 

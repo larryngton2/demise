@@ -184,9 +184,9 @@ public class AltRepositoryGUI extends GuiScreen {
                                             microsoftAltCredential.getUUID().toString(),
                                             accessToken, "msa");
                                     mc.displayGuiScreen(AltRepositoryGUI.this);
-                                    demise.getNotificationManager().post(NotificationType.OKAY, "Logged in! Username: " + microsoftAltCredential.getName());
+                                    demise.getNotificationManager().post(NotificationType.SUCCESS, "Logged in! Username: " + microsoftAltCredential.getName());
                                 } catch (Exception e) {
-                                    demise.getNotificationManager().post(NotificationType.WARNING, "Failed to logged in");
+                                    demise.getNotificationManager().post(NotificationType.ERROR, "Failed to logged in");
                                 }
                             }
                         }));
@@ -214,7 +214,7 @@ public class AltRepositoryGUI extends GuiScreen {
                         Map<String, Object> headers = new HashMap<>();
 
                         if (!skinFile.getName().endsWith(".png")) {
-                            demise.getNotificationManager().post(NotificationType.WARNING, "Its seems that the file isn't a skin..");
+                            demise.getNotificationManager().post(NotificationType.ERROR, "Its seems that the file isn't a skin..");
                             break;
                         }
 
@@ -235,14 +235,14 @@ public class AltRepositoryGUI extends GuiScreen {
 
                         HttpResponse response = HttpUtils.postFormData(url, filePathMap, keyValues, headers);
                         if (response.getCode() == 200 || response.getCode() == 204) {
-                            demise.getNotificationManager().post(NotificationType.OKAY, "Skin changed!");
+                            demise.getNotificationManager().post(NotificationType.SUCCESS, "Skin changed!");
                         } else {
-                            demise.getNotificationManager().post(NotificationType.WARNING, "Failed to change skin.");
+                            demise.getNotificationManager().post(NotificationType.ERROR, "Failed to change skin.");
                             logger.error(response);
                         }
                     }
                 } catch (Exception e) {
-                    demise.getNotificationManager().post(NotificationType.WARNING, "Failed to change skin.");
+                    demise.getNotificationManager().post(NotificationType.ERROR, "Failed to change skin.");
                     e.printStackTrace();
                 }
                 break;
@@ -750,7 +750,7 @@ public class AltRepositoryGUI extends GuiScreen {
 
             alt.select();
         } else {
-            demise.getNotificationManager().post(NotificationType.WARNING, "Account is already added!");
+            demise.getNotificationManager().post(NotificationType.ERROR, "Account is already added!");
         }
     }
 

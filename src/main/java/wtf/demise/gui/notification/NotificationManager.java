@@ -2,13 +2,16 @@ package wtf.demise.gui.notification;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.client.LoadingScreenRenderer;
+import net.minecraft.client.gui.GuiIngame;
+import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
+import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
@@ -36,6 +39,10 @@ public class NotificationManager implements InstanceAccess {
     private void post(Notification notification) {
         if (INSTANCE.getModuleManager().getModule(Interface.class).elements.isEnabled("Notification")) {
             notifications.add(notification);
+
+            if (Demise.INSTANCE.getStartTime() > 1000) {
+                SoundUtil.notifSound(notification.getNotificationType());
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.Vec3;
+import org.apache.commons.lang3.Range;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
@@ -20,7 +21,6 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.SimulatedPlayer;
@@ -41,6 +41,7 @@ public class TickBase extends Module {
     private final SliderValue stopRange = new SliderValue("Stop range", 2.5f, 0.1f, 8f, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 15, 0.1f, this);
     private final SliderValue maxTick = new SliderValue("Max ticks", 4, 1, 20, this);
+    private final BoolValue allowEarlyBreak = new BoolValue("Allow early break", false, this);
     private final BoolValue prioritiseCrits = new BoolValue("Prioritise crits", false, this);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final SliderValue targetPredictionTicks = new SliderValue("Target prediction ticks", 4, 0, 20, 1, this);
@@ -196,7 +197,15 @@ public class TickBase extends Module {
                 ticksToSkip = predictProcess.tick;
                 picked = true;
 
+                AxisAlignedBB entityBoundingBox = target.getHitbox().offset(getTargetPrediction());
+
+                double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(predictProcess.tick).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
+
                 if (predictProcess.fallDistance > 0 && prioritiseCrits.get()) {
+                    break;
+                }
+
+                if (Range.between(tickRange.get(), tickRange.get() - 0.1f).contains((float) predictedSelfDistance) && allowEarlyBreak.get()) {
                     break;
                 }
             }

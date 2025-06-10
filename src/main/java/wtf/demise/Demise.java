@@ -189,7 +189,7 @@ public class Demise {
 
     private void handleFastRender() {
         if (Minecraft.getMinecraft().gameSettings.ofFastRender) {
-            notificationManager.post(NotificationType.WARNING, "Fast Rendering has been disabled", "due to compatibility issues");
+            notificationManager.post(NotificationType.INFO, "Fast Rendering has been disabled", "due to compatibility issues");
             Minecraft.getMinecraft().gameSettings.ofFastRender = false;
             LOGGER.info("Fast Rendering was disabled due to compatibility issues.");
         }

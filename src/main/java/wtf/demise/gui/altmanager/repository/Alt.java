@@ -156,13 +156,12 @@ public class Alt {
                             setLoginProperty(true);
                             setInvalid(false);
 
-                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Logged in! " + Alt.this);
-
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.SUCCESS, "Logged in! " + Alt.this);
                         }
                     } catch (Throwable e) {
                         setLoginProperty(false);
                         setInvalid(true);
-                        Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, e.getClass().getName() + ':' + e.getMessage());
+                        Demise.INSTANCE.getNotificationManager().post(NotificationType.ERROR, e.getClass().getName() + ':' + e.getMessage());
                     }
                 } else {
                     session = new AltLoginThread(credential, new SessionUpdatingAltLoginListener() {
@@ -177,14 +176,14 @@ public class Alt {
                             setLoginProperty(true);
                             setInvalid(false);
 
-                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Logged in! " + Alt.this);
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.SUCCESS, "Logged in! " + Alt.this);
                         }
 
                         @Override
                         public void onLoginFailed() {
                             setLoginProperty(false);
                             setInvalid(true);
-                            Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Invalid credentials!");
+                            Demise.INSTANCE.getNotificationManager().post(NotificationType.ERROR, "Invalid credentials!");
                         }
                     }).run();
                 }
@@ -195,12 +194,12 @@ public class Alt {
                 this.animationX = 0;
             } else if (isLoggingIn()) {
                 if (System.currentTimeMillis() > lastTimeAlreadyLogged + 150) {
-                    Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Already trying logging in!");
+                    Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Already trying logging in!");
                     this.lastTimeAlreadyLogged = System.currentTimeMillis();
                 }
             } else if (isLoginSuccessful()) {
                 if (System.currentTimeMillis() > lastTimeAlreadyLogged + 150) {
-                    Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Already logged in!");
+                    Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Already logged in!");
                     this.lastTimeAlreadyLogged = System.currentTimeMillis();
                 }
             }
@@ -218,7 +217,7 @@ public class Alt {
                     .getId() != null) {
 
                 try {
-                    Demise.INSTANCE.getNotificationManager().post(NotificationType.OKAY, "Logged in! " + this);
+                    Demise.INSTANCE.getNotificationManager().post(NotificationType.SUCCESS, "Logged in! " + this);
 
                     repository.saveAlts();
                 } catch (Throwable t) {
@@ -395,7 +394,7 @@ public class Alt {
             JSONObject privileges = attributes.getJSONObject("privileges");
             JSONObject multiPlayerServerPrivilege = privileges.getJSONObject("multiplayerServer");
             if (!multiPlayerServerPrivilege.getBoolean("enabled")) {
-                Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Oops, this player don't have privilege to play online server.");
+                Demise.INSTANCE.getNotificationManager().post(NotificationType.ERROR, "Oops, this player don't have privilege to play online server.");
                 return false;
             }
 
@@ -406,13 +405,13 @@ public class Alt {
                     if (!bannedScopes.has("expires") ||
                             multiplayerBan.get("expires") == null ||
                             multiplayerBan.getLong("expires") >= System.currentTimeMillis()) {
-                        Demise.INSTANCE.getNotificationManager().post(NotificationType.NOTIFY, "Oops, this player got banned from mojang.");
+                        Demise.INSTANCE.getNotificationManager().post(NotificationType.ERROR, "Oops, this player got banned from mojang.");
                         return false;
                     }
                 }
             }
         } catch (Throwable e) {
-            Demise.INSTANCE.getNotificationManager().post(NotificationType.WARNING, "Failed to get player attributes.");
+            Demise.INSTANCE.getNotificationManager().post(NotificationType.ERROR, "Failed to get player attributes.");
             e.printStackTrace();
         }
 
