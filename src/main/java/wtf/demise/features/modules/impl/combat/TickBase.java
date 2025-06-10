@@ -206,8 +206,6 @@ public class TickBase extends Module {
             ticksToSkip = (int) maxTick.get() - 1;
         }
 
-        ChatUtils.sendMessageClient(ticksToSkip + " / " + criteria(ticksToSkip));
-
         return criteria(ticksToSkip);
     }
 
