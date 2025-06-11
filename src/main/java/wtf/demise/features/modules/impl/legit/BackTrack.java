@@ -35,6 +35,7 @@ public class BackTrack extends Module {
     private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this, onlyWhenNeeded::get);
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
     private final SliderValue maxRange = new SliderValue("Max range", 6, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
+    private final BoolValue onlyDouble = new BoolValue("Only double", true, this, onlyWhenNeeded::get);
     private final BoolValue extraCheck = new BoolValue("Extra check", true, this);
     private final SliderValue ms = new SliderValue("Delay ms", 50, 0, 5000, 5, this);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
@@ -79,7 +80,7 @@ public class BackTrack extends Module {
                 outOfRange = true;
             }
 
-            if (target.hurtTime == 10) {
+            if ((target.hurtTime == 10 && onlyDouble.get()) || (realDistance < 3 && !onlyDouble.get())) {
                 outOfRange = false;
             }
 

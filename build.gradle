@@ -11,7 +11,7 @@ ext {
     gsonVersion = "2.8.9"
 }
 
-project.ext.lwjglVersion = "3.3.5"
+project.ext.lwjglVersion = "3.3.6"
 project.ext.lwjglNatives = "natives-linux"
 
 repositories {
