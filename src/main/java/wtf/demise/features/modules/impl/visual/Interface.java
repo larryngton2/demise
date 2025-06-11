@@ -43,7 +43,6 @@ public class Interface extends Module {
 
     public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
-    public final BoolValue background = new BoolValue("Background", true, this, () -> elements.isEnabled("Module List"));
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
     public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this, () -> elements.isEnabled("Target HUD"));
     private final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);

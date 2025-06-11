@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 
-@ModuleInfo(name = "LagRange", description = "Abuses latency in order to simulate tickBasing.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "LagRange", description = "Abuses latency in order to simulate tickbasing.", category = ModuleCategory.Combat)
 public class LagRange extends Module {
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue tickRange = new SliderValue("Attack range", 3f, 0.1f, 8f, 0.1f, this);

@@ -4,17 +4,19 @@ import org.lwjglx.input.Keyboard;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.values.impl.ColorValue;
-
-import java.awt.*;
+import wtf.demise.features.values.impl.ModeValue;
 
 @ModuleInfo(name = "ClickGUI", category = ModuleCategory.Visual, key = Keyboard.KEY_RSHIFT)
 public class ClickGUI extends Module {
-    public final ColorValue color = new ColorValue("Color", new Color(80, 80, 80), this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Dropdown", "Panel"}, "Dropdown", this);
 
     @Override
     public void onEnable() {
-        mc.displayGuiScreen(INSTANCE.getDropdownGUI());
+        switch (mode.get()) {
+            case "Dropdown" -> mc.displayGuiScreen(INSTANCE.getDropdownGUI());
+            case "Panel" -> mc.displayGuiScreen(INSTANCE.getPanelGui());
+        }
+
         toggle();
         super.onEnable();
     }

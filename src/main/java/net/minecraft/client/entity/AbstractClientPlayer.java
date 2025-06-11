@@ -179,11 +179,16 @@ public abstract class AbstractClientPlayer extends EntityPlayer {
         float pitch = this.rotationPitch;
 
         LookEvent lookEvent = new LookEvent(new float[]{yaw, pitch});
-        Demise.INSTANCE.getEventManager().call(lookEvent);
+        if (Demise.INSTANCE.getEventManager() != null) {
+            Demise.INSTANCE.getEventManager().call(lookEvent);
 
-        yaw = lookEvent.rotation[0];
-        pitch = lookEvent.rotation[1];
+            if (lookEvent.rotation != null && lookEvent.rotation.length >= 2) {
+                yaw = lookEvent.rotation[0];
+                pitch = lookEvent.rotation[1];
+            }
+        }
 
         return this.getVectorForRotation(pitch, yaw);
     }
+
 }

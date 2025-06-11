@@ -13,9 +13,7 @@ public enum ModuleCategory {
     Player("Player"),
     Misc("Misc"),
     Exploit("Exploit"),
-    Visual("Visuals"),
-    Config("Configs"),
-    Search("Search");
+    Visual("Visuals");
 
     private final String name;
 

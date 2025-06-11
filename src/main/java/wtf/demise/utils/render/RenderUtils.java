@@ -3,6 +3,7 @@ package wtf.demise.utils.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -1294,5 +1295,14 @@ public class RenderUtils implements InstanceAccess {
         GL11.glEnable(3553);
         GL11.glPopMatrix();
         GL11.glColor3f(255, 255, 255);
+    }
+
+    public static void prepareScissorBox(int x, int y, int width, int height) {
+        int factor = mc.displayHeight / GuiScreen.height;
+
+        GL11.glScissor(x * factor,
+                (mc.displayHeight - (y + height) * factor),
+                width * factor,
+                height * factor);
     }
 }

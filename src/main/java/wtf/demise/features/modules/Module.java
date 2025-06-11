@@ -19,7 +19,6 @@ import java.util.*;
 
 public abstract class Module implements InstanceAccess {
     private static final String FUNNY = "§7 chatgpt pro billionaire bypass india vs pakistan";
-    private static final ResourceLocation CLICK_SOUND = new ResourceLocation("random.click");
 
     @Getter
     private final String name;

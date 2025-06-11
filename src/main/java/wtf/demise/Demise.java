@@ -13,6 +13,7 @@ import wtf.demise.features.command.CommandManager;
 import wtf.demise.features.config.ConfigManager;
 import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
+import wtf.demise.gui.click.panel.PanelGui;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
@@ -57,6 +58,7 @@ public class Demise {
     private CommandManager commandManager;
     private FriendManager friendManager;
     private DropdownGUI dropdownGUI;
+    private PanelGui panelGui;
     private AltRepositoryGUI altRepositoryGUI;
     private DiscordInfo discordRP;
 
@@ -127,6 +129,7 @@ public class Demise {
         commandManager = new CommandManager();
         friendManager = new FriendManager();
         dropdownGUI = new DropdownGUI();
+        panelGui = new PanelGui();
         altRepositoryGUI = new AltRepositoryGUI(this);
     }
 

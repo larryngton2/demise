@@ -33,7 +33,6 @@ public class DropdownGUI extends GuiScreen {
     public DropdownGUI() {
         openingAnimation.setDirection(Direction.BACKWARDS);
         for (ModuleCategory category : ModuleCategory.values()) {
-            if (category == ModuleCategory.Search || category == ModuleCategory.Config) continue;
             panels.add(new CategoryPanel(category));
             float width = 0;
             for (CategoryPanel panel : panels) {
@@ -93,39 +92,35 @@ public class DropdownGUI extends GuiScreen {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        int finalMouseY = mouseY;
-
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
             CategoryPanel.shader = true;
-            panels.forEach(panel -> panel.mouseClicked(mouseX, finalMouseY, mouseButton));
+            panels.forEach(panel -> panel.mouseClicked(mouseX, mouseY, mouseButton));
         }
 
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
             CategoryPanel.shader = true;
-            panels.forEach(panel -> panel.mouseClicked(mouseX, finalMouseY, mouseButton));
+            panels.forEach(panel -> panel.mouseClicked(mouseX, mouseY, mouseButton));
         }
 
         CategoryPanel.shader = false;
-        panels.forEach(panel -> panel.mouseClicked(mouseX, finalMouseY, mouseButton));
+        panels.forEach(panel -> panel.mouseClicked(mouseX, mouseY, mouseButton));
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
-        int finalMouseY = mouseY;
-
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).blur.get()) {
             CategoryPanel.shader = true;
-            panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
+            panels.forEach(panel -> panel.mouseReleased(mouseX, mouseY, state));
         }
 
         if (Demise.INSTANCE.getModuleManager().getModule(Shaders.class).shadow.get()) {
             CategoryPanel.shader = true;
-            panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
+            panels.forEach(panel -> panel.mouseReleased(mouseX, mouseY, state));
         }
 
         CategoryPanel.shader = false;
-        panels.forEach(panel -> panel.mouseReleased(mouseX, finalMouseY, state));
+        panels.forEach(panel -> panel.mouseReleased(mouseX, mouseY, state));
         super.mouseReleased(mouseX, mouseY, state);
     }
 

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.visual.ClickGUI;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.Component;
@@ -65,7 +66,7 @@ public class ModuleComponent implements IComponent {
         toggleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
         hoverAnimation.setDirection(isHovered(mouseX, mouseY) ? Direction.FORWARDS : Direction.BACKWARDS);
 
-        Fonts.interRegular.get(14).drawCenteredString(module.getName(), x + getWidth() / 2, y + yOffset / 2 - 3, ColorUtils.interpolateColor2(Color.GRAY, INSTANCE.getModuleManager().getModule(ClickGUI.class).color.get(), (float) toggleAnimation.getOutput()));
+        Fonts.interRegular.get(14).drawCenteredString(module.getName(), x + getWidth() / 2, y + yOffset / 2 - 3, ColorUtils.interpolateColor2(Color.GRAY, new Color(INSTANCE.getModuleManager().getModule(Interface.class).color(), false), (float) toggleAnimation.getOutput()));
 
         for (Component component : settings) {
             if (!component.isVisible()) continue;
