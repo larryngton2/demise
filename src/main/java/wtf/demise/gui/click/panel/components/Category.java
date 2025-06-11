@@ -12,7 +12,6 @@ import wtf.demise.gui.click.IComponent;
 import wtf.demise.gui.click.panel.PanelGui;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;

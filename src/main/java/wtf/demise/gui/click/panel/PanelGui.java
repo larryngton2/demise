@@ -1,13 +1,14 @@
 package wtf.demise.gui.click.panel;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
+import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
+import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.ModuleCategory;
-
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.click.panel.components.Category;
 import wtf.demise.gui.font.Fonts;
@@ -28,7 +29,6 @@ public class PanelGui extends GuiScreen {
     public PanelGui() {
         Demise.INSTANCE.getEventManager().unregister(this);
         Demise.INSTANCE.getEventManager().register(this);
-
         float height = 15 + Fonts.urbanist.get(35).getHeight();
 
         for (ModuleCategory category : ModuleCategory.values()) {
@@ -67,13 +67,6 @@ public class PanelGui extends GuiScreen {
             category.setSelected(selectedCategory == category);
         }
 
-        selectedCategory.drawScreen(mouseX, mouseY);
-    }
-
-    @EventTarget
-    public void onRender2D(Render2DEvent e) {
-        if (mc.currentScreen != this) return;
-
         RoundedUtils.drawRound(posX, posY, 450, 300, 7, new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
 
         float x = posX + 7;
@@ -83,14 +76,18 @@ public class PanelGui extends GuiScreen {
         Fonts.urbanist.get(24).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(35).getStringWidth(Demise.INSTANCE.getClientName()) + 2 + x, Fonts.urbanist.get(35).getHeight() + y - Fonts.urbanist.get(24).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
 
         categories.forEach(category -> category.render(false));
+
+        selectedCategory.drawScreen(mouseX, mouseY);
+
+        GlStateManager.popMatrix();
     }
 
+    @EventPriority(100)
     @EventTarget
     public void onShader2D(Shader2DEvent e) {
         if (mc.currentScreen != this) return;
 
         RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
-
         categories.forEach(category -> category.render(true));
     }
 
@@ -114,6 +111,11 @@ public class PanelGui extends GuiScreen {
 
     @Override
     public void keyTyped(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RSHIFT) {
+            mc.displayGuiScreen(null);
+            return;
+        }
+
         selectedCategory.keyTyped(typedChar, keyCode);
     }
 

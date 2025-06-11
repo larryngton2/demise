@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
@@ -19,6 +20,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.gui.click.panel.PanelGui;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.ColorUtils;
@@ -74,7 +76,6 @@ public class ESP extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
-
         if (!esp2d.get() && !tags.get()) {
             return;
         }

@@ -14,7 +14,6 @@ import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
-import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
 
@@ -311,23 +310,22 @@ public class MoveUtil implements InstanceAccess {
     }
 
     public static void fixMovement(MoveInputEvent event, float yaw, float playerYaw) {
-        final float forward = event.getForward();
-        final float strafe = event.getStrafe();
+        float forward = event.getForward();
+        float strafe = event.getStrafe();
 
-        final double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(playerYaw, forward, strafe)));
+        if (forward == 0 && strafe == 0) return;
 
-        if (forward == 0 && strafe == 0) {
-            return;
-        }
+        double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(playerYaw, forward, strafe)));
 
-        float closestForward = 0, closestStrafe = 0, closestDifference = Float.MAX_VALUE;
+        float closestForward = 0, closestStrafe = 0;
+        float closestDifference = Float.MAX_VALUE;
 
         for (float predictedForward = -1F; predictedForward <= 1F; predictedForward += 1F) {
             for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
-                if (predictedStrafe == 0 && predictedForward == 0) continue;
+                if (predictedForward == 0 && predictedStrafe == 0) continue;
 
-                final double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(yaw, predictedForward, predictedStrafe)));
-                final double difference = Math.abs(angle - predictedAngle);
+                double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(yaw, predictedForward, predictedStrafe)));
+                double difference = Math.abs(MathHelper.wrapAngleTo180_double(angle - predictedAngle));
 
                 if (difference < closestDifference) {
                     closestDifference = (float) difference;
