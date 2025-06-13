@@ -60,7 +60,7 @@ public class ModuleManager {
     private static final Set<Class<? extends Module>> VISUAL_MODULES = Set.of(
         Atmosphere.class, BlockOnSwing.class, BlockOverlay.class, Breadcrumbs.class, BreakProgress.class, Cape.class,
             ChestESP.class, ChinaHat.class, ClickGUI.class, CustomSkin.class, CustomWidgetsModule.class, ESP.class,
-            ForceDinnerbone.class, FreeCam.class, FullBright.class, ImageESP.class, Interface.class, ItemESP.class,
+            ForceDinnerbone.class, FreeCam.class, FullBright.class, Interface.class, ItemESP.class,
             ItemGlow.class, ItemPhysics.class, MainMenuOptions.class, MotionBlur.class, MoveStatus.class,
             NoHurtCam.class, NoRenderOffsetReset.class, Particles.class, Rotation.class, Shaders.class,
             ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class, VisualAimPoint.class, TargetHud.class

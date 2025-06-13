@@ -37,9 +37,8 @@ public class StringComponent extends Component {
             text = text.replaceAll("[a-zA-Z]", "");
         }
         String textToDraw = setting.get().isEmpty() && !inputting ? "Empty..." : setting.getText();
-        RoundedUtils.drawRound(getX(), getY() + Fonts.interRegular.get(14).getHeight() - 2, getWidth(), Fonts.interRegular.get(14).getHeight() + 4, 2, new Color(ColorUtils.darker(getColorRGB(), 0.5f)));
         Fonts.interRegular.get(14).drawString(setting.getName(), getX() + 4, getY(), -1);
-        drawTextWithLineBreaks(textToDraw + (inputting && text.length() < 59 && System.currentTimeMillis() % 1000 > 500 ? "|" : ""), getX() + 6, getY() + Fonts.interRegular.get(14).getHeight() + 2, getWidth() - 12);
+        drawTextWithLineBreaks(textToDraw + (inputting && text.length() < 59 && System.currentTimeMillis() % 1000 > 500 ? "|" : ""), getX() + 6, getY() + Fonts.interRegular.get(14).getHeight() + 2);
         super.drawScreen(mouseX, mouseY);
     }
 
@@ -77,48 +76,14 @@ public class StringComponent extends Component {
         super.keyTyped(typedChar, keyCode);
     }
 
-    private void drawTextWithLineBreaks(String text, float x, float y, float maxWidth) {
+    private void drawTextWithLineBreaks(String text, float x, float y) {
         String[] lines = text.split("\n");
         float currentY = y;
 
         for (String line : lines) {
-            List<String> wrappedLines = wrapText(line, 6, maxWidth);
-            for (String wrappedLine : wrappedLines) {
-
-                Fonts.interSemiBold.get(16).drawString(wrappedLine, x, currentY, ColorUtils.interpolateColor2(new Color(-1).darker(),
-                        new Color(-1), (float) input.getOutput()));
-                currentY += Fonts.interSemiBold.get(16).getHeight();
-            }
+            Fonts.interSemiBold.get(16).drawString(line, x, currentY, ColorUtils.interpolateColor2(new Color(-1).darker(), new Color(-1), (float) input.getOutput()));
+            currentY += Fonts.interSemiBold.get(16).getHeight();
         }
-    }
-
-    private List<String> wrapText(String text, float size, float maxWidth) {
-        List<String> lines = new ArrayList<>();
-        String[] words = text.split(" ");
-        StringBuilder currentLine = new StringBuilder();
-
-        for (String word : words) {
-            if (Fonts.interSemiBold.get(16).getStringWidth(word) <= maxWidth) {
-                if (Fonts.interSemiBold.get(16).getStringWidth(currentLine.toString() + word) <= maxWidth) {
-                    currentLine.append(word).append(" ");
-                } else {
-                    lines.add(currentLine.toString());
-                    currentLine = new StringBuilder(word).append(" ");
-                }
-            } else {
-                if (!currentLine.toString().isEmpty()) {
-                    lines.add(currentLine.toString());
-                    currentLine = new StringBuilder();
-                }
-                currentLine = breakAndAddWord(word, currentLine, size, lines);
-            }
-        }
-
-        if (!currentLine.toString().isEmpty()) {
-            lines.add(currentLine.toString());
-        }
-
-        return lines;
     }
 
     private void deleteLastCharacter() {
