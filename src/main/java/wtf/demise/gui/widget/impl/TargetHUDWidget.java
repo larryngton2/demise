@@ -7,8 +7,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import org.lwjglx.util.vector.Vector2f;
+import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.features.modules.impl.visual.TargetHud;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
@@ -24,10 +26,13 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 public class TargetHUDWidget extends Widget {
+    private final TargetHud targetHud;
+
     public TargetHUDWidget() {
         super("Target HUD");
         this.x = 0.44270813f;
         this.y = 0.6333332f;
+        this.targetHud = Demise.INSTANCE.getModuleManager().getModule(TargetHud.class);
     }
 
     private float interpolatedX;
@@ -38,68 +43,96 @@ public class TargetHUDWidget extends Widget {
         this.height = 37;
         this.width = 120;
 
-        if (setting.target != null) {
-            TargetHUD targetHUD;
-            if (!setting.targetHUDTracking.get()) {
-                targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
-            } else {
-                targetHUD = new TargetHUD(getPos().x, getPos().y, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
+        //todo improve
+        if (targetHud.esp.get() && targetHud.targetHUDTracking.get()) {
+            for (Entity entity : mc.theWorld.loadedEntityList) {
+                if (entity instanceof EntityPlayer entityPlayer && PlayerUtils.getDistanceToEntityBox(entityPlayer) < 6) {
+                    if (entityPlayer == mc.thePlayer) continue;
+                    if (targetHud.target != null && entityPlayer == targetHud.target) {
+                        renderTargetHUD(false, entityPlayer, false);
+                        continue;
+                    }
+
+                    renderTargetHUD(false, entityPlayer, true);
+                }
             }
-            targetHUD.render();
+        } else if (targetHud.target != null) {
+            renderTargetHUD(false, (EntityPlayer) targetHud.target, false);
         }
     }
 
     @Override
     public void onShader(Shader2DEvent e) {
-        if (setting.target != null) {
+        if (targetHud.esp.get() && targetHud.targetHUDTracking.get()) {
+            for (Entity entity : mc.theWorld.loadedEntityList) {
+                if (entity instanceof EntityPlayer entityPlayer && PlayerUtils.getDistanceToEntityBox(entityPlayer) < 6) {
+                    if (entityPlayer == mc.thePlayer) continue;
+                    if (targetHud.target != null && entityPlayer == targetHud.target) {
+                        renderTargetHUD(true, entityPlayer, false);
+                        continue;
+                    }
+
+                    renderTargetHUD(true, entityPlayer, true);
+                }
+            }
+        } else if (targetHud.target != null) {
+            renderTargetHUD(true, (EntityPlayer) targetHud.target, false);
+        }
+    }
+
+    private void renderTargetHUD(boolean shader, EntityPlayer target, boolean visibleCheck) {
+        if (target != null) {
             TargetHUD targetHUD;
-            if (!setting.targetHUDTracking.get()) {
-                targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, true);
+            if (!targetHud.targetHUDTracking.get()) {
+                targetHUD = new TargetHUD(renderX, renderY, target, targetHud.decelerateAnimation, shader);
             } else {
-                targetHUD = new TargetHUD(getPos().x, getPos().y, (EntityPlayer) setting.target, setting.decelerateAnimation, true);
+                float[] pos = new float[]{getPos(target, visibleCheck).x, getPos(target, visibleCheck).y};
+                targetHUD = new TargetHUD(pos[0], pos[1], target, targetHud.decelerateAnimation, shader);
             }
             targetHUD.render();
         }
     }
 
-    private Vector2f getPos() {
-        Entity target = setting.target;
-
-        float x = (float) (target.prevPosX + (target.posX - target.prevPosX) * mc.timer.renderPartialTicks);
-        float y = (float) (target.prevPosY + (target.posY - target.prevPosY) * mc.timer.renderPartialTicks + target.height);
-        float z = (float) (target.prevPosZ + (target.posZ - target.prevPosZ) * mc.timer.renderPartialTicks);
+    private Vector2f getPos(Entity target, boolean visibleCheck) {
+        float x = (float) MathUtils.interpolate(target.prevPosX, target.posX);
+        float y = (float) MathUtils.interpolate(target.prevPosY, target.posY) + target.height;
+        float z = (float) MathUtils.interpolate(target.prevPosZ, target.posZ);
 
         x -= (float) mc.getRenderManager().viewerPosX;
         y -= (float) mc.getRenderManager().viewerPosY;
         z -= (float) mc.getRenderManager().viewerPosZ;
 
-        Vector2f pos = RenderUtils.worldToScreen(x, y, z, sr);
+        Vector2f pos = RenderUtils.worldToScreen(x, y, z, sr, visibleCheck);
 
         if (pos == null) {
-            interpolatedX = MathUtils.interpolate(interpolatedX, renderX, setting.interpolation.get());
-            interpolatedY = MathUtils.interpolate(interpolatedY, renderY, setting.interpolation.get());
+            if (!targetHud.esp.get()) {
+                interpolatedX = MathUtils.interpolate(interpolatedX, renderX, 0.05f);
+                interpolatedY = MathUtils.interpolate(interpolatedY, renderY, 0.05f);
 
-            return new Vector2f(interpolatedX, interpolatedY);
+                return new Vector2f(interpolatedX, interpolatedY);
+            } else {
+                return new Vector2f(renderX, renderY);
+            }
         }
 
         Vector2f rPos = new Vector2f((float) Math.floor(pos.x), (float) Math.floor(pos.y));
-        float rPosX = rPos.x + (setting.centerX.get() ? target.width - width / 2 : setting.offsetX.get());
-        float rPosY = (int) rPos.y + setting.offsetY.get() - height;
+        float rPosX = rPos.x + (targetHud.centerX.get() ? target.width - width / 2 : targetHud.offsetX.get());
+        float rPosY = (int) rPos.y + targetHud.offsetY.get() - height;
 
-        if (interpolatedX == 0 && interpolatedY == 0) {
+        if ((interpolatedX == 0 && interpolatedY == 0) || targetHud.esp.get()) {
             interpolatedX = rPosX;
             interpolatedY = rPosY;
+        } else {
+            interpolatedX = MathUtils.interpolate(interpolatedX, rPosX, targetHud.interpolation.get());
+            interpolatedY = MathUtils.interpolate(interpolatedY, rPosY, targetHud.interpolation.get());
         }
-
-        interpolatedX = MathUtils.interpolate(interpolatedX, rPosX, setting.interpolation.get());
-        interpolatedY = MathUtils.interpolate(interpolatedY, rPosY, setting.interpolation.get());
 
         return new Vector2f(interpolatedX, interpolatedY);
     }
 
     @Override
     public boolean shouldRender() {
-        return setting.isEnabled() && setting.elements.isEnabled("Target HUD");
+        return targetHud.isEnabled();
     }
 }
 

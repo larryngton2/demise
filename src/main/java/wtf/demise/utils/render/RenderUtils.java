@@ -117,22 +117,15 @@ public class RenderUtils implements InstanceAccess {
         return framebuffer;
     }
 
-    public static void enableScissor() {
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-    }
-
-    public static void disableScissor() {
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
-    }
-
     public static void scissor(final double x, final double y, final double width, final double height) {
-        int scaleFactor = 1;
-        while (scaleFactor < 2 && mc.displayWidth / (scaleFactor + 1) >= 320 && mc.displayHeight / (scaleFactor + 1) >= 240) {
-            ++scaleFactor;
-        }
-        GL11.glScissor((int) (x * scaleFactor),
-                (int) (Minecraft.getMinecraft().displayHeight - (y + height) * scaleFactor),
-                (int) (width * scaleFactor), (int) (height * scaleFactor));
+        int scaleFactor = new ScaledResolution(mc).getScaleFactor();
+
+        GL11.glScissor(
+                (int) (x * scaleFactor),
+                (int) (mc.displayHeight - (y + height) * scaleFactor),
+                (int) (width * scaleFactor),
+                (int) (height * scaleFactor)
+        );
     }
 
     public static void drawImage(ResourceLocation image, float x, float y, int width, int height) {

@@ -63,7 +63,7 @@ public class ModuleManager {
             ForceDinnerbone.class, FreeCam.class, FullBright.class, ImageESP.class, Interface.class, ItemESP.class,
             ItemGlow.class, ItemPhysics.class, MainMenuOptions.class, MotionBlur.class, MoveStatus.class,
             NoHurtCam.class, NoRenderOffsetReset.class, Particles.class, Rotation.class, Shaders.class,
-            ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class, VisualAimPoint.class
+            ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class, VisualAimPoint.class, TargetHud.class
     );
 
     private final Map<ModuleCategory, List<Module>> modulesByCategory;

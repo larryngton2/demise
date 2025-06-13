@@ -34,7 +34,6 @@ public class Interface extends Module {
             new BoolValue("Module List", true),
             new BoolValue("Armor", true),
             new BoolValue("Potion HUD", true),
-            new BoolValue("Target HUD", true),
             new BoolValue("Notification", true),
             new BoolValue("BPS counter", true),
             new BoolValue("Keystrokes", true),
@@ -43,11 +42,6 @@ public class Interface extends Module {
 
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
-    public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this, () -> elements.isEnabled("Target HUD"));
-    public final SliderValue interpolation = new SliderValue("Interpolation", 0.5f, 0.01f, 1, 0.01f, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay());
-    public final BoolValue centerX = new BoolValue("Center X", true, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay());
-    public final SliderValue offsetX = new SliderValue("Offset X", 0, -100, 100, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay() && !centerX.get());
-    public final SliderValue offsetY = new SliderValue("Offset Y", 100, -25, 200, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay());
     private final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));
@@ -57,9 +51,6 @@ public class Interface extends Module {
     public final SliderValue bgAlpha = new SliderValue("Background Alpha", 204, 1, 255, 1, this, () -> bgStyle.is("Custom"));
     public final BoolValue chatCombine = new BoolValue("Chat Combine", true, this);
     public final BoolValue funy = new BoolValue("funy", false, this);
-
-    public final DecelerateAnimation decelerateAnimation = new DecelerateAnimation(175, 1);
-    public EntityLivingBase target;
     private ScaledResolution sr;
 
     @EventTarget
@@ -133,26 +124,6 @@ public class Interface extends Module {
     @EventTarget
     public void onTick(TickEvent e) {
         mainColor.setRainbow(color.is("Rainbow"));
-        KillAura aura = getModule(KillAura.class);
-
-        if (!(mc.currentScreen instanceof GuiChat)) {
-            if (aura.isEnabled()) {
-                if (KillAura.currentTarget instanceof EntityPlayer) {
-                    decelerateAnimation.setDirection(Direction.FORWARDS);
-                    target = KillAura.currentTarget;
-                }
-            }
-
-            if (!aura.isEnabled() || !(KillAura.currentTarget instanceof EntityPlayer)) {
-                decelerateAnimation.setDirection(Direction.BACKWARDS);
-                if (decelerateAnimation.finished(Direction.BACKWARDS)) {
-                    target = null;
-                }
-            }
-        } else if (target == null) {
-            decelerateAnimation.setDirection(Direction.FORWARDS);
-            target = mc.thePlayer;
-        }
     }
 
     public FontRenderer getFr() {
