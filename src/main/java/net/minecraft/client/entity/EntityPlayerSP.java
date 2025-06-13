@@ -31,12 +31,10 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.SendMessageEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.rotation.RotationManager;
-import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Objects;
 

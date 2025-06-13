@@ -8,7 +8,7 @@ import wtf.demise.features.values.impl.ModeValue;
 
 @ModuleInfo(name = "ClickGUI", category = ModuleCategory.Visual, key = Keyboard.KEY_RSHIFT)
 public class ClickGUI extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Dropdown", "Panel"}, "Dropdown", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Dropdown", "Panel"}, "Panel", this);
 
     @Override
     public void onEnable() {

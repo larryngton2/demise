@@ -29,7 +29,7 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 
-@ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach. (BACKTRACK???)", category = ModuleCategory.Legit)
 public class BackTrack extends Module {
     private final BoolValue onlyWhenNeeded = new BoolValue("Only when needed", false, this);
     private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this, onlyWhenNeeded::get);

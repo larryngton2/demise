@@ -1,7 +1,6 @@
 package wtf.demise.gui.click.panel;
 
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
@@ -11,20 +10,26 @@ import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.click.panel.components.Category;
+import wtf.demise.gui.click.panel.components.config.ConfigCategoryComponent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PanelGui extends GuiScreen {
     private final List<Category> categories = new ArrayList<>();
     public static Category selectedCategory;
+    // I cant set selectedCategory to be a ConfigCategoryComponent, so this is a workaround for that
+    public static ConfigCategoryComponent selectedConfigCategory;
     public static boolean dragging;
     private float dragX, dragY;
     public static float posX = 255, posY = 120;
+    private final ConfigCategoryComponent configCategoryComponent;
 
     public PanelGui() {
         Demise.INSTANCE.getEventManager().unregister(this);
@@ -33,12 +38,20 @@ public class PanelGui extends GuiScreen {
 
         for (ModuleCategory category : ModuleCategory.values()) {
             categories.add(new Category(category, posX + 7, posY + height));
-
             height += Fonts.interRegular.get(18).getHeight() + 7;
         }
 
+        configCategoryComponent = new ConfigCategoryComponent(posX + 7, posY + height);
+
         if (selectedCategory == null) {
             selectedCategory = categories.get(0);
+        }
+    }
+
+    @Override
+    public void initGui() {
+        if (selectedConfigCategory != null) {
+            selectedConfigCategory.initGui();
         }
     }
 
@@ -54,17 +67,45 @@ public class PanelGui extends GuiScreen {
                 category.setX(category.getX() + deltaX);
                 category.setY(category.getY() + deltaY);
             }
+
+            configCategoryComponent.setX(configCategoryComponent.getX() + deltaX);
+            configCategoryComponent.setY(configCategoryComponent.getY() + deltaY);
         }
+
+        boolean skipped = true;
 
         for (Category category : categories) {
             boolean hovered = MouseUtils.isHovered(category.getX(), category.getY(), Fonts.interRegular.get(18).getStringWidth(category.getCategory().getName()), Fonts.interRegular.get(18).getHeight(), mouseX, mouseY);
 
             if (hovered && Mouse.isButtonDown(0)) {
+                if (selectedCategory != category) {
+                    category.initCategory();
+                }
+
                 selectedCategory = category;
+                selectedConfigCategory = null;
+
+                skipped = false;
             }
 
             category.setHovered(hovered);
-            category.setSelected(selectedCategory == category);
+            category.setSelected(selectedCategory != null && selectedCategory == category);
+        }
+
+        if (skipped) {
+            boolean hovered = MouseUtils.isHovered(configCategoryComponent.getX(), configCategoryComponent.getY(), Fonts.interRegular.get(18).getStringWidth("Configs"), Fonts.interRegular.get(18).getHeight(), mouseX, mouseY);
+
+            if (hovered && Mouse.isButtonDown(0)) {
+                if (selectedConfigCategory == null) {
+                    configCategoryComponent.initCategory();
+                }
+
+                selectedConfigCategory = configCategoryComponent;
+                selectedCategory = null;
+            }
+
+            configCategoryComponent.setHovered(hovered);
+            configCategoryComponent.setSelected(selectedConfigCategory != null);
         }
 
         RoundedUtils.drawRound(posX, posY, 450, 300, 7, new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
@@ -75,11 +116,20 @@ public class PanelGui extends GuiScreen {
         Fonts.urbanist.get(35).drawString(Demise.INSTANCE.getClientName(), x, y, new Color(255, 255, 255, 208).getRGB());
         Fonts.urbanist.get(24).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(35).getStringWidth(Demise.INSTANCE.getClientName()) + 2 + x, Fonts.urbanist.get(35).getHeight() + y - Fonts.urbanist.get(24).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
 
+        configCategoryComponent.render(false);
+        if (selectedConfigCategory != null) {
+            selectedConfigCategory.drawScreen(mouseX, mouseY);
+        }
+
         categories.forEach(category -> category.render(false));
+        if (selectedCategory != null) {
+            selectedCategory.drawScreen(mouseX, mouseY);
+        }
 
-        selectedCategory.drawScreen(mouseX, mouseY);
+        String str = "Total modules: " + Demise.INSTANCE.getModuleManager().getAllModules().size() + ", Enabled: " + Demise.INSTANCE.getModuleManager().getEnabledModules().size();
 
-        GlStateManager.popMatrix();
+        Fonts.interRegular.get(14).drawString(str, posX + 450 - Fonts.interRegular.get(14).getStringWidth(str) - 4, posY + 300 - Fonts.interRegular.get(14).getHeight(), new Color(255, 255, 255, 208).getRGB());
+        Fonts.interRegular.get(14).drawString(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), posX + 3.5, posY + 300 - Fonts.interRegular.get(14).getHeight(), new Color(255, 255, 255, 208).getRGB());
     }
 
     @EventPriority(100)
@@ -89,6 +139,7 @@ public class PanelGui extends GuiScreen {
 
         RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
         categories.forEach(category -> category.render(true));
+        configCategoryComponent.render(true);
     }
 
     @Override
@@ -99,14 +150,26 @@ public class PanelGui extends GuiScreen {
             dragY = mouseY - posY;
         }
 
-        selectedCategory.mouseClicked(mouseX, mouseY, mouseButton);
+        if (selectedConfigCategory != null) {
+            selectedConfigCategory.mouseClicked(mouseX, mouseY, mouseButton);
+            return;
+        }
+        if (selectedCategory != null) {
+            selectedCategory.mouseClicked(mouseX, mouseY, mouseButton);
+        }
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         dragging = false;
 
-        selectedCategory.mouseReleased(mouseX, mouseY, state);
+        if (selectedConfigCategory != null) {
+            selectedConfigCategory.mouseReleased(mouseX, mouseY, state);
+            return;
+        }
+        if (selectedCategory != null) {
+            selectedCategory.mouseReleased(mouseX, mouseY, state);
+        }
     }
 
     @Override
@@ -116,7 +179,13 @@ public class PanelGui extends GuiScreen {
             return;
         }
 
-        selectedCategory.keyTyped(typedChar, keyCode);
+        if (selectedConfigCategory != null) {
+            selectedConfigCategory.keyTyped(typedChar, keyCode);
+            return;
+        }
+        if (selectedCategory != null) {
+            selectedCategory.keyTyped(typedChar, keyCode);
+        }
     }
 
     @Override

@@ -1296,13 +1296,4 @@ public class RenderUtils implements InstanceAccess {
         GL11.glPopMatrix();
         GL11.glColor3f(255, 255, 255);
     }
-
-    public static void prepareScissorBox(int x, int y, int width, int height) {
-        int factor = mc.displayHeight / GuiScreen.height;
-
-        GL11.glScissor(x * factor,
-                (mc.displayHeight - (y + height) * factor),
-                width * factor,
-                height * factor);
-    }
 }

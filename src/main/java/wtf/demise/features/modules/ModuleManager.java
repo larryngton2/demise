@@ -13,6 +13,8 @@ import wtf.demise.features.modules.impl.misc.bloxdphysics.BloxdPhysics;
 import wtf.demise.features.modules.impl.movement.*;
 import wtf.demise.features.modules.impl.player.*;
 import wtf.demise.features.modules.impl.visual.*;
+import wtf.demise.utils.animations.Animation;
+import wtf.demise.utils.animations.Direction;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -145,5 +147,16 @@ public class ModuleManager {
 
     public List<Module> getModules() {
         return Collections.unmodifiableList(allModules);
+    }
+
+    public List<Module> getEnabledModules() {
+        List<Module> enabledModules = new ArrayList<>();
+        for (Module module : getModules()) {
+            Animation moduleAnimation = module.getAnimation();
+            moduleAnimation.setDirection(module.isEnabled() ? Direction.FORWARDS : Direction.BACKWARDS);
+            if (!module.isEnabled() && moduleAnimation.finished(Direction.BACKWARDS)) continue;
+            enabledModules.add(module);
+        }
+        return enabledModules;
     }
 }

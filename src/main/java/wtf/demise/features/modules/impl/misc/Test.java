@@ -10,4 +10,5 @@ import wtf.demise.features.values.impl.SliderValue;
 public class Test extends Module {
     public final BoolValue hitboxes = new BoolValue("Hitboxes", false, this);
     public final SliderValue scale = new SliderValue("Scale", 1, 1, 1, 0.1f, this);
+    public final SliderValue cropEndX = new SliderValue("cropendX", 1000, 0, 1000, 0.1f, this);
 }

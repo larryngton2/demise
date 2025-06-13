@@ -16,6 +16,7 @@ import wtf.demise.gui.click.panel.PanelGui;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;
+import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.StringUtils;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.utils.render.ColorUtils;
@@ -36,8 +37,10 @@ public class ModuleComponent implements IComponent {
     private Color interpolatedColor = new Color(20, 20, 20, 150);
     private Color interpolatedColor1 = new Color(0, 0, 0, 0);
     public boolean visible;
+    private boolean visibleSetting;
     private final CopyOnWriteArrayList<Component> settings = new CopyOnWriteArrayList<>();
     private final EaseInOutQuad openAnimation = new EaseInOutQuad(250, 1);
+    private float slideProgress = 0f;
 
     public ModuleComponent(Module module) {
         openAnimation.setDirection(Direction.BACKWARDS);
@@ -65,8 +68,14 @@ public class ModuleComponent implements IComponent {
         }
     }
 
+    public void initCategory() {
+        slideProgress = 0;
+    }
+
     public void render(boolean shader) {
         float width = 375;
+        slideProgress = MathUtils.interpolate(slideProgress, visibleSetting ? 1 : 0, 0.1f);
+        float slideOffset = (width / 4) * (1.0f - slideProgress);
 
         if (!shader) {
             if (isHovered) {
@@ -81,16 +90,16 @@ public class ModuleComponent implements IComponent {
                 interpolatedColor1 = ColorUtils.interpolateColorC(interpolatedColor1, new Color(0, 0, 0, 0), 0.1f);
             }
 
-            RoundedUtils.drawRound(x, y, width, height, 8, interpolatedColor);
-            RoundedUtils.drawRound(x, y, width, height, 8, interpolatedColor1);
+            RoundedUtils.drawRound(x + slideOffset, y, width, height, 8, interpolatedColor);
+            RoundedUtils.drawRound(x + slideOffset, y, width, height, 8, interpolatedColor1);
 
-            Fonts.interRegular.get(18).drawString(module.getName(), x + 7, y + 9, 0xffffffff);
-            Fonts.interRegular.get(14).drawString(module.getDescription(), x + 7, y + 21, new Color(200, 200, 200).getRGB());
+            Fonts.interRegular.get(18).drawString(module.getName(), x + 7 + slideOffset, y + 9, Color.white.getRGB());
+            Fonts.interRegular.get(14).drawString(module.getDescription(), x + 7 + slideOffset, y + 21, new Color(200, 200, 200).getRGB());
 
             String keyName = module.getKeyBind() == 0 ? "None" : StringUtils.upperSnakeCaseToPascal(Keyboard.getKeyName(module.getKeyBind()));
-            Fonts.interRegular.get(14).drawString(keyName, x + width - 8 - Fonts.interRegular.get(14).getStringWidth(keyName), y + 10, new Color(150, 150, 150).getRGB());
+            Fonts.interRegular.get(14).drawString(keyName, x + width - 8 - Fonts.interRegular.get(14).getStringWidth(keyName) + slideOffset, y + 10, new Color(150, 150, 150, 150).getRGB());
         } else {
-            RoundedUtils.drawShaderRound(x, y, width, height, 8, Color.black);
+            RoundedUtils.drawShaderRound(x + slideOffset, y, width, height, 8, Color.black);
         }
     }
 
@@ -108,17 +117,14 @@ public class ModuleComponent implements IComponent {
 
         openAnimation.setDirection(isExpanded ? Direction.FORWARDS : Direction.BACKWARDS);
 
-        int scissorX = (int) x;
-        int scissorY = (int) PanelGui.posY + 17 + Fonts.urbanist.get(35).getHeight();
-        int scissorWidth = (int) width;
-        int scissorHeight = 263;
-        RenderUtils.prepareScissorBox(scissorX, scissorY, scissorWidth, scissorHeight);
+        RenderUtils.scissor(x, PanelGui.posY + 17 + Fonts.urbanist.get(35).getHeight(), width, 250);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        float slideOffset = (width / 4) * (1.0f - slideProgress);
 
         for (Component component : settings) {
             if (!component.isVisible()) continue;
 
-            component.setX(component.isChild() ? x + 5 : x);
+            component.setX((component.isChild() ? x + 5 : x) + slideOffset);
             component.setY((float) (y + yOffset * openAnimation.getOutput()) + 1);
             component.setWidth(component.isChild() ? width - 5 : width);
 
@@ -126,7 +132,7 @@ public class ModuleComponent implements IComponent {
                 component.drawScreen(mouseX, mouseY);
 
                 if (component.isChild()) {
-                    RenderUtils.drawRect(x + 3.5f, component.getY() - 2.8f, 1, component.getHeight(), Color.gray.getRGB());
+                    RenderUtils.drawRect(x + 3.5f + slideOffset, component.getY() - 2.8f, 1, component.getHeight(), Color.gray.getRGB());
                 }
             }
 
@@ -141,12 +147,9 @@ public class ModuleComponent implements IComponent {
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (isHovered) {
             if (visible) {
-                if (Mouse.isButtonDown(0)) {
-                    module.toggle();
-                }
-
-                if (Mouse.isButtonDown(1)) {
-                    isExpanded = !isExpanded;
+                switch (mouseButton) {
+                    case 0 -> module.toggle();
+                    case 1 -> isExpanded = !isExpanded;
                 }
             }
         } else if (isExpanded) {
