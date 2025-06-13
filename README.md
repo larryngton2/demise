@@ -7,7 +7,7 @@ A Minecraft client based around bypassing strict anticheats.
 2) download the .json from `/json/demise.json`
 3) create a new folder in minecraft's version dir named `demise`, and put both of the files in there
 4) go on the vanilla mc launcher (sk, tl and others work too) and create a new installation using the `demise` version
-5) download the [HMCL launcher](https://github.com/HMCL-dev/HMCL) (you can use prism, but it's harder to set up)
+5) download the [HMCL launcher](https://github.com/HMCL-dev/HMCL) (you can use multimc or prism, but they are harder to set up)
    <br> <b> make sure to use java 17 </b>
 
 ### the client is in early development, feel free to report any bugs in the issues
