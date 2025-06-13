@@ -8,6 +8,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RoundedUtils;
@@ -70,6 +71,7 @@ public class StringComponent extends Component {
             if (text.length() < 18 && (Character.isLetterOrDigit(typedChar) || keyCode == Keyboard.KEY_SPACE)) {
                 text += typedChar;
                 setting.setText(text);
+                SoundUtil.playSound("demise.tick");
             }
         }
         super.keyTyped(typedChar, keyCode);

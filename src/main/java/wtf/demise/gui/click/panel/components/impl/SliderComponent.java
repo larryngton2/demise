@@ -7,6 +7,8 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
@@ -16,13 +18,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class SliderComponent extends Component {
-
     private final SliderValue setting;
     private float anim;
     private boolean dragging;
+    private float previousSetting;
+    private final TimerUtils soundTimer = new TimerUtils();
 
     public SliderComponent(SliderValue setting) {
         this.setting = setting;
+        previousSetting = setting.get();
         setHeight(Fonts.interRegular.get(15).getHeight() * 2 + Fonts.interRegular.get(15).getHeight() + 2);
     }
 
@@ -44,6 +48,14 @@ public class SliderComponent extends Component {
         if (dragging) {
             final double difference = setting.getMax() - setting.getMin(), value = setting.getMin() + MathHelper.clamp_float((mouseX - getX()) / getWidth(), 0, 1) * difference;
             setting.setValue(BigDecimal.valueOf(MathUtils.incValue(value, setting.getIncrement())).setScale(getDecimalPoints(String.valueOf(setting.getIncrement())), RoundingMode.FLOOR).floatValue());
+
+            if (previousSetting != setting.get()) {
+                if (soundTimer.hasTimeElapsed(25)) {
+                    SoundUtil.playSound("demise.tick");
+                    soundTimer.reset();
+                }
+                previousSetting = setting.get();
+            }
         }
     }
 

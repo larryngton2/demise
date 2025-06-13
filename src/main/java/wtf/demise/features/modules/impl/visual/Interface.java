@@ -41,10 +41,13 @@ public class Interface extends Module {
             new BoolValue("Info", true)
     ), this);
 
-    public final SliderValue textHeight = new SliderValue("Text Height", 0, 0, 10, this, () -> elements.isEnabled("Module List"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module List"));
     public final BoolValue advancedBPS = new BoolValue("Advanced BPS", true, this, () -> elements.isEnabled("BPS counter"));
     public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this, () -> elements.isEnabled("Target HUD"));
+    public final SliderValue interpolation = new SliderValue("Interpolation", 0.5f, 0.01f, 1, 0.01f, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay());
+    public final BoolValue centerX = new BoolValue("Center X", true, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay());
+    public final SliderValue offsetX = new SliderValue("Offset X", 0, -100, 100, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay() && !centerX.get());
+    public final SliderValue offsetY = new SliderValue("Offset Y", 100, -25, 200, this, () -> targetHUDTracking.get() && targetHUDTracking.canDisplay());
     private final ModeValue color = new ModeValue("Color Setting", new String[]{"Custom", "Rainbow", "Dynamic", "Fade", "Astolfo"}, "Fade", this);
     private final ColorValue mainColor = new ColorValue("Main Color", new Color(255, 255, 255), this);
     private final ColorValue secondColor = new ColorValue("Second Color", new Color(71, 71, 71), this, () -> color.is("Fade"));

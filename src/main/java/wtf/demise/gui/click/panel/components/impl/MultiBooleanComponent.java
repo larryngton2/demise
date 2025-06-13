@@ -8,6 +8,7 @@ import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseOutSine;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 
@@ -51,6 +52,7 @@ public class MultiBooleanComponent extends Component {
         for (BoolValue boolValue : setting.getValues()) {
             if (MouseUtils.isHovered(getX() + 8, getY() + Fonts.interRegular.get(15).getHeight() + 1 + heightoff, Fonts.interRegular.get(13).getStringWidth(boolValue.getName()), Fonts.interRegular.get(13).getHeight(), mouseX, mouseY) && mouse == 0) {
                 boolValue.set(!boolValue.get());
+                SoundUtil.playSound("demise.tick");
             }
             heightoff += lineHeight;
         }

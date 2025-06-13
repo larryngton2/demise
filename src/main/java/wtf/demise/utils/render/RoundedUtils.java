@@ -2,8 +2,6 @@ package wtf.demise.utils.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.misc.Test;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.render.shader.ShaderUtils;
 

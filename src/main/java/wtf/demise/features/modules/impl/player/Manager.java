@@ -2,18 +2,12 @@ package wtf.demise.features.modules.impl.player;
 
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.item.*;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C0DPacketCloseWindow;
-import net.minecraft.network.play.client.C16PacketClientStatus;
-import net.minecraft.network.play.server.S2DPacketOpenWindow;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
@@ -23,8 +17,6 @@ import java.util.*;
 
 @ModuleInfo(name = "Manager", description = "Manages your inventory.", category = ModuleCategory.Player)
 public class Manager extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Open Inventory", "Spoof"}, "Open Inventory", this);
-
     private final SliderValue startDelay = new SliderValue("Start delay", 1, 0, 10, 1, this);
 
     private final BoolValue autoArmor = new BoolValue("Auto armor", true, this);
@@ -46,9 +38,6 @@ public class Manager extends Module {
     private final List<Integer> blockSlot = new ArrayList<>();
     private int bestSwordSlot;
     private int bestBowSlot;
-    private boolean serverOpen;
-    private boolean clientOpen;
-    private boolean nextTickCloseInventory;
     public int slot;
     private final TimerUtils armorTimer = new TimerUtils();
     private int armorWait;
@@ -59,44 +48,12 @@ public class Manager extends Module {
     private final TimerUtils startDelayTimer = new TimerUtils();
 
     @EventTarget
-    public void onPacketSend(PacketEvent event) {
-        final Packet<?> packet = event.getPacket();
-        if (packet instanceof C16PacketClientStatus clientStatus) {
-            if (clientStatus.getStatus() == C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT) {
-                this.clientOpen = true;
-                this.serverOpen = true;
-            }
-        } else if (packet instanceof C0DPacketCloseWindow packetCloseWindow) {
-            if (packetCloseWindow.windowId == mc.thePlayer.inventoryContainer.windowId) {
-                this.clientOpen = false;
-                this.serverOpen = false;
-                slot = -1;
-            }
-        }
-        if (packet instanceof S2DPacketOpenWindow) {
-            this.clientOpen = false;
-            this.serverOpen = false;
-        }
-    }
-
-    private boolean dropItem(final List<Integer> listOfSlots) {
-        if (this.dropItems.get()) {
-            if (!listOfSlots.isEmpty()) {
-                int slot = listOfSlots.remove(0);
-                windowClick(slot, 1, 4);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @EventTarget
     public void onUpdate(UpdateEvent e) {
-        if (!clientOpen) {
-            startDelayTimer.reset();
-        }
+        boolean open = mc.currentScreen instanceof GuiInventory;
 
-        if ((this.clientOpen && startDelayTimer.hasTimeElapsed(startDelay.get() * 50L)) || (mc.currentScreen == null && !Objects.equals(this.mode.get(), "Open Inventory"))) {
+        if (!open) {
+            startDelayTimer.reset();
+        } else if (startDelayTimer.hasTimeElapsed(startDelay.get() * 50L)) {
             this.clear();
 
             for (int slot = InventoryUtils.INCLUDE_ARMOR_BEGIN; slot < InventoryUtils.END; slot++) {
@@ -111,30 +68,12 @@ public class Manager extends Module {
             boolean sortReady = sortTimer.hasTimeElapsed(sortWait * 50L);
             boolean dropReady = dropTimer.hasTimeElapsed(dropWait * 50L);
 
-            boolean busy = false;
-
             if (armorReady && this.equipArmor()) {
-                busy = true;
                 resetTimings();
             } else if (dropReady && this.dropItem(this.trash)) {
-                busy = true;
                 resetTimings();
             } else if (sortReady && this.sortItems()) {
-                busy = true;
                 resetTimings();
-            }
-
-            if (!busy) {
-                if (this.nextTickCloseInventory) {
-                    this.close();
-                    this.nextTickCloseInventory = false;
-                } else {
-                    this.nextTickCloseInventory = true;
-                }
-            } else {
-                this.open();
-
-                this.nextTickCloseInventory = false;
             }
         }
     }
@@ -175,6 +114,17 @@ public class Manager extends Module {
         if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(mc.thePlayer, stack)) {
             updateBestArmor(slot, armor);
             return true;
+        }
+        return false;
+    }
+
+    private boolean dropItem(final List<Integer> listOfSlots) {
+        if (this.dropItems.get()) {
+            if (!listOfSlots.isEmpty()) {
+                int slot = listOfSlots.remove(0);
+                windowClick(slot, 1, 4);
+                return true;
+            }
         }
         return false;
     }
@@ -310,29 +260,8 @@ public class Manager extends Module {
     }
 
     @Override
-    public void onEnable() {
-        this.clientOpen = mc.currentScreen instanceof GuiInventory;
-        this.serverOpen = this.clientOpen;
-    }
-
-    @Override
     public void onDisable() {
-        this.close();
         this.clear();
-    }
-
-    private void open() {
-        if (!this.clientOpen && !this.serverOpen) {
-            mc.thePlayer.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
-            this.serverOpen = true;
-        }
-    }
-
-    private void close() {
-        if (!this.clientOpen && this.serverOpen) {
-            mc.thePlayer.sendQueue.addToSendQueue(new C0DPacketCloseWindow(mc.thePlayer.inventoryContainer.windowId));
-            this.serverOpen = false;
-        }
     }
 
     private void clear() {

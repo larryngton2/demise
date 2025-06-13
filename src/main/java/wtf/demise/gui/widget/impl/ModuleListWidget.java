@@ -1,10 +1,8 @@
 package wtf.demise.gui.widget.impl;
 
-import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
-import wtf.demise.features.modules.impl.misc.Test;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
@@ -124,15 +122,15 @@ public class ModuleListWidget extends Widget {
     private void renderBackground(float localX, float localY, float offset, int width, int height, int middle, boolean shader) {
         if (!shader) {
             if (localX < middle) {
-                RenderUtils.drawRect(localX, localY + offset, width, height + setting.textHeight.get(), setting.bgColor());
+                RenderUtils.drawRect(localX, localY + offset, width, height, setting.bgColor());
             } else {
-                RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height + setting.textHeight.get(), setting.bgColor());
+                RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height, setting.bgColor());
             }
         } else {
             if (localX < middle) {
-                RenderUtils.drawRect(localX, localY + offset, width, height + setting.textHeight.get(), Color.black.getRGB());
+                RenderUtils.drawRect(localX, localY + offset, width, height, Color.black.getRGB());
             } else {
-                RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height + setting.textHeight.get(), Color.black.getRGB());
+                RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height, Color.black.getRGB());
             }
         }
     }
@@ -187,7 +185,7 @@ public class ModuleListWidget extends Widget {
     }
 
     private float calculateNextOffset(Module module, int height, float offset) {
-        return (float) (offset + ((module.getAnimation().getOutput()) * (height + setting.textHeight.get())));
+        return (float) (offset + ((module.getAnimation().getOutput()) * (height)));
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -18,12 +19,16 @@ import net.minecraft.entity.projectile.EntityEgg;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
+import org.lwjglx.util.glu.GLU;
+import org.lwjglx.util.vector.Vector2f;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.InstanceAccess;
 
 import java.awt.*;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -1295,5 +1300,25 @@ public class RenderUtils implements InstanceAccess {
         GL11.glEnable(3553);
         GL11.glPopMatrix();
         GL11.glColor3f(255, 255, 255);
+    }
+
+    public static Vector2f worldToScreen(float x, float y, float z, ScaledResolution sr) {
+        return worldToScreen(x, y, z, sr, false);
+    }
+
+    public static Vector2f worldToScreen(float x, float y, float z, ScaledResolution sr, boolean ignoreInvisible) {
+        boolean isVisible;
+        FloatBuffer winCoords = FloatBuffer.allocate(3);
+        GLU.gluProject(x, y, z, ActiveRenderInfo.MODELVIEW, ActiveRenderInfo.PROJECTION, ActiveRenderInfo.VIEWPORT, winCoords);
+        float screenX = winCoords.get(0) / (float) sr.getScaleFactor();
+        float screenY = winCoords.get(1) / (float) sr.getScaleFactor();
+        isVisible = winCoords.get(2) >= 0.0f && winCoords.get(2) <= 1.0f && screenX >= 0.0f && screenX <= (float) sr.getScaledWidth() && screenY >= 0.0f && screenY <= (float) sr.getScaledHeight();
+        if (ignoreInvisible) {
+            return new Vector2f(screenX, (float) sr.getScaledHeight() - screenY);
+        }
+        if (isVisible) {
+            return new Vector2f(screenX, (float) sr.getScaledHeight() - screenY);
+        }
+        return null;
     }
 }

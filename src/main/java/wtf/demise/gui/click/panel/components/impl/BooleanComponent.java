@@ -7,6 +7,7 @@ import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.SmoothStepAnimation;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RoundedUtils;
@@ -36,8 +37,10 @@ public class BooleanComponent extends Component {
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
-        if (MouseUtils.isHovered(getX() + getWidth() - 17.5f, getY() + 2.5f, 12.5f, 5, mouseX, mouseY) && mouseButton == 0)
+        if (MouseUtils.isHovered(getX() + getWidth() - 17.5f, getY() + 2.5f, 12.5f, 5, mouseX, mouseY) && mouseButton == 0) {
             this.setting.set(!this.setting.get());
+            SoundUtil.playSound("demise.tick");
+        }
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 

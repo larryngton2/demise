@@ -4,14 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import wtf.demise.Demise;
 import wtf.demise.features.config.impl.ModuleConfig;
-import wtf.demise.features.modules.impl.misc.Test;
 import wtf.demise.gui.click.IComponent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
-import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.Color;
@@ -83,11 +81,6 @@ public class ConfigComponent implements IComponent {
         this.isHovered = MouseUtils.isHovered(x + slideOffset, y, width - 15 - deleteWidth - 15 - saveWidth, 30, mouseX, mouseY);
         this.saveHovered = MouseUtils.isHovered(x + width - 10 - deleteWidth - 5 - saveWidth + slideOffset, y, saveWidth, 30, mouseX, mouseY);
         this.deleteHovered = MouseUtils.isHovered(x + width - 10 - deleteWidth + slideOffset, y, deleteWidth, 30, mouseX, mouseY);
-
-        if (Demise.INSTANCE.getModuleManager().getModule(Test.class).hitboxes.get()) {
-            RenderUtils.drawRect(x, y, 375, 30, Color.red.getRGB());
-            RenderUtils.drawRect(mouseX, mouseY, 5, 5, Color.green.getRGB());
-        }
     }
 
     @Override

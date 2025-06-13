@@ -2,21 +2,19 @@ package wtf.demise.gui.widget.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
-import org.joml.Vector4d;
-import org.lwjgl.opengl.GL11;
+import org.lwjglx.util.vector.Vector2f;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
+import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.render.ProjectionComponent;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
@@ -32,74 +30,71 @@ public class TargetHUDWidget extends Widget {
         this.y = 0.6333332f;
     }
 
+    private float interpolatedX;
+    private float interpolatedY;
+
     @Override
     public void render() {
-        this.height = getTHUDHeight();
-        this.width = getTHUDWidth();
+        this.height = 37;
+        this.width = 120;
 
         if (setting.target != null) {
+            TargetHUD targetHUD;
             if (!setting.targetHUDTracking.get()) {
-                TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
-                targetHUD.render();
+                targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
             } else {
-                renderHUDOnTarget(setting.target, setting.target.posX, setting.target.posY, setting.target.posZ);
+                targetHUD = new TargetHUD(getPos().x, getPos().y, (EntityPlayer) setting.target, setting.decelerateAnimation, false);
             }
-        }
-    }
-
-    //todo... to fucking do
-    protected void renderHUDOnTarget(Entity entityIn, double x, double y, double z) {
-        double d0 = entityIn.getDistanceSqToEntity(mc.getRenderManager().livingPlayer);
-
-        if (d0 <= (double) (64 * 64)) {
-            float f = 1.6F;
-            float f1 = 0.016666668F * f;
-            GlStateManager.pushMatrix();
-            GlStateManager.translate((float) x + 0.0F, (float) y + entityIn.height * 0.85f, (float) z);
-            GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
-            GlStateManager.scale(-f1, -f1, f1);
-            GlStateManager.disableLighting();
-            GlStateManager.depthMask(false);
-            GlStateManager.disableDepth();
-            GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            int i = 0;
-
-            int j = (int) (getTHUDWidth() / 2);
-            GlStateManager.disableTexture2D();
-            GlStateManager.enableTexture2D();
-            TargetHUD targetHUD = new TargetHUD(-j, i, (EntityPlayer) entityIn, setting.decelerateAnimation, false);
             targetHUD.render();
-            //fontrenderer.drawStringWithShadow(str, -j, i, 553648127);
-            GlStateManager.enableDepth();
-            GlStateManager.depthMask(true);
-            targetHUD.render();
-            //fontrenderer.drawStringWithShadow(str, -j, i, -1);
-            GlStateManager.enableLighting();
-            GlStateManager.disableBlend();
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.popMatrix();
         }
     }
 
     @Override
-    public void onShader(Shader2DEvent event) {
+    public void onShader(Shader2DEvent e) {
         if (setting.target != null) {
-            this.height = getTHUDHeight();
-            this.width = getTHUDWidth();
-            TargetHUD targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, true);
+            TargetHUD targetHUD;
+            if (!setting.targetHUDTracking.get()) {
+                targetHUD = new TargetHUD(renderX, renderY, (EntityPlayer) setting.target, setting.decelerateAnimation, true);
+            } else {
+                targetHUD = new TargetHUD(getPos().x, getPos().y, (EntityPlayer) setting.target, setting.decelerateAnimation, true);
+            }
             targetHUD.render();
         }
     }
 
-    public float getTHUDWidth() {
-        return 120;
-    }
+    private Vector2f getPos() {
+        Entity target = setting.target;
 
-    public float getTHUDHeight() {
-        return 37;
+        float x = (float) (target.prevPosX + (target.posX - target.prevPosX) * mc.timer.renderPartialTicks);
+        float y = (float) (target.prevPosY + (target.posY - target.prevPosY) * mc.timer.renderPartialTicks + target.height);
+        float z = (float) (target.prevPosZ + (target.posZ - target.prevPosZ) * mc.timer.renderPartialTicks);
+
+        x -= (float) mc.getRenderManager().viewerPosX;
+        y -= (float) mc.getRenderManager().viewerPosY;
+        z -= (float) mc.getRenderManager().viewerPosZ;
+
+        Vector2f pos = RenderUtils.worldToScreen(x, y, z, sr);
+
+        if (pos == null) {
+            interpolatedX = MathUtils.interpolate(interpolatedX, renderX, setting.interpolation.get());
+            interpolatedY = MathUtils.interpolate(interpolatedY, renderY, setting.interpolation.get());
+
+            return new Vector2f(interpolatedX, interpolatedY);
+        }
+
+        Vector2f rPos = new Vector2f((float) Math.floor(pos.x), (float) Math.floor(pos.y));
+        float rPosX = rPos.x + (setting.centerX.get() ? target.width - width / 2 : setting.offsetX.get());
+        float rPosY = (int) rPos.y + setting.offsetY.get() - height;
+
+        if (interpolatedX == 0 && interpolatedY == 0) {
+            interpolatedX = rPosX;
+            interpolatedY = rPosY;
+        }
+
+        interpolatedX = MathUtils.interpolate(interpolatedX, rPosX, setting.interpolation.get());
+        interpolatedY = MathUtils.interpolate(interpolatedY, rPosY, setting.interpolation.get());
+
+        return new Vector2f(interpolatedX, interpolatedY);
     }
 
     @Override
@@ -127,8 +122,8 @@ class TargetHUD implements InstanceAccess {
     }
 
     public void render() {
-        setWidth(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).getTHUDWidth());
-        setHeight(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).getTHUDHeight());
+        setWidth(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).width);
+        setHeight(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).height);
         GlStateManager.pushMatrix();
 
         GlStateManager.translate(x + width / 2F, y + height / 2F, 0);

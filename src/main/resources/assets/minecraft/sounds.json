@@ -2051,5 +2051,11 @@
     "sounds": [
       "demise/success"
     ]
+  },
+  "demise.tick": {
+    "category": "master",
+    "sounds": [
+      "demise/tick"
+    ]
   }
 }

@@ -14,7 +14,7 @@ import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "LongJump", description = "Jump, but long.", category = ModuleCategory.Movement)
 public class LongJump extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "NCP", "Miniblox"}, "Vanilla", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Miniblox"}, "Vanilla", this);
     private final SliderValue jumpOffAmount = new SliderValue("JumpOff amount", 0.2f, 0.01f, 2, 0.01f, this, () -> mode.is("Vanilla"));
 
     private boolean jumped = false;

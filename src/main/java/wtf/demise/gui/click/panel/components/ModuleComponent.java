@@ -3,16 +3,13 @@ package wtf.demise.gui.click.panel.components;
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.opengl.GL11;
-import org.lwjglx.input.Mouse;
-import wtf.demise.Demise;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.impl.misc.Test;
 import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.click.IComponent;
-import wtf.demise.gui.click.dropdown.component.impl.*;
 import wtf.demise.gui.click.panel.PanelGui;
+import wtf.demise.gui.click.panel.components.impl.*;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;
@@ -106,11 +103,6 @@ public class ModuleComponent implements IComponent {
     @Override
     public void drawScreen(int mouseX, int mouseY) {
         this.isHovered = MouseUtils.isHovered(x, y, 375, 35, mouseX, mouseY);
-
-        if (Demise.INSTANCE.getModuleManager().getModule(Test.class).hitboxes.get()) {
-            RenderUtils.drawRect(x, y, 375, 35, Color.red.getRGB());
-            RenderUtils.drawRect(mouseX, mouseY, 5, 5, Color.green.getRGB());
-        }
 
         float yOffset = 35;
         float width = 375;
