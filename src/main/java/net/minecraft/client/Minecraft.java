@@ -104,6 +104,7 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
+import wtf.demise.features.modules.impl.combat.TimerRange;
 import wtf.demise.features.modules.impl.legit.HitSelect;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.render.RenderUtils;
@@ -781,12 +782,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         this.mcProfiler.startSection("tick");
 
         TickBase tickBase = Demise.INSTANCE.getModuleManager().getModule(TickBase.class);
+        TimerRange timerRange = Demise.INSTANCE.getModuleManager().getModule(TimerRange.class);
 
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
-            if (tickBase.skipTick()) {
-                if (tickBase.passthroughClicking.get()) {
-                    handleMouse();
-                }
+            if (tickBase.skipTick() || timerRange.skipTick()) {
                 continue;
             }
 
@@ -812,7 +811,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
 
         this.mcProfiler.endSection();
 
-        if (!this.skipRenderWorld) {
+        if (!this.skipRenderWorld && !tickBase.freezeAnim()) {
             this.mcProfiler.endStartSection("gameRenderer");
             this.entityRenderer.updateCameraAndRender(this.timer.renderPartialTicks, i);
             this.mcProfiler.endSection();

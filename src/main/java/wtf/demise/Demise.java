@@ -17,7 +17,6 @@ import wtf.demise.gui.click.panel.PanelGui;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
-import wtf.demise.gui.click.dropdown.DropdownGUI;
 import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.gui.notification.NotificationManager;
 import wtf.demise.gui.notification.NotificationType;
@@ -57,7 +56,6 @@ public class Demise {
     private WidgetManager widgetManager;
     private CommandManager commandManager;
     private FriendManager friendManager;
-    private DropdownGUI dropdownGUI;
     private PanelGui panelGui;
     private AltRepositoryGUI altRepositoryGUI;
     private DiscordInfo discordRP;
@@ -128,7 +126,6 @@ public class Demise {
         configManager = new ConfigManager();
         commandManager = new CommandManager();
         friendManager = new FriendManager();
-        dropdownGUI = new DropdownGUI();
         panelGui = new PanelGui();
         altRepositoryGUI = new AltRepositoryGUI(this);
     }

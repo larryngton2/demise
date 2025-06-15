@@ -25,7 +25,6 @@ public class RotationManager implements InstanceAccess {
     private static boolean silent;
     private static float cachedHSpeed;
     private static float cachedVSpeed;
-    private static float cachedMidpoint;
     private static SmoothMode smoothMode;
     public static boolean cachedCorrection;
     public static float rotDiffBuildUp;
@@ -42,7 +41,7 @@ public class RotationManager implements InstanceAccess {
     private int interpolatedAccelDeltaYaw;
     private int interpolatedAccelDeltaPitch;
 
-    public static void setRotation(float[] rotation, boolean correction, float[] speed, float midpoint, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent) {
+    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
 
@@ -53,7 +52,6 @@ public class RotationManager implements InstanceAccess {
         RotationManager.silent = silent;
         RotationManager.cachedHSpeed = speed[0];
         RotationManager.cachedVSpeed = speed[1];
-        RotationManager.cachedMidpoint = midpoint;
         RotationManager.smoothMode = smoothMode;
         RotationManager.cachedCorrection = correction;
         RotationManager.cachedAccel = accel;
@@ -222,22 +220,14 @@ public class RotationManager implements InstanceAccess {
                 };
             }
 
-            case Bezier -> {
-                float yawDirection = yawDifference / (float) rotationDifference;
-                float pitchDirection = pitchDifference / (float) rotationDifference;
+            case Polar -> {
+                // the method
+                straightLineYaw = (float) (abs(yawDifference / rotationDifference) * 78);
+                straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * 24);
 
-                float controlYaw = yawDirection * cachedMidpoint * (float) rotationDifference;
-                float controlPitch = pitchDirection * cachedMidpoint * (float) rotationDifference;
-
-                float[] t = new float[]{cachedHSpeed / 180, cachedVSpeed / 180};
-
-                float finalYaw = (1 - t[0]) * (1 - t[0]) * current[0] + 2 * (1 - t[0]) * t[0] * controlYaw + t[0] * t[0] * finalTargetRotation[0];
-                float finalPitch = (1 - t[1]) * (1 - t[1]) * current[1] + 2 * (1 - t[1]) * t[1] * controlPitch + t[1] * t[1] * finalTargetRotation[1];
-
-                //todo fix bezier rots having down syndrome
                 delta = new int[]{
-                        (int) ((finalYaw - current[0]) / f1),
-                        (int) -((finalPitch - current[1]) / f1)
+                        (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
+                        (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
                 };
             }
 

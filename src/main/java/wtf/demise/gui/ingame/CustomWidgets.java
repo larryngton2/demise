@@ -282,12 +282,6 @@ public class CustomWidgets implements InstanceAccess {
     }
 
     private void drawHotbarWidget(int i, boolean shader) {
-        TimerRange timerRange = getModule(TimerRange.class);
-
-        if (!(SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) && interpolatedWidgetY >= sr.getScaledHeight() + 19) {
-            return;
-        }
-
         ItemStack heldItem = mc.thePlayer.getCurrentEquippedItem();
         int count = heldItem == null ? 0 : heldItem.stackSize;
         String countStr = String.valueOf(count);
@@ -316,9 +310,6 @@ public class CustomWidgets implements InstanceAccess {
                 text = "";
                 totalWidth = ((Fonts.interMedium.get(18).getStringWidth(text) + blockWH + spacing) + 3);
             }
-        } else if (timerRange.isEnabled() && timerRange.renderBal) {
-            text = timerRange.balanceText;
-            totalWidth = ((Fonts.interMedium.get(18).getStringWidth(text) + spacing) + 6);
         } else {
             text = "";
             totalWidth = ((Fonts.interMedium.get(18).getStringWidth(text) + blockWH + spacing) + 3);
@@ -329,7 +320,7 @@ public class CustomWidgets implements InstanceAccess {
         float renderX = (i - totalWidth / 2);
         float renderY = (sr.getScaledHeight() - 80 - 5);
 
-        if (SpoofSlotUtils.isSpoofing() || (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing())) {
+        if (SpoofSlotUtils.isSpoofing()) {
             interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, renderY, 0.25f);
         } else {
             interpolatedWidgetY = MathUtils.interpolate(interpolatedWidgetY, sr.getScaledHeight() + height, 0.25f);
@@ -341,23 +332,15 @@ public class CustomWidgets implements InstanceAccess {
         GL11.glPushMatrix();
 
         if (!shader) {
-            //todo scissor
-
-            //RenderUtils.scissor(interpolatedX + 0.25, interpolatedY + 0.25, interpolatedWidth - 0.5, height);
-
-            //RenderUtils.enableScissor();
-
             RoundedUtils.drawRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, new Color(getModule(Interface.class).bgColor(), true));
 
-            Fonts.interMedium.get(18).drawString(text, interpolatedWidgetX + 3 - (timerRange.isEnabled() && timerRange.renderBal && !SpoofSlotUtils.isSpoofing() ? 16 : 0) + blockWH + spacing, interpolatedWidgetY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, -1);
+            Fonts.interMedium.get(18).drawString(text, interpolatedWidgetX + 3 + blockWH + spacing, interpolatedWidgetY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, -1);
 
             if (SpoofSlotUtils.isSpoofing()) {
                 RenderHelper.enableGUIStandardItemLighting();
                 mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) interpolatedWidgetX + 3, (int) (interpolatedWidgetY + 10 - (blockWH / 2)));
                 RenderHelper.disableStandardItemLighting();
             }
-
-            //RenderUtils.disableScissor();
         } else {
             RoundedUtils.drawShaderRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, Color.black);
         }

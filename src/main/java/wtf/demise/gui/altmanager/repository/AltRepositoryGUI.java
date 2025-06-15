@@ -36,6 +36,7 @@ import wtf.demise.gui.altmanager.mslogin.Auth;
 import wtf.demise.gui.altmanager.repository.credential.AltCredential;
 import wtf.demise.gui.altmanager.repository.credential.MicrosoftAltCredential;
 import wtf.demise.gui.altmanager.utils.FakeEntityPlayer;
+import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.misc.FilteredArrayList;
 import wtf.demise.utils.misc.HttpResponse;
@@ -193,6 +194,9 @@ public class AltRepositoryGUI extends GuiScreen {
                 break;
             case 3:
                 refreshAlts();
+                break;
+            case 4:
+                mc.displayGuiScreen(new GuiMainMenu());
                 break;
             case 71:
                 try {

@@ -33,10 +33,7 @@ import java.util.List;
 
 @ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TickBase extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past", "Balance"}, "Future", this);
-    public final BoolValue passthroughClicking = new BoolValue("Pass through clicking", true, this, () -> mode.is("Future"));
-    private final SliderValue balanceRange = new SliderValue("Balance range", 8, 3, 15, 0.1f, this, () -> mode.is("Balance"));
-    private final SliderValue minBalanceRange = new SliderValue("Min balance range", 3, 0, 15, 0.1f, this, () -> mode.is("Balance"));
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue tickRange = new SliderValue("Tick range", 3f, 0.1f, 8f, 0.1f, this);
     private final SliderValue minRange = new SliderValue("Min range", 2.5f, 0.1f, 8f, 0.1f, this);
@@ -59,17 +56,12 @@ public class TickBase extends Module {
     private EntityPlayer target;
     public boolean working;
     private int ticksToSkip;
-    private int cachedTicks;
-    private boolean cachedBalance;
-    private boolean pause;
+    private boolean firstAnimation;
 
     @Override
     public void onEnable() {
         shifted = 0;
         previousTime = 0;
-        cachedBalance = false;
-        cachedTicks = 0;
-        pause = false;
     }
 
     @EventTarget
@@ -138,54 +130,27 @@ public class TickBase extends Module {
             return;
         }
 
-        switch (mode.get()) {
-            case "Future":
-                if (timer.hasTimeElapsed(delay.get())) {
-                    if (shouldStart()) {
-                        tick();
-                        timer.reset();
+        if (mode.is("Future")) {
+            if (timer.hasTimeElapsed(delay.get())) {
+                if (shouldStart()) {
+                    firstAnimation = false;
+                    skippedTick = 0;
+                    working = true;
+                    while (skippedTick < ticksToSkip && !shouldStop()) {
+                        skippedTick++;
+                        try {
+                            mc.runTick();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
-                }
 
-                working = false;
-                break;
-            case "Balance":
-                if (Range.between(minBalanceRange.get(), balanceRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target))) {
-                    if (!cachedBalance) {
-                        cachedTicks = (int) maxTick.get();
-                        pause = true;
-                        cachedBalance = true;
-                    }
-                }
-
-                if (PlayerUtils.getDistanceToEntityBox(target) > balanceRange.get() && cachedBalance) {
-                    cachedBalance = false;
-                }
-
-                if (timer.hasTimeElapsed(delay.get()) && shouldStart() && cachedBalance) {
-                    tick();
-                    cachedTicks = (int) maxTick.get();
-                    cachedBalance = false;
+                    working = false;
                     timer.reset();
                 }
-                break;
-        }
-    }
-
-    private void tick() {
-        skippedTick = 0;
-        working = true;
-
-        while (skippedTick < ticksToSkip && !shouldStop()) {
-            skippedTick++;
-            try {
-                mc.runTick();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
             }
+            working = false;
         }
-
-        working = false;
     }
 
 
@@ -277,26 +242,23 @@ public class TickBase extends Module {
     }
 
     public boolean skipTick() {
-        switch (mode.get()) {
-            case "Future":
-                if (working || skippedTick < 0) return true;
-                if (isEnabled() && skippedTick > 0) {
-                    --skippedTick;
-                    return true;
-                }
-                break;
-            case "Balance":
-                if (timer.hasTimeElapsed(delay.get())) {
-                    if (cachedTicks <= 0) {
-                        pause = false;
-                        return false;
-                    }
-                    if (isEnabled() && pause && cachedTicks > 0) {
-                        --cachedTicks;
-                        return true;
-                    }
-                }
-                break;
+        if (mode.is("Future")) {
+            if (working || skippedTick < 0) return true;
+            if (isEnabled() && skippedTick > 0) {
+                --skippedTick;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean freezeAnim() {
+        if (skippedTick != 0) {
+            if (!firstAnimation) {
+                firstAnimation = true;
+                return false;
+            }
+            return true;
         }
         return false;
     }

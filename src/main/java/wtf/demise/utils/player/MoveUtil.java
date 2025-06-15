@@ -14,8 +14,10 @@ import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static java.lang.Math.toRadians;
 

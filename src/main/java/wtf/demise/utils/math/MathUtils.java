@@ -157,6 +157,14 @@ public class MathUtils implements InstanceAccess {
     }
 
     public static double randomizeDouble(double min, double max) {
+        if (min == max) {
+            return min;
+        }
+
+        if (min < 1 && max < 1) {
+            return Math.random() * (max - min) + min;
+        }
+
         return ThreadLocalRandom.current().nextDouble(min, max + 1);
     }
 
