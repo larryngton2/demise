@@ -6,8 +6,6 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.BlockPos;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
-
 public class C14PacketTabComplete implements Packet<INetHandlerPlayServer> {
     private String message;
     private BlockPos targetBlock;

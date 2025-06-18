@@ -2,8 +2,6 @@ package net.minecraft.client.gui;
 
 import net.minecraft.client.resources.I18n;
 
-import java.io.IOException;
-
 public class GuiErrorScreen extends GuiScreen {
     private final String field_146313_a;
     private final String field_146312_f;

@@ -80,7 +80,6 @@ public class EntityPlayerMP extends EntityPlayer implements ICrafting {
     public boolean isChangingQuantityOnly;
     public int ping;
     public boolean playerConqueredTheEnd;
-    public int violations;
 
     public EntityPlayerMP(MinecraftServer server, WorldServer worldIn, GameProfile profile, ItemInWorldManager interactionManager) {
         super(worldIn, profile);

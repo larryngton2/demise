@@ -6,8 +6,6 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-import java.io.IOException;
-
 public class C07PacketPlayerDigging implements Packet<INetHandlerPlayServer> {
     private BlockPos position;
     private EnumFacing facing;

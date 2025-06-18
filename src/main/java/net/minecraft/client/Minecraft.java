@@ -73,8 +73,8 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Timer;
 import net.minecraft.util.*;
+import net.minecraft.util.Timer;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.WorldProviderHell;
@@ -102,6 +102,7 @@ import org.lwjglx.util.glu.GLU;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.KeyPressEvent;
+import wtf.demise.events.impl.misc.StaticTickEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.impl.combat.TickBase;
 import wtf.demise.features.modules.impl.combat.TimerRange;
@@ -123,6 +124,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -149,6 +151,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     @Getter
     private boolean connectedToRealms = false;
     public final Timer timer = new Timer(20.0F);
+    public final Timer staticTimer = new Timer(20.0F);
     private final PlayerUsageSnooper usageSnooper = new PlayerUsageSnooper("client", this, MinecraftServer.getCurrentTimeMillis());
     public WorldClient theWorld;
     public RenderGlobal renderGlobal;
@@ -231,6 +234,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     int fpsCounter;
     long prevFrameTime = -1L;
     private String debugProfilerName = "root";
+    public boolean skippedTick;
 
     public Minecraft(GameConfiguration gameConfig) {
         theMinecraft = this;
@@ -765,8 +769,12 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
             float f = this.timer.renderPartialTicks;
             this.timer.updateTimer();
             this.timer.renderPartialTicks = f;
+            float f2 = this.staticTimer.renderPartialTicks;
+            this.staticTimer.updateTimer();
+            this.staticTimer.renderPartialTicks = f2;
         } else {
             this.timer.updateTimer();
+            this.staticTimer.updateTimer();
         }
 
         this.mcProfiler.startSection("scheduledExecutables");
@@ -781,11 +789,16 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         long l = System.nanoTime();
         this.mcProfiler.startSection("tick");
 
+        for (int j = 0; j < this.staticTimer.elapsedTicks; ++j) {
+            Demise.INSTANCE.getEventManager().call(new StaticTickEvent());
+        }
+
         TickBase tickBase = Demise.INSTANCE.getModuleManager().getModule(TickBase.class);
         TimerRange timerRange = Demise.INSTANCE.getModuleManager().getModule(TimerRange.class);
 
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
-            if (tickBase.skipTick() || timerRange.skipTick()) {
+            skippedTick = tickBase.skipTick() || timerRange.skipTick();
+            if (skippedTick) {
                 continue;
             }
 

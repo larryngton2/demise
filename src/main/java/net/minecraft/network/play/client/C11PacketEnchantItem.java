@@ -4,8 +4,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-import java.io.IOException;
-
 public class C11PacketEnchantItem implements Packet<INetHandlerPlayServer> {
     private int windowId;
     private int button;

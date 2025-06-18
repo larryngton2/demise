@@ -1,6 +1,7 @@
 package wtf.demise.gui.click.panel;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
@@ -12,7 +13,9 @@ import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.click.panel.components.Category;
 import wtf.demise.gui.click.panel.components.config.ConfigCategoryComponent;
 import wtf.demise.gui.font.Fonts;
+import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.render.MouseUtils;
+import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
@@ -30,6 +33,8 @@ public class PanelGui extends GuiScreen {
     private float dragX, dragY;
     public static float posX = 255, posY = 120;
     private final ConfigCategoryComponent configCategoryComponent;
+    public static float interpolatedScale;
+    private boolean closing;
 
     public PanelGui() {
         Demise.INSTANCE.getEventManager().unregister(this);
@@ -50,6 +55,9 @@ public class PanelGui extends GuiScreen {
 
     @Override
     public void initGui() {
+        closing = false;
+        interpolatedScale = 0;
+
         if (selectedConfigCategory != null) {
             selectedConfigCategory.initGui();
         }
@@ -57,6 +65,15 @@ public class PanelGui extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        interpolatedScale = MathUtils.interpolate(interpolatedScale, !closing ? 1 : 0, 0.25f);
+
+        if (interpolatedScale < 0.01f && closing) {
+            mc.displayGuiScreen(null);
+        }
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        RenderUtils.scaleStart(sr.getScaledWidth() / 2f, sr.getScaledHeight() / 2f, interpolatedScale);
+
         if (dragging) {
             float deltaX = mouseX - (dragX + posX);
             float deltaY = mouseY - (dragY + posY);
@@ -130,6 +147,8 @@ public class PanelGui extends GuiScreen {
 
         Fonts.interRegular.get(14).drawString(str, posX + 450 - Fonts.interRegular.get(14).getStringWidth(str) - 4, posY + 300 - Fonts.interRegular.get(14).getHeight(), new Color(255, 255, 255, 208).getRGB());
         Fonts.interRegular.get(14).drawString(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), posX + 3.5, posY + 300 - Fonts.interRegular.get(14).getHeight(), new Color(255, 255, 255, 208).getRGB());
+
+        RenderUtils.scaleEnd();
     }
 
     @EventPriority(100)
@@ -137,9 +156,12 @@ public class PanelGui extends GuiScreen {
     public void onShader2D(Shader2DEvent e) {
         if (mc.currentScreen != this) return;
 
+        ScaledResolution sr = new ScaledResolution(mc);
+        RenderUtils.scaleStart(sr.getScaledWidth() / 2f, sr.getScaledHeight() / 2f, interpolatedScale);
         RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
         categories.forEach(category -> category.render(true));
         configCategoryComponent.render(true);
+        RenderUtils.scaleEnd();
     }
 
     @Override
@@ -175,7 +197,11 @@ public class PanelGui extends GuiScreen {
     @Override
     public void keyTyped(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RSHIFT) {
-            mc.displayGuiScreen(null);
+            //mc.displayGuiScreen(null);
+            closing = !closing;
+        }
+
+        if (closing) {
             return;
         }
 

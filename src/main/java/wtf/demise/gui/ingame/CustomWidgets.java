@@ -22,7 +22,6 @@ import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.impl.combat.TimerRange;
 import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;

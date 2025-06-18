@@ -3,7 +3,6 @@ package wtf.demise.features.modules.impl.player;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBow;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import org.lwjglx.input.Keyboard;
 import org.lwjglx.input.Mouse;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;

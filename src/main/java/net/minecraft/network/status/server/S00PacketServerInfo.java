@@ -10,8 +10,6 @@ import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumTypeAdapterFactory;
 import net.minecraft.util.IChatComponent;
 
-import java.io.IOException;
-
 public class S00PacketServerInfo implements Packet<INetHandlerStatusClient> {
     private static final Gson GSON = (new GsonBuilder()).registerTypeAdapter(ServerStatusResponse.MinecraftProtocolVersionIdentifier.class, new ServerStatusResponse.MinecraftProtocolVersionIdentifier.Serializer()).registerTypeAdapter(ServerStatusResponse.PlayerCountData.class, new ServerStatusResponse.PlayerCountData.Serializer()).registerTypeAdapter(ServerStatusResponse.class, new ServerStatusResponse.Serializer()).registerTypeHierarchyAdapter(IChatComponent.class, new IChatComponent.Serializer()).registerTypeHierarchyAdapter(ChatStyle.class, new ChatStyle.Serializer()).registerTypeAdapterFactory(new EnumTypeAdapterFactory()).create();
     private ServerStatusResponse response;

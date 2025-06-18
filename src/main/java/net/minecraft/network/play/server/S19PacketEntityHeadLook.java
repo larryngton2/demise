@@ -6,8 +6,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.World;
 
-import java.io.IOException;
-
 public class S19PacketEntityHeadLook implements Packet<INetHandlerPlayClient> {
     private int entityId;
     private byte yaw;

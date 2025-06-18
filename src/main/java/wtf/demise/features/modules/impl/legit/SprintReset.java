@@ -1,9 +1,9 @@
 package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.MathHelper;
-import net.minecraft.entity.EntityLivingBase;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;

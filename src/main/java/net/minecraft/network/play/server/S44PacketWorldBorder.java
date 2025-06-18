@@ -5,8 +5,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.border.WorldBorder;
 
-import java.io.IOException;
-
 public class S44PacketWorldBorder implements Packet<INetHandlerPlayClient> {
     private S44PacketWorldBorder.Action action;
     private int size;

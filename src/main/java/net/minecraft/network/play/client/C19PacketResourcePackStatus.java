@@ -4,8 +4,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-import java.io.IOException;
-
 public class C19PacketResourcePackStatus implements Packet<INetHandlerPlayServer> {
     private String hash;
     private C19PacketResourcePackStatus.Action status;

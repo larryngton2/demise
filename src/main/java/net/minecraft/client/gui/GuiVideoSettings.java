@@ -7,8 +7,6 @@ import net.optifine.Lang;
 import net.optifine.gui.*;
 import net.optifine.shaders.gui.GuiShaders;
 
-import java.io.IOException;
-
 public class GuiVideoSettings extends GuiScreenOF {
     private final GuiScreen parentGuiScreen;
     protected String screenTitle = "Video Settings";

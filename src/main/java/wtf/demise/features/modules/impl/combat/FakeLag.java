@@ -2,7 +2,8 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
 import org.apache.commons.lang3.Range;
 import org.lwjgl.opengl.GL11;
@@ -26,7 +27,7 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.packet.PingSpoofComponent;
+import wtf.demise.utils.packet.LagUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
@@ -42,6 +43,7 @@ public class FakeLag extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Pulse", "Spoof"}, "Pulse", this);
     private final BoolValue smart = new BoolValue("Smart", true, this);
     private final BoolValue modifyMovementYaw = new BoolValue("Modify movement yaw", false, this, smart::get);
+    private final SliderValue targetRange = new SliderValue("Target range", 2.7f, 0, 4.5f, 0.1f, this, () -> smart.get() && modifyMovementYaw.get());
     private final SliderValue attackRange = new SliderValue("Attack range", 4, 0, 15, 0.1f, this, () -> !smart.get());
     private final BoolValue alwaysSpoof = new BoolValue("Always spoof", false, this);
     private final SliderValue searchRange = new SliderValue("Search range", 6, 1, 15, 0.1f, this, () -> !alwaysSpoof.get());
@@ -99,8 +101,8 @@ public class FakeLag extends Module {
                 BlinkComponent.dispatch(true);
                 break;
             case "Spoof":
-                PingSpoofComponent.disable();
-                PingSpoofComponent.dispatch();
+                LagUtils.disable();
+                LagUtils.dispatch();
                 break;
         }
     }
@@ -120,8 +122,8 @@ public class FakeLag extends Module {
                         BlinkComponent.dispatch(true);
                         break;
                     case "Spoof":
-                        PingSpoofComponent.disable();
-                        PingSpoofComponent.dispatch();
+                        LagUtils.disable();
+                        LagUtils.dispatch();
                         break;
                 }
                 blinking = false;
@@ -182,7 +184,7 @@ public class FakeLag extends Module {
                             ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
                         }
 
-                        PingSpoofComponent.spoof(ms, true, false, false, false, true, true, false);
+                        LagUtils.spoof(ms, true, false, false, false, true, true, false);
                         blinking = true;
                         dispatched = false;
                     } else {
@@ -192,15 +194,15 @@ public class FakeLag extends Module {
                     if (smart.get() && attemptingToStrafe() && modifyMovementYaw.get()) {
                         float targetYaw = target.rotationYaw + 90;
 
-                        double posX = -MathHelper.sin((float) Math.toRadians(targetYaw)) * 2 + target.posX;
-                        double posZ = MathHelper.cos((float) Math.toRadians(targetYaw)) * 2 + target.posZ;
+                        double posX = -MathHelper.sin((float) Math.toRadians(targetYaw)) * targetRange.get() + target.posX;
+                        double posZ = MathHelper.cos((float) Math.toRadians(targetYaw)) * targetRange.get() + target.posZ;
 
                         this.yaw = getYaw(mc.thePlayer, new Vec3(posX, target.posY, posZ));
                     }
                 } else {
                     if (!dispatched) {
-                        PingSpoofComponent.disable();
-                        PingSpoofComponent.dispatch();
+                        LagUtils.disable();
+                        LagUtils.dispatch();
                         dispatched = true;
                     }
                     blinking = false;

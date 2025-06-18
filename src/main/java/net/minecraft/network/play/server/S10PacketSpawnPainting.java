@@ -7,8 +7,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-import java.io.IOException;
-
 public class S10PacketSpawnPainting implements Packet<INetHandlerPlayClient> {
     private int entityID;
     private BlockPos position;

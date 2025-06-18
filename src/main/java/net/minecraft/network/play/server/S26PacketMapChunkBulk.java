@@ -5,7 +5,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.chunk.Chunk;
 
-import java.io.IOException;
 import java.util.List;
 
 public class S26PacketMapChunkBulk implements Packet<INetHandlerPlayClient> {

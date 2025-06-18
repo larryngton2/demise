@@ -21,7 +21,6 @@ import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.player.Manager;
 import wtf.demise.features.modules.impl.player.Stealer;
-import wtf.demise.gui.font.Fonts;
 
 import java.io.IOException;
 import java.util.Set;

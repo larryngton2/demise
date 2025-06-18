@@ -4,7 +4,6 @@ import org.lwjglx.input.Keyboard;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.values.impl.ModeValue;
 
 @ModuleInfo(name = "ClickGUI", category = ModuleCategory.Visual, key = Keyboard.KEY_RSHIFT)
 public class ClickGUI extends Module {

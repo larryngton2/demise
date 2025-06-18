@@ -7,7 +7,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Team;
 
-import java.io.IOException;
 import java.util.Collection;
 
 public class S3EPacketTeams implements Packet<INetHandlerPlayClient> {

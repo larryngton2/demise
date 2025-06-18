@@ -89,7 +89,7 @@ public class Category implements IComponent {
             maxScroll = Math.max(0, totalHeight - viewHeight);
             scrollOffset = MathUtils.interpolate(scrollOffset, targetScrollOffset, 0.1f);
 
-            RenderUtils.scissor(0, componentStartY - 2, PanelGui.posX + 450, viewHeight);
+            RenderUtils.scissor(0, componentStartY - 2, PanelGui.posX + 450, viewHeight, PanelGui.interpolatedScale);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             float componentOffsetY = componentStartY;

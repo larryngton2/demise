@@ -8,8 +8,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-import java.io.IOException;
-
 public class S23PacketBlockChange implements Packet<INetHandlerPlayClient> {
     private BlockPos blockPosition;
     private IBlockState blockState;

@@ -17,7 +17,6 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationManager;
-import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 @ModuleInfo(name = "AimAssist", description = "Assists in aiming.", category = ModuleCategory.Legit)

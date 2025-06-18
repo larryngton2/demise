@@ -6,7 +6,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.BlockAABBEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.PostStepEvent;
 import wtf.demise.events.impl.player.UpdateEvent;

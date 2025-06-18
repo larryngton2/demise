@@ -7,7 +7,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.stats.StatBase;
 import net.minecraft.stats.StatList;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 

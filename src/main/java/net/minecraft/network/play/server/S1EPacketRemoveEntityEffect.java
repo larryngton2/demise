@@ -5,8 +5,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.potion.PotionEffect;
 
-import java.io.IOException;
-
 public class S1EPacketRemoveEntityEffect implements Packet<INetHandlerPlayClient> {
     private int entityId;
     private int effectId;

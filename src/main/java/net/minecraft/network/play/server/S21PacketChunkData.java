@@ -7,7 +7,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
-import java.io.IOException;
 import java.util.List;
 
 public class S21PacketChunkData implements Packet<INetHandlerPlayClient> {

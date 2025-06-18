@@ -38,7 +38,7 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> MOVEMENT_MODULES = Set.of(
             AutoWalk.class, Fly.class, Freeze.class, InvMove.class, Jesus.class, JumpDelay.class, LongJump.class,
-            MotionModifier.class, MoveHelper.class, NoSlow.class, Phase.class, SafeWalk.class, Sneak.class, Speed.class,
+            MotionModifier.class, NoSlow.class, Phase.class, SafeWalk.class, Sneak.class, Speed.class,
             Sprint.class, Step.class, Strafe.class, TargetStrafe.class, WallClimb.class
     );
 
@@ -49,17 +49,17 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
         AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
-            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class, AutoMeow.class
+            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class, AutoMeow.class, CheatDetector.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
         AutoBan.class, Blink.class, ClientSpoofer.class, ComboOneHit.class, Disabler.class, NoGuiClose.class,
-            Regen.class, ResetVL.class, Timer.class
+            Regen.class, ResetVL.class, Timer.class, PingSpoof.class
     );
 
     private static final Set<Class<? extends Module>> VISUAL_MODULES = Set.of(
         Atmosphere.class, BlockOnSwing.class, BlockOverlay.class, Breadcrumbs.class, BreakProgress.class, Cape.class,
-            ChestESP.class, ChinaHat.class, ClickGUI.class, CustomSkin.class, CustomWidgetsModule.class, ESP.class,
+            ChestESP.class, ChinaHat.class, ClickGUI.class, CustomSkin.class, CustomWidgetsModule.class, NameTags.class,
             ForceDinnerbone.class, FreeCam.class, FullBright.class, Interface.class, ItemESP.class,
             ItemGlow.class, ItemPhysics.class, MainMenuOptions.class, MotionBlur.class, MoveStatus.class,
             NoHurtCam.class, NoRenderOffsetReset.class, Particles.class, Rotation.class, Shaders.class,

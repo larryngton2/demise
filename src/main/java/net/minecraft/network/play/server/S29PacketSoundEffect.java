@@ -6,8 +6,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.MathHelper;
 import org.apache.commons.lang3.Validate;
 
-import java.io.IOException;
-
 public class S29PacketSoundEffect implements Packet<INetHandlerPlayClient> {
     private String soundName;
     private int posX;

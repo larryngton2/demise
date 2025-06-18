@@ -2,9 +2,7 @@ package wtf.demise.features.modules;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.network.Packet;
-import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.Value;
@@ -12,7 +10,6 @@ import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Translate;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;
-import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.packet.PacketUtils;
 
 import java.util.*;

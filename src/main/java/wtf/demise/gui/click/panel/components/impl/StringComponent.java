@@ -11,10 +11,8 @@ import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
-import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class StringComponent extends Component {

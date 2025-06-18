@@ -1,10 +1,7 @@
 package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -14,18 +11,16 @@ import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.animations.Direction;
-import wtf.demise.utils.animations.impl.DecelerateAnimation;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @ModuleInfo(name = "Interface", category = ModuleCategory.Visual)
 public class Interface extends Module {

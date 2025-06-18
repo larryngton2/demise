@@ -3,6 +3,7 @@ package wtf.demise.gui.click.panel.components;
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.opengl.GL11;
+import org.lwjglx.input.Keyboard;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
@@ -15,13 +16,12 @@ import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.StringUtils;
-import org.lwjglx.input.Keyboard;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
@@ -109,7 +109,7 @@ public class ModuleComponent implements IComponent {
 
         openAnimation.setDirection(isExpanded ? Direction.FORWARDS : Direction.BACKWARDS);
 
-        RenderUtils.scissor(x, PanelGui.posY + 17 + Fonts.urbanist.get(35).getHeight(), width, 250);
+        RenderUtils.scissor(x, PanelGui.posY + 17 + Fonts.urbanist.get(35).getHeight(), width, 250, PanelGui.interpolatedScale);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float slideOffset = (width / 4) * (1.0f - slideProgress);
 

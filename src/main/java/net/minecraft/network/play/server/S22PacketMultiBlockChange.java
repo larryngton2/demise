@@ -9,8 +9,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.Chunk;
 
-import java.io.IOException;
-
 public class S22PacketMultiBlockChange implements Packet<INetHandlerPlayClient> {
     private ChunkCoordIntPair chunkPosCoord;
     private S22PacketMultiBlockChange.BlockUpdateData[] changedBlocks;

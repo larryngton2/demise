@@ -85,7 +85,8 @@ public class ViaLoadingBase {
     }
 
     public ProtocolVersion getTargetVersion() {
-        if (forceNativeVersionCondition != null && forceNativeVersionCondition.getAsBoolean()) return nativeProtocolVersion;
+        if (forceNativeVersionCondition != null && forceNativeVersionCondition.getAsBoolean())
+            return nativeProtocolVersion;
 
         return targetProtocolVersion;
     }
@@ -107,8 +108,7 @@ public class ViaLoadingBase {
                 platform(viaVersionPlatform).
                 loader(new VLBViaProviders()).
                 injector(new VLBViaInjector()).
-                commandHandler(new VLBViaCommandHandler())
-                ;
+                commandHandler(new VLBViaCommandHandler());
 
         if (this.managerBuilderConsumer != null) this.managerBuilderConsumer.accept(builder);
 

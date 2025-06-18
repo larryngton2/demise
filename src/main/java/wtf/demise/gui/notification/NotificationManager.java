@@ -2,12 +2,9 @@ package wtf.demise.gui.notification;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.LoadingScreenRenderer;
-import net.minecraft.client.gui.GuiIngame;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.gui.mainmenu.GuiMainMenu;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;

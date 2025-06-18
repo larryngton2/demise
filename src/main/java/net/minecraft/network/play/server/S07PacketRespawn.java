@@ -7,8 +7,6 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 
-import java.io.IOException;
-
 public class S07PacketRespawn implements Packet<INetHandlerPlayClient> {
     private int dimensionID;
     private EnumDifficulty difficulty;

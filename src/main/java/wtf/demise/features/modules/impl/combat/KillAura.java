@@ -20,8 +20,6 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.utils.misc.ChatUtils;
-import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
@@ -29,14 +27,14 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.player.*;
+import wtf.demise.utils.player.ClickHandler;
+import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.SimulatedPlayer;
 import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
-import java.util.List;
-import java.util.Queue;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -83,16 +81,16 @@ public class KillAura extends Module {
     private final SliderValue maxMissOffset = new SliderValue("max miss offset", 0, -5, 5, 0.01f, this, () -> !staticMissOffset.get());
     private final SliderValue missOffsetLerp = new SliderValue("Miss offset lerp", 0.1f, 0.01f, 1, 0.01f, this, () -> !staticMissOffset.get());
     private final BoolValue delayed = new BoolValue("Delayed target pos", false, this);
-    private final SliderValue delayedTicks = new SliderValue("Delay ticks", 1, 1, 20, 1, this, () -> delayed.get() && delayed.canDisplay());
+    private final SliderValue delayUpdates = new SliderValue("Delay updates", 1, 1, 50, 1, this, () -> delayed.get() && delayed.canDisplay());
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
-    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Drift"}, "None", this);
+    private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Jitter"}, "None", this);
     private final BoolValue notOnFirstHit = new BoolValue("Not on first hit", false, this, () -> !offsetMode.is("None"));
-    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
-    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
-    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
-    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
-    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None") && !offsetMode.is("Drift"));
+    private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> !offsetMode.is("None") && !offsetMode.is("Jitter"));
+    private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
+    private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
+    private final SliderValue minPitchFactor = new SliderValue("Min Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
+    private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
     private final BoolValue interpolateVec = new BoolValue("Interpolate vec", false, this, () -> !offsetMode.is("None"));
     private final SliderValue amount = new SliderValue("Amount", 0.5f, 0.01f, 1, 0.01f, this, () -> interpolateVec.get() && interpolateVec.canDisplay());
     private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this);
@@ -135,6 +133,7 @@ public class KillAura extends Module {
     private float[] prevRot;
     private int totalBlockingTicks;
     private boolean firstHit = true;
+    private Vec3 delayedVec = new Vec3(0, 0, 0);
 
     @Override
     public void onEnable() {
@@ -340,6 +339,29 @@ public class KillAura extends Module {
         shouldRandomize = rand.nextInt(100) <= oChance.get();
 
         rotationHandler.updateRotSpeed(e);
+
+        if (currentTarget != null && !isTargetInvalid() && delayed.get()) {
+            while (positionHistory.size() > delayUpdates.get()) {
+                positionHistory.poll();
+            }
+
+            positionHistory.offer(targetVec);
+
+            if (positionHistory.size() < delayUpdates.get()) {
+                delayedVec = targetVec;
+            }
+
+            if (positionHistory.size() >= delayUpdates.get()) {
+                if (!delayOnHurtTime.get() || currentTarget.hurtTime >= hurtTime.get()) {
+                    delayedVec = positionHistory.poll();
+                } else {
+                    delayedVec = targetVec;
+                }
+            }
+        } else {
+            positionHistory.clear();
+            delayedVec = targetVec;
+        }
     }
 
     @EventTarget
@@ -348,7 +370,7 @@ public class KillAura extends Module {
             return;
         }
 
-        if (currentTarget != null && targetESP.get()) {
+        if (currentTarget != null && !isTargetInvalid() && targetESP.get()) {
             RenderUtils.drawTargetCircle(currentTarget);
         }
     }
@@ -578,81 +600,65 @@ public class KillAura extends Module {
         }
 
         if (!firstHit || !notOnFirstHit.get()) {
+            double minXZ = -0.4;
+            double maxXZ = 0.4;
+            double minY = -2;
+            double maxY = 0.4;
+
+            double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
+            double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
+
             switch (offsetMode.get()) {
                 case "Gaussian": {
-                    double minXZ = -0.4;
-                    double maxXZ = 0.4;
-                    double minY = -2;
-                    double maxY = 0.4;
-
                     double meanXZ = (minXZ + maxXZ) / 2;
                     double stdDevXZ = (maxXZ - minXZ) / 4;
                     double meanY = (minY + maxY) / 2;
                     double stdDevY = (maxY - minY) / 4;
-
-                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
-                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
 
                     double xOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
                     double yOffset = ThreadLocalRandom.current().nextGaussian(meanY, stdDevY) * pitchFactor;
                     double zOffset = ThreadLocalRandom.current().nextGaussian(meanXZ, stdDevXZ) * yawFactor;
 
                     if (shouldRandomize) {
-                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks);
 
                         lastXOffset = (float) xOffset;
                         lastYOffset = (float) yOffset;
                         lastZOffset = (float) zOffset;
                     } else {
-                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks);
                     }
                 }
                 break;
                 case "Noise": {
-                    double minXZ = -0.4;
-                    double maxXZ = 0.4;
-                    double minY = -2;
-                    double maxY = 0.4;
-
-                    double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
-                    double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
-
                     double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
                     double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
                     double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
 
                     if (shouldRandomize) {
-                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(xOffset, yOffset, zOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks);
 
                         lastXOffset = (float) xOffset;
                         lastYOffset = (float) yOffset;
                         lastZOffset = (float) zOffset;
                     } else {
-                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks);
                     }
                 }
                 break;
-                case "Drift":
+                case "Jitter":
                     if (ClickHandler.clickingNow) {
-                        double minXZ = -0.4;
-                        double maxXZ = 0.4;
-                        double minY = -2;
-                        double maxY = 0.4;
-
-                        double yawFactor = MathUtils.randomizeDouble(0.01, 0.1);
-                        double pitchFactor = MathUtils.randomizeDouble(0.01, 0.1);
-
                         double xOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
                         double yOffset = MathUtils.randomizeDouble(minY, maxY) * pitchFactor;
                         double zOffset = MathUtils.randomizeDouble(minXZ, maxXZ) * yawFactor;
 
-                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks);
 
                         lastXOffset = (float) xOffset;
                         lastYOffset = (float) yOffset;
                         lastZOffset = (float) zOffset;
                     } else {
-                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks / 2);
+                        offsetVec = MathUtils.interpolate(offsetVec, new Vec3(lastXOffset, lastYOffset, lastZOffset), interpolateVec.get() ? amount.get() : mc.timer.partialTicks);
                     }
                     break;
                 default:
@@ -664,28 +670,14 @@ public class KillAura extends Module {
 
         if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !onlyUpdateOnMiss.get()) {
             targetVec = new Vec3(vec.xCoord, vec.yCoord, vec.zCoord).add(offsetVec).add(xOffset.get(), yOffset.get(), xOffset.get());
+            if (delayed.get() && targetVec != null) {
+                positionHistory.offer(targetVec);
+            }
         }
 
         if (delayed.get()) {
-            positionHistory.add(targetVec);
-
-            while (positionHistory.size() > delayedTicks.get()) {
-                positionHistory.poll();
-            }
-
-            if (positionHistory.size() < delayedTicks.get()) {
-                currentVec = targetVec;
-            }
-
-            if (positionHistory.size() >= delayedTicks.get()) {
-                if (!delayOnHurtTime.get() || entity.hurtTime >= hurtTime.get()) {
-                    currentVec = positionHistory.poll();
-                } else {
-                    currentVec = targetVec;
-                }
-            }
+            currentVec = delayedVec != null ? delayedVec : targetVec;
         } else {
-            positionHistory.clear();
             currentVec = targetVec;
         }
 

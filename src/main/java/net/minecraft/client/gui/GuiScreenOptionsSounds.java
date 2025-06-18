@@ -10,8 +10,6 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-import java.io.IOException;
-
 public class GuiScreenOptionsSounds extends GuiScreen {
     private final GuiScreen field_146505_f;
     private final GameSettings game_settings_4;

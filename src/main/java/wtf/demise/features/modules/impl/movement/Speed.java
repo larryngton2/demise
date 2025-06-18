@@ -16,7 +16,6 @@ import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.rotation.OldRotationUtils;
-import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

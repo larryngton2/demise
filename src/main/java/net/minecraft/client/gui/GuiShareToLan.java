@@ -6,8 +6,6 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.WorldSettings;
 
-import java.io.IOException;
-
 public class GuiShareToLan extends GuiScreen {
     private final GuiScreen field_146598_a;
     private GuiButton field_146596_f;

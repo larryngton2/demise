@@ -7,8 +7,9 @@ import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.utils.misc.ChatUtils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ModuleCommand extends Command {
     private final Module module;

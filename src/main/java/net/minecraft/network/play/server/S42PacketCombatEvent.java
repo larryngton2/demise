@@ -6,8 +6,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.CombatTracker;
 
-import java.io.IOException;
-
 public class S42PacketCombatEvent implements Packet<INetHandlerPlayClient> {
     public S42PacketCombatEvent.Event eventType;
     public int field_179774_b;

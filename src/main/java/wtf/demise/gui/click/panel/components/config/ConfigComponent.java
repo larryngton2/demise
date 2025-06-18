@@ -12,7 +12,7 @@ import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.File;
 import java.util.Objects;
 

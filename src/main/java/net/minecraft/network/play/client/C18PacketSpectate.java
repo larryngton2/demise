@@ -6,7 +6,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.world.WorldServer;
 
-import java.io.IOException;
 import java.util.UUID;
 
 public class C18PacketSpectate implements Packet<INetHandlerPlayServer> {

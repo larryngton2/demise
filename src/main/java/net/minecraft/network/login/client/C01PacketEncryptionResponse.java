@@ -6,7 +6,6 @@ import net.minecraft.network.login.INetHandlerLoginServer;
 import net.minecraft.util.CryptManager;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 

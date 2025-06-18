@@ -8,9 +8,7 @@ import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiSelectWorld;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.misc.ServerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
 public class DiscordInfo implements InstanceAccess {

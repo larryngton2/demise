@@ -2,7 +2,6 @@ package net.minecraft.nbt;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
 
 public class NBTTagEnd extends NBTBase {
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) {

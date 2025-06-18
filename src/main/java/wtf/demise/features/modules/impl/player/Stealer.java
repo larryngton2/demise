@@ -1,6 +1,6 @@
 package wtf.demise.features.modules.impl.player;
 
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.ContainerChest;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;

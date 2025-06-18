@@ -14,10 +14,8 @@ import wtf.demise.features.modules.impl.movement.TargetStrafe;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
-import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 import static java.lang.Math.toRadians;
 
@@ -53,6 +51,14 @@ public class MoveUtil implements InstanceAccess {
 
     public static boolean isMoving(EntityLivingBase player) {
         return player != null && (player.moveForward != 0F || player.moveStrafing != 0F);
+    }
+
+    public static boolean isMovingMotion() {
+        return isMovingMotion(mc.thePlayer);
+    }
+
+    public static boolean isMovingMotion(EntityLivingBase player) {
+        return player != null && (player.motionX != 0 || player.motionZ != 0);
     }
 
     public static double getSpeed(EntityPlayer player) {

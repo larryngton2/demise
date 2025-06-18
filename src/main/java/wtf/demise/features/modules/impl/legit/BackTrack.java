@@ -21,7 +21,7 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.misc.ChatUtils;
-import wtf.demise.utils.packet.PingSpoofComponent;
+import wtf.demise.utils.packet.LagUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -54,8 +54,8 @@ public class BackTrack extends Module {
 
     @Override
     public void onDisable() {
-        PingSpoofComponent.disable();
-        PingSpoofComponent.dispatch();
+        LagUtils.disable();
+        LagUtils.dispatch();
         shouldLag = false;
     }
 
@@ -73,7 +73,7 @@ public class BackTrack extends Module {
 
             if (target == null) return;
 
-            double realDistance = PlayerUtils.getCustomDistanceToEntityBox(realPosition, mc.thePlayer);
+            double realDistance = PlayerUtils.getCustomDistanceToEntityBox(realPosition.add(0, target.getEyeHeight(), 0), mc.thePlayer);
             double clientDistance = PlayerUtils.getDistToTargetFromMouseOver(target);
 
             if (clientDistance > attackRange.get() && target.hurtTime != 0) {
@@ -84,7 +84,7 @@ public class BackTrack extends Module {
                 outOfRange = false;
             }
 
-            boolean distanceCheck = PlayerUtils.getCustomDistanceToEntityBox(target.getPositionVector(), mc.thePlayer) >= PlayerUtils.getCustomDistanceToEntityBox(target.getPrevPositionVector(), mc.thePlayer);
+            boolean distanceCheck = PlayerUtils.getCustomDistanceToEntityBox(target.getPositionEyes(1), mc.thePlayer) >= PlayerUtils.getCustomDistanceToEntityBox(target.getPrevPositionVector(), mc.thePlayer);
             boolean extraCheck = distanceCheck || !this.extraCheck.get();
             boolean onlyNeeded = extraCheck && (realDistance > attackRange.get() || outOfRange) && realDistance < attackRange.get() + 1.5 && clientDistance <= attackRange.get();
             boolean on = extraCheck && realDistance > minRange.get() && realDistance < maxRange.get();
@@ -96,12 +96,12 @@ public class BackTrack extends Module {
                     ChatUtils.sendMessageClient("Attacked from " + realDistance + " blocks");
                 }
 
-                PingSpoofComponent.spoof((int) ms.get(), true, true, true, true, false, false);
+                LagUtils.spoof((int) ms.get(), true, true, true, true, false, false);
                 dispatched = false;
             } else {
                 if (!dispatched) {
-                    PingSpoofComponent.disable();
-                    PingSpoofComponent.dispatch();
+                    LagUtils.disable();
+                    LagUtils.dispatch();
                     dispatched = true;
                 }
             }

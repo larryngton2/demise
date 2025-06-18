@@ -22,8 +22,8 @@ import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.SimulatedPlayer;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
@@ -34,6 +34,7 @@ import java.util.List;
 @ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TickBase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
+    private final BoolValue pauseRenderer = new BoolValue("Pause renderer", true, this, () -> mode.is("Future"));
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue tickRange = new SliderValue("Tick range", 3f, 0.1f, 8f, 0.1f, this);
     private final SliderValue minRange = new SliderValue("Min range", 2.5f, 0.1f, 8f, 0.1f, this);
@@ -107,7 +108,7 @@ public class TickBase extends Module {
 
         simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
 
-        for (int i = 0; i < maxTick.get(); i++) {
+        for (int i = 0; i < maxTick.get() + 1; i++) {
             simulatedSelf.tick();
 
             PlayerUtils.PredictProcess predictProcess = new PlayerUtils.PredictProcess(
@@ -214,7 +215,7 @@ public class TickBase extends Module {
         }
 
         if (!picked) {
-            ticksToSkip = (int) maxTick.get() - 1;
+            ticksToSkip = (int) maxTick.get();
         }
 
         return criteria(ticksToSkip);
@@ -223,7 +224,7 @@ public class TickBase extends Module {
     private boolean criteria(int tick) {
         AxisAlignedBB entityBoundingBox = target.getHitbox().offset(getTargetPrediction());
 
-        double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(entityBoundingBox.getCenter(), mc.thePlayer);
+        double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(PlayerUtils.getPosFromAABB(entityBoundingBox).add(0, target.getEyeHeight(), 0), mc.thePlayer);
         double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(tick).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
 
         return predictedSelfDistance < predictedTargetDistance &&
@@ -253,7 +254,7 @@ public class TickBase extends Module {
     }
 
     public boolean freezeAnim() {
-        if (skippedTick != 0) {
+        if (skippedTick != 0 && pauseRenderer.get()) {
             if (!firstAnimation) {
                 firstAnimation = true;
                 return false;

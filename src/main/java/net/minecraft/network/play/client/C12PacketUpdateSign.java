@@ -6,8 +6,6 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 
-import java.io.IOException;
-
 public class C12PacketUpdateSign implements Packet<INetHandlerPlayServer> {
     private BlockPos pos;
     private IChatComponent[] lines;

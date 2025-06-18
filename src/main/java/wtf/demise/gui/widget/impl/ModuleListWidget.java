@@ -33,14 +33,6 @@ public class ModuleListWidget extends Widget {
         currX = renderX;
         currY = renderY;
 
-        /*
-        Test test = Demise.INSTANCE.getModuleManager().getModule(Test.class);
-
-        xPadding = (int) test.xpad.get();
-        yPadding = (int) test.ypad.get();
-
-         */
-
         this.height = getEnabledModules().size() * getModuleHeight();
 
         int middle = sr.getScaledWidth() / 2;

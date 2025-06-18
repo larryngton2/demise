@@ -3,7 +3,6 @@ package wtf.demise.utils.render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -28,7 +27,6 @@ import wtf.demise.utils.InstanceAccess;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -117,14 +115,25 @@ public class RenderUtils implements InstanceAccess {
         return framebuffer;
     }
 
-    public static void scissor(final double x, final double y, final double width, final double height) {
-        int scaleFactor = new ScaledResolution(mc).getScaleFactor();
+    public static void scissor(float x, float y, float width, float height) {
+        scissor(x, y, width, height, 1);
+    }
+
+    public static void scissor(float x, float y, float width, float height, float scale) {
+        Minecraft mc = Minecraft.getMinecraft();
+        ScaledResolution sr = new ScaledResolution(mc);
+        int scaleFactor = sr.getScaleFactor();
+
+        float scaledX = (x - sr.getScaledWidth() / 2f) * scale + sr.getScaledWidth() / 2f;
+        float scaledY = (y - sr.getScaledHeight() / 2f) * scale + sr.getScaledHeight() / 2f;
+        float scaledW = width * scale;
+        float scaledH = height * scale;
 
         GL11.glScissor(
-                (int) (x * scaleFactor),
-                (int) (mc.displayHeight - (y + height) * scaleFactor),
-                (int) (width * scaleFactor),
-                (int) (height * scaleFactor)
+                (int)(scaledX * scaleFactor),
+                (int)((sr.getScaledHeight() - (scaledY + scaledH)) * scaleFactor),
+                (int)(scaledW * scaleFactor),
+                (int)(scaledH * scaleFactor)
         );
     }
 

@@ -6,8 +6,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 
-import java.io.IOException;
-
 public class S3CPacketUpdateScore implements Packet<INetHandlerPlayClient> {
     private String name = "";
     private String objective = "";

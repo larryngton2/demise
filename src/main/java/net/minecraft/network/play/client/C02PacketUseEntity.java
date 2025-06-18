@@ -8,8 +8,6 @@ import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import java.io.IOException;
-
 @Getter
 public class C02PacketUseEntity implements Packet<INetHandlerPlayServer> {
     private int entityId;

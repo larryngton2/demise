@@ -1,13 +1,11 @@
 package wtf.demise.utils.math;
 
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.utils.InstanceAccess;
 
-import java.security.SecureRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MathUtils implements InstanceAccess {

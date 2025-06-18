@@ -5,8 +5,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-import java.io.IOException;
-
 public class C13PacketPlayerAbilities implements Packet<INetHandlerPlayServer> {
     private boolean invulnerable;
     private boolean flying;

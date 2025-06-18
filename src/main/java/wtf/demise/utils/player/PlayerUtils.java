@@ -1,6 +1,5 @@
 package wtf.demise.utils.player;
 
-import com.google.common.base.Predicates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
@@ -21,8 +20,6 @@ import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.player.rotation.RotationUtils;
-
-import java.util.List;
 
 public class PlayerUtils implements InstanceAccess {
     public static boolean nullCheck() {
@@ -123,7 +120,7 @@ public class PlayerUtils implements InstanceAccess {
     }
 
     public static double getCustomDistanceToEntityBox(Vec3 playerPos, Entity entity) {
-        Vec3 eyes = new Vec3(playerPos.xCoord, playerPos.yCoord + mc.thePlayer.getEyeHeight(), playerPos.zCoord);
+        Vec3 eyes = new Vec3(playerPos.xCoord, playerPos.yCoord, playerPos.zCoord);
         Vec3 pos = RotationUtils.getBestHitVec(entity);
         double xDist = Math.abs(pos.xCoord - eyes.xCoord);
         double yDist = Math.abs(pos.yCoord - eyes.yCoord);
@@ -316,5 +313,9 @@ public class PlayerUtils implements InstanceAccess {
         }
 
         return vec33 == null ? Double.MAX_VALUE : playerPos.distanceTo(vec33);
+    }
+
+    public static Vec3 getPosFromAABB(AxisAlignedBB a) {
+        return new Vec3((a.minX + a.maxX) / 2, a.minY, (a.minZ + a.maxZ) / 2);
     }
 }

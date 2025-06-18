@@ -6,8 +6,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.MathHelper;
 
-import java.io.IOException;
-
 public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient> {
     private int entityID;
     private int posX;

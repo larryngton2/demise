@@ -4,8 +4,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.status.INetHandlerStatusClient;
 
-import java.io.IOException;
-
 public class S01PacketPong implements Packet<INetHandlerStatusClient> {
     private long clientTime;
 

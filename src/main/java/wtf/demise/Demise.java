@@ -13,22 +13,22 @@ import wtf.demise.features.command.CommandManager;
 import wtf.demise.features.config.ConfigManager;
 import wtf.demise.features.friend.FriendManager;
 import wtf.demise.features.modules.ModuleManager;
-import wtf.demise.gui.click.panel.PanelGui;
-import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.gui.altmanager.repository.AltRepositoryGUI;
+import wtf.demise.gui.click.panel.PanelGui;
 import wtf.demise.gui.ingame.CustomWidgets;
 import wtf.demise.gui.notification.NotificationManager;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.gui.widget.WidgetManager;
 import wtf.demise.utils.discord.DiscordInfo;
+import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BadPacketsComponent;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.packet.PingSpoofComponent;
+import wtf.demise.utils.packet.LagUtils;
+import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.utils.player.rotation.OldRotationUtils;
-import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -133,7 +133,7 @@ public class Demise {
     private void registerEventHandlers() {
         eventManager.register(new RotationUtils());
         eventManager.register(new BadPacketsComponent());
-        eventManager.register(new PingSpoofComponent());
+        eventManager.register(new LagUtils());
         eventManager.register(new BlinkComponent());
         eventManager.register(new SpoofSlotUtils());
         eventManager.register(new CustomWidgets());

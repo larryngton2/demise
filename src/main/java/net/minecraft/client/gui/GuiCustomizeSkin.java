@@ -5,8 +5,6 @@ import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.optifine.gui.GuiButtonOF;
 import net.optifine.gui.GuiScreenCapeOF;
 
-import java.io.IOException;
-
 public class GuiCustomizeSkin extends GuiScreen {
     private final GuiScreen parentScreen;
     private String title;

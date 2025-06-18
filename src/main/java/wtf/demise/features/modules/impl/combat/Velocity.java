@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.block.BlockAir;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.AxisAlignedBB;

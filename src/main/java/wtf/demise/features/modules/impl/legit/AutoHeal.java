@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemSkull;
 import net.minecraft.item.ItemSoup;
 import net.minecraft.item.ItemStack;
@@ -19,16 +20,17 @@ import wtf.demise.utils.player.InventoryUtils;
 @ModuleInfo(name = "AutoHeal", description = "Automatically heals you.", category = ModuleCategory.Legit)
 public class AutoHeal extends Module {
     private final BoolValue head = new BoolValue("Head", true, this);
-    private final SliderValue headHealth = new SliderValue("HeadHealth", 15, 0, 20, 1, this, head::get);
-    private final SliderValue minHeadDelay = new SliderValue("MinHeadDelay", 300, 50, 5000, 50, this, head::get);
-    private final SliderValue maxHeadDelay = new SliderValue("MaxHeadDelay", 500, 50, 5000, 50, this, head::get);
+    private final SliderValue headHealth = new SliderValue("Head health", 15, 0, 20, 1, this, head::get);
+    private final SliderValue minHeadDelay = new SliderValue("Min head delay", 1, 0, 10, 1, this, head::get);
+    private final SliderValue maxHeadDelay = new SliderValue("Max head delay", 1, 0, 10, 1, this, head::get);
 
     private final BoolValue soup = new BoolValue("Soup", true, this);
-    private final SliderValue soupHealth = new SliderValue("SoupHealth", 15, 0, 20, 1, this, soup::get);
-    private final SliderValue minSoupDelay = new SliderValue("MinSoupDelay", 300, 50, 5000, 50, this, soup::get);
-    private final SliderValue maxSoupDelay = new SliderValue("MaxSoupDelay", 500, 50, 5000, 50, this, soup::get);
+    private final SliderValue soupHealth = new SliderValue("Soup health", 15, 0, 20, 1, this, soup::get);
+    private final SliderValue minSoupDelay = new SliderValue("Min soup delay", 1, 0, 10, 1, this, soup::get);
+    private final SliderValue maxSoupDelay = new SliderValue("Max soup delay", 1, 0, 10, 1, this, soup::get);
     private final BoolValue refill = new BoolValue("Refill", true, this, soup::get);
-    private final SliderValue refillDelay = new SliderValue("RefillDelay", 100, 50, 5000, 50, this, () -> soup.get() && refill.get());
+    private final SliderValue openDelay = new SliderValue("Open delay", 1, 0, 10, 1, this, () -> soup.get() && refill.get());
+    private final SliderValue refillDelay = new SliderValue("Refill delay", 1, 0, 10, 1, this, () -> soup.get() && refill.get());
 
     private final TimerUtils headTimer = new TimerUtils();
     private int headWaitTime = 0;
@@ -37,11 +39,12 @@ public class AutoHeal extends Module {
     private boolean switchBack;
     private int lastSoupSlot;
     private final TimerUtils refillTimer = new TimerUtils();
+    private final TimerUtils openTimer = new TimerUtils();
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         if (head.get() && mc.currentScreen == null) {
-            if (Range.between(1, 9).contains(getHeadSlot()) && mc.thePlayer.getHealth() < headHealth.get() && headTimer.hasTimeElapsed(headWaitTime)) {
+            if (Range.between(1, 9).contains(getHeadSlot()) && mc.thePlayer.getHealth() < headHealth.get() && headTimer.hasTimeElapsed(headWaitTime * 50L)) {
                 int lastHeadSlot = mc.thePlayer.inventory.currentItem;
 
                 mc.thePlayer.inventory.currentItem = getHeadSlot();
@@ -57,7 +60,7 @@ public class AutoHeal extends Module {
 
         if (soup.get()) {
             if (mc.currentScreen == null) {
-                if (soupTimer.hasTimeElapsed(soupWaitTime)) {
+                if (soupTimer.hasTimeElapsed(soupWaitTime * 50L)) {
                     if (switchBack) {
                         mc.thePlayer.inventory.currentItem = lastSoupSlot;
 
@@ -78,23 +81,32 @@ public class AutoHeal extends Module {
                         soupWaitTime = MathUtils.randomizeInt(minSoupDelay.get(), maxSoupDelay.get());
                         soupTimer.reset();
                     }
+                } else if (mc.thePlayer.getCurrentEquippedItem().getItem() == Items.bowl) {
+                    mc.thePlayer.dropOneItem(false);
                 }
 
                 refillTimer.reset();
+                openTimer.reset();
             } else if (mc.currentScreen instanceof GuiInventory) {
-                if (refill.get() && refillTimer.hasTimeElapsed(refillDelay.get())) {
+                if (refill.get() && refillTimer.hasTimeElapsed(refillDelay.get() * 50L) && openTimer.hasTimeElapsed(openDelay.get() * 50L)) {
                     for (int slot = InventoryUtils.EXCLUDE_ARMOR_BEGIN; slot < InventoryUtils.ONLY_HOT_BAR_BEGIN; slot++) {
                         final ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(slot).getStack();
 
-                        if (stack != null && stack.getItem() instanceof ItemSoup) {
-                            for (int hotbarSlot = InventoryUtils.ONLY_HOT_BAR_BEGIN; hotbarSlot < 45; hotbarSlot++) {
-                                final ItemStack hotbarStack = mc.thePlayer.inventoryContainer.getSlot(hotbarSlot).getStack();
+                        if (stack != null) {
+                            if (stack.getItem() instanceof ItemSoup) {
+                                for (int hotbarSlot = InventoryUtils.ONLY_HOT_BAR_BEGIN; hotbarSlot < 45; hotbarSlot++) {
+                                    final ItemStack hotbarStack = mc.thePlayer.inventoryContainer.getSlot(hotbarSlot).getStack();
 
-                                if (hotbarStack == null) {
-                                    mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, 0, 0, mc.thePlayer);
-                                    mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, hotbarSlot, 0, 0, mc.thePlayer);
-                                    refillTimer.reset();
+                                    if (hotbarStack == null) {
+                                        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, 0, 1, mc.thePlayer);
+                                        if (refillDelay.get() > 0) {
+                                            refillTimer.reset();
+                                            return;
+                                        }
+                                    }
                                 }
+                            } else if (stack.getItem() == Items.bowl) {
+                                mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot, 1, 4, mc.thePlayer);
                             }
                         }
                     }

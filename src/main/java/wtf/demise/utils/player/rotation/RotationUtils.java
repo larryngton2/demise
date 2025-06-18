@@ -1,28 +1,10 @@
 package wtf.demise.utils.player.rotation;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
-import wtf.demise.Demise;
-import wtf.demise.events.annotations.EventPriority;
-import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.GameEvent;
-import wtf.demise.events.impl.misc.WorldChangeEvent;
-import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.player.*;
-import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
-import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.ChatUtils;
-import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.MovementCorrection;
-import wtf.demise.utils.player.SmoothMode;
-
-import java.util.Objects;
 
 import static java.lang.Math.*;
 import static wtf.demise.utils.player.rotation.RotationManager.*;
@@ -192,11 +174,9 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static float[] faceTrajectory(Entity target, boolean predict, float predictSize, float gravity, float velocity) {
-        EntityPlayerSP player = mc.thePlayer;
-
-        double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (player.posX + (predict ? player.posX - player.prevPosX : 0.0));
-        double posY = target.getEntityBoundingBox().minY + (predict ? (target.getEntityBoundingBox().minY - target.prevPosY) * predictSize : 0.0) + target.getEyeHeight() - 0.15 - (player.getEntityBoundingBox().minY + (predict ? player.posY - player.prevPosY : 0.0)) - player.getEyeHeight();
-        double posZ = target.posZ + (predict ? (target.posZ - target.prevPosZ) * predictSize : 0.0) - (player.posZ + (predict ? player.posZ - player.prevPosZ : 0.0));
+        double posX = target.posX + (predict ? (target.posX - target.prevPosX) * predictSize : 0.0) - (mc.thePlayer.posX + (predict ? mc.thePlayer.posX - mc.thePlayer.prevPosX : 0.0));
+        double posY = target.getEntityBoundingBox().minY + (predict ? (target.getEntityBoundingBox().minY - target.prevPosY) * predictSize : 0.0) + target.getEyeHeight() - 0.15 - (mc.thePlayer.getEntityBoundingBox().minY + (predict ? mc.thePlayer.posY - mc.thePlayer.prevPosY : 0.0)) - mc.thePlayer.getEyeHeight();
+        double posZ = target.posZ + (predict ? (target.posZ - target.prevPosZ) * predictSize : 0.0) - (mc.thePlayer.posZ + (predict ? mc.thePlayer.posZ - mc.thePlayer.prevPosZ : 0.0));
         double posSqrt = sqrt(posX * posX + posZ * posZ);
 
         velocity = min((velocity * velocity + velocity * 2) / 3, 1f);

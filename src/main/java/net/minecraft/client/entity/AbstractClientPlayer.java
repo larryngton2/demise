@@ -24,8 +24,6 @@ import net.optifine.reflect.Reflector;
 import wtf.demise.Demise;
 import wtf.demise.events.impl.player.LookEvent;
 
-import java.util.Objects;
-
 public abstract class AbstractClientPlayer extends EntityPlayer {
     private NetworkPlayerInfo playerInfo;
     private ResourceLocation locationOfCape = null;

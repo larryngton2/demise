@@ -7,7 +7,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;

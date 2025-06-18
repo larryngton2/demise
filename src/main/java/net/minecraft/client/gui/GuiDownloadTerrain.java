@@ -8,8 +8,6 @@ import net.optifine.CustomLoadingScreens;
 import wtf.demise.Demise;
 import wtf.demise.utils.render.shader.impl.MainMenu;
 
-import java.io.IOException;
-
 public class GuiDownloadTerrain extends GuiScreen {
     private final NetHandlerPlayClient netHandlerPlayClient;
     private int progress;

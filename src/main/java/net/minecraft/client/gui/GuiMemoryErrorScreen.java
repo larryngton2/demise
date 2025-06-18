@@ -3,8 +3,6 @@ package net.minecraft.client.gui;
 import net.minecraft.client.resources.I18n;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 
-import java.io.IOException;
-
 public class GuiMemoryErrorScreen extends GuiScreen {
     public void initGui() {
         this.buttonList.clear();

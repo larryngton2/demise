@@ -4,8 +4,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-import java.io.IOException;
-
 public class C16PacketClientStatus implements Packet<INetHandlerPlayServer> {
     private C16PacketClientStatus.EnumState status;
 

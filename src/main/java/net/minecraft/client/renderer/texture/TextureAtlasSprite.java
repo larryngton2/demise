@@ -15,7 +15,6 @@ import net.optifine.util.CounterInt;
 import net.optifine.util.TextureUtils;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

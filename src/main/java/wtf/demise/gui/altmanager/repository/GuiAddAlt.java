@@ -26,7 +26,8 @@ import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
 import static net.minecraft.util.EnumChatFormatting.RED;
-import static wtf.demise.utils.misc.StringUtils.*;
+import static wtf.demise.utils.misc.StringUtils.FakerMode;
+import static wtf.demise.utils.misc.StringUtils.randomName;
 
 public final class GuiAddAlt extends GuiScreen {
 

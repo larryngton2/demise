@@ -44,7 +44,7 @@ import java.util.List;
 @ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.", category = ModuleCategory.Player)
 public class Scaffold extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly", "GodBridge"}, "Normal", this);
-    private final ModeValue resetMode = new ModeValue("Reset mode", new String[]{"Jump", "Stop"}, "Jump", this, () -> mode.is("GodBridge"));
+    private final ModeValue resetMode = new ModeValue("Reset mode", new String[]{"Jump", "Sneak"}, "Jump", this, () -> mode.is("GodBridge"));
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));
     private final SliderValue maxTellyTicks = new SliderValue("Max Telly Ticks", 4, 1, 5, this, () -> mode.is("Telly"));
     private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "GodBridge", "Derp", "Reverse"}, "Normal", this);
@@ -370,8 +370,7 @@ public class Scaffold extends Module {
                     }
                     ChatUtils.sendMessageClient("wtf");
                 } else {
-                    e.setForward(0);
-                    e.setStrafe(0);
+                    e.setSneaking(true);
                 }
             }
         }

@@ -3,7 +3,6 @@ package net.minecraft.client.renderer.texture;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.StitcherException;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
@@ -27,8 +26,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class TextureMap extends AbstractTexture implements ITickableTextureObject {

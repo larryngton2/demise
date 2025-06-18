@@ -5,9 +5,11 @@ import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import de.florianmichael.viamcp.fixes.AttackOrder;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.C02PacketUseEntity;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.StaticTickEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
@@ -16,9 +18,9 @@ import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PacketUtils;
 
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ClickHandler implements InstanceAccess {
     public final TimerUtils lastTargetTime = new TimerUtils();
@@ -35,10 +37,10 @@ public class ClickHandler implements InstanceAccess {
     private final Queue<Integer> clickPattern = new LinkedList<>();
     private static float swingRange;
     private static boolean forceblahblahblah;
-    private final TimerUtils selfHurtTimer = new TimerUtils();
     private final TimerUtils patternUpdateTimer = new TimerUtils();
     private final TimerUtils blockTimer = new TimerUtils();
     public static boolean clickingNow;
+    private int cachedClicks;
 
     public enum ClickMode {
         Legit,
@@ -112,7 +114,35 @@ public class ClickHandler implements InstanceAccess {
     }
 
     @EventTarget
+    public void onStaticTick(StaticTickEvent e) {
+        if (mc.thePlayer == null || mc.theWorld == null) {
+            return;
+        }
+
+        if (target != null && initialized) {
+            if (shouldClickThisTick()) {
+                cachedClicks++;
+            }
+        } else {
+            cachedClicks = 0;
+        }
+
+        if (mc.skippedTick) {
+            finalizeHandler();
+        }
+    }
+
+    @EventTarget
     public void onTickEvent(TickEvent e) {
+        clickingNow = false;
+
+        // just to make sure lol
+        if (!mc.skippedTick) {
+            finalizeHandler();
+        }
+    }
+
+    private void finalizeHandler() {
         if (mc.thePlayer == null || mc.theWorld == null) {
             return;
         }
@@ -124,7 +154,7 @@ public class ClickHandler implements InstanceAccess {
                 killAura.preAttack();
             }
 
-            if (shouldClickThisTick()) {
+            for (int i = 0; i < cachedClicks; i++) {
                 lastTargetTime.reset();
 
                 if (!ignoreBlocking && mc.thePlayer.isUsingItem()) {
@@ -141,9 +171,9 @@ public class ClickHandler implements InstanceAccess {
                 } else {
                     sendAttack();
                 }
-            } else {
-                clickingNow = false;
             }
+
+            cachedClicks = 0;
 
             if (killAura.isEnabled()) {
                 killAura.postAttack();
@@ -174,11 +204,22 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private boolean shouldClick() {
-        if (mc.thePlayer.hurtTime != 0) {
-            selfHurtTimer.reset();
+        float calcYaw = (float) (MathHelper.atan2(mc.thePlayer.posZ - target.posZ, mc.thePlayer.posX - target.posX) * 180.0 / Math.PI - 90.0);
+        float diffX = Math.abs(MathHelper.wrapAngleTo180_float(calcYaw - target.rotationYaw));
+
+        if (PlayerUtils.getCustomDistanceToEntityBox(target.getPositionVector().add(0, target.getEyeHeight(), 0), mc.thePlayer) < 3 && diffX < 90) {
+            return true;
         }
 
-        return !selfHurtTimer.hasTimeElapsed(250) || target.hurtTime <= 3 || (forceblahblahblah && BackTrack.shouldLag && Demise.INSTANCE.getModuleManager().getModule(BackTrack.class).isEnabled());
+        boolean hurtTime = target.hurtTime <= 3;
+
+        if (diffX > 180) {
+            hurtTime = target.hurtTime == 0;
+        }
+
+        boolean forceOnBacktrack = forceblahblahblah && BackTrack.shouldLag && Demise.INSTANCE.getModuleManager().getModule(BackTrack.class).isEnabled();
+
+        return mc.thePlayer.hurtTime != 0 || hurtTime || forceOnBacktrack;
     }
 
     private void attack() {

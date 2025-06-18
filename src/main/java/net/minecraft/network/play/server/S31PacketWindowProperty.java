@@ -4,8 +4,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-import java.io.IOException;
-
 public class S31PacketWindowProperty implements Packet<INetHandlerPlayClient> {
     private int windowId;
     private int varIndex;

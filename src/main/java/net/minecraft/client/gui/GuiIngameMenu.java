@@ -6,8 +6,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.realms.RealmsBridge;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 
-import java.io.IOException;
-
 public class GuiIngameMenu extends GuiScreen {
     public void initGui() {
         this.buttonList.clear();

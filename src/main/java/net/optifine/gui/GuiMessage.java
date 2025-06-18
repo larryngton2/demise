@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.src.Config;
 
-import java.io.IOException;
 import java.util.List;
 
 public class GuiMessage extends GuiScreen {

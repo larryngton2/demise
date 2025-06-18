@@ -1,8 +1,10 @@
 package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
@@ -14,13 +16,14 @@ import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "LongJump", description = "Jump, but long.", category = ModuleCategory.Movement)
 public class LongJump extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Miniblox"}, "Vanilla", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Miniblox", "Matrix"}, "Vanilla", this);
     private final SliderValue jumpOffAmount = new SliderValue("JumpOff amount", 0.2f, 0.01f, 2, 0.01f, this, () -> mode.is("Vanilla"));
 
-    private boolean jumped = false;
-    private int currentTimer = 0;
-    private int pauseTimes = 0;
-    private int activeTicks = 0;
+    private boolean jumped;
+    private int currentTimer;
+    private int pauseTimes;
+    private int activeTicks;
+    private boolean flagged;
 
     @EventTarget
     public void onJump(JumpEvent e) {
@@ -91,15 +94,39 @@ public class LongJump extends Module {
                     }
                 }
                 break;
+            case "Matrix":
+                if (mc.thePlayer.onGround) {
+                    if (MoveUtil.isMoving()) {
+                        mc.thePlayer.jump();
+                    }
+                } else if (MoveUtil.isMoving()) {
+                    mc.thePlayer.motionY = 0.42;
+                    MoveUtil.strafe(1.97);
+                }
+
+                if (flagged) {
+                    toggle();
+                }
+                break;
+        }
+    }
+
+    @EventTarget
+    public void onPacket(PacketEvent e) {
+        if (e.getPacket() instanceof S08PacketPlayerPosLook) {
+            flagged = true;
         }
     }
 
     @Override
     public void onDisable() {
-        MoveUtil.stop();
+        if (!mode.is("Matrix")) {
+            MoveUtil.stop();
+        }
         jumped = false;
         currentTimer = 0;
         pauseTimes = 0;
         activeTicks = 0;
+        flagged = false;
     }
 }

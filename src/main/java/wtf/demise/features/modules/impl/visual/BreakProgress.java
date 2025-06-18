@@ -39,7 +39,7 @@ public class BreakProgress extends Module {
         y = sr.getScaledHeight() - (sr.getScaledHeight() / 2f - 20);
         float height = 20;
         GL11.glPushMatrix();
-        RenderUtils.scissor(x - 1.5, y - 1.5, totalWidth + 3, height + 3);
+        RenderUtils.scissor((float) (x - 1.5), (float) (y - 1.5), totalWidth + 3, height + 3);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         RoundedUtils.drawRound(x, y, totalWidth, height, 5, new Color(INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
 
@@ -65,7 +65,7 @@ public class BreakProgress extends Module {
         y = sr.getScaledHeight() - (sr.getScaledHeight() / 2f - 20);
         float height = 20;
         GL11.glPushMatrix();
-        RenderUtils.scissor(x - 1.5, y - 1.5, totalWidth + 3, height + 3);
+        RenderUtils.scissor((float) (x - 1.5), (float) (y - 1.5), totalWidth + 3, height + 3);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         RoundedUtils.drawShaderRound(x, y, totalWidth, height, 5, Color.black);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);

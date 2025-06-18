@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.misc;
 
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.util.IChatComponent;
 import wtf.demise.Demise;
@@ -13,7 +12,6 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.misc.ChatUtils;
-import wtf.demise.utils.packet.PacketUtils;
 
 @ModuleInfo(name = "AutoQueue", description = "Automatically re-queues when a match is over.", category = ModuleCategory.Misc)
 public class AutoQueue extends Module {

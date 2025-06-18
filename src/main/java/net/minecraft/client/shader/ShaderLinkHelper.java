@@ -5,8 +5,6 @@ import net.minecraft.client.util.JsonException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-
 public class ShaderLinkHelper {
     private static final Logger logger = LogManager.getLogger();
     private static ShaderLinkHelper staticShaderLinkHelper;

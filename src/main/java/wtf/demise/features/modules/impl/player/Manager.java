@@ -13,7 +13,10 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.InventoryUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 @ModuleInfo(name = "Manager", description = "Manages your inventory.", category = ModuleCategory.Player)
 public class Manager extends Module {

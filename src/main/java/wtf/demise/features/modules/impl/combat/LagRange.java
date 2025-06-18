@@ -2,7 +2,10 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MovementInput;
+import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -90,6 +93,7 @@ public class LagRange extends Module {
                 }
 
                 picked = false;
+                msTimer.reset();
             }
 
             if (blinking) {
@@ -126,7 +130,7 @@ public class LagRange extends Module {
     private boolean shouldStart() {
         AxisAlignedBB entityBoundingBox = target.getHitbox();
 
-        double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(entityBoundingBox.getCenter(), mc.thePlayer);
+        double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(PlayerUtils.getPosFromAABB(entityBoundingBox).add(0, target.getEyeHeight(), 0), mc.thePlayer);
         double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(selfPrediction.size() - 1).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
 
         return predictedSelfDistance < predictedTargetDistance &&

@@ -1,7 +1,10 @@
 package wtf.demise.gui.mainmenu;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.gui.GuiOptions;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiSelectWorld;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.MainMenuOptions;
 import wtf.demise.features.modules.impl.visual.Shaders;

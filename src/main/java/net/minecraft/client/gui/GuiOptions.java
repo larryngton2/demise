@@ -11,8 +11,6 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.EnumDifficulty;
 
-import java.io.IOException;
-
 public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
     private static final GameSettings.Options[] field_146440_f = new GameSettings.Options[]{GameSettings.Options.FOV};
     private final GuiScreen field_146441_g;

@@ -7,8 +7,6 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 
-import java.io.IOException;
-
 public class S01PacketJoinGame implements Packet<INetHandlerPlayClient> {
     private int entityId;
     private boolean hardcoreMode;

@@ -5,8 +5,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.gui.mainmenu.GuiMainMenu;
 
-import java.io.IOException;
-
 public class GuiGameOver extends GuiScreen implements GuiYesNoCallback {
     private int enableButtonsTimer;
     private final boolean field_146346_f = false;

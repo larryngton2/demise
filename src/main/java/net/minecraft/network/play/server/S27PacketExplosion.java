@@ -7,7 +7,6 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
-import java.io.IOException;
 import java.util.List;
 
 public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {

@@ -19,7 +19,7 @@ import wtf.demise.utils.math.TimerUtils;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public final class PingSpoofComponent implements InstanceAccess {
+public final class LagUtils implements InstanceAccess {
     private static final long DEFAULT_TIMER_DELAY = 100L;
     private static final long BLINK_DELAY = 9999999L;
 
@@ -139,12 +139,6 @@ public final class PingSpoofComponent implements InstanceAccess {
         });
     }
 
-    public static void spoof(int amount, boolean... flags) {
-        if (flags.length >= 4) {
-            spoof(amount, flags[0], flags[1], flags[2], flags[3], flags.length > 4 && flags[4]);
-        }
-    }
-
     public static void spoof(int amount, boolean regular, boolean velocity, boolean teleports, boolean players, boolean blink) {
         spoof(amount, regular, velocity, teleports, players, blink, false);
     }
@@ -161,8 +155,8 @@ public final class PingSpoofComponent implements InstanceAccess {
         PacketType.PLAYERS.setEnabled(players);
         PacketType.BLINK.setEnabled(blink);
         PacketType.MOVEMENT.setEnabled(movement);
-        PingSpoofComponent.post = post;
-        PingSpoofComponent.delayAmount = amount;
+        LagUtils.post = post;
+        LagUtils.delayAmount = amount;
     }
 
     public static void blink() {
