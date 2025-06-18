@@ -41,6 +41,16 @@ public class RotationManager implements InstanceAccess {
     private int interpolatedAccelDeltaYaw;
     private int interpolatedAccelDeltaPitch;
 
+    public RotationManager() {
+        enabled = true;
+        smoothMode = SmoothMode.None;
+        cachedCorrection = true;
+        cachedHSpeed = 180;
+        cachedVSpeed = 180;
+        targetRotation = new float[]{0, 0};
+        silent = true;
+    }
+
     public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
