@@ -8,6 +8,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.concurrent.ConcurrentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -21,10 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class SoundManager {
@@ -167,37 +165,42 @@ public class SoundManager {
 
         Iterator<Entry<String, ISound>> iterator = this.playingSounds.entrySet().iterator();
 
-        while (iterator.hasNext()) {
-            Entry<String, ISound> entry = iterator.next();
-            String s1 = entry.getKey();
-            ISound isound = entry.getValue();
+        //fuckass client base, I didn't even change shit on here and it's causing crashes
+        try {
+            while (iterator.hasNext()) {
+                Entry<String, ISound> entry = iterator.next();
+                String s1 = entry.getKey();
+                ISound isound = entry.getValue();
 
-            if (!this.sndSystem.playing(s1)) {
-                int i = this.playingSoundsStopTime.get(s1);
+                if (!this.sndSystem.playing(s1)) {
+                    int i = this.playingSoundsStopTime.get(s1);
 
-                if (i <= this.playTime) {
-                    int j = isound.getRepeatDelay();
+                    if (i <= this.playTime) {
+                        int j = isound.getRepeatDelay();
 
-                    if (isound.canRepeat() && j > 0) {
-                        this.delayedSounds.put(isound, this.playTime + j);
-                    }
+                        if (isound.canRepeat() && j > 0) {
+                            this.delayedSounds.put(isound, this.playTime + j);
+                        }
 
-                    iterator.remove();
-                    logger.debug(LOG_MARKER, "Removed channel {} because it's not playing anymore", s1);
-                    this.sndSystem.removeSource(s1);
-                    this.playingSoundsStopTime.remove(s1);
-                    this.playingSoundPoolEntries.remove(isound);
+                        iterator.remove();
+                        logger.debug(LOG_MARKER, "Removed channel {} because it's not playing anymore", s1);
+                        this.sndSystem.removeSource(s1);
+                        this.playingSoundsStopTime.remove(s1);
+                        this.playingSoundPoolEntries.remove(isound);
 
-                    try {
-                        this.categorySounds.remove(this.sndHandler.getSound(isound.getSoundLocation()).getSoundCategory(), s1);
-                    } catch (RuntimeException ignored) {
-                    }
+                        try {
+                            this.categorySounds.remove(this.sndHandler.getSound(isound.getSoundLocation()).getSoundCategory(), s1);
+                        } catch (RuntimeException ignored) {
+                        }
 
-                    if (isound instanceof ITickableSound) {
-                        this.tickableSounds.remove(isound);
+                        if (isound instanceof ITickableSound) {
+                            this.tickableSounds.remove(isound);
+                        }
                     }
                 }
             }
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
         }
 
         Iterator<Entry<ISound, Integer>> iterator1 = this.delayedSounds.entrySet().iterator();
