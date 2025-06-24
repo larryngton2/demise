@@ -56,6 +56,8 @@ public class CustomWidgets implements InstanceAccess {
     private float alpha = 255;
     private float tAlpha = 255;
     private final TimerUtils textTimer = new TimerUtils();
+    private final TimerUtils fadeTimer = new TimerUtils();
+    private final TimerUtils textFadeTimer = new TimerUtils();
     private final CustomWidgetsModule customWidgetsModule = Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class);
     private float interpolatedWidgetWidth;
     private float interpolatedWidgetX;
@@ -89,7 +91,10 @@ public class CustomWidgets implements InstanceAccess {
         if (fade) {
             RenderUtils.drawRect(0, 0, sr.getScaledWidth(), sr.getScaledHeight(), new Color(0, 0, 0, (int) alpha).getRGB());
 
-            alpha -= 0.75f;
+            if (fadeTimer.hasTimeElapsed(10)) {
+                alpha -= 0.75f;
+                fadeTimer.reset();
+            }
 
             if (alpha < 0) {
                 alpha = 255;
@@ -103,7 +108,10 @@ public class CustomWidgets implements InstanceAccess {
             Fonts.interRegular.get(35).drawCenteredString("Logged in as " + mc.thePlayer.getName() + " on " + PlayerUtils.getCurrServer(), sr.getScaledWidth() / 2, 50, new Color(255, 255, 255, (int) tAlpha).getRGB());
 
             if (textTimer.hasTimeElapsed(2500)) {
-                tAlpha -= 2;
+                if (textFadeTimer.hasTimeElapsed(10)) {
+                    tAlpha -= 2;
+                    textFadeTimer.reset();
+                }
             }
 
             if (tAlpha < 0) {
@@ -333,7 +341,7 @@ public class CustomWidgets implements InstanceAccess {
         if (!shader) {
             RoundedUtils.drawRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, new Color(getModule(Interface.class).bgColor(), true));
 
-            Fonts.interMedium.get(18).drawString(text, interpolatedWidgetX + 3 + blockWH + spacing, interpolatedWidgetY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, -1);
+            Fonts.interRegular.get(18).drawGradient(text, interpolatedWidgetX + 3 + blockWH + spacing, interpolatedWidgetY + height / 2F - Fonts.interMedium.get(18).getHeight() / 2F + 2.5f, (index) -> new Color(getModule(Interface.class).color(index)));
 
             if (SpoofSlotUtils.isSpoofing()) {
                 RenderHelper.enableGUIStandardItemLighting();
@@ -390,7 +398,7 @@ public class CustomWidgets implements InstanceAccess {
 
         Interface anInterface = getModule(Interface.class);
 
-        if (anInterface.elements.isEnabled("Module List")) {
+        if (anInterface.elements.isEnabled("Module list")) {
             while (ModuleListWidget.currY + ModuleListWidget.getEnabledModules().size() * ModuleListWidget.getModuleHeight() > bgY - 15 && ModuleListWidget.currX > x - width - 25) {
                 y++;
                 bgY++;

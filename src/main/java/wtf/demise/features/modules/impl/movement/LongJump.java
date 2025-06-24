@@ -16,14 +16,17 @@ import wtf.demise.utils.player.MoveUtil;
 
 @ModuleInfo(name = "LongJump", description = "Jump, but long.", category = ModuleCategory.Movement)
 public class LongJump extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Miniblox", "Matrix"}, "Vanilla", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Boat", "Miniblox", "Matrix"}, "Vanilla", this);
     private final SliderValue jumpOffAmount = new SliderValue("JumpOff amount", 0.2f, 0.01f, 2, 0.01f, this, () -> mode.is("Vanilla"));
+    private final SliderValue verticalMotion = new SliderValue("Vertical motion", 0.25f, 0, 2, 0.01f, this, () -> mode.is("Boat"));
+    private final SliderValue horizontalMotion = new SliderValue("Horizontal motion", 0.25f, 0, 2, 0.01f, this, () -> mode.is("Boat"));
 
     private boolean jumped;
     private int currentTimer;
     private int pauseTimes;
     private int activeTicks;
     private boolean flagged;
+    private boolean wasInBoat;
 
     @EventTarget
     public void onJump(JumpEvent e) {
@@ -35,7 +38,7 @@ public class LongJump extends Module {
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         this.setTag(mode.get());
-        
+
         switch (mode.get()) {
             case "Miniblox":
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
@@ -108,6 +111,15 @@ public class LongJump extends Module {
                     toggle();
                 }
                 break;
+            case "Boat":
+                if (mc.thePlayer.ridingEntity != null) {
+                    wasInBoat = true;
+                } else if (wasInBoat) {
+                    mc.thePlayer.motionY = verticalMotion.get();
+                    MoveUtil.strafe(horizontalMotion.get());
+                    wasInBoat = false;
+                }
+                break;
         }
     }
 
@@ -120,7 +132,7 @@ public class LongJump extends Module {
 
     @Override
     public void onDisable() {
-        if (!mode.is("Matrix")) {
+        if (mode.is("Miniblox")) {
             MoveUtil.stop();
         }
         jumped = false;
@@ -128,5 +140,6 @@ public class LongJump extends Module {
         pauseTimes = 0;
         activeTicks = 0;
         flagged = false;
+        wasInBoat = false;
     }
 }

@@ -53,8 +53,8 @@ public class KillAura extends Module {
     private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
     private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
     public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
-    private final BoolValue failSwing = new BoolValue("Fail swing", false, this, rayTrace::get);
-    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get() && failSwing.canDisplay());
+    private final BoolValue failSwing = new BoolValue("Fail swing", false, this);
+    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get());
 
     // autoBlock
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
@@ -341,23 +341,7 @@ public class KillAura extends Module {
         rotationHandler.updateRotSpeed(e);
 
         if (currentTarget != null && !isTargetInvalid() && delayed.get()) {
-            while (positionHistory.size() > delayUpdates.get()) {
-                positionHistory.poll();
-            }
-
             positionHistory.offer(targetVec);
-
-            if (positionHistory.size() < delayUpdates.get()) {
-                delayedVec = targetVec;
-            }
-
-            if (positionHistory.size() >= delayUpdates.get()) {
-                if (!delayOnHurtTime.get() || currentTarget.hurtTime >= hurtTime.get()) {
-                    delayedVec = positionHistory.poll();
-                } else {
-                    delayedVec = targetVec;
-                }
-            }
         } else {
             positionHistory.clear();
             delayedVec = targetVec;
@@ -676,6 +660,22 @@ public class KillAura extends Module {
         }
 
         if (delayed.get()) {
+            while (positionHistory.size() > delayUpdates.get()) {
+                positionHistory.poll();
+            }
+
+            if (positionHistory.size() < delayUpdates.get()) {
+                delayedVec = targetVec;
+            }
+
+            if (positionHistory.size() >= delayUpdates.get()) {
+                if (!delayOnHurtTime.get() || currentTarget.hurtTime >= hurtTime.get()) {
+                    delayedVec = positionHistory.poll();
+                } else {
+                    delayedVec = targetVec;
+                }
+            }
+
             currentVec = delayedVec != null ? delayedVec : targetVec;
         } else {
             currentVec = targetVec;

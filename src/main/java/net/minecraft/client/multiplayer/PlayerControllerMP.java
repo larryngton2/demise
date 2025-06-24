@@ -336,7 +336,6 @@ public class PlayerControllerMP {
     }
 
     public void attackEntity(EntityPlayer playerIn, Entity targetEntity) {
-
         AttackEvent event = new AttackEvent(targetEntity);
 
         Demise.INSTANCE.getEventManager().call(event);
@@ -353,7 +352,6 @@ public class PlayerControllerMP {
     }
 
     public void attackEntityNoPacketEvent(EntityPlayer playerIn, Entity targetEntity) {
-
         AttackEvent event = new AttackEvent(targetEntity);
 
         Demise.INSTANCE.getEventManager().call(event);

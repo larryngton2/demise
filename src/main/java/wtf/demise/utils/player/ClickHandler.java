@@ -161,15 +161,15 @@ public class ClickHandler implements InstanceAccess {
                     blockTimer.reset();
                 }
 
-                if (rayTrace) {
-                    float distance = (float) PlayerUtils.getDistanceToEntityBox(target);
-                    if (((distance > attackRange || rayTraceFailed()) && distance <= swingRange) && failSwing) {
-                        handleFailSwing();
-                    } else if (!rayTraceFailed() && distance <= attackRange) {
+                float distance = (float) PlayerUtils.getDistanceToEntityBox(target);
+                if (distance > attackRange && distance <= swingRange && failSwing) {
+                    handleFailSwing();
+                } else if (distance <= attackRange) {
+                    if (!rayTrace || !rayTraceFailed()) {
                         sendAttack();
+                    } else if (failSwing) {
+                        handleFailSwing();
                     }
-                } else {
-                    sendAttack();
                 }
             }
 
@@ -235,7 +235,6 @@ public class ClickHandler implements InstanceAccess {
                     } else {
                         PacketUtils.sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK));
                         mc.thePlayer.swingItem();
-                        break;
                     }
                     Demise.INSTANCE.getEventManager().call(new AttackEvent(target));
                     break;

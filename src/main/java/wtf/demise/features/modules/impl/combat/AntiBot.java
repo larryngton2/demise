@@ -11,7 +11,6 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
-import wtf.demise.utils.render.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,19 +45,17 @@ public class AntiBot extends Module {
     }
 
     public boolean isBot(EntityPlayer player) {
-        if (!isEnabled())
-            return false;
+        if (!isEnabled()) return false;
 
         if (options.isEnabled("Tab")) {
-            String targetName = RenderUtils.stripColor(player.getDisplayName().getFormattedText());
-
-            boolean shouldReturn = true;
-
-            for (NetworkPlayerInfo networkPlayerInfo : mc.getNetHandler().getPlayerInfoMap()) {
-                shouldReturn = !RenderUtils.stripColor(networkPlayerInfo.getFullName()).contains(targetName);
+            boolean found = false;
+            for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
+                if (info.getGameProfile().getName().equals(player.getName())) {
+                    found = true;
+                    break;
+                }
             }
-
-            return !shouldReturn;
+            if (!found) return true;
         }
 
         if (options.isEnabled("Hypixel")) {

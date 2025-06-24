@@ -1,6 +1,7 @@
 package wtf.demise.features.values.impl;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.util.MathHelper;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.values.Value;
@@ -8,6 +9,7 @@ import wtf.demise.features.values.Value;
 import java.util.function.Supplier;
 
 public class SliderValue extends Value {
+    @Setter
     private float value;
     @Getter
     private final float min;
@@ -49,10 +51,6 @@ public class SliderValue extends Value {
     }
 
     public float get() {
-        return MathHelper.clamp_float(value, getMin(), getMax());
-    }
-
-    public void setValue(float value) {
-        this.value = MathHelper.clamp_float(value, getMin(), getMax());
+        return value;
     }
 }

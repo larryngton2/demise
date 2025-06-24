@@ -46,7 +46,7 @@ public final class LagUtils implements InstanceAccess {
         }
     }
 
-    private static final ConcurrentLinkedQueue<TimedPacket> packets = new ConcurrentLinkedQueue<>();
+    public static final ConcurrentLinkedQueue<TimedPacket> packets = new ConcurrentLinkedQueue<>();
     private static final TimerUtils enabledTimer = new TimerUtils();
 
     private static boolean enabled;

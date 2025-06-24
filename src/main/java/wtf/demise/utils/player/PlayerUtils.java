@@ -2,6 +2,7 @@ package wtf.demise.utils.player;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -317,5 +318,24 @@ public class PlayerUtils implements InstanceAccess {
 
     public static Vec3 getPosFromAABB(AxisAlignedBB a) {
         return new Vec3((a.minX + a.maxX) / 2, a.minY, (a.minZ + a.maxZ) / 2);
+    }
+
+    public static boolean isOnLiquid() {
+        boolean onLiquid = false;
+        final AxisAlignedBB playerBB = mc.thePlayer.getEntityBoundingBox();
+        final WorldClient world = mc.theWorld;
+        final int y = (int) playerBB.offset(0.0, -0.01, 0.0).minY;
+        for (int x = MathHelper.floor_double(playerBB.minX); x < MathHelper.floor_double(playerBB.maxX) + 1; ++x) {
+            for (int z = MathHelper.floor_double(playerBB.minZ); z < MathHelper.floor_double(playerBB.maxZ) + 1; ++z) {
+                final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                if (block != null && !(block instanceof BlockAir)) {
+                    if (!(block instanceof BlockLiquid)) {
+                        return false;
+                    }
+                    onLiquid = true;
+                }
+            }
+        }
+        return onLiquid;
     }
 }

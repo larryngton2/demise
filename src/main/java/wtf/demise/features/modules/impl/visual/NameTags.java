@@ -84,6 +84,10 @@ public class NameTags extends Module {
             String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(PlayerUtils.getActualHealth(player))) + EnumChatFormatting.RED + "❤" : "";
             String name = player.getDisplayName().getFormattedText() + healthString;
 
+            if (Demise.INSTANCE.getFriendManager().isFriend(player)) {
+                name += EnumChatFormatting.GREEN + " [Friend]";
+            }
+
             if (Demise.INSTANCE.getModuleManager().getModule(CheatDetector.class).isCheater(player)) {
                 name += EnumChatFormatting.RED + " [Cheater]";
             }

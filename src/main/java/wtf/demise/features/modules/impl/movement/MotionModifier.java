@@ -1,5 +1,6 @@
 package wtf.demise.features.modules.impl.movement;
 
+import net.minecraft.client.settings.KeyBinding;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -15,59 +16,59 @@ public class MotionModifier extends Module {
     private final BoolValue motionMulti = new BoolValue("Motion multi", false, this);
 
     private final BoolValue air = new BoolValue("On air", true, this, motionMulti::get);
-    private final SliderValue airXZ1 = new SliderValue("XZ multi (air tick 1)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ2 = new SliderValue("XZ multi (air tick 2)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ3 = new SliderValue("XZ multi (air tick 3)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ4 = new SliderValue("XZ multi (air tick 4)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ5 = new SliderValue("XZ multi (air tick 5)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ6 = new SliderValue("XZ multi (air tick 6)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ7 = new SliderValue("XZ multi (air tick 7)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ8 = new SliderValue("XZ multi (air tick 8)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ9 = new SliderValue("XZ multi (air tick 9)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ10 = new SliderValue("XZ multi (air tick 10)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ11 = new SliderValue("XZ multi (air tick 11)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
-    private final SliderValue airXZ12 = new SliderValue("XZ multi (air tick 12)", 1, 0, 2, 0.01f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ1 = new SliderValue("XZ multi (air tick 1)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ2 = new SliderValue("XZ multi (air tick 2)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ3 = new SliderValue("XZ multi (air tick 3)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ4 = new SliderValue("XZ multi (air tick 4)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ5 = new SliderValue("XZ multi (air tick 5)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ6 = new SliderValue("XZ multi (air tick 6)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ7 = new SliderValue("XZ multi (air tick 7)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ8 = new SliderValue("XZ multi (air tick 8)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ9 = new SliderValue("XZ multi (air tick 9)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ10 = new SliderValue("XZ multi (air tick 10)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ11 = new SliderValue("XZ multi (air tick 11)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
+    private final SliderValue airXZ12 = new SliderValue("XZ multi (air tick 12)", 1, 0, 2, 0.001f, this, () -> air.get() && motionMulti.get());
 
     private final BoolValue ground = new BoolValue("On ground", false, this, motionMulti::get);
-    private final SliderValue groundXZ1 = new SliderValue("XZ multi (ground tick 1)", 1, 0, 2, 0.01f, this, () -> ground.get() && motionMulti.get());
-    private final SliderValue groundXZ2 = new SliderValue("XZ multi (ground tick 2)", 1, 0, 2, 0.01f, this, () -> ground.get() && motionMulti.get());
-    private final SliderValue groundXZ3 = new SliderValue("XZ multi (ground tick 3)", 1, 0, 2, 0.01f, this, () -> ground.get() && motionMulti.get());
-    private final SliderValue groundXZ4 = new SliderValue("XZ multi (ground tick 4)", 1, 0, 2, 0.01f, this, () -> ground.get() && motionMulti.get());
-    private final SliderValue groundXZ5 = new SliderValue("XZ multi (ground tick 5)", 1, 0, 2, 0.01f, this, () -> ground.get() && motionMulti.get());
+    private final SliderValue groundXZ1 = new SliderValue("XZ multi (ground tick 1)", 1, 0, 2, 0.001f, this, () -> ground.get() && motionMulti.get());
+    private final SliderValue groundXZ2 = new SliderValue("XZ multi (ground tick 2)", 1, 0, 2, 0.001f, this, () -> ground.get() && motionMulti.get());
+    private final SliderValue groundXZ3 = new SliderValue("XZ multi (ground tick 3)", 1, 0, 2, 0.001f, this, () -> ground.get() && motionMulti.get());
+    private final SliderValue groundXZ4 = new SliderValue("XZ multi (ground tick 4)", 1, 0, 2, 0.001f, this, () -> ground.get() && motionMulti.get());
+    private final SliderValue groundXZ5 = new SliderValue("XZ multi (ground tick 5)", 1, 0, 2, 0.001f, this, () -> ground.get() && motionMulti.get());
 
     private final BoolValue pulldownOnAir = new BoolValue("Pulldown on air", false, this);
-    private final SliderValue pulldown1 = new SliderValue("Pulldown (tick 1)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown2 = new SliderValue("Pulldown (tick 2)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown3 = new SliderValue("Pulldown (tick 3)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown4 = new SliderValue("Pulldown (tick 4)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown5 = new SliderValue("Pulldown (tick 5)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown6 = new SliderValue("Pulldown (tick 6)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown7 = new SliderValue("Pulldown (tick 7)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown8 = new SliderValue("Pulldown (tick 8)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown9 = new SliderValue("Pulldown (tick 9)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown10 = new SliderValue("Pulldown (tick 10)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown11 = new SliderValue("Pulldown (tick 11)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
-    private final SliderValue pulldown12 = new SliderValue("Pulldown (tick 12)", 0, 0, 1, 0.01f, this, pulldownOnAir::get);
+    private final SliderValue pulldown1 = new SliderValue("Pulldown (tick 1)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown2 = new SliderValue("Pulldown (tick 2)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown3 = new SliderValue("Pulldown (tick 3)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown4 = new SliderValue("Pulldown (tick 4)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown5 = new SliderValue("Pulldown (tick 5)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown6 = new SliderValue("Pulldown (tick 6)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown7 = new SliderValue("Pulldown (tick 7)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown8 = new SliderValue("Pulldown (tick 8)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown9 = new SliderValue("Pulldown (tick 9)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown10 = new SliderValue("Pulldown (tick 10)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown11 = new SliderValue("Pulldown (tick 11)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
+    private final SliderValue pulldown12 = new SliderValue("Pulldown (tick 12)", 0, 0, 1, 0.001f, this, pulldownOnAir::get);
 
     private final BoolValue strafe = new BoolValue("Strafe", false, this);
-    private final SliderValue strafe1 = new SliderValue("Strafe (tick 1)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe2 = new SliderValue("Strafe (tick 2)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe3 = new SliderValue("Strafe (tick 3)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe4 = new SliderValue("Strafe (tick 4)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe5 = new SliderValue("Strafe (tick 5)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe6 = new SliderValue("Strafe (tick 6)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe7 = new SliderValue("Strafe (tick 7)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe8 = new SliderValue("Strafe (tick 8)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe9 = new SliderValue("Strafe (tick 9)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe10 = new SliderValue("Strafe (tick 10)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe11 = new SliderValue("Strafe (tick 11)", 0, -0.05f, 1, 0.01f, this, strafe::get);
-    private final SliderValue strafe12 = new SliderValue("Strafe (tick 12)", 0, -0.05f, 1, 0.01f, this, strafe::get);
+    private final SliderValue strafe1 = new SliderValue("Strafe (tick 1)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe2 = new SliderValue("Strafe (tick 2)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe3 = new SliderValue("Strafe (tick 3)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe4 = new SliderValue("Strafe (tick 4)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe5 = new SliderValue("Strafe (tick 5)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe6 = new SliderValue("Strafe (tick 6)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe7 = new SliderValue("Strafe (tick 7)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe8 = new SliderValue("Strafe (tick 8)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe9 = new SliderValue("Strafe (tick 9)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe10 = new SliderValue("Strafe (tick 10)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe11 = new SliderValue("Strafe (tick 11)", 0, -0.05f, 1, 0.001f, this, strafe::get);
+    private final SliderValue strafe12 = new SliderValue("Strafe (tick 12)", 0, -0.05f, 1, 0.001f, this, strafe::get);
 
     private final BoolValue autoJump = new BoolValue("Auto jump", true, this);
-    private final SliderValue jumpHeight = new SliderValue("Jump height", 0.42f, 0, 1, 0.01f, this, autoJump::get);
-    private final SliderValue jumpOff = new SliderValue("Jumpoff", 0.2f, 0, 1, 0.01f, this, autoJump::get);
+    private final SliderValue jumpHeight = new SliderValue("Jump height", 0.42f, 0, 1, 0.001f, this, autoJump::get);
+    private final SliderValue jumpOff = new SliderValue("Jumpoff", 0.2f, 0, 1, 0.001f, this, autoJump::get);
 
-    private final SliderValue timer = new SliderValue("Timer", 1, 0.1f, 2, 0.01f, this);
+    private final SliderValue timer = new SliderValue("Timer", 1, 0.1f, 2, 0.001f, this);
 
     @Override
     public void onDisable() {
@@ -223,10 +224,8 @@ public class MotionModifier extends Module {
             }
         }
 
-        if (autoJump.get()) {
-            if (mc.thePlayer.onGround) {
-                mc.thePlayer.jump();
-            }
+        if (autoJump.get() && MoveUtil.isMoving()) {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), mc.thePlayer.onGround);
         }
     }
 

@@ -21,6 +21,8 @@ public class InfoWidget extends Widget {
 
     public InfoWidget() {
         super("Info");
+        this.x = 0.8848025f;
+        this.y = 0.962963f;
         Demise.INSTANCE.getEventManager().unregister(this);
         Demise.INSTANCE.getEventManager().register(this);
     }
@@ -44,9 +46,9 @@ public class InfoWidget extends Widget {
 
         String str1 = Minecraft.getDebugFPS() + " FPS";
         String cpsText = leftClicks.size() + " | " + rightClicks.size() + " CPS";
-        float width1 = Fonts.interRegular.get(15).getStringWidth(str1) + 6;
-        float width2 = Fonts.interRegular.get(15).getStringWidth(mc.thePlayer.getName()) + 18;
-        float width3 = Fonts.interRegular.get(15).getStringWidth(cpsText) + 6;
+        float width1 = Fonts.interRegular.get(15).getStringWidth(str1) + 7;
+        float width2 = Fonts.interRegular.get(15).getStringWidth(mc.thePlayer.getName()) + 17;
+        float width3 = Fonts.interRegular.get(15).getStringWidth(cpsText) + 7;
 
         if (renderX < sr.getScaledWidth() / 2f) {
             x = renderX;
@@ -63,14 +65,14 @@ public class InfoWidget extends Widget {
 
         if (!shader) {
             RoundedUtils.drawRound(x, renderY, width3, height, 3, new Color(setting.bgColor(), true));
-            Fonts.interRegular.get(15).drawString(cpsText, x + 3, textY, -1);
+            Fonts.interRegular.get(15).drawGradient(cpsText, x + 3, textY, (index) -> new Color(setting.color(index)));
 
             RoundedUtils.drawRound(x1, renderY, width1, height, 3, new Color(setting.bgColor(), true));
-            Fonts.interRegular.get(15).drawString(str1, x1 + 3, textY, -1);
+            Fonts.interRegular.get(15).drawGradient(str1, x1 + 3, textY, (index) -> new Color(setting.color(index)));
 
             RoundedUtils.drawRound(x2, renderY, width2, height, 3, new Color(setting.bgColor(), true));
-            RenderUtils.renderPlayerHead(mc.thePlayer, x2 + 2, (renderY + height / 2) - 5, 10, 10, -1);
-            Fonts.interRegular.get(15).drawString(mc.thePlayer.getName(), x2 + 14, textY, -1);
+            RenderUtils.renderPlayerHead(mc.thePlayer, x2 + 2, (renderY + height / 2) - 5, 10, 10);
+            Fonts.interRegular.get(15).drawGradient(mc.thePlayer.getName(), x2 + 14, textY, (index) -> new Color(setting.color(index)));
         } else {
             RoundedUtils.drawShaderRound(x, renderY, width3, height, 3, Color.black);
             RoundedUtils.drawShaderRound(x1, renderY, width1, height, 3, Color.black);

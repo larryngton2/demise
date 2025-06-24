@@ -20,7 +20,7 @@ public class FastBow extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        if (!Mouse.isButtonDown(0) || !(mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemBow)) {
+        if (!Mouse.isButtonDown(1) || !(mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemBow)) {
             return;
         }
 

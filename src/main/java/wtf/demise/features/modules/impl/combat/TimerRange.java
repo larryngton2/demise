@@ -36,13 +36,16 @@ import java.util.List;
 @ModuleInfo(name = "TimerRange", description = "Abuses balance in order to be unpredictable to your target.", category = ModuleCategory.Combat)
 public class TimerRange extends Module {
     private final BoolValue preload = new BoolValue("Preload", true, this);
-    private final SliderValue balanceRange = new SliderValue("Balance range", 8, 3, 15, 0.1f, this, preload::get);
+    private final BoolValue alwaysGainBalance = new BoolValue("Always gain balance", false, this, preload::get);
+    private final SliderValue balanceRange = new SliderValue("Balance range", 8, 3, 15, 0.1f, this, () -> preload.get() && !alwaysGainBalance.get());
     private final SliderValue minBalanceRange = new SliderValue("Min balance range", 3, 0, 15, 0.1f, this, preload::get);
+    private final SliderValue balanceTimer = new SliderValue("Balance timer", 0.5f, 0.1f, 0.99f, 0.01f, this, preload::get);
+    private final SliderValue maxBalance = new SliderValue("Max balance", 8, 1, 40, 1, this, preload::get);
+    private final SliderValue maxBalanceTimer = new SliderValue("Max balance timer", 0.99f, 0.1f, 1, 0.01f, this, preload::get);
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue tickRange = new SliderValue("Tick range", 3f, 0.1f, 8f, 0.1f, this);
     private final SliderValue minRange = new SliderValue("Min range", 2.5f, 0.1f, 8f, 0.1f, this);
     private final SliderValue stopRange = new SliderValue("Stop range", 2.5f, 0.1f, 8f, 0.1f, this);
-    private final SliderValue searchRange = new SliderValue("Search range", 7f, 0.1f, 15, 0.1f, this);
     private final SliderValue maxTick = new SliderValue("Max ticks", 4, 1, 20, this);
     private final BoolValue allowEarlyBreak = new BoolValue("Allow early break", false, this);
     private final BoolValue prioritiseCrits = new BoolValue("Prioritise crits", false, this);
@@ -55,24 +58,19 @@ public class TimerRange extends Module {
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
     private EntityPlayer target;
     private int ticksToSkip;
-    private int cachedTicks;
-    private boolean cachedBalance;
-    private boolean pause;
     public static int balance;
     public static boolean working;
 
     @Override
     public void onEnable() {
         balance = 0;
-        cachedTicks = 0;
-        pause = false;
     }
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         setTag(String.valueOf(maxTick.get()));
 
-        target = PlayerUtils.getTarget(searchRange.get(), teamCheck.get());
+        target = PlayerUtils.getTarget(Double.MAX_VALUE, teamCheck.get());
     }
 
     @EventTarget
@@ -123,21 +121,24 @@ public class TimerRange extends Module {
             return;
         }
 
-        if (Range.between(minBalanceRange.get(), balanceRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target)) && !cachedBalance && preload.get()) {
-            double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(PlayerUtils.getPosFromAABB(target.getHitbox()).add(0, target.getEyeHeight(), 0), mc.thePlayer);
-            double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get((int) maxTick.get() - 1).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, target.getHitbox());
-
-            if (predictedSelfDistance < predictedTargetDistance) {
-                cachedTicks = (int) maxTick.get();
-                pause = true;
-                cachedBalance = true;
+        if (Range.between(minBalanceRange.get(), alwaysGainBalance.get() ? Float.MAX_VALUE : balanceRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target))) {
+            if (-balance < maxBalance.get() && preload.get()) {
+                mc.timer.timerSpeed = balanceTimer.get();
+            } else {
+                mc.timer.timerSpeed = maxBalanceTimer.get();
             }
+        } else {
+            mc.timer.timerSpeed = 1;
+        }
+
+        if (PlayerUtils.getDistanceToEntityBox(target) > (alwaysGainBalance.get() ? Float.MAX_VALUE : balanceRange.get()) && preload.get()) {
+            balance = 0;
         }
 
         if (timer.hasTimeElapsed(delay.get()) && shouldStart()) {
             int skippedTick = 0;
             boolean skipped = false;
-            while (skippedTick < ticksToSkip && !shouldStop() && -balance >= ticksToSkip) {
+            while (skippedTick < ticksToSkip && !shouldStop()) {
                 skippedTick++;
                 try {
                     mc.runTick();
@@ -148,7 +149,6 @@ public class TimerRange extends Module {
                 }
             }
             if (skipped) {
-                cachedBalance = false;
                 timer.reset();
             }
         } else {
@@ -217,29 +217,15 @@ public class TimerRange extends Module {
         return predictedSelfDistance < predictedTargetDistance &&
                 predictedSelfDistance <= tickRange.get() &&
                 predictedSelfDistance > minRange.get() &&
-                predictedSelfDistance <= searchRange.get() &&
                 PlayerUtils.getDistanceToEntityBox(target) >= stopRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&
                 target.canEntityBeSeen(mc.thePlayer) &&
                 !selfPrediction.get(tick).isCollidedHorizontally &&
-                !mc.thePlayer.isCollidedHorizontally;
+                !mc.thePlayer.isCollidedHorizontally &&
+                -balance > tick;
     }
 
     private boolean shouldStop() {
         return mc.thePlayer.hurtTime > hurtTimeToStop.get();
-    }
-
-    public boolean skipTick() {
-        if (timer.hasTimeElapsed(delay.get())) {
-            if (cachedTicks <= 0) {
-                pause = false;
-                return false;
-            }
-            if (isEnabled() && pause && cachedTicks > 0) {
-                --cachedTicks;
-                return true;
-            }
-        }
-        return false;
     }
 }

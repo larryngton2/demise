@@ -41,6 +41,10 @@ import wtf.demise.utils.render.RenderUtils;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.toDegrees;
+import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
+
 @ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.", category = ModuleCategory.Player)
 public class Scaffold extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly", "GodBridge"}, "Normal", this);
@@ -58,9 +62,8 @@ public class Scaffold extends Module {
     private final SliderValue maxCSearch = new SliderValue("Max C search", 0.9f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
     private final BoolValue instantRots = new BoolValue("Instant clutch rots", false, this, clutch::get);
     private final RotationHandler rotationHandler = new RotationHandler(this);
-
+    private final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Ground", "Air", "None"}, "Normal", this);
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
-            new BoolValue("Sprint", true),
             new BoolValue("Swing", true),
             new BoolValue("Ignore tick cycle", false),
             new BoolValue("Ray Trace", true),
@@ -126,7 +129,7 @@ public class Scaffold extends Module {
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
     }
 
-    private void updateTarget() {
+    private void updateState() {
         mc.thePlayer.inventory.currentItem = getBlockSlot();
         SpoofSlotUtils.startSpoofing(oldSlot);
 
@@ -161,11 +164,28 @@ public class Scaffold extends Module {
             tellyTicks = MathUtils.randomizeInt((int) minTellyTicks.get(), (int) maxTellyTicks.get());
         }
 
-        if (addons.isEnabled("Sprint")) {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
-        } else {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
-            mc.thePlayer.setSprinting(false);
+        switch (sprintMode.get()) {
+            case "Normal":
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
+                break;
+            case "Ground":
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), mc.thePlayer.onGround);
+
+                if (!mc.thePlayer.onGround) {
+                    mc.thePlayer.setSprinting(false);
+                }
+                break;
+            case "Air":
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), !mc.thePlayer.onGround);
+
+                if (mc.thePlayer.onGround) {
+                    mc.thePlayer.setSprinting(false);
+                }
+                break;
+            case "None":
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
+                mc.thePlayer.setSprinting(false);
+                break;
         }
 
         if (tower.canDisplay() && (!tower.is("Jump") && towering() || !towerMove.is("Jump") && towerMoving())) {
@@ -260,7 +280,7 @@ public class Scaffold extends Module {
         }
 
         if (!mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            rotationHandler.setRotation(clutching ? new float[]{yaw, pitch} : new float[]{initialYaw, initialPitch});
+            rotationHandler.setRotation(new float[]{clutching ? yaw : initialYaw, clutching ? pitch : initialPitch});
         }
     }
 
@@ -283,7 +303,7 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onAngle(AngleEvent e) {
-        updateTarget();
+        updateState();
         updateRotations();
     }
 
@@ -384,14 +404,14 @@ public class Scaffold extends Module {
                 blocksPlaced = 0;
             }
 
-            if (mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ)).getBlock() instanceof BlockAir && blocksPlaced >= blocksToSneak.get()) {
+            if (blocksPlaced == blocksToSneak.get()) {
                 e.setSneaking(true);
             }
         }
     }
 
     @EventTarget
-    public void onStrafe(StrafeEvent event) {
+    public void onStrafe(StrafeEvent e) {
         if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
             return;
 

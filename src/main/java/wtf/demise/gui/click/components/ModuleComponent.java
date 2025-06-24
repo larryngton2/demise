@@ -1,4 +1,4 @@
-package wtf.demise.gui.click.panel.components;
+package wtf.demise.gui.click.components;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +9,8 @@ import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.click.IComponent;
-import wtf.demise.gui.click.panel.PanelGui;
-import wtf.demise.gui.click.panel.components.impl.*;
+import wtf.demise.gui.click.PanelGui;
+import wtf.demise.gui.click.components.impl.*;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;

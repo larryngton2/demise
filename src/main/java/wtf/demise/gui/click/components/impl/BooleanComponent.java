@@ -1,4 +1,4 @@
-package wtf.demise.gui.click.panel.components.impl;
+package wtf.demise.gui.click.components.impl;
 
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -30,7 +30,7 @@ public class BooleanComponent extends Component {
 
         Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY() + 2.5f, -1);
 
-        RoundedUtils.drawRound(getX() + getWidth() - 15.5f, getY() + 2.5f, 13f, 5, 2.25f, ColorUtils.interpolateColorC(new Color(128, 128, 128, 255), Demise.INSTANCE.getModuleManager().getModule(Interface.class).getMainColor(), (float) toggleAnimation.getOutput()).darker());
+        RoundedUtils.drawRound(getX() + getWidth() - 15.5f, getY() + 2.5f, 13f, 5, 2.25f, ColorUtils.interpolateColorC(new Color(128, 128, 128, 255), Color.white, (float) toggleAnimation.getOutput()).darker());
         RoundedUtils.drawRound(getX() + getWidth() - 15.5f + 8 * (float) toggleAnimation.getOutput(), getY() + 2.5f, 5, 5, 2.25f, Color.WHITE);
         super.drawScreen(mouseX, mouseY);
     }

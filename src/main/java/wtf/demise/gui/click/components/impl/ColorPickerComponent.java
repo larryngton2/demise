@@ -1,4 +1,4 @@
-package wtf.demise.gui.click.panel.components.impl;
+package wtf.demise.gui.click.components.impl;
 
 import wtf.demise.features.values.impl.ColorValue;
 import wtf.demise.gui.click.Component;

@@ -1,4 +1,4 @@
-package wtf.demise.gui.click.panel.components.impl;
+package wtf.demise.gui.click.components.impl;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjglx.input.Keyboard;

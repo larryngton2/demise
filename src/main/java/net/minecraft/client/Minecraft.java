@@ -797,7 +797,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
         TimerRange timerRange = Demise.INSTANCE.getModuleManager().getModule(TimerRange.class);
 
         for (int j = 0; j < this.timer.elapsedTicks; ++j) {
-            skippedTick = tickBase.skipTick() || timerRange.skipTick();
+            skippedTick = tickBase.skipTick();
             if (skippedTick) {
                 continue;
             }

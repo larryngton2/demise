@@ -1,8 +1,9 @@
 package wtf.demise.gui.font;
 
 import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.opengl.GL11;
-import wtf.demise.utils.render.ColorUtils;
+import org.lwjglx.opengl.GLContext;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.misc.Test;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -40,31 +41,27 @@ public class FontRenderer {
     }
 
     public final float drawCenteredString(String text, float x, float y, int color) {
-        return drawString(text, x - getStringWidth(text) / 2, y, color);
+        return drawString(text, x - getStringWidth(text) / 2f, y, color);
     }
 
     public final float drawCenteredString(String text, double x, double y, int color) {
-        return drawString(text, (float) (x - getStringWidth(text) / 2), (float) y, color);
+        return drawString(text, (float) (x - getStringWidth(text) / 2f), (float) y, color);
     }
 
-    public final float drawCenteredStringNoFormat(String text, float x, float y, int color) {
-        return drawStringNoFormat(text, (x - (float) getStringWidth(text) / 2), y, color, false);
-    }
-
-    public final void drawCenteredStringWithShadow(String text, float x, float y, int color) {
+    public final void drawCenteredStringWithShadow(String text, double x, double y, int color) {
         drawStringWithShadow(text, (x - (float) getStringWidth(text) / 2), y, color);
     }
 
     private final byte[][] charwidth = new byte[256][];
     private final int[] textures = new int[256];
     private final FontRenderContext context = new FontRenderContext(new AffineTransform(), true, true);
-    private Font font = null;
+    private final Font font;
 
-    private float size = 0;
-    private int fontWidth = 0;
-    private int fontHeight = 0;
-    private int textureWidth = 0;
-    private int textureHeight = 0;
+    private final float size;
+    private final int fontWidth;
+    private final int fontHeight;
+    private final int textureWidth;
+    private final int textureHeight;
 
     public FontRenderer(Font font) {
         this.antiAlias = true;
@@ -127,53 +124,6 @@ public class FontRenderer {
         return drawString(str, (float) x, (float) y, color, false);
     }
 
-    public int drawStringNoFormat(String str, double x, double y, int color) {
-        return drawString(str, (float) x, (float) y, color, false);
-    }
-
-    public final void drawStringWithShadowNoFormat(String str, float x, float y, int color) {
-        drawStringNoFormat(str, x + 0.5f, y + 0.5f, color, true);
-        drawStringNoFormat(str, x, y, color, false);
-    }
-
-    public final int drawStringNoFormat(String str, float x, float y, int color, boolean darken) {
-        GlStateManager.color(1F, 1F, 1F, 1F);
-        str = str.replace("▬", "=");
-        y = y - 2;
-        x *= 2;
-        y *= 2;
-        y -= 2;
-        int offset = 0;
-        if (darken) {
-            color = (color & 0xFCFCFC) >> 2 | color & 0xFF000000;
-        }
-        float r, g, b, a;
-        r = (color >> 16 & 0xFF) / 255f;
-        g = (color >> 8 & 0xFF) / 255f;
-        b = (color & 0xFF) / 255f;
-        a = (color >> 24 & 0xFF) / 255f;
-        if (a == 0)
-            a = 1;
-        GlStateManager.color(r, g, b, a);
-        glPushMatrix();
-        glScaled(0.5, 0.5, 0.5);
-        char[] chars = str.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            char chr = chars[i];
-            if (chr == '\u00A7' && i != chars.length - 1) {
-                i++;
-                color = "0123456789abcdef".indexOf(chr);
-                if (color != -1) {
-                    if (darken) color |= 0x10;
-                }
-                continue;
-            }
-            offset += drawChar(chr, x + offset, y);
-        }
-        glPopMatrix();
-        return offset;
-    }
-
     public final int drawString(String str, float x, float y, int color, boolean darken) {
         GlStateManager.color(1F, 1F, 1F, 1F);
         str = str.replace("▬", "=");
@@ -198,7 +148,7 @@ public class FontRenderer {
         char[] chars = str.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             char chr = chars[i];
-            if (chr == '\u00A7' && i != chars.length - 1) {
+            if (chr == '§' && i != chars.length - 1) {
                 i++;
                 color = "0123456789abcdef".indexOf(chars[i]);
                 if (color != -1) {
@@ -235,7 +185,7 @@ public class FontRenderer {
             char chr = currentData[i];
 
             char character = text.charAt(i);
-            if (character == '\u00a7') {
+            if (character == '§') {
                 ++i;
             } else {
                 width += getOrGenerateCharWidthMap(chr >> 8)[chr & 0xFF];
@@ -249,14 +199,15 @@ public class FontRenderer {
         return size;
     }
 
-    private final int generateCharTexture(int id) {
+    private int generateCharTexture(int id) {
         int textureId = glGenTextures();
         int offset = id << 8;
         BufferedImage img = new BufferedImage(textureWidth, textureHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = (Graphics2D) img.getGraphics();
         if (antiAlias) {
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 100);
         }
         g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g.setFont(font);
@@ -268,22 +219,28 @@ public class FontRenderer {
                 g.drawString(chr, x * fontWidth, y * fontHeight + fontMetrics.getAscent());
             }
         glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (!Demise.INSTANCE.getModuleManager().getModule(Test.class).fuckFontRenderer.get()) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        } else {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        }
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageToBuffer(img));
         return textureId;
     }
 
-    private final int getOrGenerateCharTexture(int id) {
+    private int getOrGenerateCharTexture(int id) {
         if (textures[id] == -1)
             return textures[id] = generateCharTexture(id);
         return textures[id];
     }
 
     private int resizeToOpenGLSupportResolution(int size) {
-        int power = 0;
-        while (size > 1 << power) power++;
-        return 1 << power;
+        if (GLContext.getCapabilities().GL_ARB_texture_non_power_of_two) {
+            return size;
+        }
+        return Math.max(1, Integer.highestOneBit(size - 1) << 1);
     }
 
     private byte[] generateCharWidthMap(int id) {
@@ -295,7 +252,7 @@ public class FontRenderer {
         return widthmap;
     }
 
-    private final byte[] getOrGenerateCharWidthMap(int id) {
+    private byte[] getOrGenerateCharWidthMap(int id) {
         if (charwidth[id] == null)
             return charwidth[id] = generateCharWidthMap(id);
         return charwidth[id];
@@ -305,7 +262,7 @@ public class FontRenderer {
         return coord / (double) size;
     }
 
-    private static final ByteBuffer imageToBuffer(BufferedImage img) {
+    private static ByteBuffer imageToBuffer(BufferedImage img) {
         int[] arr = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
         ByteBuffer buf = ByteBuffer.allocateDirect(4 * arr.length);
 
@@ -329,72 +286,6 @@ public class FontRenderer {
         drawString(newstr, i, i1, rgb);
     }
 
-    public final void drawLimitedString(String text, float x, float y, int color, float maxWidth) {
-        drawLimitedStringWithAlpha(text, x, y, color, (((color >> 24) & 0xFF) / 255f), maxWidth);
-    }
-
-    public final void drawLimitedStringWithAlpha(String text, float x, float y, int color, float alpha, float maxWidth) {
-        //   text = processString(text);
-        x *= 2.0F;
-        y *= 2.0F;
-        float originalX = x;
-        float curWidth = 0;
-
-        GL11.glPushMatrix();
-        GL11.glScaled(0.5F, 0.5F, 0.5F);
-
-        final boolean wasBlend = glGetBoolean(GL_BLEND);
-        GlStateManager.enableAlpha();
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_TEXTURE_2D);
-
-        int currentColor = color;
-        char[] characters = text.toCharArray();
-
-        int index = 0;
-        for (char c : characters) {
-            if (c == '\r') {
-                x = originalX;
-            }
-            if (c == '\n') {
-                y += getHeight() * 2.0F;
-            }
-            if (c != '\247' && (index == 0 || index == characters.length - 1 || characters[index - 1] != '\247')) {
-                if (index >= 1 && characters[index - 1] == '\247') continue;
-                glPushMatrix();
-                drawString(Character.toString(c), x, y, ColorUtils.reAlpha(new Color(currentColor), (int) alpha).getRGB(), false);
-                glPopMatrix();
-
-                curWidth += (getStringWidth(Character.toString(c)) * 2.0F);
-                x += (getStringWidth(Character.toString(c)) * 2.0F);
-
-                if (curWidth > maxWidth) {
-                    break;
-                }
-
-            } else if (c == ' ') {
-                x += getStringWidth(" ");
-            } else if (c == '\247' && index != characters.length - 1) {
-                int codeIndex = "0123456789abcdefklmnor".indexOf(text.charAt(index + 1));
-                if (codeIndex < 0) continue;
-
-                if (codeIndex < 16) {
-                    currentColor = colorCode[codeIndex];
-                } else if (codeIndex == 21) {
-                    currentColor = Color.WHITE.getRGB();
-                }
-            }
-
-            index++;
-        }
-
-        if (!wasBlend)
-            glDisable(GL_BLEND);
-        glPopMatrix();
-        GL11.glColor4f(1, 1, 1, 1);
-    }
-
     public final void drawOutlinedString(String str, float x, float y, int internalCol, int externalCol) {
         this.drawString(str, x - 0.5f, y, externalCol);
         this.drawString(str, x + 0.5f, y, externalCol);
@@ -407,41 +298,9 @@ public class FontRenderer {
         drawStringWithShadow(z, (float) x, (float) positionY, mainTextColor);
     }
 
-    public void drawCenteredStringWithOutline(String text, double x, double y, int color) {
-        drawCenteredString(text, x - .5, y, 0x000000);
-
-        drawCenteredString(text, x + .5, y, 0x000000);
-
-        drawCenteredString(text, x, y - .5, 0x000000);
-
-        drawCenteredString(text, x, y + .5, 0x000000);
-
-        drawCenteredString(text, x, y, color);
-    }
-
-    public void drawCenteredStringWithOutline(String text, double x, double y, int color, int outlineColor) {
-        drawCenteredString(text, x - .5, y, outlineColor);
-
-        drawCenteredString(text, x + .5, y, outlineColor);
-
-        drawCenteredString(text, x, y - .5, outlineColor);
-
-        drawCenteredString(text, x, y + .5, outlineColor);
-
-        drawCenteredString(text, x, y, color);
-    }
-
     public float drawStringWithShadow(String text, double x, double y, double sWidth, int color) {
         float shadowWidth = this.drawString(text, (float) (x + sWidth), (float) (y + sWidth), color, true);
         return Math.max(shadowWidth, this.drawString(text, (float) x, (float) y, color, false));
-    }
-
-    public void drawScaledString(String text, double x, double y, double scale, int color) {
-        GL11.glPushMatrix();
-        GL11.glTranslated(x, y, x);
-        GL11.glScaled(scale, scale, scale);
-        drawStringWithShadow(text, 0f, 0f, color);
-        GL11.glPopMatrix();
     }
 
     public void drawGradientWithShadow(String text, float x, float y, GradientApplier colorSupplier) {
@@ -455,7 +314,7 @@ public class FontRenderer {
             final String character = valueOf(ch);
 
             drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB());
-            x += getStringWidth(character);
+            x += getStringWidth(character) + 0.25f;
         }
     }
 
@@ -470,7 +329,7 @@ public class FontRenderer {
             final String character = valueOf(ch);
 
             drawString(character, x, y, colorSupplier.colour(index).getRGB(), false);
-            x += getStringWidth(character);
+            x += getStringWidth(character) + 0.25f;
         }
     }
 

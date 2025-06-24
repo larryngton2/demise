@@ -29,6 +29,8 @@ public class KeystrokeWidget extends Widget {
 
         this.width = 57;
         this.height = 57;
+        this.x = 0.9342179f;
+        this.y = 0.84583354f;
     }
 
     @Override
@@ -60,7 +62,9 @@ public class KeystrokeWidget extends Widget {
                 y += 0.85f;
                 width -= 1.7f;
                 height -= 1.7f;
-                color = new Color(46, 46, 46, (int) setting.bgAlpha.get());
+
+                Color c = new Color(setting.color()).darker().darker().darker().darker().darker();
+                color = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) setting.bgAlpha.get());
             } else {
                 color = new Color(setting.bgColor(), true);
             }
@@ -74,7 +78,7 @@ public class KeystrokeWidget extends Widget {
 
             if (!shader) {
                 RoundedUtils.drawRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, key.getColor());
-                Fonts.interRegular.get(14).drawCenteredString(key.getName(), (key.getInterpolatedX() + key.getInterpolatedWidth() / 2) - 0.5f, (key.getInterpolatedY() + key.getInterpolatedHeight() / 2) - 1.5, setting.color());
+                Fonts.interRegular.get(14).drawCenteredString(key.getName(), (key.getInterpolatedX() + key.getInterpolatedWidth() / 2), (key.getInterpolatedY() + key.getInterpolatedHeight() / 2) - 1.5, setting.color());
             } else {
                 RoundedUtils.drawShaderRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, Color.black);
             }

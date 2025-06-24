@@ -21,11 +21,13 @@ import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.ScaffoldC
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
+import wtf.demise.utils.misc.ChatUtils;
+import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ModuleInfo(name = "CheatDetector", category = ModuleCategory.Misc)
+@ModuleInfo(name = "CheatDetector", description = "Detects cheaters in your game.", category = ModuleCategory.Misc)
 public class CheatDetector extends Module {
     public final MultiBoolValue options = new MultiBoolValue("Checks", Arrays.asList(
             new BoolValue("Aim", true),
@@ -59,50 +61,45 @@ public class CheatDetector extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        // checking players too frequently causes slight lag, so creating a new thread to do it
-        new Thread(() -> {
-            if (mc.theWorld == null) return;
+        if (mc.theWorld == null) return;
 
-            for (EntityPlayer player : mc.theWorld.playerEntities) {
-                // chunks are 16x16 blocks wide, just doing -1 to be sure
-                if (player.getDistanceSqToEntity(mc.thePlayer) > 16 * mc.gameSettings.renderDistanceChunks - 1)
-                    continue;
+        for (EntityPlayer player : mc.theWorld.playerEntities) {
+            // chunks are 16x16 blocks wide, just doing -1 to be sure
+            if (PlayerUtils.getCustomDistanceToEntityBox(player.getPositionEyes(1), mc.thePlayer) > 16 * mc.gameSettings.renderDistanceChunks)
+                continue;
 
-                for (Check check : checks) {
-                    if ((selfCheck.get() || player != mc.thePlayer) && !player.isDead && !Demise.INSTANCE.getFriendManager().isFriend(player)) {
-                        if (isEnabled(AntiBot.class) && getModule(AntiBot.class).bots.contains(player))
-                            continue;
+            for (Check check : checks) {
+                if ((selfCheck.get() || player != mc.thePlayer) && !player.isDead && !Demise.INSTANCE.getFriendManager().isFriend(player)) {
+                    if (isEnabled(AntiBot.class) && getModule(AntiBot.class).bots.contains(player))
+                        continue;
 
-                        if (options.isEnabled(check.getName())) {
-                            check.onUpdate(player);
-                        }
+                    if (options.isEnabled(check.getName())) {
+                        check.onUpdate(player);
                     }
                 }
             }
-        }).start();
+        }
     }
 
     @EventTarget
     public void onPacket(PacketEvent e) {
-        new Thread(() -> {
-            if (mc.theWorld == null) return;
+        if (mc.theWorld == null) return;
 
-            for (EntityPlayer player : mc.theWorld.playerEntities) {
-                if (player.getDistanceSqToEntity(mc.thePlayer) > 16 * mc.gameSettings.renderDistanceChunks - 1)
-                    continue;
+        for (EntityPlayer player : mc.theWorld.playerEntities) {
+            if (PlayerUtils.getCustomDistanceToEntityBox(player.getPositionEyes(1), mc.thePlayer) > 16 * mc.gameSettings.renderDistanceChunks)
+                continue;
 
-                for (Check check : checks) {
-                    if ((selfCheck.get() || player != mc.thePlayer) && !player.isDead && !Demise.INSTANCE.getFriendManager().isFriend(player)) {
-                        if (isEnabled(AntiBot.class) && getModule(AntiBot.class).bots.contains(player))
-                            continue;
+            for (Check check : checks) {
+                if ((selfCheck.get() || player != mc.thePlayer) && !player.isDead && !Demise.INSTANCE.getFriendManager().isFriend(player)) {
+                    if (isEnabled(AntiBot.class) && getModule(AntiBot.class).bots.contains(player))
+                        continue;
 
-                        if (options.isEnabled(check.getName())) {
-                            check.onPacket(e, player);
-                        }
+                    if (options.isEnabled(check.getName())) {
+                        check.onPacket(e, player);
                     }
                 }
             }
-        }).start();
+        }
     }
 
     @Override

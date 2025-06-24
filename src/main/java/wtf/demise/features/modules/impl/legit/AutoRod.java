@@ -30,7 +30,7 @@ import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
 
-@ModuleInfo(name = "AutoRod", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoRod", description = "Automatically rods. Just read man.", category = ModuleCategory.Legit)
 public class AutoRod extends Module {
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this);
     private final SliderValue maxRange = new SliderValue("Max range", 4.5f, 1, 8, 0.1f, this);

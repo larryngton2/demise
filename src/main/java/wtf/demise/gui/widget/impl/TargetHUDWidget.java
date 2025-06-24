@@ -172,7 +172,7 @@ class TargetHUD implements InstanceAccess {
             RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
 
             RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
-            RoundedUtils.drawRound(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color(0)));
+            RoundedUtils.drawGradientHorizontal(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color()), new Color(setting.color((int) target.healthAnimation.getOutput())));
             String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
             double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
             String diff;
@@ -189,7 +189,7 @@ class TargetHUD implements InstanceAccess {
             Fonts.interSemiBold.get(13).drawString(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
             Fonts.interSemiBold.get(18).drawString(target.getName(), x + 37, y + 6, -1);
 
-            RenderUtils.renderPlayerHead(target, x + 2.5f, y + 2.5f, 32, 10, -1);
+            RenderUtils.renderPlayerHead(target, x + 2.5f, y + 2.5f, 32, 10);
         } else {
             RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
         }

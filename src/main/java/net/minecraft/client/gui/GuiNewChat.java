@@ -129,14 +129,10 @@ public class GuiNewChat extends Gui {
                 this.sameMessageAmount = 1;
                 this.lastMessage = text;
             }
-            this.line++;
-            if (this.line > 256)
-                this.line = 0;
-
-            printChatMessageWithOptionalDeletion(chatComponent, this.line);
-        } else {
-            printChatMessageWithOptionalDeletion(chatComponent, this.line);
         }
+        this.line++;
+        if (this.line > 256) this.line = 0;
+        printChatMessageWithOptionalDeletion(chatComponent, this.line);
     }
 
     private String fixString(String str) {

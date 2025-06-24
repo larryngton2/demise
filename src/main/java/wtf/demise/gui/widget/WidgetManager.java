@@ -8,6 +8,7 @@ import wtf.demise.gui.widget.impl.*;
 import wtf.demise.utils.InstanceAccess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,12 +17,15 @@ public class WidgetManager implements InstanceAccess {
 
     public WidgetManager() {
         INSTANCE.getEventManager().register(this);
-        register(new TargetHUDWidget());
-        register(new PotionHUDWidget());
-        register(new ModuleListWidget());
-        register(new BPSCounterWidget());
-        register(new KeystrokeWidget());
-        register(new InfoWidget());
+
+        register(
+                new MotionGraphWidget(),
+                new ModuleListWidget(),
+                new TargetHUDWidget(),
+                new PotionHUDWidget(),
+                new KeystrokeWidget(),
+                new InfoWidget()
+        );
     }
 
     public boolean loaded;
@@ -63,8 +67,8 @@ public class WidgetManager implements InstanceAccess {
         }
     }
 
-    private void register(Widget widget) {
-        this.widgetList.add(widget);
+    private void register(Widget... widgets) {
+        this.widgetList.addAll(Arrays.asList(widgets));
     }
 
     public Widget get(String name) {

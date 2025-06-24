@@ -1,4 +1,4 @@
-package wtf.demise.gui.click.panel.components.config;
+package wtf.demise.gui.click.components.config;
 
 import lombok.Getter;
 import lombok.Setter;

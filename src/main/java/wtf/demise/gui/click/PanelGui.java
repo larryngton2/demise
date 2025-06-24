@@ -1,4 +1,4 @@
-package wtf.demise.gui.click.panel;
+package wtf.demise.gui.click;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -10,8 +10,8 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Interface;
-import wtf.demise.gui.click.panel.components.Category;
-import wtf.demise.gui.click.panel.components.config.ConfigCategoryComponent;
+import wtf.demise.gui.click.components.Category;
+import wtf.demise.gui.click.components.config.ConfigCategoryComponent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.render.MouseUtils;
@@ -196,9 +196,16 @@ public class PanelGui extends GuiScreen {
 
     @Override
     public void keyTyped(char typedChar, int keyCode) {
-        if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RSHIFT) {
-            //mc.displayGuiScreen(null);
+        if (keyCode == Keyboard.KEY_RSHIFT) {
             closing = !closing;
+        }
+
+        if (keyCode == Keyboard.KEY_ESCAPE) {
+            closing = true;
+        }
+
+        if (keyCode == Keyboard.KEY_TAB) {
+            selectedCategory = categories.get((categories.indexOf(selectedCategory) + 1) % categories.size());
         }
 
         if (closing) {

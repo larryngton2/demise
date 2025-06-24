@@ -100,9 +100,7 @@ public class GuiMainMenu extends GuiScreen {
             }
         }
 
-        mc.fontRendererObj.drawStringWithShadow("Alpha build", 2, 2, -1);
-        mc.fontRendererObj.drawStringWithShadow(Demise.HWID.getHWID(), 2, 3 + mc.fontRendererObj.FONT_HEIGHT, -1);
-        mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 4 + (mc.fontRendererObj.FONT_HEIGHT * 2), -1);
+        mc.fontRendererObj.drawStringWithShadow(Minecraft.getDebugFPS() + "fps", 2, 2, -1);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }

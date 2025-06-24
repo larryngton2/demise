@@ -30,7 +30,7 @@ public class ModuleManager {
             TimerRange.class, Velocity.class, LagRange.class
     );
 
-    private static final Set<Class <? extends Module>> LEGIT_MODULES = Set.of(
+    private static final Set<Class<? extends Module>> LEGIT_MODULES = Set.of(
             AimAssist.class, AutoClicker.class, AutoHeal.class, AutoRod.class, AutoWeapon.class, BackTrack.class,
             CombatHelper.class, HitBox.class, HitSelect.class, JumpReset.class, LegitScaffold.class, NoHitDelay.class,
             Reach.class, SprintReset.class
@@ -43,26 +43,28 @@ public class ModuleManager {
     );
 
     private static final Set<Class<? extends Module>> PLAYER_MODULES = Set.of(
-        AntiVoid.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class,
+            AntiVoid.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class,
             FastPlace.class, FastUse.class, Manager.class, NoFall.class, Scaffold.class, Stealer.class
     );
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
-        AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
-            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class, AutoMeow.class, CheatDetector.class
+            AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
+            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class,
+            AutoMeow.class, CheatDetector.class, Translator.class, Spammer.class, InputFix.class, RealLag.class,
+            KillInsults.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
-        AutoBan.class, Blink.class, ClientSpoofer.class, ComboOneHit.class, Disabler.class, NoGuiClose.class,
-            Regen.class, ResetVL.class, Timer.class, PingSpoof.class
+            AutoBan.class, Blink.class, ClientSpoofer.class, ComboOneHit.class, Disabler.class, NoGuiClose.class,
+            Regen.class, ResetVL.class, Timer.class, PingSpoof.class, InfAura.class
     );
 
     private static final Set<Class<? extends Module>> VISUAL_MODULES = Set.of(
-        Atmosphere.class, BlockOnSwing.class, BlockOverlay.class, Breadcrumbs.class, BreakProgress.class, Cape.class,
+            Atmosphere.class, BlockOnSwing.class, BlockOverlay.class, Breadcrumbs.class, BreakProgress.class, Cape.class,
             ChestESP.class, ChinaHat.class, ClickGUI.class, CustomSkin.class, CustomWidgetsModule.class, NameTags.class,
             ForceDinnerbone.class, FreeCam.class, FullBright.class, Interface.class, ItemESP.class,
             ItemGlow.class, ItemPhysics.class, MainMenuOptions.class, MotionBlur.class, MoveStatus.class,
-            NoHurtCam.class, NoRenderOffsetReset.class, Particles.class, Rotation.class, Shaders.class,
+            NoHurtCam.class, NoRenderOffsetReset.class, Rotation.class, Shaders.class,
             ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class, VisualAimPoint.class, TargetHud.class
     );
 

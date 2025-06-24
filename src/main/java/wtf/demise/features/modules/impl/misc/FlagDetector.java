@@ -12,7 +12,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.gui.notification.NotificationType;
 
-@ModuleInfo(name = "FlagDetector", category = ModuleCategory.Misc)
+@ModuleInfo(name = "FlagDetector", description = "Alerts you about anticheat flags.", category = ModuleCategory.Misc)
 public class FlagDetector extends Module {
     private int totalFlags;
 

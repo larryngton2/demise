@@ -1,12 +1,15 @@
 package wtf.demise.utils.player.rotation;
 
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.MathHelper;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
+import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
@@ -78,6 +81,9 @@ public class RotationManager implements InstanceAccess {
     private void onMove(MoveInputEvent e) {
         if (shouldCorrect()) {
             MoveUtil.fixMovement(e, currentRotation[0]);
+        } else if (shouldRotate() && abs(getAngleDifference((float) toDegrees(MoveUtil.getDirection()), currentRotation[0])) > 90 && !mc.thePlayer.omniSprint && !Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled()) {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
+            mc.thePlayer.setSprinting(false);
         }
     }
 

@@ -6,7 +6,6 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
-import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
@@ -47,7 +46,7 @@ public class ModuleListWidget extends Widget {
 
             RenderPosition position = calculateRenderPosition(module, width, middle);
 
-            renderModule(module, position.x, position.y, offset, width, height, position.alphaAnimation, middle, i, false);
+            renderModule(module, position.x, position.y, offset, width, height, middle, i, false);
 
             if (!module.isHidden()) {
                 if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
@@ -73,7 +72,7 @@ public class ModuleListWidget extends Widget {
 
             RenderPosition position = calculateRenderPosition(module, width, middle);
 
-            renderModule(module, position.x, position.y, offset, width, height, position.alphaAnimation, middle, i, true);
+            renderModule(module, position.x, position.y, offset, width, height, middle, i, true);
 
             if (!module.isHidden()) {
                 if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
@@ -106,9 +105,9 @@ public class ModuleListWidget extends Widget {
         return setting.getFr().getHeight() + yPadding;
     }
 
-    private void renderModule(Module module, float localX, float localY, float offset, int width, int height, float alphaAnimation, int middle, int index, boolean shader) {
+    private void renderModule(Module module, float localX, float localY, float offset, int width, int height, int middle, int index, boolean shader) {
         renderBackground(localX, localY, offset, width, height, middle, shader);
-        renderText(module, localX, localY, offset, width - xPadding, alphaAnimation, middle, index, shader);
+        renderText(module, localX, localY, offset, width - xPadding, middle, index, shader);
     }
 
     private void renderBackground(float localX, float localY, float offset, int width, int height, int middle, boolean shader) {
@@ -127,10 +126,10 @@ public class ModuleListWidget extends Widget {
         }
     }
 
-    private void renderText(Module module, float localX, float localY, float offset, int width, float alphaAnimation, int middle, int index, boolean shader) {
+    private void renderText(Module module, float localX, float localY, float offset, int width, int middle, int index, boolean shader) {
         String text = module.getName() + module.getTag();
-        int color = ColorUtils.swapAlpha(setting.color(index), (int) alphaAnimation * setting.getMainColor().getAlpha());
-        float textY = localY + offset + 4 + (yPadding / 2f) - 0.5f;
+        int color = setting.color(index);
+        float textY = localY + offset + 4 + (yPadding / 2f) - 1.3f;
         float textX = localX - width + this.width - (xPadding / 2f) - 0.5f;
 
         if (!shader) {
@@ -149,19 +148,17 @@ public class ModuleListWidget extends Widget {
     }
 
     private static class RenderPosition {
-        float x, y, alphaAnimation;
+        float x, y;
 
-        RenderPosition(float x, float y, float alphaAnimation) {
+        RenderPosition(float x, float y) {
             this.x = x;
             this.y = y;
-            this.alphaAnimation = alphaAnimation;
         }
     }
 
     private RenderPosition calculateRenderPosition(Module module, int width, int middle) {
         float localX = renderX;
         float localY = renderY;
-        float alphaAnimation = 1.0f;
 
         float MOVE_IN_SCALE = 2.0f;
 
@@ -173,7 +170,7 @@ public class ModuleListWidget extends Widget {
                     (MOVE_IN_SCALE + width));
         }
 
-        return new RenderPosition(localX, localY, alphaAnimation);
+        return new RenderPosition(localX, localY);
     }
 
     private float calculateNextOffset(Module module, int height, float offset) {
@@ -182,6 +179,6 @@ public class ModuleListWidget extends Widget {
 
     @Override
     public boolean shouldRender() {
-        return setting.isEnabled() && setting.elements.isEnabled("Module List");
+        return setting.isEnabled() && setting.elements.isEnabled("Module list");
     }
 }
