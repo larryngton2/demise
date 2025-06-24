@@ -466,6 +466,9 @@ public class CustomWidgets implements InstanceAccess {
         }
     }
 
+    int colWidth = 130; // should be enough
+    int maxRows = 16;
+
     @EventTarget
     public void onShader2D(Shader2DEvent e) {
         int i = sr.getScaledWidth() / 2;
@@ -503,9 +506,9 @@ public class CustomWidgets implements InstanceAccess {
             String footer = mc.ingameGUI.getTabList().getFooter().getFormattedText();
             int headerHeight = (int) (Fonts.interRegular.get(15).getHeight() * header.split("\n").length);
             int footerHeight = (int) (Fonts.interRegular.get(15).getHeight() * footer.split("\n").length);
-            int count = (int) Math.ceil((double) mc.getNetHandler().getPlayerInfoMap().size() / 12);
-            int startX = sr.getScaledWidth() / 2 - (count * 100) / 2;
-            RoundedUtils.drawShaderRound(startX - 4, 36, count * 100 + 10, Math.min(mc.getNetHandler().getPlayerInfoMap().size(), 12) * 12 + 12 + headerHeight + footerHeight, 7, Color.black);
+            int count = (int) Math.ceil((double) mc.getNetHandler().getPlayerInfoMap().size() / maxRows);
+            int startX = sr.getScaledWidth() / 2 - (count * colWidth) / 2;
+            RoundedUtils.drawShaderRound(startX - 4, 36, count * colWidth + 10, Math.min(mc.getNetHandler().getPlayerInfoMap().size(), 12) * maxRows + 12 + headerHeight + footerHeight, 7, Color.black);
         }
     }
 
@@ -516,9 +519,7 @@ public class CustomWidgets implements InstanceAccess {
                 .sorted(Comparator.comparing(info -> info.getGameProfile().getName()))
                 .toList();
 
-        int colWidth = 100;
         int rowHeight = 12;
-        int maxRows = 12;
         int columnCount = (int) Math.ceil((double) players.size() / maxRows);
         int startX = sr.getScaledWidth() / 2 - (columnCount * colWidth) / 2;
         int startY = 40;
