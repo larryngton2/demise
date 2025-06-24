@@ -499,10 +499,13 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.tabList.get() && mc.gameSettings.keyBindPlayerList.isKeyDown()) {
+            String header = mc.ingameGUI.getTabList().getHeader().getFormattedText();
+            String footer = mc.ingameGUI.getTabList().getFooter().getFormattedText();
+            int headerHeight = (int) (Fonts.interRegular.get(15).getHeight() * header.split("\n").length);
+            int footerHeight = (int) (Fonts.interRegular.get(15).getHeight() * footer.split("\n").length);
             int count = (int) Math.ceil((double) mc.getNetHandler().getPlayerInfoMap().size() / 12);
             int startX = sr.getScaledWidth() / 2 - (count * 100) / 2;
-            RoundedUtils.drawShaderRound(startX - 4, 36, count * 100 + 10, Math.min(mc.getNetHandler().getPlayerInfoMap().size(), 12) * 12 + 12, 7, Color.black);
-
+            RoundedUtils.drawShaderRound(startX - 4, 36, count * 100 + 10, Math.min(mc.getNetHandler().getPlayerInfoMap().size(), 12) * 12 + 12 + headerHeight + footerHeight, 7, Color.black);
         }
     }
 
@@ -515,21 +518,43 @@ public class CustomWidgets implements InstanceAccess {
 
         int colWidth = 100;
         int rowHeight = 12;
-        int count = (int) Math.ceil((double) players.size() / 12);
-        int startX = sr.getScaledWidth() / 2 - (count * colWidth) / 2;
+        int maxRows = 12;
+        int columnCount = (int) Math.ceil((double) players.size() / maxRows);
+        int startX = sr.getScaledWidth() / 2 - (columnCount * colWidth) / 2;
         int startY = 40;
 
+        String[] headerLines = mc.ingameGUI.getTabList().getHeader().getFormattedText().split("\n");
+        for (String line : headerLines) {
+            int textWidth = Fonts.interRegular.get(15).getStringWidth(line);
+            int x = sr.getScaledWidth() / 2 - textWidth / 2;
+            Fonts.interRegular.get(15).drawStringWithShadow(line, x, startY, Color.white.getRGB());
+            startY += Fonts.interRegular.get(15).getHeight();
+        }
+
+        int playerListStartY = startY;
+
         for (int i = 0; i < players.size(); i++) {
-            int col = i / 12;
-            int row = i % 12;
+            int col = i / maxRows;
+            int row = i % maxRows;
 
             int x = startX + col * colWidth;
-            int y = startY + row * rowHeight;
+            int y = playerListStartY + row * rowHeight;
 
             NetworkPlayerInfo info = players.get(i);
             String name = mc.ingameGUI.getTabList().getPlayerName(info);
 
             Fonts.interRegular.get(15).drawStringWithShadow(name, x, y, Color.white.getRGB());
+        }
+
+        int rowsUsed = Math.min(players.size(), maxRows);
+        startY = playerListStartY + rowsUsed * rowHeight;
+
+        String[] footerLines = mc.ingameGUI.getTabList().getFooter().getFormattedText().split("\n");
+        for (String line : footerLines) {
+            int textWidth = Fonts.interRegular.get(15).getStringWidth(line);
+            int x = sr.getScaledWidth() / 2 - textWidth / 2;
+            Fonts.interRegular.get(15).drawStringWithShadow(line, x, startY, Color.white.getRGB());
+            startY += Fonts.interRegular.get(15).getHeight();
         }
     }
 
