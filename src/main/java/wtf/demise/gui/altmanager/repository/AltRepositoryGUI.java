@@ -70,11 +70,6 @@ import static net.minecraft.util.EnumChatFormatting.RED;
 import static wtf.demise.features.modules.impl.visual.Shaders.stencilFramebuffer;
 
 public class AltRepositoryGUI extends GuiScreen {
-    static final int PLAYER_BOX_WIDTH = 320;
-    static final int PLAYER_BOX_HEIGHT = 36;
-    static final float PLAYER_BOX_SPACE = 3F;
-    static final int VERTICAL_MARGIN = 40;
-    static final int SCROLL_ALTS = 1;
 
     @NonNull
     private final Demise demise;
@@ -102,12 +97,8 @@ public class AltRepositoryGUI extends GuiScreen {
         return s.toLowerCase().startsWith(this.searchField.getText().trim().toLowerCase()) ? alt : null;
     }, EnumSort.DATE::getComparator);
 
-    private final DynamicTexture viewportTexture = new DynamicTexture(256, 256);
     @Getter
     private String tokenContent = "";
-
-    private int panoramaTimer;
-    private static final ResourceLocation[] titlePanoramaPaths = new ResourceLocation[]{new ResourceLocation("textures/gui/title/background/panorama_0.png"), new ResourceLocation("textures/gui/title/background/panorama_1.png"), new ResourceLocation("textures/gui/title/background/panorama_2.png"), new ResourceLocation("textures/gui/title/background/panorama_3.png"), new ResourceLocation("textures/gui/title/background/panorama_4.png"), new ResourceLocation("textures/gui/title/background/panorama_5.png")};
 
     public AltRepositoryGUI(@NonNull Demise demise) {
         this.demise = demise;
@@ -120,10 +111,6 @@ public class AltRepositoryGUI extends GuiScreen {
                 this.tokenContent = "";
             }
         }
-    }
-
-    public void updateScreen() {
-        ++this.panoramaTimer;
     }
 
     @Override
@@ -249,36 +236,6 @@ public class AltRepositoryGUI extends GuiScreen {
                     e.printStackTrace();
                 }
                 break;
-            /*case 72:
-                try {
-                    String url = JOptionPane.showInputDialog("TokenXGP URL:");
-
-                    String ua = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0";
-
-                    String token = HttpUtil.get(new URL(url), ua);
-
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Authorization", "Bearer "+token);
-                    headers.put("User-Agent", "MojangSharp/0.1");
-                    headers.put("Charset", "UTF-8");
-                    headers.put("connection", "keep-alive");
-                    String playerStatsRaw = HttpUtil.get(new URL("https://api.minecraftservices.com/minecraft/profile"), headers);
-                    JSONObject playerStats = new JSONObject(playerStatsRaw);
-                    String name = playerStats.getString("name");
-                    String uuid = playerStats.getString("id");
-
-                    if (!Alt.accountCheck(token))
-                        break;
-
-                    Session session = new Session(name, uuid, token, "msa");
-                    mc.session = session;
-
-                    demise.getNotificationManager().post(NotificationType.OKAY,"Logged in! " + name);
-                } catch (Throwable e) {
-                    demise.getNotificationManager().post(NotificationType.WARNING,"Oops, something went wrong. Maybe ur token expired?");
-                    e.printStackTrace();
-                }
-                break;*/
         }
     }
 
@@ -299,8 +256,8 @@ public class AltRepositoryGUI extends GuiScreen {
         int usedColumns = Math.min(maxColumns, totalAlts);
         int rows = (int) Math.ceil((double) totalAlts / (double) maxColumns);
 
-        float totalGridWidth = usedColumns * 150 + (usedColumns - 1) * PLAYER_BOX_SPACE;
-        float totalGridHeight = rows * PLAYER_BOX_HEIGHT + (rows - 1) * PLAYER_BOX_SPACE;
+        float totalGridWidth = usedColumns * 150 + (usedColumns - 1) * 3f;
+        float totalGridHeight = rows * 36 + (rows - 1) * 3f;
 
         float startX = AltRepositoryGUI.width / 2f - totalGridWidth / 2f;
         float startY = AltRepositoryGUI.height / 2f - totalGridHeight / 2f;
@@ -311,19 +268,19 @@ public class AltRepositoryGUI extends GuiScreen {
             int column = i % maxColumns;
             int row = i / maxColumns;
 
-            float x = startX + column * (150 + PLAYER_BOX_SPACE);
-            int y = (int) (startY + row * (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE));
+            float x = startX + column * (150 + 3f);
+            int y = (int) (startY + row * (36 + 3f));
 
             if (alt.mouseClicked(150, x, y, mouseX, mouseY)) {
                 return;
             }
         }
 
-        if (mouseX >= 3 && mouseX <= 3 + 9 && mouseY >= VERTICAL_MARGIN && mouseY <= VERTICAL_MARGIN + this.sliderHeight) {
-            final float perAlt = (this.sliderHeight - VERTICAL_MARGIN) / this.alts.size();
-            boolean b = mouseY >= VERTICAL_MARGIN + perAlt * this.scrolled;
+        if (mouseX >= 3 && mouseX <= 3 + 9 && mouseY >= 40 && mouseY <= 40 + this.sliderHeight) {
+            final float perAlt = (this.sliderHeight - 40) / this.alts.size();
+            boolean b = mouseY >= 40 + perAlt * this.scrolled;
 
-            if (b && mouseY <= Math.min(VERTICAL_MARGIN + perAlt * this.visibleAltsCount, this.sliderHeight) + VERTICAL_MARGIN + perAlt * this.scrolled) {
+            if (b && mouseY <= Math.min(40 + perAlt * this.visibleAltsCount, this.sliderHeight) + 40 + perAlt * this.scrolled) {
                 this.dragging = true;
             } else {
                 setScrolledAndUpdate(this.scrolled + MathHelper.ceiling_double_int(this.alts.size() / 5.0D) * (b ? 1 : -1));
@@ -332,13 +289,6 @@ public class AltRepositoryGUI extends GuiScreen {
 
         this.searchField.mouseClicked(mouseX, mouseY, mouseButton);
 
-    }
-
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##");
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-
-    static {
-        DECIMAL_FORMAT.setGroupingSize(3);
     }
 
     @Getter
@@ -356,7 +306,7 @@ public class AltRepositoryGUI extends GuiScreen {
             this.searchField.setText(oldSearchField.getText());
         }
 
-        this.sliderHeight = -VERTICAL_MARGIN + height + -DOWN_MARGIN;
+        this.sliderHeight = -40 + height + -DOWN_MARGIN;
         final int oldVisibleAltsCount = this.visibleAltsCount;
         this.visibleAltsCount = getVisibleAltsCount();
 
@@ -378,9 +328,6 @@ public class AltRepositoryGUI extends GuiScreen {
 
         this.buttonList.add(new GuiButton(4, GuiScreen.width - width - 5, y, width, 20, "Back"));
         this.buttonList.add(new GuiButton(3, GuiScreen.width - width * 2 - 10, y, width, 20, "Refresh"));
-
-        //this.buttonList.add(new GuiCustomButton("TokenXGP (URL)", 72, this.width - 150, 2, 75, 20, 8, Fonts.interSemiBold.get(16)));
-        //this.buttonList.add(new GuiCustomButton("TokenLogin", 70, this.width - 70, 2, 55, 20, 8, Fonts.interSemiBold.get(16)));
     }
 
     private static final float DOWN_MARGIN = 5;
@@ -403,7 +350,7 @@ public class AltRepositoryGUI extends GuiScreen {
 
             if (this.dragging) {
                 int sliderValue = MathHelper
-                        .clamp_int(mouseY - VERTICAL_MARGIN, 0, (int) this.sliderHeight - VERTICAL_MARGIN);
+                        .clamp_int(mouseY - 40, 0, (int) this.sliderHeight - 40);
                 final int altIndex = (int) (sliderValue / this.sliderHeight * this.alts.size());
 
                 setScrolledAndUpdate(altIndex);
@@ -412,7 +359,7 @@ public class AltRepositoryGUI extends GuiScreen {
             this.searchField.drawTextBox();
 
             if (StringUtils.isBlank(searchField.getText()) && !searchField.isFocused()) {
-                mc.fontRendererObj.drawStringWithShadow("Search...", width / 2 - 94, 11, 0xFF888888);
+                mc.fontRendererObj.drawStringWithShadow("Search...", width / 2f - 94, 11, 0xFF888888);
             }
 
             if (!this.alts.isEmpty()) {
@@ -451,8 +398,8 @@ public class AltRepositoryGUI extends GuiScreen {
         int usedColumns = Math.min(maxColumns, totalAlts);
         int rows = (int) Math.ceil((double) totalAlts / (double) maxColumns);
 
-        float totalGridWidth = usedColumns * 150 + (usedColumns - 1) * PLAYER_BOX_SPACE;
-        float totalGridHeight = rows * PLAYER_BOX_HEIGHT + (rows - 1) * PLAYER_BOX_SPACE;
+        float totalGridWidth = usedColumns * 150 + (usedColumns - 1) * 3f;
+        float totalGridHeight = rows * 36 + (rows - 1) * 3f;
 
         float startX = AltRepositoryGUI.width / 2f - totalGridWidth / 2f;
         float startY = AltRepositoryGUI.height / 2f - totalGridHeight / 2f;
@@ -463,15 +410,12 @@ public class AltRepositoryGUI extends GuiScreen {
             int column = i % maxColumns;
             int row = i / maxColumns;
 
-            float x = startX + column * (150 + PLAYER_BOX_SPACE);
-            int y = (int) (startY + row * (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE));
+            float x = startX + column * (150 + 3f);
+            int y = (int) (startY + row * (36 + 3f));
 
             alt.drawAlt(150, x, y, mouseX, mouseY);
         }
     }
-
-    private static final int SCROLL_BAR_EMPTY_COLOR = new Color(0, 0, 0, 50).getRGB();
-    private static final int SCROLL_BAR_SELECTED_COLOR = new Color(255, 255, 255, 30).getRGB();
 
     private int scrolled;
     private List<Alt> visibleAlts;
@@ -505,9 +449,9 @@ public class AltRepositoryGUI extends GuiScreen {
         if (mouse == 0) {
             return;
         } else if (mouse < 0) {
-            newValue = this.scrolled + SCROLL_ALTS;
+            newValue = this.scrolled + 1;
         } else {
-            newValue = this.scrolled - SCROLL_ALTS;
+            newValue = this.scrolled - 1;
         }
 
         if (newValue >= 0 && newValue <= altsCount - this.visibleAltsCount) {
@@ -517,7 +461,7 @@ public class AltRepositoryGUI extends GuiScreen {
 
     private int getVisibleAltsCount() {
         final int columns = 4;
-        final float rows = (height - VERTICAL_MARGIN) / (PLAYER_BOX_HEIGHT + PLAYER_BOX_SPACE);
+        final float rows = (height - 40) / (36 + 3f);
         return MathHelper.floor_float(rows) * columns;
     }
 
@@ -531,18 +475,6 @@ public class AltRepositoryGUI extends GuiScreen {
 
         final List<String> lines = Files.readAllLines(dataPath);
         return !lines.isEmpty() ? this.tokenContent = lines.get(0) : null;
-    }
-
-    @Nullable
-    public Alt getRandomAlt() {
-        List<Alt> alts = this.alts.stream().filter(alt1 -> !alt1.isInvalid()).toList();
-
-        if (alts.isEmpty()) return null;
-
-        final Alt alt = alts.get(alts.size() == 1 ? 0 : ThreadLocalRandom.current().nextInt(0, alts.size() - 1));
-        alt.select();
-
-        return alt;
     }
 
     public Alt getSelectedAlt() {
@@ -625,7 +557,7 @@ public class AltRepositoryGUI extends GuiScreen {
                     case Keyboard.KEY_NUMPADENTER:
                     case Keyboard.KEY_RETURN: {
                         final Alt alt = getSelectedAlt();
-                        if (alt != null) alt.logIn(true);
+                        if (alt != null) alt.logIn();
 
                         break;
                     }
@@ -810,7 +742,6 @@ public class AltRepositoryGUI extends GuiScreen {
     }
 
     private enum EnumSort {
-
         DATE("Date", (o1, o2) -> 0);
         private final String criteria;
         @Getter
@@ -820,17 +751,9 @@ public class AltRepositoryGUI extends GuiScreen {
             this.criteria = criteria;
             this.comparator = comparator;
         }
-
-        @NonNull
-        public String getCriteria() {
-            return "By " + this.criteria;
-        }
-
     }
-
 
     public List<Alt> getAlts() {
         return (List<Alt>) this.alts.getUnfiltered();
     }
-
 }

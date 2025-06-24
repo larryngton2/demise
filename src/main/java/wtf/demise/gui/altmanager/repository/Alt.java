@@ -60,10 +60,10 @@ public class Alt {
     }
 
     protected boolean mouseClicked(float width, float x, float y, int mouseX, int mouseY) {
-        if (!MouseUtils.isHovered(x, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, mouseX, mouseY)) return false;
+        if (!MouseUtils.isHovered(x, y, width, 36, mouseX, mouseY)) return false;
 
         if (Minecraft.getSystemTime() - lastClickTime < 250L) {
-            logIn(true);
+            logIn();
         } else {
             select();
         }
@@ -74,10 +74,10 @@ public class Alt {
 
     public void drawAlt(float width, float x, int y, int mouseX, int mouseY) {
         if (!shader) {
-            RoundedUtils.drawRound(x, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, new Color(!isSelected() ? DEFAULT_COLOR : SELECTED_COLOR, true));
+            RoundedUtils.drawRound(x, y, width, 36, 8, new Color(!isSelected() ? DEFAULT_COLOR : SELECTED_COLOR, true));
 
             if (triedAuthorizing() && alpha > 0) {
-                RoundedUtils.drawRound(x, y, animationX, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, new Color((int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ? SUCCESS_LOGIN_COLOR : FAILED_LOGIN_COLOR), true));
+                RoundedUtils.drawRound(x, y, animationX, 36, 8, new Color((int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ? SUCCESS_LOGIN_COLOR : FAILED_LOGIN_COLOR), true));
                 renderAltBox(width, mouseX, mouseY);
             }
 
@@ -93,21 +93,21 @@ public class Alt {
                 Fonts.interSemiBold.get(12).drawString(new String(new char[password.length()]).replace('\0', '*'), Fonts.interMedium.get(12).getStringWidth("Password: ") + x + 37, y + 25, TEXT_SELECTED_COLOR);
             }
 
-            if (repository.getCurrentAlt() == this) {
-                Fonts.interSemiBold.get(20).drawString("Logged", x + width - 45, y + AltRepositoryGUI.PLAYER_BOX_HEIGHT / 2F - 5, new Color(255, 255, 255, 50).getRGB());
+            if (AltRepositoryGUI.getCurrentAlt() == this) {
+                Fonts.interSemiBold.get(20).drawString("Logged", x + width - 45, y + 36 / 2F - 5, new Color(255, 255, 255, 50).getRGB());
             }
         } else {
-            RoundedUtils.drawShaderRound(x, y, width, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, Color.black);
+            RoundedUtils.drawShaderRound(x, y, width, 36, 8, Color.black);
 
             if (triedAuthorizing() && alpha > 0) {
-                RoundedUtils.drawShaderRound(x, y, animationX, AltRepositoryGUI.PLAYER_BOX_HEIGHT, 8, new Color((int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ? SUCCESS_LOGIN_COLOR : FAILED_LOGIN_COLOR), true));
+                RoundedUtils.drawShaderRound(x, y, animationX, 36, 8, new Color((int) Math.max(0, alpha) << 24 | (isLoginSuccessful() ? SUCCESS_LOGIN_COLOR : FAILED_LOGIN_COLOR), true));
                 renderAltBox(width, mouseX, mouseY);
             }
         }
     }
 
     private void drawSkull(@NotNull FakeEntityPlayer player, int scrolled, float x) {
-        RenderUtils.renderPlayerHead(player, x, scrolled + 2, AltRepositoryGUI.PLAYER_BOX_HEIGHT - 4, 12);
+        RenderUtils.renderPlayerHead(player, x, scrolled + 2, 36 - 4, 12);
     }
 
     private final TimerUtils timer = new TimerUtils();
@@ -129,16 +129,15 @@ public class Alt {
 
     private long lastTimeAlreadyLogged;
 
-    public CompletableFuture<Session> logIn(boolean trippsol) {
+    public void logIn() {
         CompletableFuture<Session> sessionCompletableFuture = CompletableFuture.supplyAsync(() -> {
             Session session = null;
 
             if (!isLoggingIn() && !isLoginSuccessful()) {
                 setLoggingIn(true);
 
-                if (credential instanceof MicrosoftAltCredential) {
+                if (credential instanceof MicrosoftAltCredential cast) {
                     try {
-                        final MicrosoftAltCredential cast = (MicrosoftAltCredential) credential;
 
                         Map.Entry<String, String> authRefreshTokens = Auth.refreshToken(cast.getRefreshToken());
                         String xblToken = Auth.authXBL(authRefreshTokens.getKey());
@@ -151,7 +150,7 @@ public class Alt {
                             Minecraft.getMinecraft().session = session;
 
                             repository.getAlts().forEach(Alt::resetLogged);
-                            repository.setCurrentAlt(Alt.this);
+                            AltRepositoryGUI.setCurrentAlt(Alt.this);
                             setGameProfile(session.getProfile());
                             setLoginProperty(true);
                             setInvalid(false);
@@ -171,7 +170,7 @@ public class Alt {
                             super.onLoginSuccess(type, session);
 
                             repository.getAlts().forEach(Alt::resetLogged);
-                            repository.setCurrentAlt(Alt.this);
+                            AltRepositoryGUI.setCurrentAlt(Alt.this);
                             setGameProfile(session.getProfile());
                             setLoginProperty(true);
                             setInvalid(false);
@@ -207,7 +206,7 @@ public class Alt {
             return session;
         }, ForkJoinPool.commonPool());
 
-        return sessionCompletableFuture.whenCompleteAsync((session, throwable) -> {
+        sessionCompletableFuture.whenCompleteAsync((session, throwable) -> {
             if (throwable != null) {
                 Demise.LOGGER.warn("An error occurred while logging in!", throwable);
                 return;
@@ -417,5 +416,4 @@ public class Alt {
 
         return true;
     }
-
 }

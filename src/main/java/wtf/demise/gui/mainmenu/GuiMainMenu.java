@@ -27,7 +27,7 @@ public class GuiMainMenu extends GuiScreen {
     private final List<MenuButton> buttons = List.of(
             new MenuButton("Singleplayer"),
             new MenuButton("Multiplayer"),
-            new MenuButton("Alt Manager"),
+            new MenuButton("Alt manager"),
             new MenuButton("Options")
     );
 
@@ -114,12 +114,11 @@ public class GuiMainMenu extends GuiScreen {
             button.width = buttonWidth;
             button.height = buttonHeight;
             button.radius = 7;
-            //button.buttonType = MenuButton.ButtonType.VANILLA;
             button.clickAction = () -> {
                 switch (button.text) {
                     case "Singleplayer" -> mc.displayGuiScreen(new GuiSelectWorld(this));
                     case "Multiplayer" -> mc.displayGuiScreen(new GuiMultiplayer(this));
-                    case "Alt Manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
+                    case "Alt manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
                     case "Options" -> mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
                 }
             };

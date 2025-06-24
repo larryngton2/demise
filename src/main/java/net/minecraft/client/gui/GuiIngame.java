@@ -313,7 +313,6 @@ public class GuiIngame extends Gui {
                 zLevel = -90.0F;
             } else {
                 if (this.mc.getRenderViewEntity() instanceof EntityPlayer entityplayer) {
-
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     this.mc.getTextureManager().bindTexture(widgetsTexPath);
                     int i = sr.getScaledWidth() / 2;

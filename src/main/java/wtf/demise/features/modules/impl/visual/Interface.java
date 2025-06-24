@@ -39,8 +39,8 @@ public class Interface extends Module {
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module list"));
     private final ModeValue colorMode = new ModeValue("Color mode", new String[]{"Winter", "Blend", "Mango", "Snowy sky", "Miko", "Satin", "Gothic"}, "Winter", this);
     private final SliderValue fadeSpeed = new SliderValue("Fade speed", 1, 1, 10, 1, this);
-    private final ModeValue bgStyle = new ModeValue("Background style", new String[]{"Transparent", "Opaque", "Custom"}, "Transparent", this, () -> elements.isEnabled("Module List"));
-    private final ColorValue bgColor = new ColorValue("Background color", new Color(21, 21, 21), this, () -> bgStyle.is("Custom"));
+    public final ModeValue bgStyle = new ModeValue("Background style", new String[]{"Transparent", "Opaque", "Custom"}, "Transparent", this, () -> elements.isEnabled("Module List"));
+    public final ColorValue bgColor = new ColorValue("Background color", new Color(21, 21, 21), this, () -> bgStyle.is("Custom"));
     public final SliderValue bgAlpha = new SliderValue("Background alpha", 204, 1, 255, 1, this, () -> bgStyle.is("Custom"));
     public final BoolValue chatCombine = new BoolValue("Chat combine", true, this);
     public final BoolValue funy = new BoolValue("funy", false, this);
@@ -157,7 +157,7 @@ public class Interface extends Module {
                 yield new Color(234, 234, 234);
             }
             // ofc I had to add her
-            // and Ik that Miko is a real name
+            // and ik that Miko is a real name
             case "Miko" -> {
                 color1 = new Color(255, 100, 100);
                 yield new Color(255, 255, 255);

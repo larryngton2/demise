@@ -105,7 +105,7 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (renderText) {
-            Fonts.interRegular.get(35).drawCenteredString("Logged in as " + mc.thePlayer.getName() + " on " + PlayerUtils.getCurrServer(), sr.getScaledWidth() / 2, 50, new Color(255, 255, 255, (int) tAlpha).getRGB());
+            Fonts.interRegular.get(35).drawCenteredString("Logged in as " + mc.thePlayer.getName() + " on " + PlayerUtils.getCurrServer(), sr.getScaledWidth() / 2f, 50, new Color(255, 255, 255, (int) tAlpha).getRGB());
 
             if (textTimer.hasTimeElapsed(2500)) {
                 if (textFadeTimer.hasTimeElapsed(10)) {
@@ -131,11 +131,12 @@ public class CustomWidgets implements InstanceAccess {
     }
 
     private void drawCustomHotbar(int i) {
-        if (x == 0) x = i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20;
+        float targetPos = i - 91 + SpoofSlotUtils.getSpoofedSlot() * 20;
 
-        x = MathUtils.interpolate(x, i - 90 + SpoofSlotUtils.getSpoofedSlot() * 20, 0.25f);
+        if (x == 0) x = targetPos;
+        x = MathUtils.interpolate(x, targetPos, 0.25f);
 
-        RoundedUtils.drawRound(i - 90, sr.getScaledHeight() - 26, 181, 21, 7, new Color(getModule(Interface.class).bgColor(), true));
+        RoundedUtils.drawRound(i - 91, sr.getScaledHeight() - 26, 181, 21, 7, new Color(getModule(Interface.class).bgColor(), true));
         RoundedUtils.drawRound(x, sr.getScaledHeight() - 26, 21, 21, 7, new Color(getModule(Interface.class).bgColor(), true).darker());
 
         Gui.zLevel = f;
@@ -146,7 +147,7 @@ public class CustomWidgets implements InstanceAccess {
         RenderHelper.enableGUIStandardItemLighting();
 
         for (int j = 0; j < 9; ++j) {
-            float k = i - 90 + (j * 20) + 2.5f;
+            float k = i - 91 + (j * 20) + 2.5f;
             float l = sr.getScaledHeight() - 23.5f;
             GuiIngame.renderHotbarItem(j, k, l, mc.timer.partialTicks, mc.thePlayer);
         }
@@ -434,7 +435,7 @@ public class CustomWidgets implements InstanceAccess {
 
                 if (j == collection.size()) {
                     String s3 = objective.getDisplayName();
-                    Fonts.interRegular.get(15).drawStringWithShadow(s3, l1 + i / 2 - Fonts.interRegular.get(15).getStringWidth(s3) / 2, y - mc.fontRendererObj.FONT_HEIGHT, -1);
+                    Fonts.interRegular.get(15).drawStringWithShadow(s3, l1 + i / 2f - Fonts.interRegular.get(15).getStringWidth(s3) / 2f, y - mc.fontRendererObj.FONT_HEIGHT, -1);
                 }
             }
         } else {
@@ -468,11 +469,11 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.hotbar.get()) {
-            RoundedUtils.drawShaderRound(i - 90, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
+            RoundedUtils.drawShaderRound(i - 91, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
 
-            if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
+            //if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
                 RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
-            }
+            //}
         }
 
         if (customWidgetsModule.chat.get()) {

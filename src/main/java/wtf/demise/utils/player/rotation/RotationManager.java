@@ -2,6 +2,7 @@ package wtf.demise.utils.player.rotation;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.MathHelper;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
@@ -117,6 +118,12 @@ public class RotationManager implements InstanceAccess {
     @EventTarget
     @EventPriority(-100)
     public void onPacket(final PacketEvent e) {
+        // how did I forget this
+        if (e.getPacket() instanceof S08PacketPlayerPosLook s08) {
+            currentRotation[0] = s08.getYaw();
+            currentRotation[1] = s08.getPitch();
+        }
+
         if (!(e.getPacket() instanceof C03PacketPlayer packetPlayer)) return;
 
         if (!packetPlayer.rotating) {

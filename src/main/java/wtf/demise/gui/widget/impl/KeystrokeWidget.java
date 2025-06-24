@@ -63,8 +63,17 @@ public class KeystrokeWidget extends Widget {
                 width -= 1.7f;
                 height -= 1.7f;
 
+                int alpha;
+
+                alpha = switch (setting.bgStyle.get()) {
+                    case "Transparent" -> 120;
+                    case "Opaque" -> 204;
+                    case "Custom" -> setting.bgColor.get().getAlpha();
+                    default -> 100;
+                };
+
                 Color c = new Color(setting.color()).darker().darker().darker().darker().darker();
-                color = new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) setting.bgAlpha.get());
+                color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
             } else {
                 color = new Color(setting.bgColor(), true);
             }

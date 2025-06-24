@@ -2,8 +2,7 @@ package wtf.demise.gui.font;
 
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjglx.opengl.GLContext;
-import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.misc.Test;
+import wtf.demise.utils.misc.ChatUtils;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -164,7 +163,7 @@ public class FontRenderer {
             offset += drawChar(chr, x + offset, y);
         }
         glPopMatrix();
-        return offset;
+        return offset / 2;
     }
 
     public float getMiddleOfBox(float height) {
@@ -219,13 +218,8 @@ public class FontRenderer {
                 g.drawString(chr, x * fontWidth, y * fontHeight + fontMetrics.getAscent());
             }
         glBindTexture(GL_TEXTURE_2D, textureId);
-        if (!Demise.INSTANCE.getModuleManager().getModule(Test.class).fuckFontRenderer.get()) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        } else {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-        }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageToBuffer(img));
         return textureId;
     }
@@ -313,8 +307,9 @@ public class FontRenderer {
             ++index;
             final String character = valueOf(ch);
 
+            float width = getStringWidth(character);
             drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB());
-            x += getStringWidth(character) + 0.25f;
+            x += width;
         }
     }
 
@@ -328,8 +323,9 @@ public class FontRenderer {
             ++index;
             final String character = valueOf(ch);
 
+            float width = getStringWidth(character);
             drawString(character, x, y, colorSupplier.colour(index).getRGB(), false);
-            x += getStringWidth(character) + 0.25f;
+            x += width;
         }
     }
 
