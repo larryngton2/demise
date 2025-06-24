@@ -3,6 +3,7 @@ package wtf.demise.gui.ingame;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,6 +38,7 @@ import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,6 +81,10 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         drawHotbarWidget(i, false);
+
+        if (customWidgetsModule.tabList.get()) {
+            drawTabList();
+        }
 
         if (customWidgetsModule.chat.get()) {
             drawChat(GuiIngame.getUpdateCounter(), false);
@@ -490,6 +496,40 @@ public class CustomWidgets implements InstanceAccess {
 
         if (customWidgetsModule.scoreboard.get()) {
             drawScoreboard(scoreObjective, sr, true);
+        }
+
+        if (customWidgetsModule.tabList.get() && mc.gameSettings.keyBindPlayerList.isKeyDown()) {
+            int count = (int) Math.ceil((double) mc.getNetHandler().getPlayerInfoMap().size() / 12);
+            int startX = sr.getScaledWidth() / 2 - (count * 100) / 2;
+            RoundedUtils.drawShaderRound(startX - 4, 36, count * 100 + 10, Math.min(mc.getNetHandler().getPlayerInfoMap().size(), 12) * 12 + 12, 7, Color.black);
+
+        }
+    }
+
+    void drawTabList() {
+        if (!mc.gameSettings.keyBindPlayerList.isKeyDown()) return;
+        Collection<NetworkPlayerInfo> xd = mc.getNetHandler().getPlayerInfoMap();
+        List<NetworkPlayerInfo> players = xd.stream()
+                .sorted(Comparator.comparing(info -> info.getGameProfile().getName()))
+                .toList();
+
+        int colWidth = 100;
+        int rowHeight = 12;
+        int count = (int) Math.ceil((double) players.size() / 12);
+        int startX = sr.getScaledWidth() / 2 - (count * colWidth) / 2;
+        int startY = 40;
+
+        for (int i = 0; i < players.size(); i++) {
+            int col = i / 12;
+            int row = i % 12;
+
+            int x = startX + col * colWidth;
+            int y = startY + row * rowHeight;
+
+            NetworkPlayerInfo info = players.get(i);
+            String name = mc.ingameGUI.getTabList().getPlayerName(info);
+
+            Fonts.interRegular.get(15).drawStringWithShadow(name, x, y, Color.white.getRGB());
         }
     }
 
