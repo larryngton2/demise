@@ -291,7 +291,8 @@ public class GuiIngame extends Gui {
 
         if (this.mc.gameSettings.keyBindPlayerList.isKeyDown() && (!this.mc.isIntegratedServerRunning() || this.mc.thePlayer.sendQueue.getPlayerInfoMap().size() > 1 || scoreobjective1 != null)) {
             this.overlayPlayerList.updatePlayerList(true);
-            this.overlayPlayerList.renderPlayerlist(i, scoreboard, scoreobjective1);
+            if(!Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).isEnabled() && !Demise.INSTANCE.getModuleManager().getModule(CustomWidgetsModule.class).tabList.get())
+                this.overlayPlayerList.renderPlayerlist(i, scoreboard, scoreobjective1);
         } else {
             this.overlayPlayerList.updatePlayerList(false);
         }
