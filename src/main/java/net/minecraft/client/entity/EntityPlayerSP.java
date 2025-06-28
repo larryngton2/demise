@@ -34,6 +34,7 @@ import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
+import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.rotation.RotationManager;
 
@@ -122,7 +123,7 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 
         boolean flag = this.isSprinting();
 
-        if (flag != this.serverSprintState && !Demise.INSTANCE.getModuleManager().getModule(Sprint.class).silent.get()) {
+        if (flag != this.serverSprintState && !Demise.INSTANCE.getModuleManager().getModule(Sprint.class).silent.get() && !(Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).sprintMode.is("Silent"))) {
             if (flag) {
                 this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.START_SPRINTING));
             } else {
@@ -130,6 +131,12 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             }
 
             this.reSprint = 1;
+            this.serverSprintState = flag;
+        }
+
+        if (flag != this.serverSprintState && !(!Demise.INSTANCE.getModuleManager().getModule(Sprint.class).silent.get() && !(Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).sprintMode.is("Silent")))) {
+            this.sendQueue.addToSendQueue(new C0BPacketEntityAction(this, C0BPacketEntityAction.Action.STOP_SPRINTING));
+
             this.serverSprintState = flag;
         }
 

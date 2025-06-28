@@ -41,10 +41,6 @@ import wtf.demise.utils.render.RenderUtils;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.toDegrees;
-import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
-
 @ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.", category = ModuleCategory.Player)
 public class Scaffold extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly", "GodBridge"}, "Normal", this);
@@ -53,49 +49,52 @@ public class Scaffold extends Module {
     private final SliderValue maxTellyTicks = new SliderValue("Max Telly Ticks", 4, 1, 5, this, () -> mode.is("Telly"));
     private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "GodBridge", "Derp", "Reverse"}, "Normal", this);
     private final BoolValue staticify = new BoolValue("Static-ify", false, this, () -> !rotations.is("Normal") && !rotations.is("Center"));
-    private final SliderValue minSearch = new SliderValue("Min search", 0.1f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
-    private final SliderValue maxSearch = new SliderValue("Max search", 0.9f, 0.01f, 1f, 0.01f, this, () -> rotations.is("Normal"));
     private final BoolValue clutch = new BoolValue("Clutch", false, this);
     private final ModeValue clutchCriteria = new ModeValue("Clutch criteria", new String[]{"MouseOver", "Prediction"}, "MouseOver", this, clutch::get);
     private final ModeValue clutchRotMode = new ModeValue("Clutch rotation mode", new String[]{"Normal", "Center"}, "Center", this, clutch::get);
-    private final SliderValue minCSearch = new SliderValue("Min C search", 0.1f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
-    private final SliderValue maxCSearch = new SliderValue("Max C search", 0.9f, 0.01f, 1f, 0.01f, this, () -> clutchRotMode.canDisplay() && clutchRotMode.is("Normal"));
     private final BoolValue instantRots = new BoolValue("Instant clutch rots", false, this, clutch::get);
+    private final BoolValue smartRotSpeed = new BoolValue("Smart clutch rot speed", false, this, () -> clutch.get() && !instantRots.get());
+    private final BoolValue autoSneakOnClutch = new BoolValue("Auto sneak on clutch", false, this, clutch::get);
+    private final SliderValue groundTicksToSneak = new SliderValue("Ground ticks to sneak", 5, 0, 10, this, () -> clutch.get() && autoSneakOnClutch.get());
     private final RotationHandler rotationHandler = new RotationHandler(this);
-    private final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Ground", "Air", "None"}, "Normal", this);
+    public final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Silent", "Ground", "Air", "None"}, "Normal", this);
+    private final ModeValue speedMode = new ModeValue("Speed mode", new String[]{"Tick", "Exempt", "None"}, "None", this);
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
             new BoolValue("Swing", true),
             new BoolValue("Ignore tick cycle", false),
-            new BoolValue("Ray Trace", true),
-            new BoolValue("Keep Y", false),
-            new BoolValue("Speed Keep Y", false),
-            new BoolValue("Auto Jump", false),
-            new BoolValue("Safe Walk", false),
-            new BoolValue("Safe Walk When No Data", false),
+            new BoolValue("RayTrace", true),
+            new BoolValue("KeepY", false),
+            new BoolValue("Speed keepY", false),
+            new BoolValue("Jump", false),
+            new BoolValue("Safewalk", false),
+            new BoolValue("Safewalk when no data", false),
             new BoolValue("Hover", false),
             new BoolValue("Sneak", false),
-            new BoolValue("Target Block ESP", false)
+            new BoolValue("Target block ESP", false)
     ), this);
-    private final SliderValue blocksToSneak = new SliderValue("Blocks To Sneak", 7, 0, 8, this, () -> addons.isEnabled("Sneak"));
+    private final SliderValue blockToJump = new SliderValue("Blocks to jump", 6, 0, 15, this, () -> addons.isEnabled("Jump"));
+    private final BoolValue onlyStraight = new BoolValue("Only straight", true, this, () -> addons.isEnabled("Jump"));
+    private final SliderValue blocksToSneak = new SliderValue("Blocks to sneak", 7, 0, 15, this, () -> addons.isEnabled("Sneak"));
     private final BoolValue onlySneakOnGround = new BoolValue("Only sneak on ground", true, this, () -> addons.isEnabled("Sneak"));
     private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> mode.is("Normal"));
-    private final ModeValue towerMove = new ModeValue("Tower Move", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> mode.is("Normal"));
+    private final ModeValue towerMove = new ModeValue("Tower move", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> mode.is("Normal"));
     private final SliderValue pullDownMotion = new SliderValue("PullDown motion", 0.95f, 0.5f, 1, 0.01f, this, () -> towerMove.is("PullDown"));
 
     private BlockPos previousBlock;
     public BlockPos targetBlock;
     private double onGroundY;
     private int oldSlot = -1;
-    private int blocksPlaced;
+    private int blocksPlacedSneak, blocksPlacedJump;
     private int tellyTicks;
     public boolean placed;
-    public PlaceData data;
+    private PlaceData data;
     private boolean isOnRightSide;
     private float yaw, pitch;
     private float initialYaw, initialPitch;
     private boolean clutching;
     private boolean startClutch;
-    private final TimerUtils clutchTime = new TimerUtils();
+    private final TimerUtils clutchTimer = new TimerUtils();
+    private final TimerUtils sneakTimer = new TimerUtils();
 
     private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
             Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
@@ -124,12 +123,14 @@ public class Scaffold extends Module {
         mc.thePlayer.inventory.currentItem = oldSlot;
         SpoofSlotUtils.stopSpoofing();
 
-        blocksPlaced = 0;
+        blocksPlacedJump = 0;
+        blocksPlacedSneak = 0;
         tellyTicks = 0;
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
     }
 
-    private void updateState() {
+    @EventTarget
+    public void onAngle(AngleEvent e) {
         mc.thePlayer.inventory.currentItem = getBlockSlot();
         SpoofSlotUtils.startSpoofing(oldSlot);
 
@@ -141,7 +142,7 @@ public class Scaffold extends Module {
 
         double posY = mc.thePlayer.getEntityBoundingBox().minY;
 
-        if ((addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
+        if ((addons.isEnabled("KeepY") || addons.isEnabled("Speed keepY") && isEnabled(Speed.class) && !mc.gameSettings.keyBindJump.isKeyDown())) {
             posY = onGroundY;
         }
 
@@ -165,7 +166,7 @@ public class Scaffold extends Module {
         }
 
         switch (sprintMode.get()) {
-            case "Normal":
+            case "Normal", "Silent":
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
                 break;
             case "Ground":
@@ -189,18 +190,18 @@ public class Scaffold extends Module {
         }
 
         if (tower.canDisplay() && (!tower.is("Jump") && towering() || !towerMove.is("Jump") && towerMoving())) {
-            blocksPlaced = 0;
+            blocksPlacedJump = 0;
+            blocksPlacedSneak = 0;
         }
-    }
 
-    private void updateRotations() {
+
         mc.entityRenderer.getMouseOver(1);
 
         if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
             switch (rotations.get()) {
                 case "Normal": {
-                    initialYaw = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[0];
-                    initialPitch = getBestRotation(data.blockPos, data.facing, minSearch.get(), maxSearch.get())[1];
+                    initialYaw = getBestRotation(data.blockPos, data.facing)[0];
+                    initialPitch = getBestRotation(data.blockPos, data.facing)[1];
                 }
                 break;
                 case "Center": {
@@ -221,17 +222,17 @@ public class Scaffold extends Module {
                     float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
 
                     initialYaw = Math.round(yaw / 45) * 45;
-                    initialPitch = staticify.get() ? 75.7f : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                    initialPitch = staticify.get() ? 75.7f : getBestRotation(data.blockPos, data.facing)[1];
                 }
                 break;
                 case "Reverse": {
                     initialYaw = MoveUtil.getYawFromKeybind() - 180;
-                    initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                    initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
                 }
                 break;
                 case "Derp": {
                     initialYaw += 30;
-                    initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing, 0.1f, 0.9f)[1];
+                    initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
                 }
                 break;
             }
@@ -264,11 +265,11 @@ public class Scaffold extends Module {
                     if ((isLeaningOffBlock && nextBlockIsAir) || !MoveUtil.isMoving()) {
                         startClutch = true;
                     } else if (startClutch) {
-                        clutchTime.reset();
+                        clutchTimer.reset();
                         startClutch = false;
                     }
 
-                    clutching = startClutch || !clutchTime.hasTimeElapsed(200);
+                    clutching = startClutch || !clutchTimer.hasTimeElapsed(200);
 
                     if (clutching) {
                         setClutchRot();
@@ -284,13 +285,37 @@ public class Scaffold extends Module {
         }
     }
 
+    @EventTarget
+    public void onMotion(MotionEvent e) {
+        if (e.isPre()) {
+            switch (speedMode.get()) {
+                case "Tick":
+                    if (mc.thePlayer.onGround) {
+                        if (mc.thePlayer.ticksExisted % 15 == 0) {
+                            mc.thePlayer.motionX *= 1.5 + Math.random() / 100D;
+                            mc.thePlayer.motionZ *= 1.5 + Math.random() / 100D;
+                        } else if (mc.thePlayer.ticksExisted - 2 % 15 == 0) {
+                            mc.thePlayer.motionX *= 0.7;
+                            mc.thePlayer.motionZ *= 0.7;
+                        }
+                    }
+                    break;
+                case "Exempt":
+                    if (mc.thePlayer.onGround) {
+                        MoveUtil.strafe(mc.thePlayer.movementInput.moveStrafe == 0 ? 0.1591f : 0.1565f);
+                    }
+                    break;
+            }
+        }
+    }
+
     private void setClutchRot() {
         Vec3 hitVec = getVec3(data);
 
         switch (clutchRotMode.get()) {
             case "Normal": {
-                this.yaw = getBestRotation(data.blockPos, data.facing, minCSearch.get(), maxCSearch.get())[0];
-                this.pitch = getBestRotation(data.blockPos, data.facing, minCSearch.get(), maxCSearch.get())[1];
+                this.yaw = getBestRotation(data.blockPos, data.facing)[0];
+                this.pitch = getBestRotation(data.blockPos, data.facing)[1];
             }
             break;
             case "Center": {
@@ -299,12 +324,13 @@ public class Scaffold extends Module {
             }
             break;
         }
-    }
 
-    @EventTarget
-    public void onAngle(AngleEvent e) {
-        updateState();
-        updateRotations();
+        if (smartRotSpeed.get() && !instantRots.get()) {
+            if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos)) {
+                rotationHandler.setRandYawSpeed(180);
+                rotationHandler.setRandPitchSpeed(180);
+            }
+        }
     }
 
     private void place() {
@@ -319,7 +345,7 @@ public class Scaffold extends Module {
 
         rotationHandler.updateRotSpeed(e);
 
-        if (!addons.isEnabled("Ignore tick cycle") || (clutching && addons.isEnabled("Ray Trace"))) {
+        if (!addons.isEnabled("Ignore tick cycle") || (clutching && addons.isEnabled("RayTrace"))) {
             place();
         }
     }
@@ -327,7 +353,7 @@ public class Scaffold extends Module {
     @EventTarget
     public void onGameUpdate(GameEvent e) {
         if (addons.isEnabled("Ignore tick cycle")) {
-            if (addons.isEnabled("Ray Trace")) {
+            if (addons.isEnabled("RayTrace")) {
                 if (!clutching) {
                     placeAlternative();
                 }
@@ -351,7 +377,8 @@ public class Scaffold extends Module {
                         mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
                     }
 
-                    blocksPlaced += 1;
+                    blocksPlacedJump++;
+                    blocksPlacedSneak++;
                     placed = true;
                 }
 
@@ -369,29 +396,30 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onSafeWalk(SafeWalkEvent event) {
-        if (addons.isEnabled("Safe Walk") && mc.thePlayer.onGround || addons.isEnabled("Safe Walk When No Data") && data == null) {
+        if (addons.isEnabled("Safewalk") && mc.thePlayer.onGround || addons.isEnabled("Safewalk when no data") && data == null) {
             event.setCancelled(true);
         }
     }
 
     @EventTarget
     public void onMovementInput(MoveInputEvent e) {
-        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
-            return;
+        if (addons.isEnabled("Jump")) {
+            if (blocksPlacedJump > blockToJump.get() || !mc.thePlayer.onGround || (onlyStraight.get() && !MoveUtil.isMovingStraight()) || !MoveUtil.isMoving()) {
+                blocksPlacedJump = 0;
+            }
 
-        //todo
-        if (mode.is("GodBridge")) {
-            MovingObjectPosition ray = RotationUtils.rayTraceSafe(new float[]{initialYaw, initialPitch}, 4.5, 1);
+            if (blocksPlacedJump == blockToJump.get()) {
+                e.setJumping(true);
+            }
+        }
 
-            if ((ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || ray.getBlockPos().distanceSq(data.blockPos.offset(data.facing)) > 1)) {
-                if (resetMode.is("Jump")) {
-                    if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
-                        e.setJumping(true);
-                    }
-                    ChatUtils.sendMessageClient("wtf");
-                } else {
-                    e.setSneaking(true);
-                }
+        if (clutch.get()) {
+            if (clutching && autoSneakOnClutch.get() && mc.thePlayer.onGroundTicks >= groundTicksToSneak.get() && MoveUtil.isMoving()) {
+                sneakTimer.reset();
+            }
+
+            if (!sneakTimer.hasTimeElapsed(100)) {
+                e.setSneaking(true);
             }
         }
 
@@ -400,11 +428,11 @@ public class Scaffold extends Module {
                 return;
             }
 
-            if (blocksPlaced > blocksToSneak.get()) {
-                blocksPlaced = 0;
+            if (blocksPlacedSneak > blocksToSneak.get()) {
+                blocksPlacedSneak = 0;
             }
 
-            if (blocksPlaced == blocksToSneak.get()) {
+            if (blocksPlacedSneak == blocksToSneak.get()) {
                 e.setSneaking(true);
             }
         }
@@ -412,11 +440,26 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onStrafe(StrafeEvent e) {
-        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
-            return;
-
         if (mc.thePlayer.onGround) {
-            if ((addons.isEnabled("Auto Jump") || mode.is("Telly")) && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
+            //todo
+            if (mode.is("GodBridge")) {
+                MovingObjectPosition ray = RotationUtils.rayTraceSafe(new float[]{initialYaw, initialPitch}, 4.5, 1);
+
+                if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
+                    if (resetMode.is("Jump")) {
+                        if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
+                            mc.thePlayer.jump();
+                        }
+                        ChatUtils.sendMessageClient("wtf");
+                    } else {
+                        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), true);
+                    }
+                } else if (resetMode.is("Sneak")) {
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), false);
+                }
+            }
+
+            if (mode.is("Telly") && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
                 if (mode.is("Telly") && !mc.thePlayer.isSprinting()) {
                     return;
                 }
@@ -512,7 +555,7 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onRender3D(Render3DEvent e) {
-        if (addons.isEnabled("Target Block ESP")) {
+        if (addons.isEnabled("Target block ESP")) {
             RenderUtils.renderBlock(data.blockPos.offset(data.facing), getModule(Interface.class).color(0, 100), false, true);
         }
     }
@@ -575,7 +618,7 @@ public class Scaffold extends Module {
     }
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
-        if (!addons.isEnabled("Ray Trace")) {
+        if (!addons.isEnabled("RayTrace")) {
             if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, facing, hitVec)) {
                 if (addons.isEnabled("Swing")) {
                     mc.thePlayer.swingItem();
@@ -583,14 +626,15 @@ public class Scaffold extends Module {
                 } else {
                     mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
                 }
-                blocksPlaced += 1;
+                blocksPlacedSneak++;
+                blocksPlacedJump++;
                 placed = true;
             }
             previousBlock = data.blockPos.offset(data.facing);
         } else {
             MovingObjectPosition ray = RotationUtils.rayTrace(4.5, 1);
 
-            if ((!addons.isEnabled("Keep Y") && !addons.isEnabled("Speed Keep Y") && ray.getBlockPos().distanceSq(pos) <= 1) || ((addons.isEnabled("Keep Y") || addons.isEnabled("Speed Keep Y")) && ray.getBlockPos().equalsBlockPos(pos))) {
+            if ((!addons.isEnabled("KeepY") && !addons.isEnabled("Speed keepY") && ray.getBlockPos().distanceSq(pos) <= 1) || ((addons.isEnabled("KeepY") || addons.isEnabled("Speed keepY")) && ray.getBlockPos().equalsBlockPos(pos))) {
                 if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
                     if (addons.isEnabled("Swing")) {
                         mc.thePlayer.swingItem();
@@ -598,7 +642,8 @@ public class Scaffold extends Module {
                     } else {
                         mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
                     }
-                    blocksPlaced += 1;
+                    blocksPlacedSneak++;
+                    blocksPlacedJump++;
                     placed = true;
                 }
             }
@@ -672,45 +717,45 @@ public class Scaffold extends Module {
         return null;
     }
 
-    private float[] getBestRotation(BlockPos blockPos, EnumFacing face, float min, float max) {
+    private float[] getBestRotation(BlockPos blockPos, EnumFacing face) {
         Vec3i faceVec = face.getDirectionVec();
 
         float minX, maxX, minY, maxY, minZ, maxZ;
 
         if (faceVec.getX() == 0) {
-            minX = min;
-            maxX = max;
+            minX = 0.1f;
+            maxX = 0.9f;
         } else if (faceVec.getX() == 1) {
             minX = maxX = 1.0f;
         } else if (faceVec.getX() == -1) {
             minX = maxX = 0.0f;
         } else {
-            minX = min;
-            maxX = max;
+            minX = 0.1f;
+            maxX = 0.9f;
         }
 
         if (faceVec.getY() == 0) {
-            minY = min;
-            maxY = max;
+            minY = 0.1f;
+            maxY = 0.9f;
         } else if (faceVec.getY() == 1) {
             minY = maxY = 1.0f;
         } else if (faceVec.getY() == -1) {
             minY = maxY = 0.0f;
         } else {
-            minY = min;
-            maxY = max;
+            minY = 0.1f;
+            maxY = 0.9f;
         }
 
         if (faceVec.getZ() == 0) {
-            minZ = min;
-            maxZ = max;
+            minZ = 0.1f;
+            maxZ = 0.9f;
         } else if (faceVec.getZ() == 1) {
             minZ = maxZ = 1.0f;
         } else if (faceVec.getZ() == -1) {
             minZ = maxZ = 0.0f;
         } else {
-            minZ = min;
-            maxZ = max;
+            minZ = 0.1f;
+            maxZ = 0.9f;
         }
 
         float[] bestRot = RotationUtils.getRotations(getVec3(data));

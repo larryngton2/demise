@@ -61,10 +61,10 @@ public class BedNuker extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && getModule(Scaffold.class).data == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
-            reset(true);
-            return;
-        }
+//        if (Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled() && getModule(Scaffold.class).data == null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) {
+//            reset(true);
+//            return;
+//        }
 
         rotationHandler.updateRotSpeed(e);
 

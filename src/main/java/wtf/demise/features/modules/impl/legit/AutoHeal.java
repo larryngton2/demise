@@ -16,6 +16,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.InventoryUtils;
+import wtf.demise.utils.player.PlayerUtils;
 
 @ModuleInfo(name = "AutoHeal", description = "Automatically heals you.", category = ModuleCategory.Legit)
 public class AutoHeal extends Module {

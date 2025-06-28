@@ -49,7 +49,7 @@ public class Velocity extends Module {
     public void onUpdate(UpdateEvent e) {
         if (onSwing.get() && !mc.thePlayer.isSwingInProgress) return;
 
-        if (PlayerUtils.nullCheck() && mc.thePlayer.maxHurtTime > 0) {
+        if (mc.thePlayer.maxHurtTime > 0) {
             if (chance.get() != 100.0D && rand.nextInt(100) <= chance.get()) {
                 return;
             }
@@ -143,7 +143,7 @@ public class Velocity extends Module {
                         }
                     }
 
-                    if (vertical.get() != 100 && vertical.get() != 0) {
+                    if (vertical.get() != 100) {
                         if (vertical.get() != 0) {
                             packet.motionY *= (int) (vertical.get() / 100);
                         } else {

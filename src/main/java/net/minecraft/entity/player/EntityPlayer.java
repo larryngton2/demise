@@ -92,6 +92,8 @@ public abstract class EntityPlayer extends EntityLivingBase {
     public final GameProfile gameProfile;
     private boolean hasReducedDebug = false;
     public EntityFishHook fishEntity;
+    public double distanceFromPlayerX, lastDistanceFromPlayerX;
+    public double distanceFromPlayerZ, lastDistanceFromPlayerZ;
 
     public EntityPlayer(World worldIn, GameProfile gameProfileIn) {
         super(worldIn);

@@ -140,21 +140,6 @@ public class RotationUtils implements InstanceAccess {
         return new Vec3(ex, ey, ez);
     }
 
-    public static float getYaw(@NotNull BlockPos pos) {
-        return getYaw(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5));
-    }
-
-    public static float getYaw(@NotNull AbstractClientPlayer from, @NotNull Vec3 pos) {
-        return from.rotationYaw +
-                MathHelper.wrapAngleTo180_float(
-                        (float) toDegrees(atan2(pos.zCoord - from.posZ, pos.xCoord - from.posX)) - 90f - from.rotationYaw
-                );
-    }
-
-    public static float getYaw(@NotNull Vec3 pos) {
-        return getYaw(mc.thePlayer, pos);
-    }
-
     public static float getPitch(@NotNull BlockPos pos) {
         return getPitch(new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5));
     }

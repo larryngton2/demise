@@ -115,8 +115,7 @@ public class TickBase extends Module {
                     simulatedSelf.getPos(),
                     simulatedSelf.fallDistance,
                     simulatedSelf.onGround,
-                    simulatedSelf.isCollidedHorizontally,
-                    simulatedSelf.player
+                    simulatedSelf.isCollidedHorizontally
             );
 
             predictProcess.tick = i;

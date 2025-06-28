@@ -1,5 +1,6 @@
 package wtf.demise.utils.player;
 
+import lombok.experimental.UtilityClass;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,40 +16,39 @@ import wtf.demise.utils.player.rotation.RotationManager;
 
 import java.util.Arrays;
 
-import static java.lang.Math.toRadians;
-
+@UtilityClass
 public class MoveUtil implements InstanceAccess {
-    public static final double BASE_JUMP_HEIGHT = 0.41999998688698;
+    public double BASE_JUMP_HEIGHT = 0.41999998688698;
 
-    public static boolean isMoving() {
+    public boolean isMoving() {
         return isMoving(mc.thePlayer);
     }
 
-    public static boolean isMoving(EntityLivingBase player) {
+    public boolean isMoving(EntityLivingBase player) {
         return player != null && (player.moveForward != 0F || player.moveStrafing != 0F);
     }
 
-    public static boolean isMovingMotion(EntityLivingBase player) {
+    public boolean isMovingMotion(EntityLivingBase player) {
         return player != null && (player.motionX != 0 || player.motionZ != 0);
     }
 
-    public static double getSpeed(EntityPlayer player) {
+    public double getSpeed(EntityPlayer player) {
         return Math.sqrt(player.motionX * player.motionX + player.motionZ * player.motionZ);
     }
 
-    public static double getSpeed() {
+    public double getSpeed() {
         return getSpeed(mc.thePlayer);
     }
 
-    public static void strafe() {
+    public void strafe() {
         strafe(getSpeed(), 1);
     }
 
-    public static void strafe(double speed) {
+    public void strafe(double speed) {
         strafe(speed, 1);
     }
 
-    public static void strafe(double speed, double strength) {
+    public void strafe(double speed, double strength) {
         double motionX = mc.thePlayer.motionX;
         double motionZ = mc.thePlayer.motionZ;
 
@@ -62,7 +62,7 @@ public class MoveUtil implements InstanceAccess {
         mc.thePlayer.motionZ = motionZ + (mc.thePlayer.motionZ - motionZ) * strength;
     }
 
-    public static void bop(double s) {
+    public void bop(double s) {
         double forward = mc.thePlayer.movementInput.moveForward;
         double strafe = mc.thePlayer.movementInput.moveStrafe;
         float yaw = mc.thePlayer.rotationYaw;
@@ -93,7 +93,7 @@ public class MoveUtil implements InstanceAccess {
         }
     }
 
-    public static float getRawDirectionRotation(float yaw, float pStrafe, float pForward) {
+    public float getRawDirectionRotation(float yaw, float pStrafe, float pForward) {
         float rotationYaw = yaw;
 
         if (pForward < 0F)
@@ -114,50 +114,50 @@ public class MoveUtil implements InstanceAccess {
         return rotationYaw;
     }
 
-    public static float getRawDirection() {
+    public float getRawDirection() {
         return getRawDirectionRotation(mc.thePlayer.rotationYaw, mc.thePlayer.moveStrafing, mc.thePlayer.moveForward);
     }
 
-    public static int getSpeedEffect(EntityPlayer player) {
+    public int getSpeedEffect(EntityPlayer player) {
         return player.isPotionActive(Potion.moveSpeed) ? player.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 : 0;
     }
 
-    public static int getSpeedEffect() {
+    public int getSpeedEffect() {
         return getSpeedEffect(mc.thePlayer);
     }
 
-    public static void stopXZ() {
+    public void stopXZ() {
         mc.thePlayer.motionX = mc.thePlayer.motionZ = 0;
     }
 
-    public static void stop() {
+    public void stop() {
         mc.thePlayer.motionX = mc.thePlayer.motionY = mc.thePlayer.motionZ = 0;
     }
 
-    public static double getBPS() {
+    public double getBPS() {
         return getBPS(mc.thePlayer);
     }
 
-    public static double getBPS(EntityPlayer player) {
+    public double getBPS(EntityPlayer player) {
         if (player == null || player.ticksExisted < 1) {
             return 0.0;
         }
         return getDistance(player.lastTickPosX, player.lastTickPosZ) * (20.0f * mc.timer.timerSpeed);
     }
 
-    public static double getDistance(final double x, final double z) {
-        final double xSpeed = mc.thePlayer.posX - x;
-        final double zSpeed = mc.thePlayer.posZ - z;
+    public double getDistance(double x, double z) {
+        double xSpeed = mc.thePlayer.posX - x;
+        double zSpeed = mc.thePlayer.posZ - z;
         return MathHelper.sqrt_double(xSpeed * xSpeed + zSpeed * zSpeed);
     }
 
-    public static boolean isMovingStraight() {
+    public boolean isMovingStraight() {
         float direction = getYawFromKeybind() + 180;
         float movingYaw = Math.round(direction / 45) * 45;
         return movingYaw % 90 == 0f;
     }
 
-    public static boolean canSprint(final boolean legit) {
+    public boolean canSprint(boolean legit) {
         return (legit ? mc.thePlayer.moveForward >= 0.8F
                 && !mc.thePlayer.isCollidedHorizontally
                 && (mc.thePlayer.getFoodStats().getFoodLevel() > 6 || mc.thePlayer.capabilities.allowFlying)
@@ -167,15 +167,15 @@ public class MoveUtil implements InstanceAccess {
                 : enoughMovementForSprinting());
     }
 
-    public static boolean enoughMovementForSprinting() {
+    public boolean enoughMovementForSprinting() {
         return Math.abs(mc.thePlayer.moveForward) >= 0.8F || Math.abs(mc.thePlayer.moveStrafing) >= 0.8F;
     }
 
-    public static boolean isGoingDiagonally(double amount) {
+    public boolean isGoingDiagonally(double amount) {
         return Math.abs(mc.thePlayer.motionX) > amount && Math.abs(mc.thePlayer.motionZ) > amount;
     }
 
-    public static double getBaseMoveSpeed(EntityPlayer player) {
+    public double getBaseMoveSpeed(EntityPlayer player) {
         double baseSpeed = 0.2873;
         if (player.isPotionActive(Potion.moveSpeed)) {
             int amplifier = player.getActivePotionEffect(Potion.moveSpeed).getAmplifier();
@@ -184,11 +184,11 @@ public class MoveUtil implements InstanceAccess {
         return baseSpeed;
     }
 
-    public static double getBaseMoveSpeed() {
+    public double getBaseMoveSpeed() {
         return getBaseMoveSpeed(mc.thePlayer);
     }
 
-    public static double getJumpHeight() {
+    public double getJumpHeight() {
         double jumpY = BASE_JUMP_HEIGHT;
 
         if (mc.thePlayer.isPotionActive(Potion.jump)) {
@@ -198,11 +198,11 @@ public class MoveUtil implements InstanceAccess {
         return jumpY;
     }
 
-    public static void jump(MoveEvent event) {
+    public void jump(MoveEvent event) {
         event.setY(mc.thePlayer.motionY = getJumpHeight());
     }
 
-    public static double predictedMotionY(final double motion, final int ticks) {
+    public double predictedMotionY(double motion, int ticks) {
         if (ticks == 0) return motion;
         double predicted = motion;
 
@@ -213,7 +213,7 @@ public class MoveUtil implements InstanceAccess {
         return predicted;
     }
 
-    public static double direction(float rotationYaw, final double moveForward, final double moveStrafing) {
+    public double direction(float rotationYaw, double moveForward, double moveStrafing) {
         if (moveForward < 0F) rotationYaw += 180F;
 
         float forward = 1F;
@@ -227,11 +227,11 @@ public class MoveUtil implements InstanceAccess {
         return Math.toRadians(rotationYaw);
     }
 
-    public static void fixMovement(MoveInputEvent event, float yaw) {
+    public void fixMovement(MoveInputEvent event, float yaw) {
         fixMovement(event, yaw, mc.thePlayer.rotationYaw);
     }
 
-    public static void fixMovement(MoveInputEvent event, float yaw, float playerYaw) {
+    public void fixMovement(MoveInputEvent event, float yaw, float playerYaw) {
         float forward = event.getForward();
         float strafe = event.getStrafe();
 
@@ -261,17 +261,17 @@ public class MoveUtil implements InstanceAccess {
         event.setStrafe(closestStrafe);
     }
 
-    public static void moveFlying(double increase) {
+    public void moveFlying(double increase) {
         if (!MoveUtil.isMoving()) return;
-        final double yaw = getDirection();
+        double yaw = getDirection();
         mc.thePlayer.motionX += -MathHelper.sin((float) yaw) * increase;
         mc.thePlayer.motionZ += MathHelper.cos((float) yaw) * increase;
     }
 
-    public static void useDiagonalSpeed() {
+    public void useDiagonalSpeed() {
         KeyBinding[] gameSettings = new KeyBinding[]{mc.gameSettings.keyBindForward, mc.gameSettings.keyBindRight, mc.gameSettings.keyBindBack, mc.gameSettings.keyBindLeft};
 
-        final int[] down = {0};
+        int[] down = {0};
 
         Arrays.stream(gameSettings).forEach(keyBinding -> down[0] = down[0] + (keyBinding.isKeyDown() ? 1 : 0));
 
@@ -279,16 +279,16 @@ public class MoveUtil implements InstanceAccess {
 
         if (!active) return;
 
-        final double groundIncrease = (0.1299999676734952 - 0.12739998266255503) + 1E-7 - 1E-8;
-        final double airIncrease = (0.025999999334873708 - 0.025479999685988748) - 1E-8;
-        final double increase = mc.thePlayer.onGround ? groundIncrease : airIncrease;
+        double groundIncrease = (0.1299999676734952 - 0.12739998266255503) + 1E-7 - 1E-8;
+        double airIncrease = (0.025999999334873708 - 0.025479999685988748) - 1E-8;
+        double increase = mc.thePlayer.onGround ? groundIncrease : airIncrease;
 
         moveFlying(increase);
     }
 
-    private static float yaw = 0;
+    private float yaw = 0;
 
-    public static float getDir() {
+    public float getDir() {
         if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindLeft.isKeyDown()) {
             yaw = 45f;
         } else if (mc.gameSettings.keyBindForward.isKeyDown() && mc.gameSettings.keyBindRight.isKeyDown()) {
@@ -310,11 +310,11 @@ public class MoveUtil implements InstanceAccess {
         return yaw;
     }
 
-    public static float getYawFromKeybind() {
+    public float getYawFromKeybind() {
         return mc.thePlayer.rotationYaw - getDir();
     }
 
-    public static float getDirection() {
+    public float getDirection() {
         float dir;
 
         TargetStrafe targetStrafe = Demise.INSTANCE.getModuleManager().getModule(TargetStrafe.class);
@@ -325,10 +325,10 @@ public class MoveUtil implements InstanceAccess {
             dir = mc.thePlayer.rotationYaw - getDir();
         }
 
-        return (float) toRadians(dir);
+        return (float) Math.toRadians(dir);
     }
 
-    public static double getDirection(float moveForward, float moveStrafing, float rotationYaw) {
+    public double getDirection(float moveForward, float moveStrafing, float rotationYaw) {
         if (moveForward < 0) {
             rotationYaw += 180;
         }
@@ -352,11 +352,11 @@ public class MoveUtil implements InstanceAccess {
         return Math.toRadians(rotationYaw);
     }
 
-    public static void holdS(MoveInputEvent e) {
-        final float forward = e.getForward();
-        final float strafe = e.getStrafe();
+    public void holdS(MoveInputEvent e) {
+        float forward = e.getForward();
+        float strafe = e.getStrafe();
 
-        final double angle = MathHelper.wrapAngleTo180_double(RotationManager.currentRotation[0] - 180);
+        double angle = MathHelper.wrapAngleTo180_double(RotationManager.currentRotation[0] - 180);
         if (forward == 0 && strafe == 0) {
             return;
         }
@@ -367,8 +367,8 @@ public class MoveUtil implements InstanceAccess {
             for (float predictedStrafe = -1F; predictedStrafe <= 1F; predictedStrafe += 1F) {
                 if (predictedStrafe == 0 && predictedForward == 0) continue;
 
-                final double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection(predictedForward, predictedStrafe, mc.thePlayer.rotationYaw)));
-                final double difference = MathUtils.wrappedDifference(angle, predictedAngle);
+                double predictedAngle = MathHelper.wrapAngleTo180_double(Math.toDegrees(MoveUtil.getDirection(predictedForward, predictedStrafe, mc.thePlayer.rotationYaw)));
+                double difference = MathUtils.wrappedDifference(angle, predictedAngle);
 
                 if (difference < closestDifference) {
                     closestDifference = (float) difference;

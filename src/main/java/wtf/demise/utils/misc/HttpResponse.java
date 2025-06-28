@@ -1,5 +1,10 @@
 package wtf.demise.utils.misc;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class HttpResponse {
     private int code;
     private String content;
@@ -9,24 +14,8 @@ public class HttpResponse {
         this.content = content;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String toString() {
-        return new StringBuilder("[ code = ").append(code)
-                .append(" , content = ").append(content).append(" ]").toString();
+        return "[ code = " + code +
+                " , content = " + content + " ]";
     }
 }

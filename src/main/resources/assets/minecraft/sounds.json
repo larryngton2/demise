@@ -2057,5 +2057,11 @@
     "sounds": [
       "demise/tick"
     ]
+  },
+  "demise.boot": {
+    "category": "master",
+    "sounds": [
+      "demise/startupmac"
+    ]
   }
 }

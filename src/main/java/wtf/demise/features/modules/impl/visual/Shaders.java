@@ -10,7 +10,7 @@ import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.shader.impl.Blur;
 import wtf.demise.utils.render.shader.impl.Shadow;
 
-@ModuleInfo(name = "Shaders", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Shaders", description = "Renders shaders in HUD elements.", category = ModuleCategory.Visual)
 public class Shaders extends Module {
     public final BoolValue blur = new BoolValue("Blur", true, this);
     public final BoolValue shadow = new BoolValue("Shadow", true, this);

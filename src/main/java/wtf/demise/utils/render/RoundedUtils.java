@@ -28,20 +28,6 @@ public class RoundedUtils implements InstanceAccess {
         drawGradientRound(x, y, width, height, radius, left, left, right, right);
     }
 
-    public static void drawGradientVertical(float x, float y, float width, float height, float radius, Color top, Color bottom) {
-        drawGradientRound(x, y, width, height, radius, bottom, top, bottom, top);
-    }
-
-    public static void drawGradientCornerLR(float x, float y, float width, float height, float radius, Color topLeft, Color bottomRight) {
-        Color mixedColor = ColorUtils.interpolateColorC(topLeft, bottomRight, .5f);
-        drawGradientRound(x, y, width, height, radius, mixedColor, topLeft, bottomRight, mixedColor);
-    }
-
-    public static void drawGradientCornerRL(float x, float y, float width, float height, float radius, Color bottomLeft, Color topRight) {
-        Color mixedColor = ColorUtils.interpolateColorC(topRight, bottomLeft, .5f);
-        drawGradientRound(x, y, width, height, radius, bottomLeft, mixedColor, mixedColor, topRight);
-    }
-
     public static void drawGradientRound(float x, float y, float width, float height, float radius, Color bottomLeft, Color topLeft, Color bottomRight, Color topRight) {
         RenderUtils.setAlphaLimit(0);
         RenderUtils.resetColor();
@@ -113,19 +99,6 @@ public class RoundedUtils implements InstanceAccess {
 
         ShaderUtils.drawQuads(x - (2 + outlineThickness), y - (2 + outlineThickness), width + (4 + outlineThickness * 2), height + (4 + outlineThickness * 2));
         roundedOutlineShader.unload();
-        GLUtils.endBlend();
-    }
-
-    public static void drawRoundTextured(float x, float y, float width, float height, float radius, float alpha) {
-        RenderUtils.resetColor();
-        RenderUtils.setAlphaLimit(0);
-        GLUtils.startBlend();
-        roundedTexturedShader.init();
-        roundedTexturedShader.setUniformi("textureIn", 0);
-        setupRoundedRectUniforms(x, y, width, height, radius, roundedTexturedShader);
-        roundedTexturedShader.setUniformf("alpha", alpha);
-        ShaderUtils.drawQuads(x - 1, y - 1, width + 2, height + 2);
-        roundedTexturedShader.unload();
         GLUtils.endBlend();
     }
 

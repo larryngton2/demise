@@ -9,7 +9,7 @@ import wtf.demise.features.values.impl.ModeValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "Cape", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Cape", description = "Renders a cape on your player.", category = ModuleCategory.Visual)
 public class Cape extends Module {
     public final ModeValue capeMode = new ModeValue("Cape mode", new String[]{"Default", "Normal", "Minecraft", "Rise", "What the fuck."}, "Normal", this);
     public final ModeValue riseMode = new ModeValue("Rise cape mode", new String[]{"Normal", "Red", "Green", "Blue", "Dogshit"}, "Normal", this, () -> capeMode.is("Rise"));

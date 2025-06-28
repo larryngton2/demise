@@ -1,6 +1,7 @@
 package wtf.demise.utils.packet;
 
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -13,8 +14,9 @@ import wtf.demise.utils.misc.ChatUtils;
 import javax.script.ScriptException;
 import java.util.Arrays;
 
+@UtilityClass
 public class NetworkAPI implements InstanceAccess {
-    public final static Class<Packet<INetHandlerPlayServer>>[] serverbound = new Class[]{
+    public Class<Packet<INetHandlerPlayServer>>[] serverbound = new Class[]{
             C00PacketKeepAlive.class,
             C01PacketChatMessage.class,
             C02PacketUseEntity.class,
@@ -42,7 +44,7 @@ public class NetworkAPI implements InstanceAccess {
             C18PacketSpectate.class,
             C19PacketResourcePackStatus.class,
     };
-    public final static Class<Packet<INetHandlerPlayClient>>[] clientbound = new Class[]{
+    public Class<Packet<INetHandlerPlayClient>>[] clientbound = new Class[]{
             S00PacketKeepAlive.class,
             S01PacketJoinGame.class,
             S02PacketChat.class,
@@ -117,7 +119,7 @@ public class NetworkAPI implements InstanceAccess {
     };
 
     @SneakyThrows
-    private static Packet<?> instantiatePacket(final EnumPacketDirection direction, final int id, final Object... params) {
+    private Packet<?> instantiatePacket(final EnumPacketDirection direction, final int id, final Object... params) {
         Packet<?> packet = null;
         try {
             if (direction == EnumPacketDirection.CLIENTBOUND) {

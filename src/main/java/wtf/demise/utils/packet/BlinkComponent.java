@@ -22,12 +22,6 @@ public final class BlinkComponent implements InstanceAccess {
     public static final ConcurrentLinkedQueue<Packet<?>> packets = new ConcurrentLinkedQueue<>();
     public static boolean blinking;
     public static ArrayList<Class<?>> exemptedPackets = new ArrayList<>();
-    public static TimerUtils exemptionWatch = new TimerUtils();
-
-    public static void setExempt(Class<?>... packets) {
-        exemptedPackets = new ArrayList<>(Arrays.asList(packets));
-        exemptionWatch.reset();
-    }
 
     @EventTarget
     @EventPriority(-1)

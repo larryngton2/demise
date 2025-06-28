@@ -31,7 +31,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@ModuleInfo(name = "NameTags", category = ModuleCategory.Visual)
+@ModuleInfo(name = "NameTags", description = "Renders player nametags.", category = ModuleCategory.Visual)
 public class NameTags extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Modern"}, "Modern", this);
     private final SliderValue offsetY = new SliderValue("Offset Y", 0, -20, 20, 1, this);

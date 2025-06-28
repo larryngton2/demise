@@ -15,8 +15,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.MovementCorrection;
-import wtf.demise.utils.player.rotation.OldRotationUtils;
+import wtf.demise.utils.player.rotation.BasicRotations;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -55,6 +54,8 @@ public class Speed extends Module {
 
     private final SliderValue hopTicks = new SliderValue("Hop ticks", 5, 1, 6, 1, this, () -> mode.is("Miniblox"));
 
+    private final BoolValue damageBoost = new BoolValue("Damage boost", false, this);
+    private final SliderValue boostSpeed = new SliderValue("Boost speed", 0.5f, 0.01f, 1f, 0.01f, this, damageBoost::get);
     private final ModeValue yawOffsetMode = new ModeValue("Yaw offset", new String[]{"None", "Ground", "Air", "Constant"}, "Air", this);
     private final BoolValue minSpeedLimiter = new BoolValue("Min speed limiter", false, this);
     private final SliderValue minSpeed = new SliderValue("Min speed", 0.25f, 0, 1, 0.01f, this, minSpeedLimiter::get);
@@ -105,17 +106,21 @@ public class Speed extends Module {
         switch (yawOffsetMode.get()) {
             case "Ground":
                 if (mc.thePlayer.onGround) {
-                    OldRotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                    BasicRotations.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, true, 180, 180);
                 }
                 break;
             case "Air":
                 if (!mc.thePlayer.onGround) {
-                    OldRotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                    BasicRotations.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, true, 180, 180);
                 }
                 break;
             case "Constant":
-                OldRotationUtils.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, MovementCorrection.Silent, 180, 180);
+                BasicRotations.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, true, 180, 180);
                 break;
+        }
+
+        if (mc.thePlayer.hurtTime >= 9 && damageBoost.get()) {
+            MoveUtil.strafe(boostSpeed.get());
         }
 
         switch (mode.get()) {
@@ -141,7 +146,7 @@ public class Speed extends Module {
 
                         mc.timer.timerSpeed = 1f;
                         break;
-                    case "Old Hop":
+                    case "Old hop":
                         if (MoveUtil.isMoving() && !mc.thePlayer.isInWater()) {
                             double spd = 0.0025 * speedMulti.get();
                             double m = (float) (Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX + mc.thePlayer.motionZ * mc.thePlayer.motionZ) + spd);

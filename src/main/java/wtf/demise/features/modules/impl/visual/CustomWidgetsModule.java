@@ -5,7 +5,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 
-@ModuleInfo(name = "CustomWidgets", category = ModuleCategory.Visual)
+@ModuleInfo(name = "CustomWidgets", description = "Edits the vanilla HUD widgets.", category = ModuleCategory.Visual)
 public class CustomWidgetsModule extends Module {
     public final BoolValue hotbar = new BoolValue("Hotbar", true, this);
     public final BoolValue scoreboard = new BoolValue("Scoreboard", true, this);

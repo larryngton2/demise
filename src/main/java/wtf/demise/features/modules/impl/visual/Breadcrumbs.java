@@ -5,7 +5,6 @@ import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-@ModuleInfo(name = "Breadcrumbs", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Breadcrumbs", description = "Renders a trail behind you.", category = ModuleCategory.Visual)
 public class Breadcrumbs extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Line", "Dot"}, "Line", this);
     private final SliderValue timeout = new SliderValue("Time", 15, 1, 150, 1, this);

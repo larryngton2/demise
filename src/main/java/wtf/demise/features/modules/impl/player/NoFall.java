@@ -1,135 +1,160 @@
 package wtf.demise.features.modules.impl.player;
 
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import wtf.demise.events.annotations.EventTarget;
+
+import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.player.MotionEvent;
-import wtf.demise.events.impl.render.Render2DEvent;
+import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.SimulatedPlayer;
+import wtf.demise.utils.player.rotation.BasicRotations;
+import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @ModuleInfo(name = "NoFall", description = "Mitigates fall damage.", category = ModuleCategory.Player)
 public class NoFall extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"NoGround", "Extra", "Blink", "Watchdog"}, "NoGround", this);
-    public final SliderValue distance = new SliderValue("Fall distance", 3, 0, 8, 1, this, () -> !mode.is("NoGround"));
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Packet", "On ground", "Off ground", "Clutch"}, "Packet", this);
+    private final SliderValue fallDistance = new SliderValue("Fall distance", 3, 0, 10, 1, this, () -> !mode.is("Off ground"));
+    private final SliderValue predictTicks = new SliderValue("Max predict ticks", 5, 0, 100, 1, this, () -> mode.is("Clutch"));
+    private final SliderValue keepTicks = new SliderValue("Keep ticks", 2, 0, 10, 1, this, () -> mode.is("Clutch"));
 
-    private boolean blinked = false;
-    private boolean prevOnGround = false;
-    private double fallDistance = 0;
-    private boolean timed = false;
-
-    @Override
-    public void onEnable() {
-        if (PlayerUtils.nullCheck())
-            fallDistance = mc.thePlayer.fallDistance;
-    }
-
-    @Override
-    public void onDisable() {
-        if (blinked) {
-            BlinkComponent.dispatch();
-            blinked = false;
-        }
-        mc.timer.timerSpeed = 1f;
-    }
+    private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
+    private Vec3 targetPos;
+    private int oldSlot;
+    private boolean setSlot;
+    private final TimerUtils keepSlotTimer = new TimerUtils();
+    private boolean clicked;
 
     @EventTarget
-    public void onMotion(MotionEvent event) {
+    public void onMotion(MotionEvent e) {
         setTag(mode.get());
-        if (!PlayerUtils.nullCheck())
-            return;
-
-        if (event.isPost())
-            return;
-
-        if (mc.thePlayer.onGround)
-            fallDistance = 0;
-        else {
-            fallDistance += (float) Math.max(mc.thePlayer.lastTickPosY - event.getY(), 0);
-
-            fallDistance -= MoveUtil.predictedMotionY(mc.thePlayer.motionY, 1);
-        }
-
-        if (mc.thePlayer.capabilities.allowFlying) return;
-
-        if (isVoid()) {
-            if (blinked) {
-                BlinkComponent.dispatch();
-                blinked = false;
-            }
-            return;
-        }
 
         switch (mode.get()) {
-            case "NoGround":
-                event.setOnGround(false);
-                break;
-
-            case "Extra":
-                float extra$fallDistance = mc.thePlayer.fallDistance;
-                mc.timer.timerSpeed = 1f;
-                if (extra$fallDistance - mc.thePlayer.motionY > distance.get()) {
-                    mc.timer.timerSpeed = 0.5f;
-                    mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
+            case "Packet":
+                if (mc.thePlayer.fallDistance > fallDistance.get()) {
+                    PacketUtils.sendPacket(new C03PacketPlayer(true));
                     mc.thePlayer.fallDistance = 0;
                 }
                 break;
-
-            case "Watchdog":
-                if (fallDistance >= distance.get() && !isEnabled(Scaffold.class)) {
-                    mc.timer.timerSpeed = (float) 0.5;
-                    timed = true;
-                    mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
-                    fallDistance = 0;
-                } else if (timed) {
-                    mc.timer.timerSpeed = 1;
-                    timed = false;
+            case "On ground":
+                if (mc.thePlayer.fallDistance > fallDistance.get()) {
+                    e.setOnGround(true);
+                    mc.thePlayer.fallDistance = 0;
                 }
                 break;
-            case "Blink":
-                if (mc.thePlayer.onGround) {
-                    if (blinked) {
-                        BlinkComponent.dispatch();
-                        blinked = false;
-                    }
-
-                    prevOnGround = true;
-                } else if (prevOnGround) {
-                    if (shouldBlink()) {
-                        if (!BlinkComponent.blinking)
-                            BlinkComponent.blinking = true;
-                        blinked = true;
-                    }
-
-                    prevOnGround = false;
-                } else if (PlayerUtils.isBlockUnder() && BlinkComponent.blinking && (fallDistance - mc.thePlayer.motionY) >= distance.get()) {
-                    mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
-                    fallDistance = 0.0F;
-                }
+            case "Off ground":
+                e.setOnGround(false);
                 break;
         }
     }
 
     @EventTarget
-    public void onRender2D(Render2DEvent event) {
-        ScaledResolution sr = new ScaledResolution(mc);
-        if (mode.is("Blink")) {
-            if (blinked)
-                mc.fontRendererObj.drawStringWithShadow("Blinking: " + BlinkComponent.packets.size(), (float) sr.getScaledWidth() / 2.0F - (float) mc.fontRendererObj.getStringWidth("Blinking: " + BlinkComponent.packets.size()) / 2.0F, (float) sr.getScaledHeight() / 2.0F + 13.0F, -1);
+    public void onAngle(AngleEvent e) {
+        if (mode.is("Clutch")) {
+            if (mc.thePlayer.fallDistance > fallDistance.get()) {
+                for (PlayerUtils.PredictProcess predictProcess : selfPrediction) {
+                    if (predictProcess.isInWater) {
+                        continue;
+                    }
+
+                    if (predictProcess.onGround) {
+                        targetPos = predictProcess.position;
+                        break;
+                    }
+                }
+
+                BasicRotations.setRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
+
+                mc.thePlayer.inventory.currentItem = getBucketSlot();
+                SpoofSlotUtils.startSpoofing(oldSlot);
+                setSlot = false;
+
+                if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                    if (!clicked) {
+                        KeyBinding.onTick(mc.gameSettings.keyBindUseItem.getKeyCode());
+                        clicked = true;
+                    }
+                    keepSlotTimer.reset();
+                }
+            } else {
+                if (keepSlotTimer.hasTimeElapsed(keepTicks.get() * 50L)) {
+                    if (!setSlot) {
+                        mc.thePlayer.inventory.currentItem = oldSlot;
+                        SpoofSlotUtils.stopSpoofing();
+                        setSlot = true;
+                    }
+
+                    oldSlot = mc.thePlayer.inventory.currentItem;
+                } else {
+                    BasicRotations.setRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
+                }
+
+                clicked = false;
+            }
         }
     }
 
-    private boolean isVoid() {
-        return PlayerUtils.overVoid(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
+    public int getBucketSlot() {
+        for (int i = 0; i < 9; i++) {
+            final ItemStack itemStack = mc.thePlayer.inventory.getStackInSlot(i);
+
+            if (itemStack == null) {
+                continue;
+            }
+
+            if (itemStack.getItem() == Items.water_bucket) {
+                return i;
+            }
+        }
+
+        return mc.thePlayer.inventory.currentItem;
     }
 
-    private boolean shouldBlink() {
-        return !mc.thePlayer.onGround && !PlayerUtils.isBlockUnder((int) Math.floor(distance.get())) && PlayerUtils.isBlockUnder() && !getModule(Scaffold.class).isEnabled();
+    @EventTarget
+    public void onMoveInput(MoveInputEvent e) {
+        if (!mode.is("Clutch")) {
+            return;
+        }
+
+        selfPrediction.clear();
+
+        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
+
+        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
+
+        for (int i = 0; i < predictTicks.get(); i++) {
+            simulatedSelf.tick();
+
+            PlayerUtils.PredictProcess predictProcess = new PlayerUtils.PredictProcess(
+                    simulatedSelf.getPos(),
+                    simulatedSelf.fallDistance,
+                    simulatedSelf.onGround,
+                    simulatedSelf.isCollidedHorizontally,
+                    simulatedSelf.isInWater()
+            );
+
+            predictProcess.tick = i;
+
+            selfPrediction.add(predictProcess);
+        }
     }
 }

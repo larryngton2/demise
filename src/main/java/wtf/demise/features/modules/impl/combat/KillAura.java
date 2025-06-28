@@ -29,9 +29,7 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.SimulatedPlayer;
 import wtf.demise.utils.player.rotation.RotationHandler;
-import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -54,7 +52,7 @@ public class KillAura extends Module {
     private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
     public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
     private final BoolValue failSwing = new BoolValue("Fail swing", false, this);
-    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, () -> failSwing.get());
+    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, failSwing::get);
 
     // autoBlock
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
@@ -73,7 +71,6 @@ public class KillAura extends Module {
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
     private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
-    private final SliderValue simulatedMotionMulti = new SliderValue("Simulated motion multi", 1.5f, 0.1f, 5, 0.1f, this, () -> predict.get() && predict.canDisplay());
     private final SliderValue targetOffset = new SliderValue("Normal target pos offset", 0, -5, 5, 0.01f, this);
     private final BoolValue staticMissOffset = new BoolValue("Static miss offset", true, this);
     private final SliderValue missTargetOffset = new SliderValue("Miss target pos offset", 0, -5, 5, 0.01f, this, staticMissOffset::get);
@@ -116,7 +113,7 @@ public class KillAura extends Module {
             new BoolValue("Dead", false)
     ), this);
 
-    private final List<PlayerUtils.PredictProcess> predictProcesses = new ArrayList<>();
+    private PlayerUtils.PredictProcess selfPrediction;
     private final Queue<Vec3> positionHistory = new LinkedList<>();
     private final TimerUtils lastSwitchTime = new TimerUtils();
     public List<EntityLivingBase> targets = new ArrayList<>();
@@ -513,9 +510,8 @@ public class KillAura extends Module {
     private float[] getRotations(EntityLivingBase entity) {
         Vec3 playerPos;
 
-        if (predict.get() && !predictProcesses.isEmpty()) {
-            PlayerUtils.PredictProcess predictedProcess = predictProcesses.get(predictProcesses.size() - 1);
-            playerPos = new Vec3(predictedProcess.position.xCoord, predictedProcess.position.yCoord + mc.thePlayer.getEyeHeight(), predictedProcess.position.zCoord);
+        if (predict.get() && selfPrediction != null) {
+            playerPos = new Vec3(selfPrediction.position.xCoord, selfPrediction.position.yCoord + mc.thePlayer.getEyeHeight(), selfPrediction.position.zCoord);
         } else {
             playerPos = mc.thePlayer.getPositionEyes(1);
         }
@@ -708,22 +704,6 @@ public class KillAura extends Module {
 
     @EventTarget
     public void onMove(MoveEvent e) {
-        predictProcesses.clear();
-
-        SimulatedPlayer simulatedPlayer = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, simulatedMotionMulti.get());
-
-        simulatedPlayer.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
-
-        for (int i = 0; i < predictTicks.get(); i++) {
-            simulatedPlayer.tick();
-            predictProcesses.add(
-                    new PlayerUtils.PredictProcess(
-                            simulatedPlayer.getPos(),
-                            simulatedPlayer.fallDistance,
-                            simulatedPlayer.onGround,
-                            simulatedPlayer.isCollidedHorizontally
-                    )
-            );
-        }
+        selfPrediction = PlayerUtils.predictPlayerPosition((int) predictTicks.get());
     }
 }

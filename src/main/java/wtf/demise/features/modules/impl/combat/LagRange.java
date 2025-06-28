@@ -4,7 +4,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
@@ -25,13 +24,9 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.SimulatedPlayer;
-import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 
@@ -52,7 +47,7 @@ public class LagRange extends Module {
     private final BoolValue onlyKillAura = new BoolValue("Only on killAura", false, this);
     private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
 
-    private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
+    private PlayerUtils.PredictProcess selfPrediction;
     private final TimerUtils msTimer = new TimerUtils();
     private final TimerUtils timer = new TimerUtils();
     private EntityPlayer target;
@@ -131,7 +126,7 @@ public class LagRange extends Module {
         AxisAlignedBB entityBoundingBox = target.getHitbox();
 
         double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(PlayerUtils.getPosFromAABB(entityBoundingBox).add(0, target.getEyeHeight(), 0), mc.thePlayer);
-        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.get(selfPrediction.size() - 1).position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
+        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
 
         return predictedSelfDistance < predictedTargetDistance &&
                 predictedSelfDistance <= tickRange.get() &&
@@ -139,7 +134,7 @@ public class LagRange extends Module {
                 PlayerUtils.getDistanceToEntityBox(target) >= stopRange.get() &&
                 mc.thePlayer.canEntityBeSeen(target) &&
                 target.canEntityBeSeen(mc.thePlayer) &&
-                !selfPrediction.get(selfPrediction.size() - 1).isCollidedHorizontally &&
+                !selfPrediction.isCollidedHorizontally &&
                 !mc.thePlayer.isCollidedHorizontally &&
                 mc.thePlayer.hurtTime <= hurtTimeToStop.get();
     }
@@ -147,9 +142,9 @@ public class LagRange extends Module {
     @EventTarget
     public void onRender3D(Render3DEvent e) {
         if (renderPredictedSelfPos.get() && mc.gameSettings.thirdPersonView != 0) {
-            double x = selfPrediction.get(selfPrediction.size() - 1).position.xCoord - mc.getRenderManager().viewerPosX;
-            double y = selfPrediction.get(selfPrediction.size() - 1).position.yCoord - mc.getRenderManager().viewerPosY;
-            double z = selfPrediction.get(selfPrediction.size() - 1).position.zCoord - mc.getRenderManager().viewerPosZ;
+            double x = selfPrediction.position.xCoord - mc.getRenderManager().viewerPosX;
+            double y = selfPrediction.position.yCoord - mc.getRenderManager().viewerPosY;
+            double z = selfPrediction.position.zCoord - mc.getRenderManager().viewerPosZ;
             AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1D, 0.1, 0.1);
             AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + x, box.minY - mc.thePlayer.posY + y, box.minZ - mc.thePlayer.posZ + z, box.maxX - mc.thePlayer.posX + x, box.maxY - mc.thePlayer.posY + y, box.maxZ - mc.thePlayer.posZ + z);
             RenderUtils.drawAxisAlignedBB(axis, true, false, new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).color(1, 100), true).getRGB());
@@ -183,29 +178,6 @@ public class LagRange extends Module {
 
     @EventTarget
     public void onMoveInput(MoveInputEvent e) {
-        selfPrediction.clear();
-
-        MovementInput movementInput = new MovementInput();
-
-        movementInput.moveForward = mc.thePlayer.movementInput.moveForward;
-        movementInput.moveStrafe = 0;
-        movementInput.jump = mc.thePlayer.movementInput.jump;
-        movementInput.sneak = mc.thePlayer.movementInput.sneak;
-
-        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(movementInput, 1);
-
-        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
-
-        for (int i = 0; i < lagTicks.get(); i++) {
-            simulatedSelf.tick();
-            selfPrediction.add(new PlayerUtils.PredictProcess(
-                            simulatedSelf.getPos(),
-                            simulatedSelf.fallDistance,
-                            simulatedSelf.onGround,
-                            simulatedSelf.isCollidedHorizontally,
-                            simulatedSelf.player
-                    )
-            );
-        }
+        selfPrediction = PlayerUtils.predictPlayerPosition((int) lagTicks.get());
     }
 }

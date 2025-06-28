@@ -109,7 +109,7 @@ public class ModuleComponent implements IComponent {
 
         openAnimation.setDirection(isExpanded ? Direction.FORWARDS : Direction.BACKWARDS);
 
-        RenderUtils.scissor(x, PanelGui.posY + 17 + Fonts.urbanist.get(35).getHeight(), width, 250, PanelGui.interpolatedScale);
+        RenderUtils.scissor(x, PanelGui.posY + 12 + Fonts.urbanist.get(35).getHeight(), width, 255, PanelGui.interpolatedScale);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float slideOffset = (width / 4) * (1.0f - slideProgress);
 
@@ -138,7 +138,7 @@ public class ModuleComponent implements IComponent {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (isHovered) {
-            if (visible) {
+            if (visible && mouseY > PanelGui.posY + 12 + Fonts.urbanist.get(35).getHeight()) {
                 switch (mouseButton) {
                     case 0 -> module.toggle();
                     case 1 -> isExpanded = !isExpanded;

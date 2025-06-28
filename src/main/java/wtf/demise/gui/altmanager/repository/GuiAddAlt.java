@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 
 import static net.minecraft.util.EnumChatFormatting.RED;
 import static wtf.demise.utils.misc.StringUtils.FakerMode;
-import static wtf.demise.utils.misc.StringUtils.randomName;
 
 public final class GuiAddAlt extends GuiScreen {
 
@@ -166,8 +165,7 @@ public final class GuiAddAlt extends GuiScreen {
                 });
                 break;
             case 3:
-                //wtf.demise.utils.misc.StringUtils.randomString(wtf.demise.utils.misc.StringUtils.sb, 10)
-                usernameField.setText(randomName(currFMode));
+                usernameField.setText(wtf.demise.utils.misc.StringUtils.randomName(currFMode));
                 passwordField.setText("");
                 break;
             case 5:

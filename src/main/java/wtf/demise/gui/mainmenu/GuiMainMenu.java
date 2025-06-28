@@ -28,7 +28,8 @@ public class GuiMainMenu extends GuiScreen {
             new MenuButton("Singleplayer"),
             new MenuButton("Multiplayer"),
             new MenuButton("Alt manager"),
-            new MenuButton("Options")
+            new MenuButton("Options"),
+            new MenuButton("Quit")
     );
 
     private float interpolatedX;
@@ -120,6 +121,7 @@ public class GuiMainMenu extends GuiScreen {
                     case "Multiplayer" -> mc.displayGuiScreen(new GuiMultiplayer(this));
                     case "Alt manager" -> mc.displayGuiScreen(Demise.INSTANCE.getAltRepositoryGUI());
                     case "Options" -> mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
+                    case "Quit" -> mc.shutdown();
                 }
             };
 

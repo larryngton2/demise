@@ -15,7 +15,7 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
-@ModuleInfo(name = "ChinaHat", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ChinaHat", description = "A rong rong time ago...", category = ModuleCategory.Visual)
 public class ChinaHat extends Module {
     private final ModeValue quality = new ModeValue("Quality", new String[]{
             "Not china hat anymore",

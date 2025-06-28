@@ -17,7 +17,6 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SmoothMode;
 
@@ -117,7 +116,7 @@ public class RotationHandler implements InstanceAccess {
         if (rotateLegit.get()) {
             RotationManager.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get());
         } else {
-            OldRotationUtils.setRotation(targetRotation, movementFix.get() ? MovementCorrection.Silent : MovementCorrection.None, hSpeed, vSpeed);
+            BasicRotations.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed);
         }
     }
 

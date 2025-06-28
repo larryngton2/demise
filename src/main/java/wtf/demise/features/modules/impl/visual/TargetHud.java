@@ -14,7 +14,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 
-@ModuleInfo(name = "TargetHud", category = ModuleCategory.Visual)
+@ModuleInfo(name = "TargetHud", description = "Renders a widget with the current target's info.", category = ModuleCategory.Visual)
 public class TargetHud extends Module {
     public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this);
     public final BoolValue esp = new BoolValue("ESP", false, this, targetHUDTracking::get);

@@ -18,14 +18,14 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "ChestESP", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ChestESP", description = "ESP but for chests.", category = ModuleCategory.Visual)
 public class ChestESP extends Module {
 
     private final ModeValue mode = new ModeValue("Mode", new String[]{"3D", "2D"}, "3D", this);
     public final BoolValue outline = new BoolValue("Outline", false, this, () -> mode.is("3D"));
     public final BoolValue filled = new BoolValue("Filled", true, this, () -> mode.is("3D"));
     public final BoolValue syncColor = new BoolValue("Sync Color", false, this, () -> mode.is("3D"));
-    public final ColorValue color = new ColorValue("Color", new Color(255, 255, 128), this, () -> !syncColor.get() && mode.is("3D"));
+    public final ColorValue color = new ColorValue("Color", new Color(255, 255, 255, 128), this, () -> !syncColor.get() && mode.is("3D"));
 
     @EventTarget
     public void onRender3D(Render3DEvent e) {

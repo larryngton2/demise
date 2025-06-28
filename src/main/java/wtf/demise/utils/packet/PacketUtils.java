@@ -1,20 +1,22 @@
 package wtf.demise.utils.packet;
 
+import lombok.experimental.UtilityClass;
 import net.minecraft.network.Packet;
 import wtf.demise.utils.InstanceAccess;
 
 import java.util.Arrays;
 
+@UtilityClass
 public class PacketUtils implements InstanceAccess {
-    public static void sendPacket(Packet<?> packet) {
+    public void sendPacket(Packet<?> packet) {
         mc.getNetHandler().addToSendQueue(packet);
     }
 
-    public static void sendPacketNoEvent(Packet<?> packet) {
+    public void sendPacketNoEvent(Packet<?> packet) {
         mc.getNetHandler().sendPacketNoEvent(packet);
     }
 
-    public static void queue(final Packet packet) {
+    public void queue(final Packet packet) {
         if (packet == null) {
             System.out.println("Packet is null");
             return;
@@ -27,7 +29,7 @@ public class PacketUtils implements InstanceAccess {
         }
     }
 
-    public static boolean isClientPacket(final Packet<?> packet) {
+    public boolean isClientPacket(final Packet<?> packet) {
         return Arrays.stream(NetworkAPI.serverbound).anyMatch(clazz -> clazz == packet.getClass());
     }
 }

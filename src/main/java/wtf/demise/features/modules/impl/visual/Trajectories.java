@@ -19,7 +19,7 @@ import wtf.demise.utils.render.RenderUtils;
 import java.awt.*;
 import java.util.ArrayList;
 
-@ModuleInfo(name = "Trajectories", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Trajectories", description = "Renders throwable items' trajectories.", category = ModuleCategory.Visual)
 public class Trajectories extends Module {
 
     @EventTarget

@@ -8,7 +8,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 
-@ModuleInfo(name = "MotionBlur", category = ModuleCategory.Visual)
+@ModuleInfo(name = "MotionBlur", description = "Blurs your motion. (??)", category = ModuleCategory.Visual)
 public class MotionBlur extends Module {
     public final SliderValue amount = new SliderValue("Amount", 1, 1, 10, 1, this);
 

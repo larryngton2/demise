@@ -19,7 +19,7 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "VisualAimPoint", category = ModuleCategory.Visual)
+@ModuleInfo(name = "VisualAimPoint", description = "Rotations but different.", category = ModuleCategory.Visual)
 public class VisualAimPoint extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Dot", "Box"}, "Dot", this);
     private final BoolValue onlySilent = new BoolValue("Only silent", false, this);

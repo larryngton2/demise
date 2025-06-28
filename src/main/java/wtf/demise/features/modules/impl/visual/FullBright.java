@@ -9,12 +9,12 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "FullBright", category = ModuleCategory.Visual)
+@ModuleInfo(name = "FullBright", description = "Brightens up the world.", category = ModuleCategory.Visual)
 public class FullBright extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Gamma", "Potion"}, "Gamma", this);
 
     @EventTarget
-    public void onUpdate(UpdateEvent event) {
+    public void onUpdate(UpdateEvent e) {
         switch (mode.get()) {
             case "Gamma":
                 mc.gameSettings.gammaSetting = 100000;

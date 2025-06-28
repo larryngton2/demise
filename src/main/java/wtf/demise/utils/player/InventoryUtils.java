@@ -232,11 +232,11 @@ public class InventoryUtils implements InstanceAccess {
     }
 
     public static boolean isValidBlock(final Block block, final boolean toPlace) {
-        if (block instanceof BlockContainer || block instanceof BlockTNT || !block.isFullBlock() || (!block.isFullCube() && !(block instanceof BlockGlass)) || (toPlace && block instanceof BlockFalling)) {
+        if (block instanceof BlockContainer || block instanceof BlockTNT || !block.isFullBlock() || (!block.isFullCube() && !(block instanceof BlockGlass)) || (toPlace && block instanceof BlockFalling) || block instanceof BlockSoulSand) {
             return false;
         }
         final Material material = block.getMaterial();
-        return !material.isLiquid() && material.isSolid();
+        return (!material.isLiquid() && material.isSolid()) || block instanceof BlockGlass;
     }
 
     public static boolean isBestArmor(ItemStack itemStack) {

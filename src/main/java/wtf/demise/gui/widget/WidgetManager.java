@@ -24,7 +24,8 @@ public class WidgetManager implements InstanceAccess {
                 new TargetHUDWidget(),
                 new PotionHUDWidget(),
                 new KeystrokeWidget(),
-                new InfoWidget()
+                new InfoWidget(),
+                new RadarWidget()
         );
     }
 

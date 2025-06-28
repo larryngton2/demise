@@ -13,7 +13,6 @@ import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
 
 import java.awt.*;
-import java.util.List;
 
 public class StringComponent extends Component {
     private final TextValue setting;
@@ -65,11 +64,12 @@ public class StringComponent extends Component {
                 deleteLastCharacter();
             }
 
-            if (text.length() < 18 && (Character.isLetterOrDigit(typedChar) || keyCode == Keyboard.KEY_SPACE)) {
+            if (Character.isLetterOrDigit(typedChar) || keyCode == Keyboard.KEY_SPACE) {
                 text += typedChar;
                 setting.setText(text);
-                SoundUtil.playSound("demise.tick");
             }
+
+            SoundUtil.playSound("demise.tick");
         }
         super.keyTyped(typedChar, keyCode);
     }
@@ -79,8 +79,8 @@ public class StringComponent extends Component {
         float currentY = y;
 
         for (String line : lines) {
-            Fonts.interSemiBold.get(16).drawString(line, x, currentY, ColorUtils.interpolateColor2(new Color(-1).darker(), new Color(-1), (float) input.getOutput()));
-            currentY += Fonts.interSemiBold.get(16).getHeight();
+            Fonts.interRegular.get(15).drawString(line, x, currentY, ColorUtils.interpolateColor2(new Color(-1).darker(), new Color(-1), (float) input.getOutput()));
+            currentY += Fonts.interRegular.get(15).getHeight();
         }
     }
 
@@ -89,21 +89,6 @@ public class StringComponent extends Component {
             text = text.substring(0, text.length() - 1);
             setting.setText(text);
         }
-    }
-
-    private StringBuilder breakAndAddWord(String word, StringBuilder currentLine, float maxWidth, List<String> lines) {
-        int wordLength = word.length();
-        for (int i = 0; i < wordLength; i++) {
-            char c = word.charAt(i);
-            String nextPart = currentLine.toString() + c;
-            if (Fonts.interSemiBold.get(16).getStringWidth(nextPart) <= maxWidth) {
-                currentLine.append(c);
-            } else {
-                lines.add(currentLine.toString());
-                currentLine = new StringBuilder(String.valueOf(c));
-            }
-        }
-        return currentLine;
     }
 
     @Override

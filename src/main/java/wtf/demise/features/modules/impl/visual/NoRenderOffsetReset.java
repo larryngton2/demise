@@ -4,6 +4,6 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "NoRenderOffsetReset", category = ModuleCategory.Visual)
+@ModuleInfo(name = "NoRenderOffsetReset", description = "Prevents your body's yaw from being reset when swinging.", category = ModuleCategory.Visual)
 public class NoRenderOffsetReset extends Module {
 }

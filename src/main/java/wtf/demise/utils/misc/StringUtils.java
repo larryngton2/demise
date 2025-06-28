@@ -1,34 +1,17 @@
 package wtf.demise.utils.misc;
 
 import com.github.javafaker.Faker;
+import lombok.experimental.UtilityClass;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+@UtilityClass
 public class StringUtils {
-    public static final String sb = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-
-    public static String ticksToElapsedTime(int ticks) {
-        int i = ticks / 20;
-        int j = i / 60;
-        i = i % 60;
-        return i < 10 ? j + ":0" + i : j + ":" + i;
-    }
-
-    public static String upperSnakeCaseToPascal(String string) {
+    public String upperSnakeCaseToPascal(String string) {
         return string.charAt(0) + string.substring(1).toLowerCase();
     }
 
-    public static String randomString(String pool, int length) {
-        final StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < length; i++) {
-            builder.append(pool.charAt(ThreadLocalRandom.current().nextInt(0, pool.length())));
-        }
-
-        return builder.toString();
-    }
-
-    public static String randomName(FakerMode fakerMode) {
+    public String randomName(FakerMode fakerMode) {
         Faker faker = new Faker();
 
         return switch (fakerMode) {
@@ -45,7 +28,7 @@ public class StringUtils {
         IM_FUCKING_BORED
     }
 
-    public static String capitalizeWords(String input) {
+    public String capitalizeWords(String input) {
         if (input == null || input.isEmpty()) {
             return input;
         }

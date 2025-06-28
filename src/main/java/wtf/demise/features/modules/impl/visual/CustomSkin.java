@@ -7,7 +7,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.TextValue;
 
-@ModuleInfo(name = "CustomSkin", category = ModuleCategory.Visual)
+@ModuleInfo(name = "CustomSkin", description = "What do you think this does?", category = ModuleCategory.Visual)
 public class CustomSkin extends Module {
     public final BoolValue slimSkin = new BoolValue("Slim", true, this);
     public final BoolValue customUrl = new BoolValue("Custom URL", false, this);

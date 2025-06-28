@@ -1,31 +1,33 @@
 package wtf.demise.utils.misc;
 
+import lombok.experimental.UtilityClass;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import wtf.demise.utils.InstanceAccess;
 
+@UtilityClass
 public class ChatUtils implements InstanceAccess {
-    public static void sendMessageClient(String message) {
+    public void sendMessageClient(String message) {
         mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(EnumChatFormatting.DARK_GRAY + "demise" + EnumChatFormatting.GRAY + " » " + EnumChatFormatting.WHITE + message));
     }
 
-    public static void sendMessageClient(boolean message) {
+    public void sendMessageClient(boolean message) {
         sendMessageClient(String.valueOf(message));
     }
 
-    public static void sendMessageClient(int message) {
+    public void sendMessageClient(int message) {
         sendMessageClient(String.valueOf(message));
     }
 
-    public static void sendMessageClient(float message) {
+    public void sendMessageClient(float message) {
         sendMessageClient(String.valueOf(message));
     }
 
-    public static void sendMessageClient(double message) {
+    public void sendMessageClient(double message) {
         sendMessageClient(String.valueOf(message));
     }
 
-    public static void sendMessageServer(String message) {
+    public void sendMessageServer(String message) {
         mc.thePlayer.sendChatMessage(message);
     }
 }

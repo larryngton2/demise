@@ -14,7 +14,7 @@ import wtf.demise.features.values.impl.SliderValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "Atmosphere", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Atmosphere", description = "Changes the atmosphere.", category = ModuleCategory.Visual)
 public class Atmosphere extends Module {
     private final BoolValue time = new BoolValue("Time Editor", true, this);
     private final SliderValue timeValue = new SliderValue("Time", 18000, 0, 24000, 1000, this, time::get);

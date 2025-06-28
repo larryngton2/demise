@@ -1,5 +1,6 @@
 package wtf.demise.utils.misc;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -12,17 +13,17 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
 
+@UtilityClass
 public class HttpUtils {
-
-    private static final String DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0";
-    private static final String BOUNDARY_PREFIX = "--";
-    private static final String LINE_END = "\r\n";
+    private final String DEFAULT_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0";
+    private final String BOUNDARY_PREFIX = "--";
+    private final String LINE_END = "\r\n";
 
     static {
         HttpURLConnection.setFollowRedirects(true);
     }
 
-    private static HttpURLConnection make(String url, String method, String agent) throws IOException {
+    private HttpURLConnection make(String url, String method, String agent) throws IOException {
         HttpURLConnection httpConnection = (HttpURLConnection) new URL(url).openConnection();
 
         httpConnection.setRequestMethod(method);
@@ -37,11 +38,11 @@ public class HttpUtils {
         return httpConnection;
     }
 
-    private static HttpURLConnection make(String url, String method) throws IOException {
+    private HttpURLConnection make(String url, String method) throws IOException {
         return make(url, method, DEFAULT_AGENT);
     }
 
-    public static String request(String url, String method, String agent) throws IOException {
+    public String request(String url, String method, String agent) throws IOException {
         HttpURLConnection connection = make(url, method, agent);
 
         try (InputStream inputStream = connection.getInputStream()) {
@@ -49,36 +50,15 @@ public class HttpUtils {
         }
     }
 
-    public static InputStream requestStream(String url, String method, String agent) throws IOException {
-        HttpURLConnection connection = make(url, method, agent);
-
-        return connection.getInputStream();
-    }
-
-    public static String get(String url) throws IOException {
+    public String get(String url) throws IOException {
         return request(url, "GET", DEFAULT_AGENT);
     }
 
-    public static void download(String url, File file) throws IOException {
+    public void download(String url, File file) throws IOException {
         FileUtils.copyInputStreamToFile(make(url, "GET").getInputStream(), file);
     }
 
-
-    public static JSONObject obtainJson(String url) {
-        try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
-            connection.setRequestMethod("GET");
-            connection.addRequestProperty("User-Agent", "Mozilla/4.76 (Sk1er-UHCStars V1.0)");
-            InputStream is = connection.getInputStream();
-            return new JSONObject(IOUtils.toString(is, Charset.defaultCharset()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new JSONObject().put("succcess", false).put("cause", "API_DOWN");
-    }
-
-    public static HttpResponse postFormData(String urlStr, Map<String, File> filePathMap, Map<String, Object> keyValues, Map<String, Object> headers) throws IOException {
+    public HttpResponse postFormData(String urlStr, Map<String, File> filePathMap, Map<String, Object> keyValues, Map<String, Object> headers) throws IOException {
         HttpResponse response;
         HttpURLConnection conn = getHttpURLConnection(urlStr, headers);
         String boundary = "------------9sflsjbdgvsuhgbjvskjlvj13h5g1jh34v513hb" + System.currentTimeMillis() + "515ijk9a85e18429711ee9e70f040429711eebe560242ac120002be5602------------";
@@ -111,7 +91,7 @@ public class HttpUtils {
         return getHttpResponse(conn);
     }
 
-    private static HttpURLConnection getHttpURLConnection(String urlStr, Map<String, Object> headers) throws IOException {
+    private HttpURLConnection getHttpURLConnection(String urlStr, Map<String, Object> headers) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setConnectTimeout(50000);
@@ -132,7 +112,7 @@ public class HttpUtils {
         return conn;
     }
 
-    private static HttpResponse getHttpResponse(HttpURLConnection conn) {
+    private HttpResponse getHttpResponse(HttpURLConnection conn) {
         HttpResponse response;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             int responseCode = conn.getResponseCode();
@@ -158,8 +138,8 @@ public class HttpUtils {
         return response;
     }
 
-    private static void writeFile(String paramName, File filePath, String boundary,
-                                  DataOutputStream out) {
+    private void writeFile(String paramName, File filePath, String boundary,
+                           DataOutputStream out) {
         try (InputStream fileReader = Files.newInputStream(filePath.toPath())) {
             String boundaryStr = BOUNDARY_PREFIX + boundary + LINE_END;
             out.write(boundaryStr.getBytes());
@@ -181,7 +161,7 @@ public class HttpUtils {
         }
     }
 
-    private static void writeSimpleFormField(String boundary, DataOutputStream out, Map.Entry<String, Object> entry) throws IOException {
+    private void writeSimpleFormField(String boundary, DataOutputStream out, Map.Entry<String, Object> entry) throws IOException {
         String boundaryStr = BOUNDARY_PREFIX + boundary + LINE_END;
         out.write(boundaryStr.getBytes());
         String contentDispositionStr = String.format("Content-Disposition: form-data; name=\"%s\"", entry.getKey()) + LINE_END + LINE_END;

@@ -21,12 +21,12 @@ import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.gui.widget.WidgetManager;
 import wtf.demise.utils.discord.DiscordInfo;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.misc.SpoofSlotUtils;
-import wtf.demise.utils.packet.BadPacketsComponent;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.LagUtils;
 import wtf.demise.utils.player.ClickHandler;
-import wtf.demise.utils.player.rotation.OldRotationUtils;
+import wtf.demise.utils.player.rotation.BasicRotations;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
@@ -94,6 +94,8 @@ public class Demise {
 
         dataFolder = Paths.get(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()).resolve(clientName);
         LOGGER.info("{} {} initialized successfully.", clientName, version);
+
+        SoundUtil.playSound("demise.boot");
     }
 
     private void setupMainDirectory() {
@@ -132,7 +134,6 @@ public class Demise {
 
     private void registerEventHandlers() {
         eventManager.register(new RotationUtils());
-        eventManager.register(new BadPacketsComponent());
         eventManager.register(new LagUtils());
         eventManager.register(new BlinkComponent());
         eventManager.register(new SpoofSlotUtils());
@@ -140,7 +141,7 @@ public class Demise {
         eventManager.register(new ClickHandler());
         eventManager.register(new MathUtils());
         eventManager.register(new RotationManager());
-        eventManager.register(new OldRotationUtils());
+        eventManager.register(new BasicRotations());
 
         LOGGER.info("Event handlers registered.");
     }

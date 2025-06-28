@@ -9,8 +9,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.player.MovementCorrection;
-import wtf.demise.utils.player.rotation.OldRotationUtils;
+import wtf.demise.utils.player.rotation.BasicRotations;
 
 @ModuleInfo(name = "Fly", description = "Allows you to fly.", category = ModuleCategory.Movement)
 public class Fly extends Module {
@@ -58,7 +57,7 @@ public class Fly extends Module {
     @EventTarget
     public void onAngle(AngleEvent e) {
         if (mode.is("Intave")) {
-            OldRotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw - 180, 50}, MovementCorrection.Silent, 80, 80);
+            BasicRotations.setRotation(new float[]{mc.thePlayer.rotationYaw - 180, 50}, true, 80, 80);
         }
     }
 

@@ -64,7 +64,15 @@ public class NotificationManager implements InstanceAccess {
                 Interface anInterface = INSTANCE.getModuleManager().getModule(Interface.class);
 
                 x = (float) (10 * animation.getOutput());
-                y = 10 + (anInterface.elements.isEnabled("Watermark") ? (anInterface.watermarkMode.is("Text") ? Fonts.urbanist.get(38).getHeight() + 5 : 60) : 0) - yOffset;
+
+                float extraY = switch (anInterface.watermarkMode.get()) {
+                    case "Text" -> Fonts.urbanist.get(38).getHeight() + 5;
+                    case "Blue archive" -> 60;
+                    case "Bivir" -> 80;
+                    default -> 0;
+                };
+
+                y = 10 + (anInterface.elements.isEnabled("Watermark") ? (extraY) : 0) - yOffset;
 
                 notification.getAnimation().setDuration(150);
                 actualOffset = 7;

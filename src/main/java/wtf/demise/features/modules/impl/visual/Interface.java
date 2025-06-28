@@ -32,16 +32,17 @@ public class Interface extends Module {
             new BoolValue("Notification", true),
             new BoolValue("Keystrokes", true),
             new BoolValue("Info", true),
-            new BoolValue("Motion graph", false)
+            new BoolValue("Motion graph", false),
+            new BoolValue("Radar", false)
     ), this);
 
-    public final ModeValue watermarkMode = new ModeValue("Watermark mode", new String[]{"Text", "Image"}, "Text", this, () -> elements.isEnabled("Watermark"));
+    public final ModeValue watermarkMode = new ModeValue("Watermark mode", new String[]{"Text", "Blue archive", "Bivir"}, "Text", this, () -> elements.isEnabled("Watermark"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module list"));
-    private final ModeValue colorMode = new ModeValue("Color mode", new String[]{"Winter", "Blend", "Mango", "Snowy sky", "Miko", "Satin", "Gothic"}, "Winter", this);
+    public final BoolValue notificationSounds = new BoolValue("Notification sounds", true, this, () -> elements.isEnabled("Notification"));
+    private final ModeValue colorMode = new ModeValue("Color mode", new String[]{"Winter", "Blend", "Mango", "Snowy sky", "Miko", "Satin", "Gothic", "Cotton candy"}, "Winter", this);
     private final SliderValue fadeSpeed = new SliderValue("Fade speed", 1, 1, 10, 1, this);
     public final ModeValue bgStyle = new ModeValue("Background style", new String[]{"Transparent", "Opaque", "Custom"}, "Transparent", this, () -> elements.isEnabled("Module List"));
     public final ColorValue bgColor = new ColorValue("Background color", new Color(21, 21, 21), this, () -> bgStyle.is("Custom"));
-    public final SliderValue bgAlpha = new SliderValue("Background alpha", 204, 1, 255, 1, this, () -> bgStyle.is("Custom"));
     public final BoolValue chatCombine = new BoolValue("Chat combine", true, this);
     public final BoolValue funy = new BoolValue("funy", false, this);
 
@@ -57,9 +58,12 @@ public class Interface extends Module {
                     Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, new Color(255, 255, 255, 208).getRGB());
                     Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
                     break;
-                case "Image":
+                case "Blue archive":
                     RenderUtils.drawImage(new ResourceLocation("demise/img/BAlogo/BA-base.png"), 0, 0, (int) (424 * 0.3f), (int) (250 * 0.3f));
                     RenderUtils.drawImage(new ResourceLocation("demise/img/BAlogo/BA-colored.png"), 0, 0, (int) (424 * 0.3f), (int) (250 * 0.3f), color());
+                    break;
+                case "Bivir":
+                    RenderUtils.drawImage(new ResourceLocation("demise/img/bivir.png"), 10, 0, (int) (240 * 0.35f), (int) (240 * 0.35f));
                     break;
             }
         }
@@ -98,7 +102,7 @@ public class Interface extends Module {
                     Fonts.urbanist.get(38).drawString(Demise.INSTANCE.getClientName(), 10, 10, Color.black.getRGB());
                     Fonts.urbanist.get(27).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(38).getStringWidth(Demise.INSTANCE.getClientName()) + 11.5f, Fonts.urbanist.get(38).getHeight() + 10 - Fonts.urbanist.get(27).getHeight() * 1.1f, Color.black.getRGB());
                     break;
-                case "Image":
+                case "Blue archive":
                     RenderUtils.drawImage(new ResourceLocation("demise/img/BAlogo/BA-base.png"), 0, 0, (int) (424 * 0.3f), (int) (250 * 0.3f), Color.black.getRGB());
                     RenderUtils.drawImage(new ResourceLocation("demise/img/BAlogo/BA-colored.png"), 0, 0, (int) (424 * 0.3f), (int) (250 * 0.3f), Color.black.getRGB());
                     break;
@@ -169,6 +173,10 @@ public class Interface extends Module {
             case "Gothic" -> {
                 color1 = new Color(31, 30, 30);
                 yield new Color(196, 190, 190);
+            }
+            case "Cotton candy" -> {
+                color1 = new Color(202, 153, 221);
+                yield new Color(103, 244, 253);
             }
             default -> {
                 color1 = Color.white;

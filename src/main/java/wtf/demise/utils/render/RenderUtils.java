@@ -547,15 +547,13 @@ public class RenderUtils implements InstanceAccess {
             GL11.glRotated(-(mc.getRenderManager()).playerViewY, 0.0D, 1.0D, 0.0D);
             GL11.glRotated((mc.getRenderManager()).playerViewX, 1.0D, 0.0D, 0.0D);
 
-            final Color c = color;
-
-            drawFilledCircleNoGL(0, 0, 0.7, c.hashCode(), quality);
+            drawFilledCircleNoGL(0, 0, 0.7, color.hashCode(), quality);
 
             if (distanceFromPlayer < 4)
-                drawFilledCircleNoGL(0, 0, 1.4, new Color(c.getRed(), c.getGreen(), c.getBlue(), 50).hashCode(), quality);
+                drawFilledCircleNoGL(0, 0, 1.4, new Color(color.getRed(), color.getGreen(), color.getBlue(), 50).hashCode(), quality);
 
             if (distanceFromPlayer < 20)
-                drawFilledCircleNoGL(0, 0, 2.3, new Color(c.getRed(), c.getGreen(), c.getBlue(), 30).hashCode(), quality);
+                drawFilledCircleNoGL(0, 0, 2.3, new Color(color.getRed(), color.getGreen(), color.getBlue(), 30).hashCode(), quality);
 
             GL11.glScalef(0.8f, 0.8f, 0.8f);
 
@@ -572,22 +570,46 @@ public class RenderUtils implements InstanceAccess {
         GL11.glColor3d(255, 255, 255);
     }
 
-    public static void drawFilledCircleNoGL(final int x, final int y, final double r, final int c, final int quality) {
-        final float f = ((c >> 24) & 0xff) / 255F;
-        final float f1 = ((c >> 16) & 0xff) / 255F;
-        final float f2 = ((c >> 8) & 0xff) / 255F;
-        final float f3 = (c & 0xff) / 255F;
+    public static void drawFilledCircleNoGL(double x, double y, double r, int c, int quality) {
+        float f = ((c >> 24) & 0xff) / 255F;
+        float f1 = ((c >> 16) & 0xff) / 255F;
+        float f2 = ((c >> 8) & 0xff) / 255F;
+        float f3 = (c & 0xff) / 255F;
 
         GL11.glColor4f(f1, f2, f3, f);
         GL11.glBegin(GL11.GL_TRIANGLE_FAN);
 
         for (int i = 0; i <= 360 / quality; i++) {
-            final double x2 = Math.sin(((i * quality * Math.PI) / 180)) * r;
-            final double y2 = Math.cos(((i * quality * Math.PI) / 180)) * r;
+            double x2 = Math.sin((i * quality * Math.PI) / 180) * r;
+            double y2 = Math.cos((i * quality * Math.PI) / 180) * r;
             GL11.glVertex2d(x + x2, y + y2);
         }
 
         GL11.glEnd();
+    }
+
+    public static void drawFilledCircle(final double x, final double y, final double r, final int c, final int quality) {
+        final float f = ((c >> 24) & 0xff) / 255F;
+        final float f1 = ((c >> 16) & 0xff) / 255F;
+        final float f2 = ((c >> 8) & 0xff) / 255F;
+        final float f3 = (c & 0xff) / 255F;
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(f1, f2, f3, f);
+        GL11.glBegin(GL11.GL_TRIANGLE_FAN);
+
+        for (int i = 0; i <= 360 / quality; i++) {
+            final double x2 = Math.sin((i * quality * Math.PI) / 180) * r;
+            final double y2 = Math.cos((i * quality * Math.PI) / 180) * r;
+            GL11.glVertex2d(x + x2, y + y2);
+        }
+
+        GL11.glEnd();
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public static void drawTargetCircle(Entity entity) {

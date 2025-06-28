@@ -10,7 +10,6 @@ import wtf.demise.events.impl.player.LookEvent;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.player.MovementCorrection;
 
 import java.util.Objects;
 
@@ -19,10 +18,10 @@ import static wtf.demise.utils.player.rotation.RotationManager.*;
 import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
 import static wtf.demise.utils.player.rotation.RotationUtils.getRotationDifference;
 
-public class OldRotationUtils implements InstanceAccess {
+public class BasicRotations implements InstanceAccess {
     public static float[] currRotRequireNonNullElse;
     public static float[] prevRotRequireNonNullElse;
-    public static MovementCorrection currentCorrection = MovementCorrection.None;
+    public static boolean currentCorrection;
     public static boolean enabled;
     private static float cachedHSpeed;
     private static float cachedVSpeed;
@@ -30,7 +29,7 @@ public class OldRotationUtils implements InstanceAccess {
     private boolean angleCalled;
     private static final TimerUtils tickTimer = new TimerUtils();
 
-    public static void setRotation(float[] rotation, final MovementCorrection correction, float hSpeed, float vSpeed) {
+    public static void setRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed) {
         prevRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
         if (tickTimer.hasTimeElapsed(50)) {
@@ -53,7 +52,7 @@ public class OldRotationUtils implements InstanceAccess {
         currentCorrection = correction;
         cachedHSpeed = hSpeed;
         cachedVSpeed = vSpeed;
-        cachedCorrection = correction != MovementCorrection.None;
+        cachedCorrection = correction;
         enabled = true;
         RotationManager.enabled = true;
         currRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
@@ -102,7 +101,7 @@ public class OldRotationUtils implements InstanceAccess {
     private static void resetRotation() {
         enabled = false;
         currentRotation = null;
-        currentCorrection = MovementCorrection.None;
+        currentCorrection = false;
     }
 
     public static float[] limitRotations(float[] currentRotation, float[] targetRotation, float hSpeed, float vSpeed) {

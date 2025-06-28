@@ -21,27 +21,21 @@ import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
-import wtf.demise.utils.player.MovementCorrection;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.OldRotationUtils;
 
 @ModuleInfo(name = "Phase", description = "Allows you to phase through blocks.", category = ModuleCategory.Movement)
 public class Phase extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Intave"}, "Vanilla", this);
-    private final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Manual", "SWAuto"}, "Manual", this, () -> mode.is("Intave"));
 
     private boolean phasing;
     private boolean handle;
     private BlockPos pos;
     private EnumFacing sideHit;
-    private boolean phaseNow;
-    private double startY;
-    private boolean setY;
     private final TimerUtils timer = new TimerUtils();
 
     @Override
     public void onEnable() {
-        if (mode.is("Intave") && intaveMode.is("Manual")) {
+        if (mode.is("Intave")) {
             Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Intave Phase", "Sneak to move forward in blocks.", 10);
             Demise.INSTANCE.getNotificationManager().post(NotificationType.INFO, "Intave Phase", "LMB to start.", 10);
         }
@@ -73,31 +67,7 @@ public class Phase extends Module {
                 }
                 break;
             case "Intave":
-                boolean check;
-
-                if (intaveMode.is("SWAuto")) {
-                    boolean check1 = phaseNow && timer.hasTimeElapsed(500);
-
-                    check = check1;
-
-                    if (check1) {
-                        if (!setY) {
-                            startY = mc.thePlayer.posY;
-                            setY = true;
-                        }
-
-                        OldRotationUtils.setRotation(new float[]{mc.thePlayer.rotationYaw, 89.9f}, MovementCorrection.Silent, 180, 180);
-
-                        if (startY - mc.thePlayer.posY > 2) {
-                            timer.reset();
-                            setY = false;
-                            check = false;
-                            phaseNow = false;
-                        }
-                    }
-                } else {
-                    check = mc.gameSettings.keyBindAttack.isKeyDown() && mc.thePlayer.rotationPitch > 80;
-                }
+                boolean check = mc.gameSettings.keyBindAttack.isKeyDown() && mc.thePlayer.rotationPitch > 80;
 
                 if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && check) {
                     pos = mc.objectMouseOver.getBlockPos();
@@ -117,65 +87,51 @@ public class Phase extends Module {
                     handle = false;
                 }
 
-                if (intaveMode.is("Manual")) {
-                    if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK && handle) {
-                        switch (mc.objectMouseOver.typeOfHit) {
-                            case ENTITY -> ChatUtils.sendMessageClient("A fatass is blocking the way, can't phase");
-                            case MISS -> ChatUtils.sendMessageClient("Stopped");
-                        }
-
-                        mc.thePlayer.jump();
-                        handle = false;
+                if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK && handle) {
+                    switch (mc.objectMouseOver.typeOfHit) {
+                        case ENTITY -> ChatUtils.sendMessageClient("A fatass is blocking the way, can't phase");
+                        case MISS -> ChatUtils.sendMessageClient("Stopped");
                     }
 
-                    if (mc.thePlayer.isSneaking()) {
-                        final double wDist = 0.00001D;
-                        final double aDist = 0.00001D;
-                        final double sDist = -0.00001D;
-                        final double dDist = -0.00001D;
+                    mc.thePlayer.jump();
+                    handle = false;
+                }
 
-                        final double rotationn = Math.toRadians(mc.thePlayer.rotationYaw);
+                if (mc.thePlayer.isSneaking()) {
+                    final double wDist = 0.00001D;
+                    final double aDist = 0.00001D;
+                    final double sDist = -0.00001D;
+                    final double dDist = -0.00001D;
 
-                        if (mc.gameSettings.keyBindForward.isKeyDown()) {
-                            final double xx = Math.sin(rotationn) * wDist;
-                            final double zz = Math.cos(rotationn) * wDist;
+                    final double rotationn = Math.toRadians(mc.thePlayer.rotationYaw);
 
-                            mc.thePlayer.setPosition(mc.thePlayer.posX - xx, mc.thePlayer.posY, mc.thePlayer.posZ + zz);
-                        }
+                    if (mc.gameSettings.keyBindForward.isKeyDown()) {
+                        final double xx = Math.sin(rotationn) * wDist;
+                        final double zz = Math.cos(rotationn) * wDist;
 
-                        if (mc.gameSettings.keyBindLeft.isKeyDown()) {
-                            final double xx = Math.sin(rotationn) * aDist;
+                        mc.thePlayer.setPosition(mc.thePlayer.posX - xx, mc.thePlayer.posY, mc.thePlayer.posZ + zz);
+                    }
 
-                            mc.thePlayer.setPosition(mc.thePlayer.posX + xx, mc.thePlayer.posY, mc.thePlayer.posZ);
-                        }
+                    if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+                        final double xx = Math.sin(rotationn) * aDist;
 
-                        if (mc.gameSettings.keyBindBack.isKeyDown()) {
-                            final double xx = Math.sin(rotationn) * sDist;
-                            final double zz = Math.cos(rotationn) * sDist;
+                        mc.thePlayer.setPosition(mc.thePlayer.posX + xx, mc.thePlayer.posY, mc.thePlayer.posZ);
+                    }
 
-                            mc.thePlayer.setPosition(mc.thePlayer.posX - xx, mc.thePlayer.posY, mc.thePlayer.posZ + zz);
-                        }
+                    if (mc.gameSettings.keyBindBack.isKeyDown()) {
+                        final double xx = Math.sin(rotationn) * sDist;
+                        final double zz = Math.cos(rotationn) * sDist;
 
-                        if (mc.gameSettings.keyBindLeft.isKeyDown()) {
-                            final double xx = Math.sin(rotationn) * dDist;
+                        mc.thePlayer.setPosition(mc.thePlayer.posX - xx, mc.thePlayer.posY, mc.thePlayer.posZ + zz);
+                    }
 
-                            mc.thePlayer.setPosition(mc.thePlayer.posX + xx, mc.thePlayer.posY, mc.thePlayer.posZ);
-                        }
+                    if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+                        final double xx = Math.sin(rotationn) * dDist;
+
+                        mc.thePlayer.setPosition(mc.thePlayer.posX + xx, mc.thePlayer.posY, mc.thePlayer.posZ);
                     }
                 }
                 break;
-        }
-    }
-
-    @EventTarget
-    public void onPacket(PacketEvent e) {
-        if (mode.is("Intave") && intaveMode.is("SWAuto")) {
-            if (e.getPacket() instanceof S45PacketTitle s45PacketTitle) {
-                if (s45PacketTitle.getMessage().getFormattedText().contains("2")) {
-                    phaseNow = true;
-                    timer.reset();
-                }
-            }
         }
     }
 

@@ -1,5 +1,8 @@
 package wtf.demise.gui.widget.impl;
 
+import wtf.demise.Demise;
+import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.math.MathUtils;
@@ -15,23 +18,33 @@ import java.util.List;
 // it can't get more Russian than this
 public class MotionGraphWidget extends Widget {
     private final List<Double> speeds = new ArrayList<>();
-    private static final int MAX_POINTS = 200;
+    private static final int MAX_POINTS = 50;
     private float interpolatedMaxSpeed = 10;
     private float interpolatedTextY = renderY + 2;
+    private double prevSpeed;
 
     public MotionGraphWidget() {
         super("Motion graph");
         this.width = 150;
         this.height = 50;
+        Demise.INSTANCE.getEventManager().unregister(this);
+        Demise.INSTANCE.getEventManager().register(this);
+    }
+
+    @EventTarget
+    public void onMotion(MotionEvent e) {
+        if (e.isPre()) {
+            prevSpeed = MathUtils.interpolateNoUpdateCheck((float) prevSpeed, (float) MoveUtil.getBPS(), 0.5f);
+            speeds.add(prevSpeed);
+
+            if (speeds.size() > MAX_POINTS) {
+                speeds.remove(0);
+            }
+        }
     }
 
     @Override
     public void render() {
-        speeds.add(MoveUtil.getBPS());
-        if (speeds.size() > MAX_POINTS) {
-            speeds.remove(0);
-        }
-
         float lastY = interpolatedTextY;
 
         RoundedUtils.drawRound(renderX, renderY, width, height, 3, new Color(setting.bgColor(), true));

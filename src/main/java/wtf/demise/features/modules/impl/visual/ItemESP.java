@@ -19,7 +19,7 @@ import wtf.demise.features.modules.impl.misc.MurderMystery;
 
 import java.awt.*;
 
-@ModuleInfo(name = "ItemESP", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ItemESP", description = "ESP but for items.", category = ModuleCategory.Visual)
 public class ItemESP extends Module {
 
     @EventTarget

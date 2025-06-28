@@ -19,7 +19,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@ModuleInfo(name = "BreakProgress", category = ModuleCategory.Visual)
+@ModuleInfo(name = "BreakProgress", description = "Renders your break progress in the HUD.", category = ModuleCategory.Visual)
 public class BreakProgress extends Module {
     private final Animation anim = new DecelerateAnimation(175, 1);
 

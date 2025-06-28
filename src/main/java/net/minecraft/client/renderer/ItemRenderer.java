@@ -29,8 +29,8 @@ import net.optifine.reflect.Reflector;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
+import wtf.demise.events.impl.render.RenderItemEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
-import wtf.demise.features.modules.impl.visual.BlockOnSwing;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
@@ -39,7 +39,7 @@ public class ItemRenderer {
     private static final ResourceLocation RES_UNDERWATER_OVERLAY = new ResourceLocation("textures/misc/underwater.png");
     private static Minecraft mc;
     private static ItemStack itemToRender;
-    private static float equippedProgress;
+    public static float equippedProgress;
     private static float prevEquippedProgress;
     private static RenderManager renderManager;
     private static RenderItem itemRenderer;
@@ -237,7 +237,7 @@ public class ItemRenderer {
         GlStateManager.rotate(f3 * 30.0F, 0.0F, 0.0F, 1.0F);
     }
 
-    private static void transformFirstPersonItem(float equipProgress, float swingProgress) {
+    public static void transformFirstPersonItem(float equipProgress, float swingProgress) {
         GlStateManager.translate(0.56F, -0.52F, -0.71999997F);
         GlStateManager.translate(0.0F, equipProgress * -0.6F, 0.0F);
         GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
@@ -273,14 +273,12 @@ public class ItemRenderer {
         GlStateManager.scale(1.0F, 1.0F, 1.0F + f1 * 0.2F);
     }
 
-    private static void doBlockTransformations() {
+    public static void doBlockTransformations() {
         GlStateManager.translate(-0.5F, 0.2F, 0.0F);
         GlStateManager.rotate(30.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-80.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(60.0F, 0.0F, 1.0F, 0.0F);
     }
-
-    private static int i = 0;
 
     public static void renderItemInFirstPerson(float partialTicks) {
         if (!Config.isShaders() || !Shaders.isSkipRenderHand()) {
@@ -289,20 +287,26 @@ public class ItemRenderer {
             float f1 = abstractclientplayer.getSwingProgress(partialTicks);
             float f2 = abstractclientplayer.prevRotationPitch + (abstractclientplayer.rotationPitch - abstractclientplayer.prevRotationPitch) * partialTicks;
             float f3 = abstractclientplayer.prevRotationYaw + (abstractclientplayer.rotationYaw - abstractclientplayer.prevRotationYaw) * partialTicks;
-            float var9 = MathHelper.sin(MathHelper.sqrt_float(f1) * MathHelper.PI);
             rotateArroundXAndY(f2, f3);
             setLightMapFromPlayer(abstractclientplayer);
             rotateWithPlayerRotations(abstractclientplayer, partialTicks);
             GlStateManager.enableRescaleNormal();
             GlStateManager.pushMatrix();
-            i++;
 
             if (itemToRender != null) {
+                EnumAction enumaction = itemToRender.getItemUseAction();
+                boolean useItem = abstractclientplayer.getItemInUseCount() > 0;
+
+                RenderItemEvent renderItemEvent = new RenderItemEvent(enumaction, useItem, f, f1, itemToRender);
+                Demise.INSTANCE.getEventManager().call(renderItemEvent);
+                enumaction = renderItemEvent.getEnumAction();
+                useItem = renderItemEvent.isUseItem();
+                f = renderItemEvent.getProgress();
+                f1 = renderItemEvent.getSwingProgress();
+
                 if (itemToRender.getItem() instanceof ItemMap) {
                     renderItemMap(abstractclientplayer, f2, f, f1);
-                } else if ((abstractclientplayer.getItemInUseCount() > 0 || (KillAura.isBlocking && PlayerUtils.isHoldingSword()) || (Demise.INSTANCE.getModuleManager().getModule(BlockOnSwing.class).isEnabled() && mc.thePlayer.isSwingInProgress && SpoofSlotUtils.getSpoofedStack() != null && SpoofSlotUtils.getSpoofedStack().getItem() instanceof ItemSword))) {
-                    EnumAction enumaction = itemToRender.getItemUseAction();
-
+                } else if ((useItem || (KillAura.isBlocking && PlayerUtils.isHoldingSword())) && !renderItemEvent.isCancelled()) {
                     switch (enumaction) {
                         case NONE:
                             transformFirstPersonItem(f, f1);
@@ -320,7 +324,7 @@ public class ItemRenderer {
                             transformFirstPersonItem(f, f1);
                             doBowTransformations(partialTicks, abstractclientplayer);
                     }
-                } else {
+                } else if (!renderItemEvent.isCancelled()) {
                     doItemUsedTransformations(f1);
                     transformFirstPersonItem(f, f1);
                 }

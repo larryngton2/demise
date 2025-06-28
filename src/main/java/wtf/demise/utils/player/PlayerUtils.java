@@ -1,5 +1,6 @@
 package wtf.demise.utils.player;
 
+import lombok.experimental.UtilityClass;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLiquid;
@@ -9,6 +10,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.scoreboard.Score;
@@ -20,39 +22,17 @@ import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@UtilityClass
 public class PlayerUtils implements InstanceAccess {
-    public static boolean nullCheck() {
-        return mc.thePlayer != null && mc.theWorld != null;
-    }
-
-    public static boolean isBlockUnder() {
-        if (mc.thePlayer.posY >= 0.0) {
-            for (int offset = 0; offset < (int) mc.thePlayer.posY + 2; offset += 2) {
-                AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0.0, (-offset), 0.0);
-                if (!mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isEmpty()) {
-                    return true;
-                }
-            }
-
-        }
-        return false;
-    }
-
-    public static boolean isBlockUnder(int distance) {
-        for (int y = (int) mc.thePlayer.posY; y >= (int) mc.thePlayer.posY - distance; --y) {
-            if (!(mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, y, mc.thePlayer.posZ)).getBlock() instanceof BlockAir)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean isBlockUnder(final double height, final boolean boundingBox) {
+    public boolean isBlockUnder(double height, boolean boundingBox) {
         if (boundingBox) {
-            final AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0, -height, 0);
+            AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox().offset(0, -height, 0);
 
             return !mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer, bb).isEmpty();
         } else {
@@ -65,20 +45,20 @@ public class PlayerUtils implements InstanceAccess {
         return false;
     }
 
-    public static int findTool(final BlockPos blockPos) {
+    public int findTool(BlockPos blockPos) {
         float bestSpeed = 1;
         int bestSlot = -1;
 
-        final IBlockState blockState = mc.theWorld.getBlockState(blockPos);
+        IBlockState blockState = mc.theWorld.getBlockState(blockPos);
 
         for (int i = 0; i < 9; i++) {
-            final ItemStack itemStack = mc.thePlayer.inventory.getStackInSlot(i);
+            ItemStack itemStack = mc.thePlayer.inventory.getStackInSlot(i);
 
             if (itemStack == null) {
                 continue;
             }
 
-            final float speed = itemStack.getStrVsBlock(blockState.getBlock());
+            float speed = itemStack.getStrVsBlock(blockState.getBlock());
 
             if (speed > bestSpeed) {
                 bestSpeed = speed;
@@ -89,11 +69,11 @@ public class PlayerUtils implements InstanceAccess {
         return bestSlot;
     }
 
-    public static boolean overVoid() {
+    public boolean overVoid() {
         return overVoid(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
     }
 
-    public static boolean overVoid(double posX, double posY, double posZ) {
+    public boolean overVoid(double posX, double posY, double posZ) {
         for (int i = (int) posY; i > -1; i--) {
             if (!(mc.theWorld.getBlockState(new BlockPos(posX, i, posZ)).getBlock() instanceof BlockAir)) {
                 return false;
@@ -102,7 +82,7 @@ public class PlayerUtils implements InstanceAccess {
         return true;
     }
 
-    public static boolean isInTeam(Entity entity) {
+    public boolean isInTeam(Entity entity) {
         if (mc.thePlayer.getDisplayName() != null && entity.getDisplayName() != null) {
             String targetName = entity.getDisplayName().getFormattedText().replace("§r", "");
             String clientName = mc.thePlayer.getDisplayName().getFormattedText().replace("§r", "");
@@ -111,7 +91,7 @@ public class PlayerUtils implements InstanceAccess {
         return false;
     }
 
-    public static double getDistanceToEntityBox(Entity entity) {
+    public double getDistanceToEntityBox(Entity entity) {
         Vec3 eyes = mc.thePlayer.getPositionEyes(1);
         Vec3 pos = RotationUtils.getBestHitVec(entity);
         double xDist = Math.abs(pos.xCoord - eyes.xCoord);
@@ -120,7 +100,7 @@ public class PlayerUtils implements InstanceAccess {
         return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2) + Math.pow(zDist, 2));
     }
 
-    public static double getCustomDistanceToEntityBox(Vec3 playerPos, Entity entity) {
+    public double getCustomDistanceToEntityBox(Vec3 playerPos, Entity entity) {
         Vec3 eyes = new Vec3(playerPos.xCoord, playerPos.yCoord, playerPos.zCoord);
         Vec3 pos = RotationUtils.getBestHitVec(entity);
         double xDist = Math.abs(pos.xCoord - eyes.xCoord);
@@ -129,19 +109,19 @@ public class PlayerUtils implements InstanceAccess {
         return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2) + Math.pow(zDist, 2));
     }
 
-    public static boolean inLiquid() {
+    public boolean inLiquid() {
         return mc.thePlayer.isInWater() || mc.thePlayer.isInLava();
     }
 
-    public static Block getBlock(final double x, final double y, final double z) {
+    public Block getBlock(double x, double y, double z) {
         return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 
-    public static Block blockRelativeToPlayer(final double offsetX, final double offsetY, final double offsetZ) {
+    public Block blockRelativeToPlayer(double offsetX, double offsetY, double offsetZ) {
         return getBlock(mc.thePlayer.posX + offsetX, mc.thePlayer.posY + offsetY, mc.thePlayer.posZ + offsetZ);
     }
 
-    public static EntityPlayer getTarget(double distance, boolean teamCheck) {
+    public EntityPlayer getTarget(double distance, boolean teamCheck) {
         EntityPlayer target = null;
         if (mc.theWorld == null) {
             return null;
@@ -168,17 +148,17 @@ public class PlayerUtils implements InstanceAccess {
         return target;
     }
 
-    public static Block getBlock(BlockPos blockPos) {
+    public Block getBlock(BlockPos blockPos) {
         return mc.theWorld.getBlockState(blockPos).getBlock();
     }
 
-    public static boolean isReplaceable(BlockPos blockPos) {
+    public boolean isReplaceable(BlockPos blockPos) {
         return getBlock(blockPos).isReplaceable(mc.theWorld, blockPos);
     }
 
-    private static final String[] healthSubstrings = {"hp", "health", "lives", "❤"};
+    private String[] healthSubstrings = {"hp", "health", "lives", "❤"};
 
-    public static Float getActualHealth(EntityLivingBase entity) {
+    public Float getActualHealth(EntityLivingBase entity) {
         Scoreboard scoreboard = entity.getEntityWorld().getScoreboard();
         ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(2);
 
@@ -215,44 +195,44 @@ public class PlayerUtils implements InstanceAccess {
         return entity.getHealth();
     }
 
-    public static class PredictProcess {
-        public final Vec3 position;
-        public final float fallDistance;
-        private final boolean onGround;
-        public final boolean isCollidedHorizontally;
-        public final EntityPlayerSP player;
+    public class PredictProcess {
+        public Vec3 position;
+        public float fallDistance;
+        public boolean onGround;
+        public boolean isCollidedHorizontally;
         public int tick;
-
-        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally, EntityPlayerSP player) {
-            this.position = position;
-            this.fallDistance = fallDistance;
-            this.onGround = onGround;
-            this.isCollidedHorizontally = isCollidedHorizontally;
-            this.player = player;
-        }
+        public boolean isInWater;
 
         public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally) {
             this.position = position;
             this.fallDistance = fallDistance;
             this.onGround = onGround;
             this.isCollidedHorizontally = isCollidedHorizontally;
-            this.player = mc.thePlayer;
+            this.isInWater = false;
+        }
+
+        public PredictProcess(Vec3 position, float fallDistance, boolean onGround, boolean isCollidedHorizontally, boolean inWater) {
+            this.position = position;
+            this.fallDistance = fallDistance;
+            this.onGround = onGround;
+            this.isCollidedHorizontally = isCollidedHorizontally;
+            this.isInWater = inWater;
         }
     }
 
-    public static boolean insideBlock() {
+    public boolean insideBlock() {
         if (mc.thePlayer.ticksExisted < 5) {
             return false;
         }
 
-        final EntityPlayerSP player = mc.thePlayer;
-        final WorldClient world = mc.theWorld;
-        final AxisAlignedBB bb = player.getEntityBoundingBox();
+        EntityPlayerSP player = mc.thePlayer;
+        WorldClient world = mc.theWorld;
+        AxisAlignedBB bb = player.getEntityBoundingBox();
         for (int x = MathHelper.floor_double(bb.minX); x < MathHelper.floor_double(bb.maxX) + 1; ++x) {
             for (int y = MathHelper.floor_double(bb.minY); y < MathHelper.floor_double(bb.maxY) + 1; ++y) {
                 for (int z = MathHelper.floor_double(bb.minZ); z < MathHelper.floor_double(bb.maxZ) + 1; ++z) {
-                    final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
-                    final AxisAlignedBB boundingBox;
+                    Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                    AxisAlignedBB boundingBox;
                     if (block != null && !(block instanceof BlockAir) && (boundingBox = block.getCollisionBoundingBox(world, new BlockPos(x, y, z), world.getBlockState(new BlockPos(x, y, z)))) != null && player.getEntityBoundingBox().intersectsWith(boundingBox)) {
                         return true;
                     }
@@ -262,7 +242,7 @@ public class PlayerUtils implements InstanceAccess {
         return false;
     }
 
-    public static String getCurrServer() {
+    public String getCurrServer() {
         String srv;
 
         if (!mc.isSingleplayer()) {
@@ -278,21 +258,21 @@ public class PlayerUtils implements InstanceAccess {
         return srv;
     }
 
-    public static boolean isHoldingSword() {
+    public boolean isHoldingSword() {
         return mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword;
     }
 
-    public static double getDistToTargetFromMouseOver(Entity target) {
+    public double getDistToTargetFromMouseOver(Entity target) {
         return getDistToTargetFromMouseOver(mc.thePlayer.getPositionEyes(1), mc.thePlayer.getLook(1), target, target.getHitbox());
     }
 
-    public static double getDistToTargetFromMouseOver(Vec3 playerPos, Vec3 look, Entity target, AxisAlignedBB targetBB) {
+    public double getDistToTargetFromMouseOver(Vec3 playerPos, Vec3 look, Entity target, AxisAlignedBB targetBB) {
         double blockReachDistance = 64;
         Vec3 vec32 = playerPos.addVector(look.xCoord * blockReachDistance, look.yCoord * blockReachDistance, look.zCoord * blockReachDistance);
 
         Vec3 vec33 = null;
 
-        final MovingObjectPosition movingobjectposition = targetBB.calculateIntercept(playerPos, vec32);
+        MovingObjectPosition movingobjectposition = targetBB.calculateIntercept(playerPos, vec32);
 
         if (targetBB.isVecInside(playerPos)) {
             vec33 = movingobjectposition == null ? playerPos : movingobjectposition.hitVec;
@@ -316,18 +296,18 @@ public class PlayerUtils implements InstanceAccess {
         return vec33 == null ? Double.MAX_VALUE : playerPos.distanceTo(vec33);
     }
 
-    public static Vec3 getPosFromAABB(AxisAlignedBB a) {
+    public Vec3 getPosFromAABB(AxisAlignedBB a) {
         return new Vec3((a.minX + a.maxX) / 2, a.minY, (a.minZ + a.maxZ) / 2);
     }
 
-    public static boolean isOnLiquid() {
+    public boolean isOnLiquid() {
         boolean onLiquid = false;
-        final AxisAlignedBB playerBB = mc.thePlayer.getEntityBoundingBox();
-        final WorldClient world = mc.theWorld;
-        final int y = (int) playerBB.offset(0.0, -0.01, 0.0).minY;
+        AxisAlignedBB playerBB = mc.thePlayer.getEntityBoundingBox();
+        WorldClient world = mc.theWorld;
+        int y = (int) playerBB.offset(0.0, -0.01, 0.0).minY;
         for (int x = MathHelper.floor_double(playerBB.minX); x < MathHelper.floor_double(playerBB.maxX) + 1; ++x) {
             for (int z = MathHelper.floor_double(playerBB.minZ); z < MathHelper.floor_double(playerBB.maxZ) + 1; ++z) {
-                final Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+                Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
                 if (block != null && !(block instanceof BlockAir)) {
                     if (!(block instanceof BlockLiquid)) {
                         return false;
@@ -337,5 +317,30 @@ public class PlayerUtils implements InstanceAccess {
             }
         }
         return onLiquid;
+    }
+
+    public PredictProcess predictPlayerPosition(int ticks) {
+        List<PredictProcess> selfPrediction = new ArrayList<>();
+
+        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
+
+        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
+
+        for (int i = 0; i < ticks; i++) {
+            simulatedSelf.tick();
+
+            PlayerUtils.PredictProcess predictProcess = new PlayerUtils.PredictProcess(
+                    simulatedSelf.getPos(),
+                    simulatedSelf.fallDistance,
+                    simulatedSelf.onGround,
+                    simulatedSelf.isCollidedHorizontally
+            );
+
+            predictProcess.tick = i;
+
+            selfPrediction.add(predictProcess);
+        }
+
+        return selfPrediction.get(selfPrediction.size() - 1);
     }
 }

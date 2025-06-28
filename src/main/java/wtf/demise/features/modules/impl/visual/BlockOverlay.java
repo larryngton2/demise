@@ -9,7 +9,7 @@ import wtf.demise.features.values.impl.SliderValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "BlockOverlay", category = ModuleCategory.Visual)
+@ModuleInfo(name = "BlockOverlay", description = "Modifies the block overlay.", category = ModuleCategory.Visual)
 public class BlockOverlay extends Module {
     public final BoolValue outline = new BoolValue("Outline", true, this);
     public final BoolValue filled = new BoolValue("Filled", false, this);

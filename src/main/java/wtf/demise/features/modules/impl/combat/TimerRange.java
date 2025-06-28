@@ -77,14 +77,7 @@ public class TimerRange extends Module {
     public void onMoveInput(MoveInputEvent e) {
         selfPrediction.clear();
 
-        MovementInput movementInput = new MovementInput();
-
-        movementInput.moveForward = mc.thePlayer.movementInput.moveForward;
-        movementInput.moveStrafe = 0;
-        movementInput.jump = mc.thePlayer.movementInput.jump;
-        movementInput.sneak = mc.thePlayer.movementInput.sneak;
-
-        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(movementInput, 1);
+        SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
 
         simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
 
@@ -95,8 +88,7 @@ public class TimerRange extends Module {
                     simulatedSelf.getPos(),
                     simulatedSelf.fallDistance,
                     simulatedSelf.onGround,
-                    simulatedSelf.isCollidedHorizontally,
-                    simulatedSelf.player
+                    simulatedSelf.isCollidedHorizontally
             );
 
             predictProcess.tick = i;

@@ -8,7 +8,7 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "ViewBobbing", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ViewBobbing", description = "Modifies your bobbing animation.", category = ModuleCategory.Visual)
 public class ViewBobbing extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Smooth", "Funny", "None"}, "Smooth", this);
 

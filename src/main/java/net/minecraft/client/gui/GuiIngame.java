@@ -907,6 +907,7 @@ public class GuiIngame extends Gui {
         }
     }
 
+
     public void updateTick() {
         if (this.recordPlayingUpFor > 0) {
             --this.recordPlayingUpFor;
@@ -924,19 +925,25 @@ public class GuiIngame extends Gui {
         ++updateCounter;
 
         if (this.mc.thePlayer != null) {
-            ItemStack itemstack = mc.thePlayer.inventory.getStackInSlot(SpoofSlotUtils.getSpoofedSlot());
+            int slot = SpoofSlotUtils.getSpoofedSlot();
+            if (slot >= 0 && slot < 36) {
+                ItemStack itemstack = mc.thePlayer.inventory.getStackInSlot(slot);
 
-            if (itemstack == null) {
-                this.remainingHighlightTicks = 0;
-            } else if (this.highlightingItemStack != null && itemstack.getItem() == this.highlightingItemStack.getItem() && ItemStack.areItemStackTagsEqual(itemstack, this.highlightingItemStack) && (itemstack.isItemStackDamageable() || itemstack.getMetadata() == this.highlightingItemStack.getMetadata())) {
-                if (this.remainingHighlightTicks > 0) {
-                    --this.remainingHighlightTicks;
+                if (itemstack == null) {
+                    this.remainingHighlightTicks = 0;
+                } else if (this.highlightingItemStack != null && itemstack.getItem() == this.highlightingItemStack.getItem() && ItemStack.areItemStackTagsEqual(itemstack, this.highlightingItemStack) && (itemstack.isItemStackDamageable() || itemstack.getMetadata() == this.highlightingItemStack.getMetadata())) {
+                    if (this.remainingHighlightTicks > 0) {
+                        --this.remainingHighlightTicks;
+                    }
+                } else {
+                    this.remainingHighlightTicks = 40;
                 }
-            } else {
-                this.remainingHighlightTicks = 40;
-            }
 
-            this.highlightingItemStack = itemstack;
+                this.highlightingItemStack = itemstack;
+            } else {
+                this.remainingHighlightTicks = 0;
+                this.highlightingItemStack = null;
+            }
         }
     }
 

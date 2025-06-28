@@ -11,6 +11,7 @@ import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.click.components.Category;
+import wtf.demise.gui.click.components.SearchCategory;
 import wtf.demise.gui.click.components.config.ConfigCategoryComponent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
@@ -29,10 +30,12 @@ public class PanelGui extends GuiScreen {
     public static Category selectedCategory;
     // I cant set selectedCategory to be a ConfigCategoryComponent, so this is a workaround for that
     public static ConfigCategoryComponent selectedConfigCategory;
+    public static SearchCategory selectedSearchCategory;
     public static boolean dragging;
     private float dragX, dragY;
     public static float posX = 255, posY = 120;
     private final ConfigCategoryComponent configCategoryComponent;
+    private final SearchCategory searchCategoryComponent;
     public static float interpolatedScale;
     private boolean closing;
 
@@ -47,6 +50,7 @@ public class PanelGui extends GuiScreen {
         }
 
         configCategoryComponent = new ConfigCategoryComponent(posX + 7, posY + height);
+        searchCategoryComponent = new SearchCategory();
 
         if (selectedCategory == null) {
             selectedCategory = categories.get(0);
@@ -101,6 +105,7 @@ public class PanelGui extends GuiScreen {
 
                 selectedCategory = category;
                 selectedConfigCategory = null;
+                selectedSearchCategory = null;
 
                 skipped = false;
             }
@@ -108,6 +113,8 @@ public class PanelGui extends GuiScreen {
             category.setHovered(hovered);
             category.setSelected(selectedCategory != null && selectedCategory == category);
         }
+
+        boolean skipped1 = true;
 
         if (skipped) {
             boolean hovered = MouseUtils.isHovered(configCategoryComponent.getX(), configCategoryComponent.getY(), Fonts.interRegular.get(18).getStringWidth("Configs"), Fonts.interRegular.get(18).getHeight(), mouseX, mouseY);
@@ -119,6 +126,8 @@ public class PanelGui extends GuiScreen {
 
                 selectedConfigCategory = configCategoryComponent;
                 selectedCategory = null;
+                selectedSearchCategory = null;
+                skipped1 = false;
             }
 
             configCategoryComponent.setHovered(hovered);
@@ -133,9 +142,36 @@ public class PanelGui extends GuiScreen {
         Fonts.urbanist.get(35).drawString(Demise.INSTANCE.getClientName(), x, y, new Color(255, 255, 255, 208).getRGB());
         Fonts.urbanist.get(24).drawString(Demise.INSTANCE.getVersion(), Fonts.urbanist.get(35).getStringWidth(Demise.INSTANCE.getClientName()) + 2 + x, Fonts.urbanist.get(35).getHeight() + y - Fonts.urbanist.get(24).getHeight() * 1.1f, new Color(245, 245, 245, 208).getRGB());
 
+        float watermarkWidth = Fonts.urbanist.get(35).getStringWidth(Demise.INSTANCE.getClientName()) + 2 + Fonts.urbanist.get(24).getStringWidth(Demise.INSTANCE.getVersion());
+        float calcWidth = 450 - watermarkWidth - 19;
+
+        RoundedUtils.drawRound(posX + watermarkWidth + 13, posY + 7, calcWidth, 20, 7, new Color(0, 0, 0, 100));
+
+        boolean searchHovered = MouseUtils.isHovered(posX + watermarkWidth + 13, posY + 7, calcWidth, 20, mouseX, mouseY);
+        if (searchHovered && Mouse.isButtonDown(0) && skipped1) {
+            if (selectedSearchCategory == null) {
+                searchCategoryComponent.initCategory();
+            }
+
+            selectedSearchCategory = searchCategoryComponent;
+            selectedCategory = null;
+            selectedConfigCategory = null;
+        }
+
+        searchCategoryComponent.setSelected(selectedSearchCategory != null);
+
+        if (selectedSearchCategory == null) {
+            Fonts.interRegular.get(18).drawString("Search...", posX + watermarkWidth + 18, posY + 7 + Fonts.interRegular.get(15).getHeight() - 2, new Color(147, 147, 147, 255).getRGB());
+        }
+
         configCategoryComponent.render(false);
         if (selectedConfigCategory != null) {
             selectedConfigCategory.drawScreen(mouseX, mouseY);
+        }
+
+        searchCategoryComponent.render(false);
+        if (selectedSearchCategory != null) {
+            selectedSearchCategory.drawScreen(mouseX, mouseY);
         }
 
         categories.forEach(category -> category.render(false));
@@ -161,6 +197,7 @@ public class PanelGui extends GuiScreen {
         RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
         categories.forEach(category -> category.render(true));
         configCategoryComponent.render(true);
+        searchCategoryComponent.render(true);
         RenderUtils.scaleEnd();
     }
 
@@ -172,6 +209,10 @@ public class PanelGui extends GuiScreen {
             dragY = mouseY - posY;
         }
 
+        if (selectedSearchCategory != null) {
+            selectedSearchCategory.mouseClicked(mouseX, mouseY, mouseButton);
+            return;
+        }
         if (selectedConfigCategory != null) {
             selectedConfigCategory.mouseClicked(mouseX, mouseY, mouseButton);
             return;
@@ -185,6 +226,10 @@ public class PanelGui extends GuiScreen {
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         dragging = false;
 
+        if (selectedSearchCategory != null) {
+            selectedSearchCategory.mouseReleased(mouseX, mouseY, state);
+            return;
+        }
         if (selectedConfigCategory != null) {
             selectedConfigCategory.mouseReleased(mouseX, mouseY, state);
             return;
@@ -212,6 +257,10 @@ public class PanelGui extends GuiScreen {
             return;
         }
 
+        if (selectedSearchCategory != null) {
+            selectedSearchCategory.keyTyped(typedChar, keyCode);
+            return;
+        }
         if (selectedConfigCategory != null) {
             selectedConfigCategory.keyTyped(typedChar, keyCode);
             return;
