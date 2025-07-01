@@ -23,7 +23,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
@@ -106,7 +106,7 @@ public class TickBase extends Module {
 
         SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(movementInput, 1);
 
-        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedSelf.rotationYaw = RotationHandler.currentRotation != null ? RotationHandler.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < maxTick.get() + 1; i++) {
             simulatedSelf.tick();

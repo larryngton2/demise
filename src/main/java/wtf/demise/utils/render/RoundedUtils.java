@@ -2,6 +2,9 @@ package wtf.demise.utils.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import wtf.demise.Demise;
+import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.render.shader.ShaderUtils;
 
@@ -10,10 +13,8 @@ import java.awt.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RoundedUtils implements InstanceAccess {
-
     public static ShaderUtils roundedShader = new ShaderUtils("roundedRect");
     public static ShaderUtils roundedOutlineShader = new ShaderUtils("roundRectOutline");
-    private static final ShaderUtils roundedTexturedShader = new ShaderUtils("roundRectTexture");
     private static final ShaderUtils roundedGradientShader = new ShaderUtils("roundedRectGradient");
 
     public static void drawRound(float x, float y, float width, float height, float radius, Color color) {
@@ -22,6 +23,18 @@ public class RoundedUtils implements InstanceAccess {
 
     public static void drawShaderRound(float x, float y, float width, float height, float radius, Color color) {
         drawShaderRound(x, y, width, height, radius, false, color);
+    }
+
+    public static void drawGradientPreset(float x, float y, float width, float height, float radius) {
+        Shaders shaders = Demise.INSTANCE.getModuleManager().getModule(Shaders.class);
+
+        if (shaders.syncColor.get()) {
+            Interface anInterface = Demise.INSTANCE.getModuleManager().getModule(Interface.class);
+
+            drawGradientRound(x, y, width, height, radius, new Color(anInterface.color((int) x)), new Color(anInterface.color((int) (x + height))), new Color(anInterface.color((int) (x + width))), new Color(anInterface.color((int) (x + width + height))));
+        } else {
+            drawGradientRound(x, y, width, height, radius, shaders.bloomColor.get(), shaders.bloomColor.get(), shaders.bloomColor.get(), shaders.bloomColor.get());
+        }
     }
 
     public static void drawGradientHorizontal(float x, float y, float width, float height, float radius, Color left, Color right) {

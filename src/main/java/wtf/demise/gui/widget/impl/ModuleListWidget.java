@@ -1,8 +1,10 @@
 package wtf.demise.gui.widget.impl;
 
+import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
+import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.animations.Direction;
@@ -46,7 +48,7 @@ public class ModuleListWidget extends Widget {
 
             RenderPosition position = calculateRenderPosition(module, width, middle);
 
-            renderModule(module, position.x, position.y, offset, width, height, middle, i, false);
+            renderModule(module, position.x, position.y, offset, width, height, middle, i, false, false);
 
             if (!module.isHidden()) {
                 if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
@@ -72,7 +74,7 @@ public class ModuleListWidget extends Widget {
 
             RenderPosition position = calculateRenderPosition(module, width, middle);
 
-            renderModule(module, position.x, position.y, offset, width, height, middle, i, true);
+            renderModule(module, position.x, position.y, offset, width, height, middle, i, true, event.getShaderType() == Shader2DEvent.ShaderType.GLOW);
 
             if (!module.isHidden()) {
                 if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
@@ -105,12 +107,12 @@ public class ModuleListWidget extends Widget {
         return setting.getFr().getHeight() + yPadding;
     }
 
-    private void renderModule(Module module, float localX, float localY, float offset, int width, int height, int middle, int index, boolean shader) {
-        renderBackground(localX, localY, offset, width, height, middle, shader);
+    private void renderModule(Module module, float localX, float localY, float offset, int width, int height, int middle, int index, boolean shader, boolean isGlow) {
+        renderBackground(localX, localY, offset, width, height, middle, shader, isGlow);
         renderText(module, localX, localY, offset, width - xPadding, middle, index, shader);
     }
 
-    private void renderBackground(float localX, float localY, float offset, int width, int height, int middle, boolean shader) {
+    private void renderBackground(float localX, float localY, float offset, int width, int height, int middle, boolean shader, boolean isGlow) {
         if (!shader) {
             if (localX < middle) {
                 RenderUtils.drawRect(localX, localY + offset, width, height, setting.bgColor());
@@ -118,10 +120,20 @@ public class ModuleListWidget extends Widget {
                 RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height, setting.bgColor());
             }
         } else {
-            if (localX < middle) {
-                RenderUtils.drawRect(localX, localY + offset, width, height, Color.black.getRGB());
+            if (!isGlow) {
+                if (localX < middle) {
+                    RenderUtils.drawRect(localX, localY + offset, width, height, Color.black.getRGB());
+                } else {
+                    RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height, Color.black.getRGB());
+                }
             } else {
-                RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height, Color.black.getRGB());
+                int color = Demise.INSTANCE.getModuleManager().getModule(Shaders.class).syncColor.get() ? setting.color((int) localY) : Demise.INSTANCE.getModuleManager().getModule(Shaders.class).bloomColor.get().getRGB();
+
+                if (localX < middle) {
+                    RenderUtils.drawRect(localX, localY + offset, width, height, color);
+                } else {
+                    RenderUtils.drawRect(localX + this.width - width, localY + offset, width, height, color);
+                }
             }
         }
     }

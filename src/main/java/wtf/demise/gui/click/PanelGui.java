@@ -194,7 +194,11 @@ public class PanelGui extends GuiScreen {
 
         ScaledResolution sr = new ScaledResolution(mc);
         RenderUtils.scaleStart(sr.getScaledWidth() / 2f, sr.getScaledHeight() / 2f, interpolatedScale);
-        RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
+        if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+            RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
+        } else {
+            RoundedUtils.drawGradientPreset(posX, posY, 450, 300, 7);
+        }
         categories.forEach(category -> category.render(true));
         configCategoryComponent.render(true);
         searchCategoryComponent.render(true);

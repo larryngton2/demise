@@ -7,6 +7,7 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.render.RenderUtils;
@@ -29,15 +30,15 @@ public class InfoWidget extends Widget {
 
     @Override
     public void render() {
-        draw(false);
+        draw(false, false);
     }
 
     @Override
     public void onShader(Shader2DEvent event) {
-        draw(true);
+        draw(true, event.getShaderType() == Shader2DEvent.ShaderType.GLOW);
     }
 
-    private void draw(boolean shader) {
+    private void draw(boolean shader, boolean isGlow) {
         float x;
 
         long time = System.currentTimeMillis();
@@ -74,9 +75,15 @@ public class InfoWidget extends Widget {
             RenderUtils.renderPlayerHead(mc.thePlayer, x2 + 2, (renderY + height / 2) - 5, 10, 10);
             Fonts.interRegular.get(15).drawGradient(mc.thePlayer.getName(), x2 + 14, textY, (index) -> new Color(setting.color(index)));
         } else {
-            RoundedUtils.drawShaderRound(x, renderY, width3, height, 3, Color.black);
-            RoundedUtils.drawShaderRound(x1, renderY, width1, height, 3, Color.black);
-            RoundedUtils.drawShaderRound(x2, renderY, width2, height, 3, Color.black);
+            if (!isGlow) {
+                RoundedUtils.drawShaderRound(x, renderY, width3, height, 3, Color.black);
+                RoundedUtils.drawShaderRound(x1, renderY, width1, height, 3, Color.black);
+                RoundedUtils.drawShaderRound(x2, renderY, width2, height, 3, Color.black);
+            } else {
+                RoundedUtils.drawGradientPreset(x, renderY, width3, height, 3);
+                RoundedUtils.drawGradientPreset(x1, renderY, width1, height, 3);
+                RoundedUtils.drawGradientPreset(x2, renderY, width2, height, 3);
+            }
         }
     }
 

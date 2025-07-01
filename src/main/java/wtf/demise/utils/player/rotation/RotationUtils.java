@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import wtf.demise.utils.InstanceAccess;
 
 import static java.lang.Math.*;
-import static wtf.demise.utils.player.rotation.RotationManager.*;
+import static wtf.demise.utils.player.rotation.RotationHandler.*;
 
 public class RotationUtils implements InstanceAccess {
     public static float getAngleDifference(float a, float b) {

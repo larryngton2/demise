@@ -10,7 +10,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.scoreboard.Score;
@@ -22,7 +21,7 @@ import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.ArrayList;
@@ -324,7 +323,7 @@ public class PlayerUtils implements InstanceAccess {
 
         SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
 
-        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedSelf.rotationYaw = RotationHandler.currentRotation != null ? RotationHandler.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < ticks; i++) {
             simulatedSelf.tick();

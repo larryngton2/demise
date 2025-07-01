@@ -24,7 +24,7 @@ import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
 import wtf.demise.utils.player.rotation.BasicRotations;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.ArrayList;
@@ -139,7 +139,7 @@ public class NoFall extends Module {
 
         SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
 
-        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedSelf.rotationYaw = RotationHandler.currentRotation != null ? RotationHandler.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < predictTicks.get(); i++) {
             simulatedSelf.tick();

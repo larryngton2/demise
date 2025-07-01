@@ -40,7 +40,7 @@ import wtf.demise.features.modules.impl.visual.NoRenderOffsetReset;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.animations.ContinualAnimation;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 
 import java.util.*;
 
@@ -1326,7 +1326,7 @@ public abstract class EntityLivingBase extends Entity {
 
         if (this.swingProgress > 0.0F) {
             if (!Demise.INSTANCE.getModuleManager().getModule(NoRenderOffsetReset.class).isEnabled()) {
-                f1 = RotationManager.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationManager.currentRotation[0] : this.rotationYaw;
+                f1 = RotationHandler.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationHandler.currentRotation[0] : this.rotationYaw;
             }
         }
 
@@ -1379,8 +1379,8 @@ public abstract class EntityLivingBase extends Entity {
     protected float updateDistance(float p_110146_1_, float p_110146_2_) {
         float rotationYaw = this.rotationYaw;
         if (this instanceof EntityPlayerSP) {
-            if (RotationManager.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).body.get()) {
-                rotationYaw = RotationManager.currentRotation[0];
+            if (RotationHandler.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).body.get()) {
+                rotationYaw = RotationHandler.currentRotation[0];
             }
         }
 
@@ -1397,7 +1397,7 @@ public abstract class EntityLivingBase extends Entity {
             f1 = 75.0F;
         }
 
-        if (RotationManager.shouldRotate() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && !Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get())
+        if (RotationHandler.shouldRotate() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && !Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get())
             f1 = 0;
 
         this.renderYawOffset = rotationYaw - f1;
@@ -1456,7 +1456,7 @@ public abstract class EntityLivingBase extends Entity {
         } else if (this.isServerWorld()) {
             this.worldObj.theProfiler.startSection("newAi");
             this.updateEntityActionState();
-            this.rotationYawHead = RotationManager.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationManager.currentRotation[0] : this.rotationYawHead;
+            this.rotationYawHead = RotationHandler.shouldRotate() && this == Minecraft.getMinecraft().thePlayer && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(Rotation.class).realistic.get() ? RotationHandler.currentRotation[0] : this.rotationYawHead;
             this.worldObj.theProfiler.endSection();
         }
 

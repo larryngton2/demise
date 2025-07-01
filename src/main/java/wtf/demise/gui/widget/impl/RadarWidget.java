@@ -85,7 +85,11 @@ public class RadarWidget extends Widget {
 
     @Override
     public void onShader(Shader2DEvent event) {
-        RoundedUtils.drawShaderRound(renderX, renderY, width, height, 5, Color.BLACK);
+        if (event.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+            RoundedUtils.drawShaderRound(renderX, renderY, width, height, 5, Color.BLACK);
+        } else {
+            RoundedUtils.drawGradientPreset(renderX, renderY, width, height, 5);
+        }
     }
 
     @Override

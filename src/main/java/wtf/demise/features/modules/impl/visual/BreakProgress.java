@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.opengl.GL11;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Shader2DEvent;
@@ -67,7 +68,11 @@ public class BreakProgress extends Module {
         GL11.glPushMatrix();
         RenderUtils.scissor((float) (x - 1.5), (float) (y - 1.5), totalWidth + 3, height + 3);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        RoundedUtils.drawShaderRound(x, y, totalWidth, height, 5, Color.black);
+        if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+            RoundedUtils.drawShaderRound(x, y, totalWidth, height, 5, Color.black);
+        } else {
+            RoundedUtils.drawGradientPreset(x, y, totalWidth, height, 5);
+        }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         GL11.glPopMatrix();
     }

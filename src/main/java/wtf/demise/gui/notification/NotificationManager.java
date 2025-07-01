@@ -43,7 +43,7 @@ public class NotificationManager implements InstanceAccess {
         }
     }
 
-    public void publish(boolean shader) {
+    public void publish(boolean shader, boolean isGlow) {
         float yOffset = 0;
 
         for (Notification notification : getNotifications()) {
@@ -82,7 +82,11 @@ public class NotificationManager implements InstanceAccess {
                     Fonts.interSemiBold.get(17).drawString(notification.getTitle(), x + 4, y + 5, new Color(255, 255, 255, 255).getRGB());
                     Fonts.interRegular.get(17).drawString(notification.getDescription(), x + 4, y + 15, new Color(170, 170, 170).getRGB());
                 } else {
-                    RoundedUtils.drawShaderRound(x, y, width, height, 7, Color.black);
+                    if (!isGlow) {
+                        RoundedUtils.drawShaderRound(x, y, width, height, 7, Color.black);
+                    } else {
+                        RoundedUtils.drawGradientPreset(x, y, width, height, 7);
+                    }
                 }
 
                 yOffset -= (height + actualOffset) * (float) (notification.getAnimation().getOutput());

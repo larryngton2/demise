@@ -27,7 +27,7 @@ import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.LagUtils;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.utils.player.rotation.BasicRotations;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import javax.imageio.ImageIO;
@@ -140,7 +140,7 @@ public class Demise {
         eventManager.register(new CustomWidgets());
         eventManager.register(new ClickHandler());
         eventManager.register(new MathUtils());
-        eventManager.register(new RotationManager());
+        eventManager.register(new RotationHandler());
         eventManager.register(new BasicRotations());
 
         LOGGER.info("Event handlers registered.");

@@ -19,7 +19,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 @ModuleInfo(name = "CombatHelper", description = "Helps you with combat.", category = ModuleCategory.Legit)
@@ -135,7 +135,7 @@ public class CombatHelper extends Module {
 
             if ((attemptingToStrafe() || forceStrafe.get()) && adaptiveStrafe.get() && PlayerUtils.getDistanceToEntityBox(target) < maxStrafeDistance.get()) {
                 float strafeYaw = calculateStrafeYaw((EntityPlayer) target);
-                MoveUtil.fixMovement(e, RotationManager.shouldRotate() ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw, strafeYaw);
+                MoveUtil.fixMovement(e, RotationHandler.shouldRotate() ? RotationHandler.currentRotation[0] : mc.thePlayer.rotationYaw, strafeYaw);
             }
         }
     }

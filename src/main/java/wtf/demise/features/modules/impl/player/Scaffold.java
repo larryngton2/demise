@@ -32,14 +32,14 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.player.InventoryUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.util.Arrays;
-import java.util.List;
 
 @ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.", category = ModuleCategory.Player)
 public class Scaffold extends Module {
@@ -52,11 +52,14 @@ public class Scaffold extends Module {
     private final BoolValue clutch = new BoolValue("Clutch", false, this);
     private final ModeValue clutchCriteria = new ModeValue("Clutch criteria", new String[]{"MouseOver", "Prediction"}, "MouseOver", this, clutch::get);
     private final ModeValue clutchRotMode = new ModeValue("Clutch rotation mode", new String[]{"Normal", "Center"}, "Center", this, clutch::get);
-    private final BoolValue instantRots = new BoolValue("Instant clutch rots", false, this, clutch::get);
-    private final BoolValue smartRotSpeed = new BoolValue("Smart clutch rot speed", false, this, () -> clutch.get() && !instantRots.get());
+    private final MultiBoolValue instantRotsCriteria = new MultiBoolValue("Instant rot criteria", Arrays.asList(
+            new BoolValue("Always", false),
+            new BoolValue("On miss", false),
+            new BoolValue("Predict", false)
+    ), this, clutch::get);
     private final BoolValue autoSneakOnClutch = new BoolValue("Auto sneak on clutch", false, this, clutch::get);
     private final SliderValue groundTicksToSneak = new SliderValue("Ground ticks to sneak", 5, 0, 10, this, () -> clutch.get() && autoSneakOnClutch.get());
-    private final RotationHandler rotationHandler = new RotationHandler(this);
+    private final RotationManager rotationManager = new RotationManager(this);
     public final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Silent", "Ground", "Air", "None"}, "Normal", this);
     private final ModeValue speedMode = new ModeValue("Speed mode", new String[]{"Tick", "Exempt", "None"}, "None", this);
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
@@ -95,22 +98,6 @@ public class Scaffold extends Module {
     private boolean startClutch;
     private final TimerUtils clutchTimer = new TimerUtils();
     private final TimerUtils sneakTimer = new TimerUtils();
-
-    private final List<Block> blacklistedBlocks = Arrays.asList(Blocks.air, Blocks.water, Blocks.flowing_water, Blocks.lava, Blocks.wooden_slab, Blocks.chest, Blocks.flowing_lava,
-            Blocks.enchanting_table, Blocks.carpet, Blocks.glass_pane, Blocks.skull, Blocks.stained_glass_pane, Blocks.iron_bars, Blocks.snow_layer, Blocks.ice, Blocks.packed_ice,
-            Blocks.coal_ore, Blocks.diamond_ore, Blocks.emerald_ore, Blocks.trapped_chest, Blocks.torch, Blocks.anvil,
-            Blocks.noteblock, Blocks.jukebox, Blocks.tnt, Blocks.gold_ore, Blocks.iron_ore, Blocks.lapis_ore, Blocks.lit_redstone_ore, Blocks.quartz_ore, Blocks.redstone_ore,
-            Blocks.wooden_pressure_plate, Blocks.stone_pressure_plate, Blocks.light_weighted_pressure_plate, Blocks.heavy_weighted_pressure_plate,
-            Blocks.stone_button, Blocks.wooden_button, Blocks.lever, Blocks.tallgrass, Blocks.tripwire, Blocks.tripwire_hook, Blocks.rail, Blocks.waterlily, Blocks.red_flower,
-            Blocks.red_mushroom, Blocks.brown_mushroom, Blocks.vine, Blocks.trapdoor, Blocks.yellow_flower, Blocks.ladder, Blocks.furnace, Blocks.sand, Blocks.cactus,
-            Blocks.dispenser, Blocks.noteblock, Blocks.dropper, Blocks.crafting_table, Blocks.pumpkin, Blocks.sapling, Blocks.cobblestone_wall,
-            Blocks.oak_fence, Blocks.activator_rail, Blocks.detector_rail, Blocks.golden_rail, Blocks.redstone_torch, Blocks.acacia_stairs,
-            Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs, Blocks.jungle_stairs, Blocks.nether_brick_stairs, Blocks.oak_stairs,
-            Blocks.quartz_stairs, Blocks.red_sandstone_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs, Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.double_wooden_slab, Blocks.stone_slab, Blocks.double_stone_slab, Blocks.stone_slab2, Blocks.double_stone_slab2,
-            Blocks.web, Blocks.gravel, Blocks.daylight_detector_inverted, Blocks.daylight_detector, Blocks.soul_sand, Blocks.piston, Blocks.piston_extension,
-            Blocks.piston_head, Blocks.sticky_piston, Blocks.iron_trapdoor, Blocks.ender_chest, Blocks.end_portal, Blocks.end_portal_frame, Blocks.standing_banner,
-            Blocks.wall_banner, Blocks.deadbush, Blocks.slime_block, Blocks.acacia_fence_gate, Blocks.birch_fence_gate, Blocks.dark_oak_fence_gate,
-            Blocks.jungle_fence_gate, Blocks.spruce_fence_gate, Blocks.oak_fence_gate);
 
     @Override
     public void onEnable() {
@@ -194,7 +181,6 @@ public class Scaffold extends Module {
             blocksPlacedSneak = 0;
         }
 
-
         mc.entityRenderer.getMouseOver(1);
 
         if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
@@ -240,19 +226,13 @@ public class Scaffold extends Module {
 
         float[] rotation = new float[]{initialYaw, initialPitch};
 
-        if (clutch.get()) {
+        if (clutch.get() && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.getPositionVector().subtract(0, 2, 0))).getBlock() instanceof BlockAir) {
             switch (clutchCriteria.get()) {
                 case "MouseOver":
                     MovingObjectPosition ray = RotationUtils.rayTraceSafe(rotation, 4.5, 1);
 
-                    if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving()) {
-                        if (instantRots.get()) {
-                            rotationHandler.setRandYawSpeed(180);
-                            rotationHandler.setRandPitchSpeed(180);
-                        }
-
+                    if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving() || (ray.getBlockPos() != null && ray.getBlockPos().distanceSq(data.blockPos) > 1)) {
                         setClutchRot();
-
                         clutching = true;
                     } else {
                         clutching = false;
@@ -260,7 +240,7 @@ public class Scaffold extends Module {
                     break;
                 case "Prediction":
                     boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
-                    boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(yaw), 1).down()).getBlock() instanceof BlockAir;
+                    boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(initialYaw), 1).down()).getBlock() instanceof BlockAir;
 
                     if ((isLeaningOffBlock && nextBlockIsAir) || !MoveUtil.isMoving()) {
                         startClutch = true;
@@ -281,7 +261,7 @@ public class Scaffold extends Module {
         }
 
         if (!mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            rotationHandler.setRotation(new float[]{clutching ? yaw : initialYaw, clutching ? pitch : initialPitch});
+            rotationManager.setRotation(new float[]{clutching ? yaw : initialYaw, clutching ? pitch : initialPitch});
         }
     }
 
@@ -325,11 +305,25 @@ public class Scaffold extends Module {
             break;
         }
 
-        if (smartRotSpeed.get() && !instantRots.get()) {
-            if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos)) {
-                rotationHandler.setRandYawSpeed(180);
-                rotationHandler.setRandPitchSpeed(180);
+        boolean isLeaningOffBlock = PlayerUtils.getBlock(targetBlock.offset(data.facing.getOpposite())) instanceof BlockAir;
+        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(initialYaw), 1).down()).getBlock() instanceof BlockAir;
+
+        boolean instantRotation = instantRotsCriteria.isEnabled("Predict") && isLeaningOffBlock && nextBlockIsAir;
+
+        if (instantRotsCriteria.isEnabled("Always")) {
+            instantRotation = true;
+        }
+
+        MovingObjectPosition nigger = RotationUtils.rayTraceSafe(new float[]{yaw, pitch}, 4.5, 1);
+        if (instantRotsCriteria.isEnabled("On miss")) {
+            if (nigger.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !nigger.getBlockPos().equalsBlockPos(data.blockPos)) {
+                instantRotation = true;
             }
+        }
+
+        if (instantRotation) {
+            rotationManager.setRandYawSpeed(180);
+            rotationManager.setRandPitchSpeed(180);
         }
     }
 
@@ -343,7 +337,7 @@ public class Scaffold extends Module {
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());
 
-        rotationHandler.updateRotSpeed(e);
+        rotationManager.updateRotSpeed(e);
 
         if (!addons.isEnabled("Ignore tick cycle") || (clutching && addons.isEnabled("RayTrace"))) {
             place();
@@ -586,7 +580,7 @@ public class Scaffold extends Module {
             if (itemStack != null && itemStack.stackSize > 0) {
                 final Item item = itemStack.getItem();
 
-                if (item instanceof ItemBlock && !blacklistedBlocks.contains(((ItemBlock) item).getBlock())) {
+                if (item instanceof ItemBlock && !InventoryUtils.blacklistedBlocks.contains(((ItemBlock) item).getBlock())) {
                     slot = i;
                 }
             }
@@ -603,7 +597,7 @@ public class Scaffold extends Module {
 
             final ItemStack is = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
 
-            if (!(is.getItem() instanceof ItemBlock && !blacklistedBlocks.contains(((ItemBlock) is.getItem()).getBlock()))) {
+            if (!(is.getItem() instanceof ItemBlock && !InventoryUtils.blacklistedBlocks.contains(((ItemBlock) is.getItem()).getBlock()))) {
                 continue;
             }
 

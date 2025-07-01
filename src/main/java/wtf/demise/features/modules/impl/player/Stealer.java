@@ -44,7 +44,7 @@ public class Stealer extends Module {
 
             if (startDelayTimer.hasTimeElapsed(startDelay.get() * 50L)) {
                 for (int i = 0; i < container.getLowerChestInventory().getSizeInventory(); ++i) {
-                    if (container.getLowerChestInventory().getStackInSlot(i) != null && (stealTimer.hasTimeElapsed(currentStealWait * 50L) || currentStealWait == 0 && InventoryUtils.isValid(container.getLowerChestInventory().getStackInSlot(i)))) {
+                    if (container.getLowerChestInventory().getStackInSlot(i) != null && (stealTimer.hasTimeElapsed(currentStealWait * 50L) || currentStealWait == 0) && InventoryUtils.isValidStack(container.getLowerChestInventory().getStackInSlot(i))) {
                         slot = i;
                         mc.playerController.windowClick(container.windowId, i, 0, 1, mc.thePlayer);
                         currentStealWait = MathUtils.randomizeInt(minDelay.get(), maxDelay.get());

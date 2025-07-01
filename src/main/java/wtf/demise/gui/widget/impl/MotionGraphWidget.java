@@ -92,7 +92,11 @@ public class MotionGraphWidget extends Widget {
 
     @Override
     public void onShader(Shader2DEvent e) {
-        RoundedUtils.drawShaderRound(renderX, renderY, width, height, 3, Color.BLACK);
+        if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+            RoundedUtils.drawShaderRound(renderX, renderY, width, height, 3, Color.BLACK);
+        } else {
+            RoundedUtils.drawGradientPreset(renderX, renderY, width, height, 3);
+        }
     }
 
     @Override

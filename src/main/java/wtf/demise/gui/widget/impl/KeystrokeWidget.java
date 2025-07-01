@@ -35,15 +35,15 @@ public class KeystrokeWidget extends Widget {
 
     @Override
     public void render() {
-        drawKeystrokes(false);
+        drawKeystrokes(false, false);
     }
 
     @Override
     public void onShader(Shader2DEvent event) {
-        drawKeystrokes(true);
+        drawKeystrokes(true, event.getShaderType() == Shader2DEvent.ShaderType.GLOW);
     }
 
-    private void drawKeystrokes(boolean shader) {
+    private void drawKeystrokes(boolean shader, boolean isGlow) {
         w.setPressed(mc.thePlayer.movementInput.moveForward > 0);
         a.setPressed(mc.thePlayer.movementInput.moveStrafe > 0);
         s.setPressed(mc.thePlayer.movementInput.moveForward < 0);
@@ -89,7 +89,11 @@ public class KeystrokeWidget extends Widget {
                 RoundedUtils.drawRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, key.getColor());
                 Fonts.interRegular.get(14).drawCenteredString(key.getName(), (key.getInterpolatedX() + key.getInterpolatedWidth() / 2), (key.getInterpolatedY() + key.getInterpolatedHeight() / 2) - 1.5, setting.color());
             } else {
-                RoundedUtils.drawShaderRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, Color.black);
+                if (!isGlow) {
+                    RoundedUtils.drawShaderRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, Color.black);
+                } else {
+                    RoundedUtils.drawGradientPreset(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3);
+                }
             }
         }
     }

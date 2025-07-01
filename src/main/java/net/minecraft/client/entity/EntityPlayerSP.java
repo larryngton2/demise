@@ -36,7 +36,7 @@ import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 
 import java.util.Objects;
 
@@ -160,15 +160,15 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             float yaw = motionEvent.getYaw();
             float pitch = motionEvent.getPitch();
 
-            if (RotationManager.shouldRotate()) {
-                RotationManager.previousRotation = RotationManager.currentRotation;
+            if (RotationHandler.shouldRotate()) {
+                RotationHandler.previousRotation = RotationHandler.currentRotation;
 
-                float[] rot = Objects.requireNonNullElse(RotationManager.currentRotation, mc.thePlayer.getRotation());
+                float[] rot = Objects.requireNonNullElse(RotationHandler.currentRotation, mc.thePlayer.getRotation());
 
                 yaw = rot[0];
                 pitch = rot[1];
             } else {
-                RotationManager.previousRotation = new float[]{yaw, pitch};
+                RotationHandler.previousRotation = new float[]{yaw, pitch};
             }
 
             double d3 = (yaw - this.lastReportedYaw);

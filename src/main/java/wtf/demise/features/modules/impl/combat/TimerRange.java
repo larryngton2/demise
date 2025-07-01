@@ -3,7 +3,6 @@ package wtf.demise.features.modules.impl.combat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MovementInput;
 import org.apache.commons.lang3.Range;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
@@ -25,7 +24,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
-import wtf.demise.utils.player.rotation.RotationManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
@@ -79,7 +78,7 @@ public class TimerRange extends Module {
 
         SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);
 
-        simulatedSelf.rotationYaw = RotationManager.currentRotation != null ? RotationManager.currentRotation[0] : mc.thePlayer.rotationYaw;
+        simulatedSelf.rotationYaw = RotationHandler.currentRotation != null ? RotationHandler.currentRotation[0] : mc.thePlayer.rotationYaw;
 
         for (int i = 0; i < maxTick.get() + 1; i++) {
             simulatedSelf.tick();

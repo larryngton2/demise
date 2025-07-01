@@ -14,7 +14,7 @@ import wtf.demise.utils.math.TimerUtils;
 import java.util.Objects;
 
 import static java.lang.Math.*;
-import static wtf.demise.utils.player.rotation.RotationManager.*;
+import static wtf.demise.utils.player.rotation.RotationHandler.*;
 import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
 import static wtf.demise.utils.player.rotation.RotationUtils.getRotationDifference;
 
@@ -54,7 +54,7 @@ public class BasicRotations implements InstanceAccess {
         cachedVSpeed = vSpeed;
         cachedCorrection = correction;
         enabled = true;
-        RotationManager.enabled = true;
+        RotationHandler.enabled = true;
         currRotRequireNonNullElse = Objects.requireNonNullElse(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
     }
 
@@ -80,7 +80,7 @@ public class BasicRotations implements InstanceAccess {
     public void onGameUpdate(GameEvent e) {
         double distanceToPlayerRotation = getRotationDifference(currentRotation, new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch});
 
-        if (!enabled && angleCalled && RotationManager.reset) {
+        if (!enabled && angleCalled && RotationHandler.reset) {
             if (distanceToPlayerRotation < 1) {
                 resetRotation();
                 return;

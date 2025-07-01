@@ -22,7 +22,7 @@ import wtf.demise.utils.render.RenderUtils;
 @ModuleInfo(name = "AimAssist", description = "Assists in aiming.", category = ModuleCategory.Legit)
 public class AimAssist extends Module {
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
-    private final RotationHandler rotationHandler = new RotationHandler(this);
+    private final RotationManager rotationManager = new RotationManager(this);
     private final BoolValue onlyOnClick = new BoolValue("Only on click", true, this);
     private final SliderValue resetTime = new SliderValue("Reset time", 500, 0, 1000, 1, this, onlyOnClick::get);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);
@@ -34,7 +34,7 @@ public class AimAssist extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        rotationHandler.updateRotSpeed(e);
+        rotationManager.updateRotSpeed(e);
 
         if (onlyOnClick.get() && Mouse.isButtonDown(0) && angleCalled) {
             resetTimer.reset();
@@ -51,7 +51,7 @@ public class AimAssist extends Module {
         }
 
         if (angleCalled && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.MISS) {
-            rotationHandler.setRotation(rotationHandler.getSimpleRotationsToEntity(target));
+            rotationManager.setRotation(rotationManager.getSimpleRotationsToEntity(target));
         }
 
         angleCalled = false;
@@ -65,7 +65,7 @@ public class AimAssist extends Module {
     @EventTarget
     public void onGameEvent(GameEvent e) {
         if (target != null) {
-            RotationManager.enabled = true;
+            RotationHandler.enabled = true;
         }
     }
 

@@ -4,12 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
-import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.TeleportEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
@@ -19,13 +17,13 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 @ModuleInfo(name = "BedNuker", description = "Automatically breaks beds around you.", category = ModuleCategory.Player)
 public class BedNuker extends Module {
     public final SliderValue breakRange = new SliderValue("Break Range", 4.5f, 1, 6, 0.1f, this);
-    private final RotationHandler rotationHandler = new RotationHandler(this);
+    private final RotationManager rotationManager = new RotationManager(this);
     public final BoolValue whitelistOwnBed = new BoolValue("Whitelist Own Bed", true, this);
     public BlockPos bedPos;
     public boolean rotate = false;
@@ -66,14 +64,14 @@ public class BedNuker extends Module {
 //            return;
 //        }
 
-        rotationHandler.updateRotSpeed(e);
+        rotationManager.updateRotSpeed(e);
 
         getBedPos();
 
         if (bedPos != null) {
             if (rotate) {
                 float[] rot = RotationUtils.getRotationToBlock(bedPos, getEnumFacing(bedPos));
-                rotationHandler.setRotation(rot);
+                rotationManager.setRotation(rot);
                 rotate = false;
             }
             mine(bedPos);

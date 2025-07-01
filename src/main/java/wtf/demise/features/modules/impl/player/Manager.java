@@ -110,11 +110,11 @@ public class Manager extends Module {
     }
 
     private boolean processToolsAndArmor(int slot, ItemStack stack) {
-        if (stack.getItem() instanceof ItemTool && InventoryUtils.isBestTool(mc.thePlayer, stack)) {
+        if (stack.getItem() instanceof ItemTool && InventoryUtils.isBestTool(stack)) {
             updateBestTool(slot, stack);
             return true;
         }
-        if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(mc.thePlayer, stack)) {
+        if (stack.getItem() instanceof ItemArmor armor && InventoryUtils.isBestArmor(stack)) {
             updateBestArmor(slot, armor);
             return true;
         }

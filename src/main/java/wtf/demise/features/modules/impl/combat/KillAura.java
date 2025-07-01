@@ -29,7 +29,7 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -63,7 +63,7 @@ public class KillAura extends Module {
     public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
-    private final RotationHandler rotationHandler = new RotationHandler(this);
+    private final RotationManager rotationManager = new RotationManager(this);
 
     // aim point
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this);
@@ -326,7 +326,7 @@ public class KillAura extends Module {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
             if (distance <= searchRange.get()) {
-                rotationHandler.setRotation(getRotations(currentTarget));
+                rotationManager.setRotation(getRotations(currentTarget));
             }
         }
     }
@@ -335,7 +335,7 @@ public class KillAura extends Module {
     public void onUpdate(UpdateEvent e) {
         shouldRandomize = rand.nextInt(100) <= oChance.get();
 
-        rotationHandler.updateRotSpeed(e);
+        rotationManager.updateRotSpeed(e);
 
         if (currentTarget != null && !isTargetInvalid() && delayed.get()) {
             positionHistory.offer(targetVec);

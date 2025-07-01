@@ -18,7 +18,7 @@ import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 
 import java.util.Arrays;
 
@@ -26,7 +26,7 @@ import java.util.Arrays;
 public class AutoWalk extends Module {
     private final BoolValue target = new BoolValue("Target player", false, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this, target::get);
-    private final RotationHandler rotationHandler = new RotationHandler(this);
+    private final RotationManager rotationManager = new RotationManager(this);
     private final SliderValue minRange = new SliderValue("Min range", 1.5f, 0, 15, 0.1f, this, target::get);
     private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
             new BoolValue("Players", true),
@@ -44,10 +44,10 @@ public class AutoWalk extends Module {
         } else {
             EntityLivingBase target = findTarget();
             if (target != null) {
-                rotationHandler.updateRotSpeed(e);
+                rotationManager.updateRotSpeed(e);
 
                 if (rotate.get()) {
-                    rotationHandler.setRotation(rotationHandler.getSimpleRotationsToEntity(target));
+                    rotationManager.setRotation(rotationManager.getSimpleRotationsToEntity(target));
                 }
 
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), PlayerUtils.getDistanceToEntityBox(target) > minRange.get());

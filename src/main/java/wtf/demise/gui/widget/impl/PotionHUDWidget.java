@@ -3,6 +3,7 @@ package wtf.demise.gui.widget.impl;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import wtf.demise.Demise;
 import wtf.demise.events.impl.render.Shader2DEvent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
@@ -55,7 +56,11 @@ public class PotionHUDWidget extends Widget {
         width = 92;
         height = heightAnimation.getOutput();
 
-        RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
+        if (event.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+            RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
+        } else {
+            RoundedUtils.drawGradientPreset(renderX, renderY, width, height, 6);
+        }
 
         heightAnimation.animate(20 + potions.size() * 10, 20);
     }

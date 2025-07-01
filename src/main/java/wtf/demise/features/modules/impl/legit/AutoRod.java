@@ -25,7 +25,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.rotation.RotationHandler;
+import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class AutoRod extends Module {
     private final SliderValue fov = new SliderValue("Fov", 90, 0, 360, 1, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this);
     private final SliderValue predictSize = new SliderValue("Predict Size", 2, 0.1f, 10, 0.1f, this, rotate::get);
-    private final RotationHandler rotationHandler = new RotationHandler(this);
+    private final RotationManager rotationManager = new RotationManager(this);
     private final BoolValue onlyOnKillAura = new BoolValue("Only on KillAura", false, this);
 
     private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
@@ -59,7 +59,7 @@ public class AutoRod extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        rotationHandler.updateRotSpeed(e);
+        rotationManager.updateRotSpeed(e);
 
         currentTarget = findTarget();
 
@@ -166,7 +166,7 @@ public class AutoRod extends Module {
         if (rotate.get() && KillAura.currentTarget == null && range > minRange.get() && range <= maxRange.get()) {
             float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.get(), 0.03f, 2f);
 
-            rotationHandler.setRotation(finalRotation);
+            rotationManager.setRotation(finalRotation);
         }
     }
 

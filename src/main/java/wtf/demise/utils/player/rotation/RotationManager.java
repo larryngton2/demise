@@ -1,278 +1,171 @@
 package wtf.demise.utils.player.rotation;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.network.play.client.C03PacketPlayer;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
-import wtf.demise.Demise;
-import wtf.demise.events.annotations.EventPriority;
-import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldChangeEvent;
-import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.player.*;
-import wtf.demise.features.modules.impl.player.Scaffold;
+import net.minecraft.util.Vec3;
+import org.apache.commons.lang3.Range;
+import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.values.impl.BoolValue;
+import wtf.demise.features.values.impl.ModeValue;
+import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SmoothMode;
 
-import static java.lang.Math.*;
-import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
-import static wtf.demise.utils.player.rotation.RotationUtils.getRotationDifference;
-
+@Getter
 public class RotationManager implements InstanceAccess {
-    public static float[] currentRotation = new float[]{}, serverRotation = new float[]{}, previousRotation = null;
-    public static float lastDelta;
-    public static boolean enabled;
-    private static float[] targetRotation;
-    private static boolean silent;
-    private static float cachedHSpeed;
-    private static float cachedVSpeed;
-    private static SmoothMode smoothMode;
-    public static boolean cachedCorrection;
-    public static float rotDiffBuildUp;
-    public static boolean reset;
-    private static final TimerUtils tickTimer = new TimerUtils();
-    private static final TimerUtils tickTimer1 = new TimerUtils();
-    private long lastFrameTime = System.nanoTime();
-    private float timeScale;
-    private int previousDeltaYaw = 0;
-    private int previousDeltaPitch = 0;
-    private static boolean cachedAccel;
-    private static float cachedAccelFactorYaw;
-    private static float cachedAccelFactorPitch;
-    private int interpolatedAccelDeltaYaw;
-    private int interpolatedAccelDeltaPitch;
+    final ModeValue smoothMode;
+    final BoolValue imperfectCorrelation;
+    final SliderValue yawRotationSpeedMin;
+    final SliderValue yawRotationSpeedMax;
+    final SliderValue pitchRotationSpeedMin;
+    final SliderValue pitchRotationSpeedMax;
+    final BoolValue distanceBasedRotationSpeed;
+    final SliderValue minRange;
+    final SliderValue maxRange;
+    final SliderValue decrementPerCycle;
+    final BoolValue movementFix;
+    final BoolValue shortStop;
+    final SliderValue shortStopDuration;
+    final SliderValue rotationDiffBuildUpToStop;
+    final SliderValue maxThresholdAttemptsToStop;
+    final BoolValue silent;
+    final BoolValue rotateLegit;
+    private EntityLivingBase target;
+    private final Module module;
+    final BoolValue accel;
+    final SliderValue yawAccelFactor;
+    final SliderValue pitchAccelFactor;
 
-    public RotationManager() {
-        enabled = true;
-        smoothMode = SmoothMode.None;
-        cachedCorrection = true;
-        cachedHSpeed = 180;
-        cachedVSpeed = 180;
-        targetRotation = currentRotation = new float[]{0, 0};
-        silent = true;
+    public RotationManager(Module module) {
+        this.module = module;
+
+        silent = new BoolValue("Silent", true, module);
+        rotateLegit = new BoolValue("Rotate legit", false, module);
+        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Polar", "None"}, "Linear", module, rotateLegit::get);
+        accel = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
+        yawAccelFactor = new SliderValue("Yaw accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
+        pitchAccelFactor = new SliderValue("Pitch accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
+        imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
+        yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
+        yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
+        pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
+        pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
+        distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> !smoothMode.is("None") && module.getClass() == KillAura.class && rotateLegit.get());
+        minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
+        maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
+        decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
+        movementFix = new BoolValue("Movement fix", false, module);
+        shortStop = new BoolValue("Short stop", false, module, rotateLegit::get);
+        shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, () -> shortStop.get() && shortStop.canDisplay());
+        rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, () -> shortStop.get() && shortStop.canDisplay());
+        maxThresholdAttemptsToStop = new SliderValue("Max threshold attempts to stop", 1, 0, 5, 1, module, () -> shortStop.get() && shortStop.canDisplay());
     }
 
-    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent) {
-        if (tickTimer.hasTimeElapsed(50)) {
-            lastDelta = getRotationDifference(currentRotation, previousRotation);
+    private final TimerUtils shortStopTimer = new TimerUtils();
+    @Setter
+    private float randYawSpeed;
+    @Setter
+    private float randPitchSpeed;
+    private int maxThresholdReachAttempts;
 
-            tickTimer.reset();
+    public void setRotation(float[] targetRotation) {
+        SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
+
+        float hSpeed = randYawSpeed;
+        float vSpeed = randPitchSpeed;
+
+        if (shortStop.get() && shouldShortStop()) {
+            hSpeed = MathUtils.randomizeFloat(0, 0.1f);
+            vSpeed = MathUtils.randomizeFloat(0, 0.1f);
         }
 
-        RotationManager.targetRotation = rotation;
-        RotationManager.silent = silent;
-        RotationManager.cachedHSpeed = speed[0];
-        RotationManager.cachedVSpeed = speed[1];
-        RotationManager.smoothMode = smoothMode;
-        RotationManager.cachedCorrection = correction;
-        RotationManager.cachedAccel = accel;
-        RotationManager.cachedAccelFactorYaw = accelFactor[0];
-        RotationManager.cachedAccelFactorPitch = accelFactor[1];
-        enabled = true;
-    }
-
-    private boolean shouldCorrect() {
-        return shouldRotate() && cachedCorrection;
-    }
-
-    @EventTarget
-    private void onMove(MoveInputEvent e) {
-        if (shouldCorrect()) {
-            MoveUtil.fixMovement(e, currentRotation[0]);
-        } else if (shouldRotate() && abs(getAngleDifference((float) toDegrees(MoveUtil.getDirection()), currentRotation[0])) > 90 && !mc.thePlayer.omniSprint && !Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled()) {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
-            mc.thePlayer.setSprinting(false);
-        }
-    }
-
-    @EventTarget
-    private void onStrafe(StrafeEvent e) {
-        if (shouldCorrect()) {
-            e.setYaw(currentRotation[0]);
-        }
-    }
-
-    @EventTarget
-    private void onJump(JumpEvent event) {
-        if (shouldCorrect()) {
-            event.setYaw(currentRotation[0]);
-        }
-    }
-
-    @EventTarget
-    public void onLook(LookEvent e) {
-        if (shouldRotate()) {
-            e.rotation = currentRotation;
-        }
-    }
-
-    @EventTarget
-    public void onWorldChange(WorldChangeEvent e) {
-        currentRotation = mc.thePlayer.getRotation();
-        targetRotation = mc.thePlayer.getRotation();
-    }
-
-    @EventTarget
-    @EventPriority(-100)
-    public void onPacket(final PacketEvent e) {
-        if (!(e.getPacket() instanceof C03PacketPlayer packetPlayer)) return;
-
-        if (!packetPlayer.rotating) {
-            rotDiffBuildUp = 0;
-            return;
+        if (imperfectCorrelation.get()) {
+            hSpeed *= MathUtils.randomizeFloat(0.9F, 1.1F);
+            vSpeed *= MathUtils.randomizeFloat(0.9F, 1.1F);
         }
 
-        if (shouldRotate()) {
-            packetPlayer.yaw = currentRotation[0];
-            packetPlayer.pitch = currentRotation[1];
-        }
+        if (module.getClass() == KillAura.class) {
+            target = KillAura.currentTarget;
 
-        if (serverRotation != null && shouldRotate()) {
-            float diff = getAngleDifference(packetPlayer.getYaw(), serverRotation[0]);
-            rotDiffBuildUp += diff;
-        }
-
-        serverRotation = new float[]{packetPlayer.yaw, packetPlayer.pitch};
-    }
-
-    @EventTarget
-    public void onMouseMove(MouseMoveEvent e) {
-        if (currentRotation == null) {
-            currentRotation = mc.thePlayer.getRotation();
-        }
-
-        if (e.getState() == MouseMoveEvent.State.PRE) {
-            if (lastFrameTime == 0L) {
-                lastFrameTime = System.nanoTime();
+            if (distanceBasedRotationSpeed.get() && rotateLegit.get() && target != null) {
+                float distance = (float) PlayerUtils.getDistanceToEntityBox(target);
+                if (Range.between(minRange.get(), maxRange.get()).contains(distance)) {
+                    float decreaseAmount = ((distance - minRange.get()) / 0.01f) * decrementPerCycle.get();
+                    hSpeed -= decreaseAmount;
+                    vSpeed -= decreaseAmount;
+                }
             }
-
-            long currentTime = System.nanoTime();
-            float deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
-            lastFrameTime = currentTime;
-
-            timeScale = deltaTime * 120;
-            return;
         }
 
-        if (enabled) {
-            handleRotation(e, targetRotation);
+        if (!rotateLegit.get() && !smoothMode.is("Linear")) {
+            smoothMode.set("Linear");
+        }
+
+        hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
+        vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
+
+        if (rotateLegit.get()) {
+            RotationHandler.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get());
         } else {
-            if (abs(RotationUtils.getRotationDifference(currentRotation, mc.thePlayer.getRotation())) < 1 || reset) {
-                currentRotation = mc.thePlayer.getRotation();
-                targetRotation = null;
-                reset = true;
-                previousDeltaYaw = previousDeltaPitch = 0;
-            } else {
-                handleRotation(e, mc.thePlayer.getRotation());
-            }
+            BasicRotations.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed);
         }
-
-        enabled = false;
     }
 
-    public static boolean shouldRotate() {
-        return currentRotation != null;
+    public float[] getSimpleRotationsToEntity(Entity entity) {
+        float yaw;
+        float pitch;
+        Vec3 currentVec;
+
+        Vec3 playerPos = mc.thePlayer.getPositionEyes(1);
+
+        AxisAlignedBB bb = entity.getHitbox();
+
+        Vec3 boxCenter = bb.getCenter();
+        Vec3 entityPos = new Vec3(boxCenter.xCoord, bb.minY, boxCenter.zCoord);
+
+        currentVec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
+
+        double deltaX = currentVec.xCoord - playerPos.xCoord;
+        double deltaY = currentVec.yCoord - playerPos.yCoord;
+        double deltaZ = currentVec.zCoord - playerPos.zCoord;
+
+        yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
+        pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
+
+        pitch = MathHelper.clamp_float(pitch, -90, 90);
+
+        return new float[]{yaw, pitch};
     }
 
-    private void handleRotation(MouseMoveEvent e, float[] target) {
-        float[] delta = toFloats(limitRotations(currentRotation, target));
-        int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
+    private boolean shouldShortStop() {
+        if (!rotateLegit.get()) return false;
 
-        if (!silent) {
-            e.setDeltaX(scaledDelta[0]);
-            e.setDeltaY(scaledDelta[1]);
-
-            currentRotation = mc.thePlayer.getRotation();
-        } else {
-            float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-            float f1 = f * f * f * 8.0F;
-
-            float yawStep = scaledDelta[0] * f1;
-            float pitchStep = scaledDelta[1] * f1;
-
-            currentRotation[0] += yawStep * 0.15f;
-            currentRotation[1] -= pitchStep * 0.15f;
-
-            currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
+        if (!shortStopTimer.hasTimeElapsed(shortStopDuration.get())) {
+            return true;
         }
 
-        reset = false;
+        if (Math.abs(RotationHandler.rotDiffBuildUp) < rotationDiffBuildUpToStop.get()) return false;
+
+        if (maxThresholdReachAttempts < maxThresholdAttemptsToStop.get()) {
+            maxThresholdReachAttempts++;
+            return false;
+        }
+
+        shortStopTimer.reset();
+        return true;
     }
 
-    private int[] limitRotations(float[] current, float[] target) {
-        float yawDifference = getAngleDifference(target[0], current[0]);
-        float pitchDifference = getAngleDifference(target[1], current[1]);
-
-        double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
-
-        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * cachedHSpeed);
-        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * cachedVSpeed);
-
-        float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-        float f1 = f * f * f * 8.0F;
-
-        int[] finalTargetRotation = new int[]{
-                (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
-                (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
-        };
-
-        int[] delta;
-
-        switch (smoothMode) {
-            case Relative -> {
-                float factorH = (float) max(min(rotationDifference / 180 * cachedHSpeed, 180), MathUtils.randomizeFloat(4, 6));
-                float factorV = (float) max(min(rotationDifference / 180 * cachedVSpeed, 180), MathUtils.randomizeFloat(4, 6));
-
-                float[] factor = new float[]{factorH, factorV};
-
-                straightLineYaw = straightLineYaw / cachedHSpeed * factor[0];
-                straightLinePitch = straightLinePitch / cachedVSpeed * factor[1];
-
-                delta = new int[]{
-                        (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
-                        (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
-                };
-            }
-
-            case Polar -> {
-                // the method
-                straightLineYaw = (float) (abs(yawDifference / rotationDifference) * 78);
-                straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * 24);
-
-                delta = new int[]{
-                        (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
-                        (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
-                };
-            }
-
-            default -> delta = finalTargetRotation;
-        }
-
-        if (cachedAccel) {
-            float[] factors = new float[]{cachedAccelFactorYaw, cachedAccelFactorPitch};
-
-            // nothing else worked ok
-            // 16.67 is roughly the frame delay of 60 fps
-            // if you don't get > 60 fps, please don't consider using this client
-            if (tickTimer1.hasTimeElapsed((long) 16.67)) {
-                interpolatedAccelDeltaYaw = (int) (delta[0] * (1 - factors[0]) + previousDeltaYaw * factors[0]);
-                interpolatedAccelDeltaPitch = (int) (delta[1] * (1 - factors[1]) + previousDeltaPitch * factors[1]);
-                tickTimer1.reset();
-            }
-
-            delta[0] = interpolatedAccelDeltaYaw;
-            delta[1] = interpolatedAccelDeltaPitch;
-        }
-
-        previousDeltaYaw = delta[0];
-        previousDeltaPitch = delta[1];
-
-        return delta;
-    }
-
-    private float[] toFloats(int[] ints) {
-        return new float[]{ints[0], ints[1]};
+    public void updateRotSpeed(UpdateEvent e) {
+        randYawSpeed = MathUtils.randomizeFloat(yawRotationSpeedMin.get(), yawRotationSpeedMax.get());
+        randPitchSpeed = MathUtils.randomizeFloat(pitchRotationSpeedMin.get(), pitchRotationSpeedMax.get());
     }
 }

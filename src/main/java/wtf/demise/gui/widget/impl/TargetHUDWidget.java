@@ -49,15 +49,15 @@ public class TargetHUDWidget extends Widget {
                 if (entity instanceof EntityPlayer entityPlayer && PlayerUtils.getDistanceToEntityBox(entityPlayer) < 6) {
                     if (entityPlayer == mc.thePlayer) continue;
                     if (targetHud.target != null && entityPlayer == targetHud.target) {
-                        renderTargetHUD(false, entityPlayer, false);
+                        renderTargetHUD(false, entityPlayer, false, false);
                         continue;
                     }
 
-                    renderTargetHUD(false, entityPlayer, true);
+                    renderTargetHUD(false, entityPlayer, true, false);
                 }
             }
         } else if (targetHud.target != null) {
-            renderTargetHUD(false, (EntityPlayer) targetHud.target, false);
+            renderTargetHUD(false, (EntityPlayer) targetHud.target, false, false);
         }
     }
 
@@ -68,26 +68,26 @@ public class TargetHUDWidget extends Widget {
                 if (entity instanceof EntityPlayer entityPlayer && PlayerUtils.getDistanceToEntityBox(entityPlayer) < 6) {
                     if (entityPlayer == mc.thePlayer) continue;
                     if (targetHud.target != null && entityPlayer == targetHud.target) {
-                        renderTargetHUD(true, entityPlayer, false);
+                        renderTargetHUD(true, entityPlayer, false, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
                         continue;
                     }
 
-                    renderTargetHUD(true, entityPlayer, true);
+                    renderTargetHUD(true, entityPlayer, true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
                 }
             }
         } else if (targetHud.target != null) {
-            renderTargetHUD(true, (EntityPlayer) targetHud.target, false);
+            renderTargetHUD(true, (EntityPlayer) targetHud.target, false, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
         }
     }
 
-    private void renderTargetHUD(boolean shader, EntityPlayer target, boolean visibleCheck) {
+    private void renderTargetHUD(boolean shader, EntityPlayer target, boolean visibleCheck, boolean isGlow) {
         if (target != null) {
             TargetHUD targetHUD;
             if (!targetHud.targetHUDTracking.get()) {
-                targetHUD = new TargetHUD(renderX, renderY, target, targetHud.decelerateAnimation, shader);
+                targetHUD = new TargetHUD(renderX, renderY, target, targetHud.decelerateAnimation, shader, isGlow);
             } else {
                 float[] pos = new float[]{getPos(target, visibleCheck).x, getPos(target, visibleCheck).y};
-                targetHUD = new TargetHUD(pos[0], pos[1], target, targetHud.decelerateAnimation, shader);
+                targetHUD = new TargetHUD(pos[0], pos[1], target, targetHud.decelerateAnimation, shader, isGlow);
             }
             targetHUD.render();
         }
@@ -145,13 +145,15 @@ class TargetHUD implements InstanceAccess {
     private boolean shader;
     private Interface setting = INSTANCE.getModuleManager().getModule(Interface.class);
     private final DecimalFormat decimalFormat = new DecimalFormat("0.0");
+    private boolean isGlow;
 
-    public TargetHUD(float x, float y, EntityPlayer target, Animation animation, boolean shader) {
+    public TargetHUD(float x, float y, EntityPlayer target, Animation animation, boolean shader, boolean isGlow) {
         this.x = x;
         this.y = y;
         this.target = target;
         this.animation = animation;
         this.shader = shader;
+        this.isGlow = isGlow;
     }
 
     public void render() {
@@ -191,7 +193,11 @@ class TargetHUD implements InstanceAccess {
 
             RenderUtils.renderPlayerHead(target, x + 2.5f, y + 2.5f, 32, 10);
         } else {
-            RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
+            if (!isGlow) {
+                RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
+            } else {
+                RoundedUtils.drawGradientPreset(x, y, width, height, 7);
+            }
         }
 
         GlStateManager.popMatrix();

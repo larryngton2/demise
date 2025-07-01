@@ -78,14 +78,14 @@ public class CustomWidgets implements InstanceAccess {
             drawCustomHotbar(i);
         }
 
-        drawHotbarWidget(i, false);
+        drawHotbarWidget(i, false, false);
 
         if (customWidgetsModule.chat.get()) {
-            drawChat(GuiIngame.getUpdateCounter(), false);
+            drawChat(GuiIngame.getUpdateCounter(), false, false);
         }
 
         if (customWidgetsModule.scoreboard.get()) {
-            drawScoreboard(scoreObjective, sr, false);
+            drawScoreboard(scoreObjective, sr, false, false);
         }
 
         if (fade) {
@@ -157,7 +157,7 @@ public class CustomWidgets implements InstanceAccess {
         GlStateManager.disableBlend();
     }
 
-    public void drawChat(int updateCounter, boolean shader) {
+    public void drawChat(int updateCounter, boolean shader, boolean isGlow) {
         if (mc.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN) {
             int i = GuiNewChat.getLineCount();
             boolean flag = false;
@@ -217,7 +217,11 @@ public class CustomWidgets implements InstanceAccess {
                     if (!shader) {
                         RoundedUtils.drawRound(-2, -interpolatedChatHeight - 2, l + 4, interpolatedChatHeight + 4, radius, new Color(getModule(Interface.class).bgColor(), true));
                     } else {
-                        RoundedUtils.drawShaderRound(-2, -interpolatedChatHeight - 2, l + 4, interpolatedChatHeight + 4, radius, Color.black);
+                        if (!isGlow) {
+                            RoundedUtils.drawShaderRound(-2, -interpolatedChatHeight - 2, l + 4, interpolatedChatHeight + 4, radius, Color.black);
+                        } else {
+                            RoundedUtils.drawGradientPreset(-2, -interpolatedChatHeight - 2, l + 4, interpolatedChatHeight + 4, radius);
+                        }
                     }
                 }
 
@@ -276,7 +280,7 @@ public class CustomWidgets implements InstanceAccess {
         }
     }
 
-    public void drawChatScreen(boolean shader) {
+    public void drawChatScreen(boolean shader, boolean isGlow) {
         float width = MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()) + 4;
         float height = 12;
         float x = 8;
@@ -285,11 +289,15 @@ public class CustomWidgets implements InstanceAccess {
         if (!shader) {
             RoundedUtils.drawRound(x, y, width, height, 5, new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true));
         } else {
-            RoundedUtils.drawShaderRound(x, y, width, height, 5, Color.black);
+            if (!isGlow) {
+                RoundedUtils.drawShaderRound(x, y, width, height, 5, Color.black);
+            } else {
+                RoundedUtils.drawGradientPreset(x, y, width, height, 5);
+            }
         }
     }
 
-    private void drawHotbarWidget(int i, boolean shader) {
+    private void drawHotbarWidget(int i, boolean shader, boolean isGlow) {
         ItemStack heldItem = mc.thePlayer.getCurrentEquippedItem();
         int count = heldItem == null ? 0 : heldItem.stackSize;
         String countStr = String.valueOf(count);
@@ -350,7 +358,11 @@ public class CustomWidgets implements InstanceAccess {
                 RenderHelper.disableStandardItemLighting();
             }
         } else {
-            RoundedUtils.drawShaderRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, Color.black);
+            if (!isGlow) {
+                RoundedUtils.drawShaderRound(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7, Color.black);
+            } else {
+                RoundedUtils.drawGradientPreset(interpolatedWidgetX, interpolatedWidgetY, interpolatedWidgetWidth, height, 7);
+            }
         }
 
         GL11.glPopMatrix();
@@ -358,7 +370,7 @@ public class CustomWidgets implements InstanceAccess {
 
     public static final Pattern LINK_PATTERN = Pattern.compile("(http(s)?://.)?(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[A-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)");
 
-    private void drawScoreboard(ScoreObjective objective, ScaledResolution scaledRes, boolean shader) {
+    private void drawScoreboard(ScoreObjective objective, ScaledResolution scaledRes, boolean shader, boolean isGlow) {
         if (objective == null) {
             return;
         }
@@ -439,7 +451,11 @@ public class CustomWidgets implements InstanceAccess {
                 }
             }
         } else {
-            RoundedUtils.drawShaderRound(x - 3, interpolatedScorebgY, interpolatedScoreWidth, interpolatedScoreHeight, 7, Color.black);
+            if (!isGlow) {
+                RoundedUtils.drawShaderRound(x - 3, interpolatedScorebgY, interpolatedScoreWidth, interpolatedScoreHeight, 7, Color.black);
+            } else {
+                RoundedUtils.drawGradientPreset(x - 3, interpolatedScorebgY, interpolatedScoreWidth, interpolatedScoreHeight, 7);
+            }
         }
     }
 
@@ -456,7 +472,7 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.chat.get()) {
-            drawChatScreen(false);
+            drawChatScreen(false, false);
         }
     }
 
@@ -469,27 +485,31 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.hotbar.get()) {
-            RoundedUtils.drawShaderRound(i - 91, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
+            if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+                RoundedUtils.drawShaderRound(i - 91, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
 
-            //if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
-                RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
-            //}
+                if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
+                    RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
+                }
+            } else {
+                RoundedUtils.drawGradientPreset(i - 91, sr.getScaledHeight() - 26, 181, 21, 7);
+            }
         }
 
         if (customWidgetsModule.chat.get()) {
-            drawChat(GuiIngame.getUpdateCounter(), true);
+            drawChat(GuiIngame.getUpdateCounter(), true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
 
             if (GuiNewChat.getChatOpen()) {
-                drawChatScreen(true);
+                drawChatScreen(true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
             }
         }
 
         if (customWidgetsModule.hotbar.get()) {
-            drawHotbarWidget(i, true);
+            drawHotbarWidget(i, true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
         }
 
         if (customWidgetsModule.scoreboard.get()) {
-            drawScoreboard(scoreObjective, sr, true);
+            drawScoreboard(scoreObjective, sr, true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
         }
     }
 

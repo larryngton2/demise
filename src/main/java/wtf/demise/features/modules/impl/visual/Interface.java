@@ -90,7 +90,7 @@ public class Interface extends Module {
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(false);
+            Demise.INSTANCE.getNotificationManager().publish(false, false);
         }
     }
 
@@ -109,7 +109,7 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Armor")) {
+        if (elements.isEnabled("Armor") && e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
             ArrayList<ItemStack> stuff = new ArrayList<>();
             boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
             int split = -3;
@@ -131,7 +131,7 @@ public class Interface extends Module {
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(true);
+            Demise.INSTANCE.getNotificationManager().publish(true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
         }
     }
 

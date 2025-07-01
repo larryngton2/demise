@@ -62,15 +62,15 @@ public class NameTags extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent e) {
-        renderTags(false);
+        renderTags(false, false);
     }
 
     @EventTarget
     public void onShader2D(Shader2DEvent e) {
-        renderTags(true);
+        renderTags(true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
     }
 
-    private void renderTags(boolean shader) {
+    private void renderTags(boolean shader, boolean isGlow) {
         for (EntityPlayer player : entityPosMap.keySet()) {
             if ((player.getDistanceToEntity(mc.thePlayer) < 1.0F && mc.gameSettings.thirdPersonView == 0) || !RenderUtils.isBBInFrustum(player.getEntityBoundingBox()))
                 continue;
@@ -103,7 +103,7 @@ public class NameTags extends Module {
 
             if (mode.is("Vanilla")) {
                 if (tagsBackground.get()) {
-                    Gui.drawRect(left, renderY - 1, right, renderY + textHeight + 1, !shader ? new Color(0x96000000).getRGB() : Color.black.getRGB());
+                    Gui.drawRect(left, renderY - 1, right, renderY + textHeight + 1, (!shader ? new Color(0x96000000).getRGB() : (isGlow ? getModule(Interface.class).color() : Color.black.getRGB())));
                 }
 
                 if (!shader) {
@@ -114,7 +114,11 @@ public class NameTags extends Module {
                     if (!shader) {
                         RoundedUtils.drawRound(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, new Color(getModule(Interface.class).bgColor(), true));
                     } else {
-                        RoundedUtils.drawShaderRound(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, Color.black);
+                        if (isGlow) {
+                            RoundedUtils.drawGradientPreset(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4);
+                        } else {
+                            RoundedUtils.drawShaderRound(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, Color.black);
+                        }
                     }
                 }
 
