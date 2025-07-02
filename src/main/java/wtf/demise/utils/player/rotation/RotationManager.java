@@ -38,7 +38,7 @@ public class RotationManager implements InstanceAccess {
     final SliderValue rotationDiffBuildUpToStop;
     final SliderValue maxThresholdAttemptsToStop;
     final BoolValue silent;
-    final BoolValue rotateLegit;
+    final BoolValue extraSmoothing;
     private EntityLivingBase target;
     private final Module module;
     final BoolValue accel;
@@ -49,25 +49,25 @@ public class RotationManager implements InstanceAccess {
         this.module = module;
 
         silent = new BoolValue("Silent", true, module);
-        rotateLegit = new BoolValue("Rotate legit", false, module);
-        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative", "Polar", "None"}, "Linear", module, rotateLegit::get);
-        accel = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
+        extraSmoothing = new BoolValue("Extra smoothing", false, module);
+        smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative"}, "Linear", module);
+        accel = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None"));
         yawAccelFactor = new SliderValue("Yaw accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
         pitchAccelFactor = new SliderValue("Pitch accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
-        imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None") && rotateLegit.get());
+        imperfectCorrelation = new BoolValue("Imperfect correlation", false, module, () -> !smoothMode.is("None"));
         yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
         yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
         pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
         pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, module, () -> !smoothMode.is("None") && !smoothMode.is("Polar"));
-        distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> !smoothMode.is("None") && module.getClass() == KillAura.class && rotateLegit.get());
+        distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> !smoothMode.is("None") && module.getClass() == KillAura.class);
         minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         movementFix = new BoolValue("Movement fix", false, module);
-        shortStop = new BoolValue("Short stop", false, module, rotateLegit::get);
-        shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, () -> shortStop.get() && shortStop.canDisplay());
-        rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, () -> shortStop.get() && shortStop.canDisplay());
-        maxThresholdAttemptsToStop = new SliderValue("Max threshold attempts to stop", 1, 0, 5, 1, module, () -> shortStop.get() && shortStop.canDisplay());
+        shortStop = new BoolValue("Short stop", false, module);
+        shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, shortStop::get);
+        rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, shortStop::get);
+        maxThresholdAttemptsToStop = new SliderValue("Max threshold attempts to stop", 1, 0, 5, 1, module, shortStop::get);
     }
 
     private final TimerUtils shortStopTimer = new TimerUtils();
@@ -96,7 +96,7 @@ public class RotationManager implements InstanceAccess {
         if (module.getClass() == KillAura.class) {
             target = KillAura.currentTarget;
 
-            if (distanceBasedRotationSpeed.get() && rotateLegit.get() && target != null) {
+            if (distanceBasedRotationSpeed.get() && target != null) {
                 float distance = (float) PlayerUtils.getDistanceToEntityBox(target);
                 if (Range.between(minRange.get(), maxRange.get()).contains(distance)) {
                     float decreaseAmount = ((distance - minRange.get()) / 0.01f) * decrementPerCycle.get();
@@ -106,18 +106,10 @@ public class RotationManager implements InstanceAccess {
             }
         }
 
-        if (!rotateLegit.get() && !smoothMode.is("Linear")) {
-            smoothMode.set("Linear");
-        }
-
         hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
-        if (rotateLegit.get()) {
-            RotationHandler.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get());
-        } else {
-            BasicRotations.setRotation(targetRotation, movementFix.get(), hSpeed, vSpeed);
-        }
+        RotationHandler.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get(), extraSmoothing.get());
     }
 
     public float[] getSimpleRotationsToEntity(Entity entity) {
@@ -147,8 +139,6 @@ public class RotationManager implements InstanceAccess {
     }
 
     private boolean shouldShortStop() {
-        if (!rotateLegit.get()) return false;
-
         if (!shortStopTimer.hasTimeElapsed(shortStopDuration.get())) {
             return true;
         }

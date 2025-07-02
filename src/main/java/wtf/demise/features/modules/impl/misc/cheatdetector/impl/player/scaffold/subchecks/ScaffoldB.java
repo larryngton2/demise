@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold;
+package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.subchecks;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.ScaffoldCheck.blocksPlacedMap;
+import static wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldCheck.blocksPlacedMap;
 
 public class ScaffoldB extends Check {
 
@@ -31,20 +31,20 @@ public class ScaffoldB extends Check {
 
         boolean bridgingCheck = player.rotationPitchHead > 70 && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemBlock;
 
-            if (bridgingCheck && player.isSwingInProgress && !player.isJumping && player.onGround && MoveUtil.getSpeed(player) > 0.1) {
-                double pitchDelta = Math.abs(player.rotationPitchHead - cachedPitch);
+        if (bridgingCheck && player.isSwingInProgress && !player.isJumping && player.onGround && MoveUtil.getSpeed(player) > 0.1) {
+            double pitchDelta = Math.abs(player.rotationPitchHead - cachedPitch);
 
-                if (pitchDelta > 2) {
-                    buffer += 1.4;
+            if (pitchDelta > 2) {
+                buffer += 1.4;
 
-                    if (buffer > 4) {
-                        flag(player, "Suspicious pitch change");
-                        buffer = 0;
-                    }
-                } else {
-                    buffer = Math.max(0, buffer - 0.8);
+                if (buffer > 4) {
+                    flag(player, "Suspicious pitch change");
+                    buffer = 0;
                 }
+            } else {
+                buffer = Math.max(0, buffer - 0.8);
             }
+        }
 
         if (blocksPlaced > 7) {
             buffer = 0;

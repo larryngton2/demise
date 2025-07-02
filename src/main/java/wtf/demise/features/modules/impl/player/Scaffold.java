@@ -30,7 +30,6 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.InventoryUtils;
 import wtf.demise.utils.player.MoveUtil;
@@ -39,15 +38,14 @@ import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
-import java.util.Arrays;
+import java.util.*;
 
 @ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.", category = ModuleCategory.Player)
 public class Scaffold extends Module {
-    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly", "GodBridge"}, "Normal", this);
-    private final ModeValue resetMode = new ModeValue("Reset mode", new String[]{"Jump", "Sneak"}, "Jump", this, () -> mode.is("GodBridge"));
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Telly"}, "Normal", this);
     private final SliderValue minTellyTicks = new SliderValue("Min Telly Ticks", 2, 1, 5, this, () -> mode.is("Telly"));
     private final SliderValue maxTellyTicks = new SliderValue("Max Telly Ticks", 4, 1, 5, this, () -> mode.is("Telly"));
-    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "GodBridge", "Derp", "Reverse"}, "Normal", this);
+    private final ModeValue rotations = new ModeValue("Rotations", new String[]{"Normal", "Center", "GodBridge", "Reverse"}, "Normal", this);
     private final BoolValue staticify = new BoolValue("Static-ify", false, this, () -> !rotations.is("Normal") && !rotations.is("Center"));
     private final BoolValue clutch = new BoolValue("Clutch", false, this);
     private final ModeValue clutchCriteria = new ModeValue("Clutch criteria", new String[]{"MouseOver", "Prediction"}, "MouseOver", this, clutch::get);
@@ -98,6 +96,17 @@ public class Scaffold extends Module {
     private boolean startClutch;
     private final TimerUtils clutchTimer = new TimerUtils();
     private final TimerUtils sneakTimer = new TimerUtils();
+    private static final EnumFacing[] FACINGS = {
+            EnumFacing.EAST, EnumFacing.WEST,
+            EnumFacing.NORTH, EnumFacing.SOUTH,
+            EnumFacing.UP
+    };
+
+    private static final BlockPos[] OFFSETS = {
+            new BlockPos(-1, 0, 0), new BlockPos(1, 0, 0),
+            new BlockPos(0, 0, 1), new BlockPos(0, 0, -1),
+            new BlockPos(0, -1, 0)
+    };
 
     @Override
     public void onEnable() {
@@ -185,19 +194,17 @@ public class Scaffold extends Module {
 
         if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing)) || rotations.is("Derp")) {
             switch (rotations.get()) {
-                case "Normal": {
+                case "Normal":
                     initialYaw = getBestRotation(data.blockPos, data.facing)[0];
                     initialPitch = getBestRotation(data.blockPos, data.facing)[1];
-                }
-                break;
-                case "Center": {
+                    break;
+                case "Center":
                     Vec3 hitVec = getVec3(data);
 
                     initialYaw = RotationUtils.getRotations(hitVec)[0];
                     initialPitch = RotationUtils.getRotations(hitVec)[1];
-                }
-                break;
-                case "GodBridge": {
+                    break;
+                case "GodBridge":
                     float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
 
                     if (mc.thePlayer.onGround) {
@@ -209,18 +216,11 @@ public class Scaffold extends Module {
 
                     initialYaw = Math.round(yaw / 45) * 45;
                     initialPitch = staticify.get() ? 75.7f : getBestRotation(data.blockPos, data.facing)[1];
-                }
-                break;
-                case "Reverse": {
+                    break;
+                case "Reverse":
                     initialYaw = MoveUtil.getYawFromKeybind() - 180;
                     initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
-                }
-                break;
-                case "Derp": {
-                    initialYaw += 30;
-                    initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
-                }
-                break;
+                    break;
             }
         }
 
@@ -398,12 +398,14 @@ public class Scaffold extends Module {
     @EventTarget
     public void onMovementInput(MoveInputEvent e) {
         if (addons.isEnabled("Jump")) {
-            if (blocksPlacedJump > blockToJump.get() || !mc.thePlayer.onGround || (onlyStraight.get() && !MoveUtil.isMovingStraight()) || !MoveUtil.isMoving()) {
-                blocksPlacedJump = 0;
-            }
+            if (MoveUtil.isMoving()) {
+                if (blocksPlacedJump > blockToJump.get() || !mc.thePlayer.onGround || (onlyStraight.get() && !MoveUtil.isMovingStraight())) {
+                    blocksPlacedJump = 0;
+                }
 
-            if (blocksPlacedJump == blockToJump.get()) {
-                e.setJumping(true);
+                if (blocksPlacedJump == blockToJump.get()) {
+                    e.setJumping(true);
+                }
             }
         }
 
@@ -435,24 +437,6 @@ public class Scaffold extends Module {
     @EventTarget
     public void onStrafe(StrafeEvent e) {
         if (mc.thePlayer.onGround) {
-            //todo
-            if (mode.is("GodBridge")) {
-                MovingObjectPosition ray = RotationUtils.rayTraceSafe(new float[]{initialYaw, initialPitch}, 4.5, 1);
-
-                if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
-                    if (resetMode.is("Jump")) {
-                        if (mc.thePlayer.onGround && MoveUtil.isMoving()) {
-                            mc.thePlayer.jump();
-                        }
-                        ChatUtils.sendMessageClient("wtf");
-                    } else {
-                        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), true);
-                    }
-                } else if (resetMode.is("Sneak")) {
-                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), false);
-                }
-            }
-
             if (mode.is("Telly") && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
                 if (mode.is("Telly") && !mc.thePlayer.isSprinting()) {
                     return;
@@ -467,7 +451,7 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onMove(MoveEvent event) {
-        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
+        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(targetBlock).getBlock() instanceof BlockAir))
             return;
 
         if (tower.canDisplay()) {
@@ -496,7 +480,7 @@ public class Scaffold extends Module {
         if (event.isPost())
             return;
 
-        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(getModule(Scaffold.class).targetBlock).getBlock() instanceof BlockAir))
+        if (data == null || data.blockPos == null || data.facing == null || getBlockSlot() == -1 || isEnabled(KillAura.class) && KillAura.currentTarget != null && !(mc.theWorld.getBlockState(targetBlock).getBlock() instanceof BlockAir))
             return;
 
         if (tower.canDisplay()) {
@@ -628,7 +612,7 @@ public class Scaffold extends Module {
         } else {
             MovingObjectPosition ray = RotationUtils.rayTrace(4.5, 1);
 
-            if ((!addons.isEnabled("KeepY") && !addons.isEnabled("Speed keepY") && ray.getBlockPos().distanceSq(pos) <= 1) || ((addons.isEnabled("KeepY") || addons.isEnabled("Speed keepY")) && ray.getBlockPos().equalsBlockPos(pos))) {
+            if (ray.getBlockPos().equalsBlockPos(pos) && ray.sideHit.equals(facing)) {
                 if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
                     if (addons.isEnabled("Swing")) {
                         mc.thePlayer.swingItem();
@@ -660,52 +644,70 @@ public class Scaffold extends Module {
     }
 
     private PlaceData findBlock(BlockPos pos) {
-        EnumFacing[] facings = {EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.UP};
-        BlockPos[] offsets = {
-                new BlockPos(-1, 0, 0), new BlockPos(1, 0, 0),
-                new BlockPos(0, 0, 1), new BlockPos(0, 0, -1),
-                new BlockPos(0, -1, 0)
-        };
-
-        if (previousBlock != null && previousBlock.getY() > mc.thePlayer.posY) {
-            previousBlock = null;
+        PlaceData immediateCheck = checkPositions(pos);
+        if (immediateCheck != null) {
+            return immediateCheck;
         }
 
-        PlaceData result = checkPositions(pos, offsets, facings);
-        if (result != null) {
-            return result;
-        }
+        for (int depth = 1; depth <= 6; depth++) {
+            List<BlockPos> positions = generateOffsets(pos, depth);
+            if (positions.isEmpty()) continue;
 
-        for (BlockPos offset : offsets) {
-            result = checkPositions(pos.add(offset), offsets, facings);
-            if (result != null) {
-                return result;
-            }
-        }
+            BlockPos playerPos = mc.thePlayer.getPosition();
+            positions.sort(Comparator.comparingDouble(p -> p.distanceSq(playerPos)));
 
-        for (BlockPos offset1 : offsets) {
-            for (BlockPos offset2 : offsets) {
-                result = checkPositions(pos.add(offset1).add(offset2), offsets, facings);
+            for (BlockPos targetPos : positions) {
+                PlaceData result = checkPositions(targetPos);
                 if (result != null) {
                     return result;
                 }
             }
         }
-
         return null;
     }
 
-    private PlaceData checkPositions(BlockPos basePos, BlockPos[] offsets, EnumFacing[] facings) {
-        for (int i = 0; i < offsets.length; i++) {
-            BlockPos newPos = basePos.add(offsets[i]);
-            Block block = mc.theWorld.getBlockState(newPos).getBlock();
+    private List<BlockPos> generateOffsets(BlockPos origin, int depth) {
+        List<BlockPos> result = new ArrayList<>((int) Math.pow(OFFSETS.length, depth));
+        if (depth == 0) {
+            result.add(origin);
+            return result;
+        }
 
-            if (newPos.equals(previousBlock)) {
-                return new PlaceData(facings[i], newPos);
+        List<BlockPos> currentLevel = new ArrayList<>();
+        List<BlockPos> nextLevel = new ArrayList<>();
+        currentLevel.add(origin);
+
+        for (int i = 0; i < depth; i++) {
+            for (BlockPos pos : currentLevel) {
+                for (BlockPos offset : OFFSETS) {
+                    nextLevel.add(pos.add(offset));
+                }
             }
 
-            if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
-                return new PlaceData(facings[i], newPos);
+            if (i < depth - 1) {
+                currentLevel.clear();
+                List<BlockPos> temp = currentLevel;
+                currentLevel = nextLevel;
+                nextLevel = temp;
+            }
+        }
+
+        return nextLevel;
+    }
+
+    private PlaceData checkPositions(BlockPos basePos) {
+        for (int i = 0; i < OFFSETS.length; i++) {
+            BlockPos newPos = basePos.add(OFFSETS[i]);
+            Block block = mc.theWorld.getBlockState(newPos).getBlock();
+
+            if (block != Blocks.air) {
+                if (newPos.equals(previousBlock)) {
+                    return new PlaceData(FACINGS[i], newPos);
+                }
+
+                if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
+                    return new PlaceData(FACINGS[i], newPos);
+                }
             }
         }
         return null;

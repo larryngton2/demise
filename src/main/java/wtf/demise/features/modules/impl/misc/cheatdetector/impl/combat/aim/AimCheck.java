@@ -1,21 +1,21 @@
-package wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement;
+package wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.aim;
 
 import net.minecraft.entity.player.EntityPlayer;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.noslow.NoSlowA;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.noslow.NoSlowB;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.aim.subchecks.AimA;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.aim.subchecks.AimB;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class NoSlowCheck extends Check {
-    private final List<Check> checks = Arrays.asList(new NoSlowA(), new NoSlowB());
+public class AimCheck extends Check {
+    private final List<Check> checks = Arrays.asList(new AimA(), new AimB());
 
     @Override
     public String getName() {
-        return "No slow";
+        return "Aim";
     }
 
     @Override

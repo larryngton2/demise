@@ -21,11 +21,7 @@ public class MoveUtil implements InstanceAccess {
     public double BASE_JUMP_HEIGHT = 0.41999998688698;
 
     public boolean isMoving() {
-        return isMoving(mc.thePlayer);
-    }
-
-    public boolean isMoving(EntityLivingBase player) {
-        return player != null && (player.moveForward != 0F || player.moveStrafing != 0F);
+        return mc.thePlayer != null && (mc.thePlayer.moveForward != 0F || mc.thePlayer.moveStrafing != 0F);
     }
 
     public boolean isMovingMotion(EntityLivingBase player) {

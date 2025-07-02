@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold;
+package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.subchecks;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.ScaffoldCheck.blocksPlacedMap;
+import static wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldCheck.blocksPlacedMap;
 
 public class ScaffoldA extends Check {
 
@@ -31,16 +31,16 @@ public class ScaffoldA extends Check {
 
         boolean bridgingCheck = player.rotationPitchHead > 70 && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemBlock;
 
-            if (bridgingCheck && player.isSwingInProgress && !player.isJumping && player.onGround && MoveUtil.getSpeed(player) > 0.1) {
-                if (Math.abs(player.rotationYawHead - cachedYaw) > 45 && !player.isSneaking()) {
-                    yawSnapCount++;
+        if (bridgingCheck && player.isSwingInProgress && !player.isJumping && player.onGround && MoveUtil.getSpeed(player) > 0.1) {
+            if (Math.abs(player.rotationYawHead - cachedYaw) > 45 && !player.isSneaking()) {
+                yawSnapCount++;
 
-                    if (yawSnapCount > 2) {
-                        flag(player, "Suspicious yaw change");
-                        yawSnapCount = 0;
-                    }
+                if (yawSnapCount > 2) {
+                    flag(player, "Suspicious yaw change");
+                    yawSnapCount = 0;
                 }
             }
+        }
 
         if (blocksPlaced > 7) {
             yawSnapCount = 0;

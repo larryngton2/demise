@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.play.server.S14PacketEntity;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;
 import wtf.demise.utils.player.MoveUtil;
@@ -15,10 +14,8 @@ public class VelocityCheck extends Check {
 
     @Override
     public void onPacket(PacketEvent e, EntityPlayer player) {
-        if (e.getPacket() instanceof S14PacketEntity) {
-            if (MoveUtil.getSpeed(player) == 0.0 && player.hurtTime < 6 && player.hurtTime > 2 && !mc.theWorld.checkBlockCollision(player.getEntityBoundingBox().expand(0.05, 0.0, 0.05))) {
-                flag(player, "Invalid velocity");
-            }
+        if (MoveUtil.getSpeed(player) == 0.0 && player.hurtTime < 6 && player.hurtTime > 2 && !mc.theWorld.checkBlockCollision(player.getEntityBoundingBox().expand(0.05, 0.0, 0.05))) {
+            flag(player, "Invalid velocity");
         }
     }
 }

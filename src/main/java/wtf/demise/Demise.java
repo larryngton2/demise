@@ -26,7 +26,6 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.LagUtils;
 import wtf.demise.utils.player.ClickHandler;
-import wtf.demise.utils.player.rotation.BasicRotations;
 import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
@@ -141,7 +140,6 @@ public class Demise {
         eventManager.register(new ClickHandler());
         eventManager.register(new MathUtils());
         eventManager.register(new RotationHandler());
-        eventManager.register(new BasicRotations());
 
         LOGGER.info("Event handlers registered.");
     }

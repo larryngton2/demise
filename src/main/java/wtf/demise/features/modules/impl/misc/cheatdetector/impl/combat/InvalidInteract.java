@@ -1,6 +1,8 @@
 package wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.server.S0BPacketAnimation;
+import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;
 
 import java.util.HashMap;
@@ -17,7 +19,7 @@ public class InvalidInteract extends Check {
     }
 
     @Override
-    public void onUpdate(EntityPlayer player) {
+    public void onPacket(PacketEvent e, EntityPlayer player) {
         UUID uuid = player.getUniqueID();
         int useTime = useTimeMap.getOrDefault(uuid, 0);
 
@@ -29,7 +31,7 @@ public class InvalidInteract extends Check {
 
         useTimeMap.put(uuid, useTime);
 
-        if (useTime > 2 && player.swingProgressInt == 0 && player.isSwingInProgress) {
+        if (useTime > 2 && e.getPacket() instanceof S0BPacketAnimation s0b && s0b.getEntityID() == player.getEntityId()) {
             flag(player, "Swinging while using an item");
         }
     }

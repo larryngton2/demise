@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold;
+package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.subchecks;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.ScaffoldCheck.blocksPlacedMap;
+import static wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldCheck.blocksPlacedMap;
 
 public class ScaffoldC extends Check {
     private final Map<UUID, TimerUtils> bridgingTimerMap = new HashMap<>();
@@ -40,7 +40,7 @@ public class ScaffoldC extends Check {
         }
 
         // might false for breezily and shit like that, but I don't care
-        if (blocksPlaced > 7 && flagTimer.hasTimeElapsed(500)) {
+        if (blocksPlaced > 6 && flagTimer.hasTimeElapsed(500)) {
             flag(player, "Suspicious block placement");
             flagTimer.reset();
         }

@@ -10,18 +10,18 @@ import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.AimCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.aim.AimCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.InvalidInteract;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.VelocityCheck;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.MotionCheck;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.NoSlowCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.motion.MotionCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.noslow.NoSlowCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.OmniSprintCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.LegitScaffoldCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.NoFallCheck;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.ScaffoldCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldCheck;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.*;
@@ -37,7 +37,8 @@ public class CheatDetector extends Module {
             new BoolValue("No slow", true),
             new BoolValue("Omni sprint", true),
             new BoolValue("Scaffold", true),
-            new BoolValue("Velocity", true)
+            new BoolValue("Velocity", true),
+            new BoolValue("Legit scaffold", true)
     ), this);
 
     public final BoolValue selfCheck = new BoolValue("Check self", false, this);
@@ -55,7 +56,8 @@ public class CheatDetector extends Module {
                 new NoSlowCheck(),
                 new ScaffoldCheck(),
                 new VelocityCheck(),
-                new OmniSprintCheck()
+                new OmniSprintCheck(),
+                new LegitScaffoldCheck()
         );
     }
 

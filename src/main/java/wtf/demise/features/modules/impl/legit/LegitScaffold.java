@@ -5,6 +5,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.util.BlockPos;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventTarget;
+import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
@@ -30,6 +31,10 @@ public class LegitScaffold extends Module {
     @EventTarget
     public void onPreMotion(MotionEvent e) {
         if (e.isPre()) {
+            if (mc.currentScreen != null) {
+                return;
+            }
+
             if (!blockCheck.get() || (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) && !directionCheck.get() || mc.thePlayer.moveForward < 0) {
                 if (mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ)).getBlock() instanceof BlockAir && mc.thePlayer.onGround) {
                     mc.gameSettings.keyBindSneak.setPressed(true);

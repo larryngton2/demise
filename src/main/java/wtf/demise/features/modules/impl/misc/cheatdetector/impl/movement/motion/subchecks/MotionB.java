@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.motion;
+package wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.motion.subchecks;
 
 import net.minecraft.entity.player.EntityPlayer;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;

@@ -15,7 +15,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.rotation.BasicRotations;
+import wtf.demise.utils.player.rotation.RotationHandler;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -106,16 +106,16 @@ public class Speed extends Module {
         switch (yawOffsetMode.get()) {
             case "Ground":
                 if (mc.thePlayer.onGround) {
-                    BasicRotations.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, true, 180, 180);
+                    RotationHandler.setBasicRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, true, 180, 180);
                 }
                 break;
             case "Air":
                 if (!mc.thePlayer.onGround) {
-                    BasicRotations.setRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, true, 180, 180);
+                    RotationHandler.setBasicRotation(new float[]{mc.thePlayer.rotationYaw + 45, mc.thePlayer.rotationPitch}, true, 180, 180);
                 }
                 break;
             case "Constant":
-                BasicRotations.setRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, true, 180, 180);
+                RotationHandler.setBasicRotation(new float[]{MoveUtil.getYawFromKeybind(), mc.thePlayer.rotationPitch}, true, 180, 180);
                 break;
         }
 

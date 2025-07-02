@@ -23,7 +23,6 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.SimulatedPlayer;
-import wtf.demise.utils.player.rotation.BasicRotations;
 import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
@@ -82,7 +81,7 @@ public class NoFall extends Module {
                     }
                 }
 
-                BasicRotations.setRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
+                RotationHandler.setBasicRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
 
                 mc.thePlayer.inventory.currentItem = getBucketSlot();
                 SpoofSlotUtils.startSpoofing(oldSlot);
@@ -105,7 +104,7 @@ public class NoFall extends Module {
 
                     oldSlot = mc.thePlayer.inventory.currentItem;
                 } else {
-                    BasicRotations.setRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
+                    RotationHandler.setBasicRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
                 }
 
                 clicked = false;

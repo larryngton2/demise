@@ -1,13 +1,13 @@
-package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player;
+package wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.server.S25PacketBlockBreakAnim;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldA;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldB;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldC;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.subchecks.ScaffoldA;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.subchecks.ScaffoldB;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.subchecks.ScaffoldC;
 import wtf.demise.utils.player.MoveUtil;
 
 import java.util.*;
@@ -36,9 +36,9 @@ public class ScaffoldCheck extends Check {
 
         bridgingCheck = player.rotationPitchHead > 70 && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemBlock;
 
-        if (!MoveUtil.isMoving(player) || player.isJumping || player.isSneaking() || !player.onGround || MoveUtil.getSpeed(player) < 0.1) blocksPlaced = 0;
+        if (!MoveUtil.isMovingMotion(player) || player.isJumping || player.isSneaking() || !player.onGround || MoveUtil.getSpeed(player) < 0.1) blocksPlaced = 0;
 
-        if (blocksPlaced > 8) {
+        if (blocksPlaced > 7) {
             blocksPlaced = 0;
         }
 

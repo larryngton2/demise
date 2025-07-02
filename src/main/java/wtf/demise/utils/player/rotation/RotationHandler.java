@@ -24,7 +24,7 @@ public class RotationHandler implements InstanceAccess {
     public static float[] currentRotation = new float[]{}, serverRotation = new float[]{}, previousRotation = null;
     public static float lastDelta;
     public static boolean enabled;
-    private static float[] targetRotation;
+    public static float[] targetRotation;
     private static boolean silent;
     private static float cachedHSpeed;
     private static float cachedVSpeed;
@@ -36,25 +36,44 @@ public class RotationHandler implements InstanceAccess {
     private static final TimerUtils tickTimer1 = new TimerUtils();
     private long lastFrameTime = System.nanoTime();
     private float timeScale;
-    private int previousDeltaYaw = 0;
-    private int previousDeltaPitch = 0;
+    private static int previousDeltaYaw = 0;
+    private static int previousDeltaPitch = 0;
     private static boolean cachedAccel;
     private static float cachedAccelFactorYaw;
     private static float cachedAccelFactorPitch;
-    private int interpolatedAccelDeltaYaw;
-    private int interpolatedAccelDeltaPitch;
+    private static int interpolatedAccelDeltaYaw;
+    private static int interpolatedAccelDeltaPitch;
+    private static boolean isSmooth;
 
     public RotationHandler() {
         enabled = true;
-        smoothMode = SmoothMode.None;
+        smoothMode = SmoothMode.Linear;
         cachedCorrection = true;
         cachedHSpeed = 180;
         cachedVSpeed = 180;
         targetRotation = currentRotation = new float[]{0, 0};
         silent = true;
+        cachedAccel = false;
+        cachedAccelFactorYaw = 0;
+        cachedAccelFactorPitch = 0;
+        isSmooth = true;
     }
 
-    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent) {
+    public static void setBasicRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed) {
+        RotationHandler.targetRotation = rotation;
+        RotationHandler.silent = true;
+        RotationHandler.cachedHSpeed = hSpeed;
+        RotationHandler.cachedVSpeed = vSpeed;
+        RotationHandler.smoothMode = SmoothMode.Linear;
+        RotationHandler.cachedCorrection = correction;
+        RotationHandler.cachedAccel = false;
+        RotationHandler.cachedAccelFactorYaw = 0;
+        RotationHandler.cachedAccelFactorPitch = 0;
+        RotationHandler.isSmooth = false;
+        enabled = true;
+    }
+
+    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent, boolean smooth) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
 
@@ -70,6 +89,7 @@ public class RotationHandler implements InstanceAccess {
         RotationHandler.cachedAccel = accel;
         RotationHandler.cachedAccelFactorYaw = accelFactor[0];
         RotationHandler.cachedAccelFactorPitch = accelFactor[1];
+        RotationHandler.isSmooth = smooth;
         enabled = true;
     }
 
@@ -173,42 +193,67 @@ public class RotationHandler implements InstanceAccess {
     }
 
     public static boolean shouldRotate() {
-        return currentRotation != null;
+        return currentRotation != null && targetRotation != null;
     }
 
     private void handleRotation(MouseMoveEvent e, float[] target) {
-        float[] delta = toFloats(limitRotations(currentRotation, target));
-        int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
+        float hSpeed = cachedHSpeed;
+        float vSpeed = cachedVSpeed;
 
-        if (!silent) {
-            e.setDeltaX(scaledDelta[0]);
-            e.setDeltaY(scaledDelta[1]);
+        if (!isSmooth) {
+            // because rotations become too fucking fast
+            hSpeed *= mc.timer.partialTicks / 2;
+            vSpeed *= mc.timer.partialTicks / 2;
 
-            currentRotation = mc.thePlayer.getRotation();
+            hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
+            vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
+        }
+
+        float[] delta = toFloats(limitRotations(currentRotation, target, hSpeed, vSpeed));
+        float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
+        float f1 = f * f * f * 8.0F;
+
+        delta[0] = Math.max(Math.abs(delta[0]), f1) * Math.signum(delta[0]);
+        delta[1] = Math.max(Math.abs(delta[1]), f1) * Math.signum(delta[1]);
+
+        if (isSmooth) {
+            int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
+
+            if (!silent) {
+                e.setDeltaX(scaledDelta[0]);
+                e.setDeltaY(scaledDelta[1]);
+                currentRotation = mc.thePlayer.getRotation();
+            } else {
+                float yawStep = scaledDelta[0] * f1;
+                float pitchStep = scaledDelta[1] * f1;
+
+                currentRotation[0] += yawStep * 0.15f;
+                currentRotation[1] -= pitchStep * 0.15f;
+                currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
+            }
         } else {
-            float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
-            float f1 = f * f * f * 8.0F;
-
-            float yawStep = scaledDelta[0] * f1;
-            float pitchStep = scaledDelta[1] * f1;
-
-            currentRotation[0] += yawStep * 0.15f;
-            currentRotation[1] -= pitchStep * 0.15f;
-
-            currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
+            if (!silent) {
+                mc.thePlayer.rotationYaw += delta[0] * f1;
+                mc.thePlayer.rotationPitch -= delta[1] * f1;
+                currentRotation = mc.thePlayer.getRotation();
+            } else {
+                currentRotation[0] += delta[0] * f1;
+                currentRotation[1] -= delta[1] * f1;
+                currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
+            }
         }
 
         reset = false;
     }
 
-    private int[] limitRotations(float[] current, float[] target) {
+    private int[] limitRotations(float[] current, float[] target, float hSpeed, float vSpeed) {
         float yawDifference = getAngleDifference(target[0], current[0]);
         float pitchDifference = getAngleDifference(target[1], current[1]);
 
         double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
 
-        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * cachedHSpeed);
-        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * cachedVSpeed);
+        float straightLineYaw = (float) (abs(yawDifference / rotationDifference) * hSpeed);
+        float straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * vSpeed);
 
         float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
@@ -220,34 +265,21 @@ public class RotationHandler implements InstanceAccess {
 
         int[] delta;
 
-        switch (smoothMode) {
-            case Relative -> {
-                float factorH = (float) max(min(rotationDifference / 180 * cachedHSpeed, 180), MathUtils.randomizeFloat(4, 6));
-                float factorV = (float) max(min(rotationDifference / 180 * cachedVSpeed, 180), MathUtils.randomizeFloat(4, 6));
+        if (smoothMode.equals(SmoothMode.Relative)) {
+            float factorH = (float) max(min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
+            float factorV = (float) max(min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
 
-                float[] factor = new float[]{factorH, factorV};
+            float[] factor = new float[]{factorH, factorV};
 
-                straightLineYaw = straightLineYaw / cachedHSpeed * factor[0];
-                straightLinePitch = straightLinePitch / cachedVSpeed * factor[1];
+            straightLineYaw = straightLineYaw / hSpeed * factor[0];
+            straightLinePitch = straightLinePitch / vSpeed * factor[1];
 
-                delta = new int[]{
-                        (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
-                        (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
-                };
-            }
-
-            case Polar -> {
-                // the method
-                straightLineYaw = (float) (abs(yawDifference / rotationDifference) * 78);
-                straightLinePitch = (float) (abs(pitchDifference / rotationDifference) * 24);
-
-                delta = new int[]{
-                        (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
-                        (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
-                };
-            }
-
-            default -> delta = finalTargetRotation;
+            delta = new int[]{
+                    (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
+                    (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
+            };
+        } else {
+            delta = finalTargetRotation;
         }
 
         if (cachedAccel) {
