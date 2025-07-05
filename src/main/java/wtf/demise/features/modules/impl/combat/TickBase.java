@@ -9,11 +9,10 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.TimerManipulationEvent;
-import wtf.demise.events.impl.player.MoveInputEvent;
+import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -31,7 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "TickBase", description = "Abuses tick manipulation in order to be unpredictable to your target.")
 public class TickBase extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Future", "Past"}, "Future", this);
     private final BoolValue pauseRenderer = new BoolValue("Pause renderer", true, this, () -> mode.is("Future"));
@@ -94,7 +93,7 @@ public class TickBase extends Module {
     }
 
     @EventTarget
-    public void onMoveInput(MoveInputEvent e) {
+    public void onMove(MoveEvent e) {
         selfPrediction.clear();
 
         MovementInput movementInput = new MovementInput();

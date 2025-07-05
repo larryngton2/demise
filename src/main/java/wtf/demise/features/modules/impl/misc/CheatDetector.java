@@ -6,16 +6,15 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.misc.cheatdetector.Check;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.aim.AimCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.InvalidInteract;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.VelocityCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.combat.aim.AimCheck;
+import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.OmniSprintCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.motion.MotionCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.noslow.NoSlowCheck;
-import wtf.demise.features.modules.impl.misc.cheatdetector.impl.movement.OmniSprintCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.LegitScaffoldCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.NoFallCheck;
 import wtf.demise.features.modules.impl.misc.cheatdetector.impl.player.scaffold.ScaffoldCheck;
@@ -27,7 +26,7 @@ import wtf.demise.utils.player.PlayerUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@ModuleInfo(name = "CheatDetector", description = "Detects cheaters in your game.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "CheatDetector", description = "Detects cheaters in your game.")
 public class CheatDetector extends Module {
     public final MultiBoolValue options = new MultiBoolValue("Checks", Arrays.asList(
             new BoolValue("Aim", true),

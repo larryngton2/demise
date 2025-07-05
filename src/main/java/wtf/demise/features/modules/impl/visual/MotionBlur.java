@@ -4,11 +4,10 @@ import net.minecraft.util.ResourceLocation;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 
-@ModuleInfo(name = "MotionBlur", description = "Blurs your motion. (??)", category = ModuleCategory.Visual)
+@ModuleInfo(name = "MotionBlur", description = "Blurs your motion. (??)")
 public class MotionBlur extends Module {
     public final SliderValue amount = new SliderValue("Amount", 1, 1, 10, 1, this);
 

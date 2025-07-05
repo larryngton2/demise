@@ -10,12 +10,10 @@ import wtf.demise.events.impl.CancellableEvent;
 @Setter
 @AllArgsConstructor
 public final class TeleportEvent extends CancellableEvent {
-
     private C03PacketPlayer response;
     private double posX;
     private double posY;
     private double posZ;
     private float yaw;
     private float pitch;
-
 }

@@ -9,16 +9,14 @@ import org.apache.commons.lang3.Range;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.InventoryUtils;
-import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "AutoHeal", description = "Automatically heals you.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoHeal", description = "Automatically heals you.")
 public class AutoHeal extends Module {
     private final BoolValue head = new BoolValue("Head", true, this);
     private final SliderValue headHealth = new SliderValue("Head health", 15, 0, 20, 1, this, head::get);

@@ -4,14 +4,13 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.rotation.RotationHandler;
 
-@ModuleInfo(name = "Fly", description = "Allows you to fly.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Fly", description = "Allows you to fly.")
 public class Fly extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Intave"}, "Vanilla", this);
     private final SliderValue speed = new SliderValue("Speed", 2, 1, 5, 0.1f, this, () -> mode.is("Vanilla"));

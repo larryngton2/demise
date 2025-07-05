@@ -35,7 +35,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.player.GravityEvent;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.MoveEvent;
-import wtf.demise.events.impl.player.MoveMathEvent;
 import wtf.demise.features.modules.impl.visual.NoRenderOffsetReset;
 import wtf.demise.features.modules.impl.visual.Rotation;
 import wtf.demise.utils.animations.ContinualAnimation;
@@ -1111,11 +1110,6 @@ public abstract class EntityLivingBase extends Entity {
     }
 
     public void moveEntityWithHeading(float strafe, float forward) {
-        MoveMathEvent event = new MoveMathEvent(strafe, forward);
-        Demise.INSTANCE.getEventManager().call(event);
-
-        if (event.isCancelled())
-            return;
         if (this.isServerWorld()) {
             if (!this.isInWater() || this instanceof EntityPlayer && ((EntityPlayer) this).capabilities.isFlying) {
                 if (!this.isInLava() || this instanceof EntityPlayer && ((EntityPlayer) this).capabilities.isFlying) {
@@ -1160,10 +1154,9 @@ public abstract class EntityLivingBase extends Entity {
 
                     if (this instanceof EntityPlayerSP) {
                         MoveEvent moveEvent = new MoveEvent(this.motionX, this.motionY, this.motionZ);
-
                         Demise.INSTANCE.getEventManager().call(moveEvent);
 
-                        if (event.isCancelled()) {
+                        if (moveEvent.isCancelled()) {
                             this.moveEntity(0, 0, 0);
                         } else {
                             this.moveEntity(moveEvent.getX(), moveEvent.getY(), moveEvent.getZ());

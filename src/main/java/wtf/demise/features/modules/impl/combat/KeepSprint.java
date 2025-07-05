@@ -4,13 +4,12 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 
-@ModuleInfo(name = "KeepSprint", description = "Modifies slowdown on hit.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "KeepSprint", description = "Modifies slowdown on hit.")
 public class KeepSprint extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Smart"}, "Normal", this);
     private final SliderValue motion = new SliderValue("Motion", 0.6f, 0.6f, 1, 0.01f, this);

@@ -20,7 +20,7 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -157,7 +157,7 @@ public class CustomWidgets implements InstanceAccess {
         GlStateManager.disableBlend();
     }
 
-    public void drawChat(int updateCounter, boolean shader, boolean isGlow) {
+    private void drawChat(int updateCounter, boolean shader, boolean isGlow) {
         if (mc.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN) {
             int i = GuiNewChat.getLineCount();
             boolean flag = false;
@@ -280,7 +280,7 @@ public class CustomWidgets implements InstanceAccess {
         }
     }
 
-    public void drawChatScreen(boolean shader, boolean isGlow) {
+    private void drawChatScreen(boolean shader, boolean isGlow) {
         float width = MathHelper.ceiling_float_int((float) GuiNewChat.getChatWidth() / GuiNewChat.getChatScale()) + 4;
         float height = 12;
         float x = 8;
@@ -459,6 +459,10 @@ public class CustomWidgets implements InstanceAccess {
         }
     }
 
+    public void drawInventory(boolean shader, boolean isGlow) {
+
+    }
+
     @EventTarget
     public void onWorldChange(WorldChangeEvent e) {
         fade = true;
@@ -477,7 +481,7 @@ public class CustomWidgets implements InstanceAccess {
     }
 
     @EventTarget
-    public void onShader2D(Shader2DEvent e) {
+    public void onShader2D(ShaderEvent e) {
         int i = sr.getScaledWidth() / 2;
 
         if (!customWidgetsModule.isEnabled()) {
@@ -485,10 +489,10 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.hotbar.get()) {
-            if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+            if (e.getShaderType() != ShaderEvent.ShaderType.GLOW) {
                 RoundedUtils.drawShaderRound(i - 91, sr.getScaledHeight() - 26, 181, 21, 7, Color.black);
 
-                if (e.getShaderType() == Shader2DEvent.ShaderType.SHADOW) {
+                if (e.getShaderType() == ShaderEvent.ShaderType.SHADOW) {
                     RoundedUtils.drawShaderRound(x, sr.getScaledHeight() - 26, 21, 21, 7, Color.black);
                 }
             } else {
@@ -497,19 +501,19 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         if (customWidgetsModule.chat.get()) {
-            drawChat(GuiIngame.getUpdateCounter(), true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+            drawChat(GuiIngame.getUpdateCounter(), true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
 
             if (GuiNewChat.getChatOpen()) {
-                drawChatScreen(true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+                drawChatScreen(true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
             }
         }
 
         if (customWidgetsModule.hotbar.get()) {
-            drawHotbarWidget(i, true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+            drawHotbarWidget(i, true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
         }
 
         if (customWidgetsModule.scoreboard.get()) {
-            drawScoreboard(scoreObjective, sr, true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+            drawScoreboard(scoreObjective, sr, true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
         }
     }
 

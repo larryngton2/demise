@@ -11,7 +11,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.values.impl.BoolValue;
@@ -22,7 +21,7 @@ import wtf.demise.utils.player.rotation.RotationManager;
 
 import java.util.Arrays;
 
-@ModuleInfo(name = "AutoWalk", description = "w a l k", category = ModuleCategory.Movement)
+@ModuleInfo(name = "AutoWalk", description = "w a l k")
 public class AutoWalk extends Module {
     private final BoolValue target = new BoolValue("Target player", false, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this, target::get);
@@ -44,9 +43,8 @@ public class AutoWalk extends Module {
         } else {
             EntityLivingBase target = findTarget();
             if (target != null) {
-                rotationManager.updateRotSpeed(e);
-
                 if (rotate.get()) {
+                    rotationManager.updateRotSpeed(e);
                     rotationManager.setRotation(rotationManager.getSimpleRotationsToEntity(target));
                 }
 

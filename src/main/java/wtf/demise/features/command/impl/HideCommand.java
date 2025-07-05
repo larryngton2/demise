@@ -9,7 +9,7 @@ import wtf.demise.utils.misc.ChatUtils;
 
 import java.util.Optional;
 
-public final class HideCommand extends Command {
+public class HideCommand extends Command {
     @Override
     public String[] getAliases() {
         return new String[]{"hide", "h", "visible", "v"};

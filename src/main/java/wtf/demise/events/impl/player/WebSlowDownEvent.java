@@ -2,5 +2,5 @@ package wtf.demise.events.impl.player;
 
 import wtf.demise.events.impl.CancellableEvent;
 
-public class PostStrafeEvent extends CancellableEvent {
+public class WebSlowDownEvent extends CancellableEvent {
 }

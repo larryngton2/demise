@@ -18,7 +18,6 @@ import wtf.demise.events.impl.misc.MouseOverEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -36,7 +35,7 @@ import wtf.demise.utils.render.RenderUtils;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@ModuleInfo(name = "KillAura", description = "Automatically attack targets.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "KillAura", description = "Automatically attack targets.")
 public class KillAura extends Module {
 
     // reach

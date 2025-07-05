@@ -8,7 +8,6 @@ import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.movement.Speed;
 import wtf.demise.features.values.impl.BoolValue;
@@ -19,7 +18,7 @@ import wtf.demise.utils.player.MoveUtil;
 
 import java.util.Objects;
 
-@ModuleInfo(name = "Criticals", description = "Allows you to get more critical hits.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "Criticals", description = "Allows you to get more critical hits.")
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Jump", "NoGround", "Visual", "NCP", "Timer"}, "Jump", this);
     private final BoolValue staticOffset = new BoolValue("Static offset", false, this, () -> mode.is("NCP"));

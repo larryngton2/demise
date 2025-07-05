@@ -5,7 +5,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
@@ -14,7 +13,7 @@ import wtf.demise.features.values.impl.SliderValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "Atmosphere", description = "Changes the atmosphere.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Atmosphere", description = "Changes the atmosphere.")
 public class Atmosphere extends Module {
     private final BoolValue time = new BoolValue("Time Editor", true, this);
     private final SliderValue timeValue = new SliderValue("Time", 18000, 0, 24000, 1000, this, time::get);

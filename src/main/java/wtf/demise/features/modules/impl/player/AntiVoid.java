@@ -4,13 +4,12 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "AntiVoid", description = "Prevents you from falling into the void.", category = ModuleCategory.Player)
+@ModuleInfo(name = "AntiVoid", description = "Prevents you from falling into the void.")
 public class AntiVoid extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Collide", "Packet"}, "Collide", this);
     private final SliderValue fallDistance = new SliderValue("Min fall distance", 3, 0, 10, 1, this);

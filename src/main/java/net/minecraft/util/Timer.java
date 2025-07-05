@@ -5,17 +5,10 @@ import wtf.demise.Demise;
 import wtf.demise.events.impl.misc.TimerManipulationEvent;
 
 public class Timer {
-    /**
-     * How many full ticks have turned over since the last call to updateTimer(), capped at 10.
-     */
     public int elapsedTicks;
     public float partialTicks;
     public float field_194148_c;
     public float renderPartialTicks;
-
-    /**
-     * The time reported by the system clock at the last sync, in milliseconds
-     */
     private long lastSyncSysClock;
     private final float field_194149_e;
     public float timerSpeed;
@@ -26,9 +19,6 @@ public class Timer {
         this.timerSpeed = 1.0F;
     }
 
-    /**
-     * Updates all fields of the Timer using the current time
-     */
     public void updateTimer() {
         TimerManipulationEvent timerManipulationEvent = new TimerManipulationEvent(Minecraft.getSystemTime());
         Demise.INSTANCE.getEventManager().call(timerManipulationEvent);

@@ -3,15 +3,15 @@ package wtf.demise.gui.widget.impl;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MotionEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
+import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
-import wtf.demise.gui.font.Fonts;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,8 +91,8 @@ public class MotionGraphWidget extends Widget {
     }
 
     @Override
-    public void onShader(Shader2DEvent e) {
-        if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+    public void onShader(ShaderEvent e) {
+        if (e.getShaderType() != ShaderEvent.ShaderType.GLOW) {
             RoundedUtils.drawShaderRound(renderX, renderY, width, height, 3, Color.BLACK);
         } else {
             RoundedUtils.drawGradientPreset(renderX, renderY, width, height, 3);

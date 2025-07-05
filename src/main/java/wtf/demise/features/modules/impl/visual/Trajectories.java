@@ -12,14 +12,13 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-@ModuleInfo(name = "Trajectories", description = "Renders throwable items' trajectories.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Trajectories", description = "Renders throwable items' trajectories.")
 public class Trajectories extends Module {
 
     @EventTarget

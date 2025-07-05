@@ -67,7 +67,7 @@ public abstract class GuiContainer extends GuiScreen {
         this.guiTop = (height - this.ySize) / 2;
 
         this.buttonList.add(new GuiButton(1001, 3, 3, 120, 21, "Disable KillAura"));
-        this.buttonList.add(new GuiButton(1002, 3, 24, 120, 21, "Disable InvManager"));
+        this.buttonList.add(new GuiButton(1002, 3, 24, 120, 21, "Disable Manager"));
         this.buttonList.add(new GuiButton(1003, 3, 45, 120, 21, "Disable Stealer"));
     }
 

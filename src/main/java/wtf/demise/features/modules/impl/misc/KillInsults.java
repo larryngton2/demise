@@ -7,12 +7,11 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.utils.math.MathUtils;
 
-@ModuleInfo(name = "KillInsults", description = "Insults people when you kill them.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "KillInsults", description = "Insults people when you kill them.")
 public class KillInsults extends Module {
     // I can't be bothered writing shit like this
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Rise 5", "Sigma"}, "Rise 5", this);

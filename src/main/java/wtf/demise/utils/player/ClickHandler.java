@@ -16,6 +16,7 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
+import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 
 import java.util.LinkedList;
@@ -126,20 +127,12 @@ public class ClickHandler implements InstanceAccess {
         } else {
             cachedClicks = 0;
         }
-
-        if (mc.skippedTick) {
-            finalizeHandler();
-        }
     }
 
     @EventTarget
     public void onTickEvent(TickEvent e) {
         clickingNow = false;
-
-        // just to make sure lol
-        if (!mc.skippedTick) {
-            finalizeHandler();
-        }
+        finalizeHandler();
     }
 
     private void finalizeHandler() {
@@ -207,7 +200,7 @@ public class ClickHandler implements InstanceAccess {
         float calcYaw = (float) (MathHelper.atan2(mc.thePlayer.posZ - target.posZ, mc.thePlayer.posX - target.posX) * 180.0 / Math.PI - 90.0);
         float diffX = Math.abs(MathHelper.wrapAngleTo180_float(calcYaw - target.rotationYaw));
 
-        if (PlayerUtils.getCustomDistanceToEntityBox(target.getPositionVector().add(0, target.getEyeHeight(), 0), mc.thePlayer) < 3 && diffX < 90) {
+        if (PlayerUtils.getDistToTargetFromMouseOver(target.getPositionEyes(1), target.getLook(1), mc.thePlayer, mc.thePlayer.getHitbox()) < 3) {
             return true;
         }
 

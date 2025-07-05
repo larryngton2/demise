@@ -6,10 +6,9 @@ import net.minecraft.client.settings.KeyBinding;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "InputFix", description = "Applies the input fix from newer Minecraft versions.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "InputFix", description = "Applies the input fix from newer Minecraft versions.")
 public class InputFix extends Module {
     private GuiScreen prevGuiScreen;
     private final KeyBinding[] keyBindings = new KeyBinding[]{

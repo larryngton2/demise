@@ -7,15 +7,15 @@ import net.minecraft.network.login.client.C01PacketEncryptionResponse;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.minecraft.network.status.client.C00PacketServerQuery;
 import net.minecraft.network.status.client.C01PacketPing;
+import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.packet.PacketEvent;
+import wtf.demise.events.impl.packet.PacketReleaseEvent;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.TimerUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class BlinkComponent implements InstanceAccess {
@@ -65,7 +65,10 @@ public final class BlinkComponent implements InstanceAccess {
 
     public static void release(boolean clear) {
         if (!packets.isEmpty()) {
-            packets.forEach(PacketUtils::sendPacketNoEvent);
+            packets.forEach(packet -> {
+                PacketUtils.sendPacketNoEvent(packet);
+                Demise.INSTANCE.getEventManager().call(new PacketReleaseEvent(new TimedPacket(packet)));
+            });
             if (clear) {
                 packets.clear();
                 exemptedPackets.clear();
@@ -78,10 +81,6 @@ public final class BlinkComponent implements InstanceAccess {
             release(true);
         }
         blinking = false;
-    }
-
-    public static void dispatch() {
-        dispatch(true);
     }
 
     @EventTarget

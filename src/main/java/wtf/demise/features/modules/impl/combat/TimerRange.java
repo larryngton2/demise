@@ -10,12 +10,11 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.misc.StaticTickEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
-import wtf.demise.events.impl.player.MoveInputEvent;
+import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
@@ -32,7 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleInfo(name = "TimerRange", description = "Abuses balance in order to be unpredictable to your target.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "TimerRange", description = "Abuses balance in order to be unpredictable to your target.")
 public class TimerRange extends Module {
     private final BoolValue preload = new BoolValue("Preload", true, this);
     private final BoolValue alwaysGainBalance = new BoolValue("Always gain balance", false, this, preload::get);
@@ -73,7 +72,7 @@ public class TimerRange extends Module {
     }
 
     @EventTarget
-    public void onMoveInput(MoveInputEvent e) {
+    public void onMove(MoveEvent e) {
         selfPrediction.clear();
 
         SimulatedPlayer simulatedSelf = SimulatedPlayer.fromClientPlayer(mc.thePlayer.movementInput, 1);

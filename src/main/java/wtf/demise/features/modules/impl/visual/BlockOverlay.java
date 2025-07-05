@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.visual;
 
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
@@ -9,7 +8,7 @@ import wtf.demise.features.values.impl.SliderValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "BlockOverlay", description = "Modifies the block overlay.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "BlockOverlay", description = "Modifies the block overlay.")
 public class BlockOverlay extends Module {
     public final BoolValue outline = new BoolValue("Outline", true, this);
     public final BoolValue filled = new BoolValue("Filled", false, this);

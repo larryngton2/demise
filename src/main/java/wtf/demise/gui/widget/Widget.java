@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjglx.input.Mouse;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.render.MouseUtils;
@@ -45,7 +45,7 @@ public abstract class Widget implements InstanceAccess {
         this.align = align;
     }
 
-    public abstract void onShader(Shader2DEvent event);
+    public abstract void onShader(ShaderEvent event);
 
     public abstract void render();
 

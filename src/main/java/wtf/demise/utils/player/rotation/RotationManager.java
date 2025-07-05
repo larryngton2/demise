@@ -38,7 +38,7 @@ public class RotationManager implements InstanceAccess {
     final SliderValue rotationDiffBuildUpToStop;
     final SliderValue maxThresholdAttemptsToStop;
     final BoolValue silent;
-    final BoolValue extraSmoothing;
+    final SliderValue extraSmoothFactor;
     private EntityLivingBase target;
     private final Module module;
     final BoolValue accel;
@@ -49,7 +49,8 @@ public class RotationManager implements InstanceAccess {
         this.module = module;
 
         silent = new BoolValue("Silent", true, module);
-        extraSmoothing = new BoolValue("Extra smoothing", false, module);
+        // rotation deltas are multiplied by 0.15 in the mc code, I just want to make it customisable
+        extraSmoothFactor = new SliderValue("Extra smoothing factor", 0.15f, 0.01f, 1, 0.01f, module);
         smoothMode = new ModeValue("Smooth mode", new String[]{"Linear", "Relative"}, "Linear", module);
         accel = new BoolValue("Accelerate", false, module, () -> !smoothMode.is("None"));
         yawAccelFactor = new SliderValue("Yaw accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
@@ -109,7 +110,7 @@ public class RotationManager implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
-        RotationHandler.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get(), extraSmoothing.get());
+        RotationHandler.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get(), extraSmoothFactor.get());
     }
 
     public float[] getSimpleRotationsToEntity(Entity entity) {

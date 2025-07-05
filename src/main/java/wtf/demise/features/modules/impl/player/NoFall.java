@@ -9,12 +9,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import wtf.demise.events.annotations.EventTarget;
-
 import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -29,7 +27,7 @@ import wtf.demise.utils.player.rotation.RotationUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleInfo(name = "NoFall", description = "Mitigates fall damage.", category = ModuleCategory.Player)
+@ModuleInfo(name = "NoFall", description = "Mitigates fall damage.")
 public class NoFall extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Packet", "On ground", "Off ground", "Clutch"}, "Packet", this);
     private final SliderValue fallDistance = new SliderValue("Fall distance", 3, 0, 10, 1, this, () -> !mode.is("Off ground"));

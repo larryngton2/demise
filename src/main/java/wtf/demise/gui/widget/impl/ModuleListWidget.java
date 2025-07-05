@@ -1,7 +1,7 @@
 package wtf.demise.gui.widget.impl;
 
 import wtf.demise.Demise;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Shaders;
@@ -51,7 +51,7 @@ public class ModuleListWidget extends Widget {
             renderModule(module, position.x, position.y, offset, width, height, middle, i, false, false);
 
             if (!module.isHidden()) {
-                if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
+                if (!(setting.hideRender.get() && Demise.INSTANCE.getModuleManager().getModulesByCategory().get(ModuleCategory.Visual).contains(module))) {
                     offset = calculateNextOffset(module, height, offset);
                 }
             }
@@ -59,7 +59,7 @@ public class ModuleListWidget extends Widget {
     }
 
     @Override
-    public void onShader(Shader2DEvent event) {
+    public void onShader(ShaderEvent event) {
         if (!shouldRender()) return;
 
         int middle = sr.getScaledWidth() / 2;
@@ -74,10 +74,10 @@ public class ModuleListWidget extends Widget {
 
             RenderPosition position = calculateRenderPosition(module, width, middle);
 
-            renderModule(module, position.x, position.y, offset, width, height, middle, i, true, event.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+            renderModule(module, position.x, position.y, offset, width, height, middle, i, true, event.getShaderType() == ShaderEvent.ShaderType.GLOW);
 
             if (!module.isHidden()) {
-                if (!(setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
+                if (!setting.hideRender.get() || !Demise.INSTANCE.getModuleManager().getModulesByCategory().get(ModuleCategory.Visual).contains(module)) {
                     offset = calculateNextOffset(module, height, offset);
                 }
             }
@@ -87,7 +87,7 @@ public class ModuleListWidget extends Widget {
     public static List<Module> getEnabledModules() {
         List<Module> enabledModules = new ArrayList<>();
         for (Module module : INSTANCE.getModuleManager().getModules()) {
-            if (module.isHidden() || (setting.hideRender.get() && module.getCategory() == ModuleCategory.Visual)) {
+            if (module.isHidden() || (setting.hideRender.get() && Demise.INSTANCE.getModuleManager().getModulesByCategory().get(ModuleCategory.Visual).contains(module))) {
                 continue;
             }
             Animation moduleAnimation = module.getAnimation();

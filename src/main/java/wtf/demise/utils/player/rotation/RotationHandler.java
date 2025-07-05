@@ -26,10 +26,10 @@ public class RotationHandler implements InstanceAccess {
     public static boolean enabled;
     public static float[] targetRotation;
     private static boolean silent;
-    private static float cachedHSpeed;
-    private static float cachedVSpeed;
+    private static float hSpeed;
+    private static float vSpeed;
     private static SmoothMode smoothMode;
-    public static boolean cachedCorrection;
+    public static boolean correction;
     public static float rotDiffBuildUp;
     public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
@@ -38,42 +38,43 @@ public class RotationHandler implements InstanceAccess {
     private float timeScale;
     private static int previousDeltaYaw = 0;
     private static int previousDeltaPitch = 0;
-    private static boolean cachedAccel;
-    private static float cachedAccelFactorYaw;
-    private static float cachedAccelFactorPitch;
+    private static boolean accel;
+    private static float accelFactorYaw;
+    private static float accelFactorPitch;
     private static int interpolatedAccelDeltaYaw;
     private static int interpolatedAccelDeltaPitch;
-    private static boolean isSmooth;
+    private static float smoothingFactor;
 
     public RotationHandler() {
         enabled = true;
         smoothMode = SmoothMode.Linear;
-        cachedCorrection = true;
-        cachedHSpeed = 180;
-        cachedVSpeed = 180;
+        correction = true;
+        hSpeed = 180;
+        vSpeed = 180;
         targetRotation = currentRotation = new float[]{0, 0};
+        reset = true;
         silent = true;
-        cachedAccel = false;
-        cachedAccelFactorYaw = 0;
-        cachedAccelFactorPitch = 0;
-        isSmooth = true;
+        accel = false;
+        accelFactorYaw = 0;
+        accelFactorPitch = 0;
+        smoothingFactor = 1;
     }
 
     public static void setBasicRotation(float[] rotation, boolean correction, float hSpeed, float vSpeed) {
         RotationHandler.targetRotation = rotation;
         RotationHandler.silent = true;
-        RotationHandler.cachedHSpeed = hSpeed;
-        RotationHandler.cachedVSpeed = vSpeed;
+        RotationHandler.hSpeed = hSpeed;
+        RotationHandler.vSpeed = vSpeed;
         RotationHandler.smoothMode = SmoothMode.Linear;
-        RotationHandler.cachedCorrection = correction;
-        RotationHandler.cachedAccel = false;
-        RotationHandler.cachedAccelFactorYaw = 0;
-        RotationHandler.cachedAccelFactorPitch = 0;
-        RotationHandler.isSmooth = false;
+        RotationHandler.correction = correction;
+        RotationHandler.accel = false;
+        RotationHandler.accelFactorYaw = 0;
+        RotationHandler.accelFactorPitch = 0;
+        smoothingFactor = 1;
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent, boolean smooth) {
+    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent, float smoothingFactor) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
 
@@ -82,19 +83,19 @@ public class RotationHandler implements InstanceAccess {
 
         RotationHandler.targetRotation = rotation;
         RotationHandler.silent = silent;
-        RotationHandler.cachedHSpeed = speed[0];
-        RotationHandler.cachedVSpeed = speed[1];
+        RotationHandler.hSpeed = speed[0];
+        RotationHandler.vSpeed = speed[1];
         RotationHandler.smoothMode = smoothMode;
-        RotationHandler.cachedCorrection = correction;
-        RotationHandler.cachedAccel = accel;
-        RotationHandler.cachedAccelFactorYaw = accelFactor[0];
-        RotationHandler.cachedAccelFactorPitch = accelFactor[1];
-        RotationHandler.isSmooth = smooth;
+        RotationHandler.correction = correction;
+        RotationHandler.accel = accel;
+        RotationHandler.accelFactorYaw = accelFactor[0];
+        RotationHandler.accelFactorPitch = accelFactor[1];
+        RotationHandler.smoothingFactor = smoothingFactor;
         enabled = true;
     }
 
     private boolean shouldCorrect() {
-        return shouldRotate() && cachedCorrection;
+        return shouldRotate() && correction;
     }
 
     @EventTarget
@@ -172,6 +173,7 @@ public class RotationHandler implements InstanceAccess {
             float deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
             lastFrameTime = currentTime;
 
+            deltaTime = Math.min(deltaTime, 1.0f / 90);
             timeScale = deltaTime * 120;
             return;
         }
@@ -197,58 +199,38 @@ public class RotationHandler implements InstanceAccess {
     }
 
     private void handleRotation(MouseMoveEvent e, float[] target) {
-        float hSpeed = cachedHSpeed;
-        float vSpeed = cachedVSpeed;
+        float[] delta = toFloats(limitRotations(target));
 
-        if (!isSmooth) {
-            // because rotations become too fucking fast
-            hSpeed *= mc.timer.partialTicks / 2;
-            vSpeed *= mc.timer.partialTicks / 2;
-
-            hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
-            vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
-        }
-
-        float[] delta = toFloats(limitRotations(currentRotation, target, hSpeed, vSpeed));
         float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
 
         delta[0] = Math.max(Math.abs(delta[0]), f1) * Math.signum(delta[0]);
         delta[1] = Math.max(Math.abs(delta[1]), f1) * Math.signum(delta[1]);
 
-        if (isSmooth) {
-            int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
+        int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
 
-            if (!silent) {
-                e.setDeltaX(scaledDelta[0]);
-                e.setDeltaY(scaledDelta[1]);
-                currentRotation = mc.thePlayer.getRotation();
-            } else {
-                float yawStep = scaledDelta[0] * f1;
-                float pitchStep = scaledDelta[1] * f1;
+        float yawStep = scaledDelta[0] * f1;
+        float pitchStep = scaledDelta[1] * f1;
 
-                currentRotation[0] += yawStep * 0.15f;
-                currentRotation[1] -= pitchStep * 0.15f;
-                currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
-            }
+        if (!silent) {
+            e.setDeltaX(0);
+            e.setDeltaY(0);
+            mc.thePlayer.rotationYaw += yawStep * smoothingFactor;
+            mc.thePlayer.rotationPitch -= pitchStep * smoothingFactor;
+            mc.thePlayer.rotationPitch = MathHelper.clamp_float(mc.thePlayer.rotationPitch, -90f, 90f);
+            currentRotation = mc.thePlayer.getRotation();
         } else {
-            if (!silent) {
-                mc.thePlayer.rotationYaw += delta[0] * f1;
-                mc.thePlayer.rotationPitch -= delta[1] * f1;
-                currentRotation = mc.thePlayer.getRotation();
-            } else {
-                currentRotation[0] += delta[0] * f1;
-                currentRotation[1] -= delta[1] * f1;
-                currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90, 90);
-            }
+            currentRotation[0] += yawStep * smoothingFactor;
+            currentRotation[1] -= pitchStep * smoothingFactor;
+            currentRotation[1] = MathHelper.clamp_float(currentRotation[1], -90f, 90f);
         }
 
         reset = false;
     }
 
-    private int[] limitRotations(float[] current, float[] target, float hSpeed, float vSpeed) {
-        float yawDifference = getAngleDifference(target[0], current[0]);
-        float pitchDifference = getAngleDifference(target[1], current[1]);
+    private int[] limitRotations(float[] target) {
+        float yawDifference = getAngleDifference(target[0], currentRotation[0]);
+        float pitchDifference = getAngleDifference(target[1], currentRotation[1]);
 
         double rotationDifference = hypot(abs(yawDifference), abs(pitchDifference));
 
@@ -282,8 +264,8 @@ public class RotationHandler implements InstanceAccess {
             delta = finalTargetRotation;
         }
 
-        if (cachedAccel) {
-            float[] factors = new float[]{cachedAccelFactorYaw, cachedAccelFactorPitch};
+        if (accel) {
+            float[] factors = new float[]{accelFactorYaw, accelFactorPitch};
 
             // nothing else worked ok
             // 16.67 is roughly the frame delay of 60 fps

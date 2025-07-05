@@ -11,7 +11,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.FakeLag;
 import wtf.demise.features.modules.impl.combat.KillAura;
@@ -22,7 +21,7 @@ import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
 
-@ModuleInfo(name = "CombatHelper", description = "Helps you with combat.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "CombatHelper", description = "Helps you with combat.")
 public class CombatHelper extends Module {
     private final SliderValue publicSearchRange = new SliderValue("Public search range", 6, 0.1f, 12, 0.1f, this);
 

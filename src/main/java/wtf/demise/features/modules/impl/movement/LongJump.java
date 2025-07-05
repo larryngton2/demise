@@ -8,13 +8,12 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "LongJump", description = "Jump, but long.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "LongJump", description = "Jump, but long.")
 public class LongJump extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Boat", "Miniblox", "Matrix"}, "Vanilla", this);
     private final SliderValue jumpOffAmount = new SliderValue("JumpOff amount", 0.2f, 0.01f, 2, 0.01f, this, () -> mode.is("Vanilla"));

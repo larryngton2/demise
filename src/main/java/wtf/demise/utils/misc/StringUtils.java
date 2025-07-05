@@ -3,8 +3,6 @@ package wtf.demise.utils.misc;
 import com.github.javafaker.Faker;
 import lombok.experimental.UtilityClass;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 @UtilityClass
 public class StringUtils {
     public String upperSnakeCaseToPascal(String string) {

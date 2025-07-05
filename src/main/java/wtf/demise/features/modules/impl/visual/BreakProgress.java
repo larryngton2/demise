@@ -2,12 +2,10 @@ package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.opengl.GL11;
-import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Animation;
@@ -20,7 +18,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@ModuleInfo(name = "BreakProgress", description = "Renders your break progress in the HUD.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "BreakProgress", description = "Renders your break progress in the HUD.")
 public class BreakProgress extends Module {
     private final Animation anim = new DecelerateAnimation(175, 1);
 
@@ -51,7 +49,7 @@ public class BreakProgress extends Module {
     }
 
     @EventTarget
-    public void drawShader2D(Shader2DEvent e) {
+    public void drawShader2D(ShaderEvent e) {
         anim.setDirection(mc.playerController.curBlockDamageMP != 0 ? Direction.FORWARDS : Direction.BACKWARDS);
         if (mc.playerController.curBlockDamageMP == 0 && anim.isDone()) return;
         ScaledResolution sr = new ScaledResolution(mc);
@@ -68,7 +66,7 @@ public class BreakProgress extends Module {
         GL11.glPushMatrix();
         RenderUtils.scissor((float) (x - 1.5), (float) (y - 1.5), totalWidth + 3, height + 3);
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+        if (e.getShaderType() != ShaderEvent.ShaderType.GLOW) {
             RoundedUtils.drawShaderRound(x, y, totalWidth, height, 5, Color.black);
         } else {
             RoundedUtils.drawGradientPreset(x, y, totalWidth, height, 5);

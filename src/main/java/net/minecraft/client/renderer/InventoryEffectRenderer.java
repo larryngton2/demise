@@ -21,13 +21,9 @@ public abstract class InventoryEffectRenderer extends GuiContainer {
     }
 
     protected void updateActivePotionEffects() {
-        if (!mc.thePlayer.getActivePotionEffects().isEmpty()) {
-            this.guiLeft = 160 + (width - this.xSize - 200) / 2;
-            this.hasActivePotionEffects = true;
-        } else {
-            this.guiLeft = (width - this.xSize) / 2;
-            this.hasActivePotionEffects = false;
-        }
+        this.guiLeft = (width - this.xSize) / 2;
+
+        this.hasActivePotionEffects = !mc.thePlayer.getActivePotionEffects().isEmpty();
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {

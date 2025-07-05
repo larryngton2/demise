@@ -15,7 +15,6 @@ import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.events.impl.player.HitSlowDownEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -24,9 +23,8 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "Velocity", description = "Minimises or removes knockback.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "Velocity", description = "Minimises or removes knockback.")
 public class Velocity extends Module {
     public final ModeValue mode = new ModeValue("Mode", new String[]{"Normal", "Cancel", "Reduce", "Legit", "GrimC07", "Intave", "Karhu", "ReStrafe"}, "Normal", this);
     public final ModeValue intaveMode = new ModeValue("Intave mode", new String[]{"Tick Reduce", "Reduce"}, "Reduce", this, () -> mode.is("Intave"));

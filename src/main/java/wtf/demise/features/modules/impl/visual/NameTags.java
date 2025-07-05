@@ -1,19 +1,17 @@
 package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
+import org.lwjglx.util.vector.Vector2f;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.events.impl.render.RenderNameTagEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.misc.CheatDetector;
 import wtf.demise.features.values.impl.BoolValue;
@@ -23,15 +21,15 @@ import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.render.GLUtils;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-@ModuleInfo(name = "NameTags", description = "Renders player nametags.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "NameTags", description = "Renders player nametags.")
 public class NameTags extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Modern"}, "Modern", this);
     private final SliderValue offsetY = new SliderValue("Offset Y", 0, -20, 20, 1, this);
@@ -39,25 +37,13 @@ public class NameTags extends Module {
     private final BoolValue tagsHealth = new BoolValue("Tags health", true, this);
     private final BoolValue tagsBackground = new BoolValue("Tags background", true, this);
 
-    private final Map<EntityPlayer, float[]> entityPosMap = new HashMap<>();
-    public Map<EntityPlayer, float[][]> playerRotationMap = new HashMap<>();
-
-    @Override
-    public void onDisable() {
-        entityPosMap.clear();
-        playerRotationMap.clear();
-    }
+    private final Map<UUID, Vector2f> posMap = new HashMap<>();
 
     @EventTarget
-    public void onRenderNameTag(RenderNameTagEvent event) {
-        if (entityPosMap.containsKey(event.getEntity()))
-            event.setCancelled(true);
-    }
-
-    @EventTarget
-    public void onWorld(WorldChangeEvent e) {
-        entityPosMap.clear();
-        playerRotationMap.clear();
+    public void onRenderNameTag(RenderNameTagEvent e) {
+        if (isValid(e.getEntity())) {
+            e.setCancelled(true);
+        }
     }
 
     @EventTarget
@@ -66,19 +52,28 @@ public class NameTags extends Module {
     }
 
     @EventTarget
-    public void onShader2D(Shader2DEvent e) {
-        renderTags(true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+    public void onShader2D(ShaderEvent e) {
+        renderTags(true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
     }
 
     private void renderTags(boolean shader, boolean isGlow) {
-        for (EntityPlayer player : entityPosMap.keySet()) {
-            if ((player.getDistanceToEntity(mc.thePlayer) < 1.0F && mc.gameSettings.thirdPersonView == 0) || !RenderUtils.isBBInFrustum(player.getEntityBoundingBox()))
-                continue;
+        for (EntityPlayer player : mc.theWorld.playerEntities) {
+            if (!isValid(player) || !RenderUtils.isBBInFrustum(player.getEntityBoundingBox())) continue;
 
-            float[] positions = entityPosMap.get(player);
-            float x = positions[0];
-            float y = positions[1];
-            float x2 = positions[2];
+            float playerX = (float) MathUtils.interpolate(player.prevPosX, player.posX);
+            float playerY = (float) MathUtils.interpolate(player.prevPosY, player.posY) + player.height + 25f / 100;
+            float playerZ = (float) MathUtils.interpolate(player.prevPosZ, player.posZ);
+
+            Vector2f pos = RenderUtils.worldToScreen(playerX, playerY, playerZ, new ScaledResolution(mc), true);
+
+            if (pos == null) {
+                pos = posMap.getOrDefault(player.getUniqueID(), new Vector2f(0, 0));
+            }
+
+            posMap.put(player.getUniqueID(), pos);
+
+            float x = pos.x;
+            float y = pos.y;
 
             FontRenderer modernFont = Fonts.interRegular.get((int) (17 * tagsSize.get()));
             String healthString = tagsHealth.get() ? " " + (MathUtils.roundToHalf(PlayerUtils.getActualHealth(player))) + EnumChatFormatting.RED + "❤" : "";
@@ -93,8 +88,7 @@ public class NameTags extends Module {
             }
 
             float halfWidth = mode.is("Vanilla") ? (float) mc.fontRendererObj.getStringWidth(name) / 2 * tagsSize.get() : (float) modernFont.getStringWidth(name) / 2;
-            float xDif = x2 - x;
-            float middle = x + (xDif / 2);
+            float middle = x - halfWidth;
             float textHeight = mode.is("Vanilla") ? mc.fontRendererObj.FONT_HEIGHT * tagsSize.get() : (float) modernFont.getHeight();
             float renderY = y - textHeight - offsetY.get();
 
@@ -107,71 +101,30 @@ public class NameTags extends Module {
                 }
 
                 if (!shader) {
-                    mc.fontRendererObj.drawScaledString(name, middle - halfWidth, renderY + 0.5f, tagsSize.get(), -1);
+                    mc.fontRendererObj.drawScaledString(name, middle + 3, renderY + 0.5f, tagsSize.get(), -1);
                 }
             } else {
                 if (tagsBackground.get()) {
                     if (!shader) {
-                        RoundedUtils.drawRound(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, new Color(getModule(Interface.class).bgColor(), true));
+                        RoundedUtils.drawRound(middle, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, new Color(getModule(Interface.class).bgColor(), true));
                     } else {
                         if (isGlow) {
-                            RoundedUtils.drawGradientPreset(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4);
+                            RoundedUtils.drawGradientPreset(middle, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4);
                         } else {
-                            RoundedUtils.drawShaderRound(middle - halfWidth - 3, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, Color.black);
+                            RoundedUtils.drawShaderRound(middle, renderY - 0.5f - 3, modernFont.getStringWidth(name) + 6, textHeight + 3, 4, Color.black);
                         }
                     }
                 }
 
                 if (!shader) {
-                    modernFont.drawStringWithShadow(name, middle - halfWidth, renderY + 0.5f, -1);
+                    modernFont.drawStringWithShadow(name, middle + 3, renderY + 0.5f, -1);
                 }
             }
-        }
-    }
-
-    @EventTarget
-    public void onRender3D(Render3DEvent event) {
-        if (!entityPosMap.isEmpty()) entityPosMap.clear();
-
-        for (EntityPlayer player : mc.theWorld.playerEntities) {
-            double posX = (MathUtils.interpolate(player.prevPosX, player.posX) - mc.getRenderManager().viewerPosX);
-            double posY = (MathUtils.interpolate(player.prevPosY, player.posY) - mc.getRenderManager().viewerPosY);
-            double posZ = (MathUtils.interpolate(player.prevPosZ, player.posZ) - mc.getRenderManager().viewerPosZ);
-
-            double halfWidth = player.width / 2.0D;
-            AxisAlignedBB bb = new AxisAlignedBB(posX - halfWidth, posY, posZ - halfWidth, posX + halfWidth, posY + player.height + (player.isSneaking() ? -0.2D : 0.1D), posZ + halfWidth).expand(0.1, 0.1, 0.1);
-
-            double[][] vectors = {{bb.minX, bb.minY, bb.minZ},
-                    {bb.minX, bb.maxY, bb.minZ},
-                    {bb.minX, bb.maxY, bb.maxZ},
-                    {bb.minX, bb.minY, bb.maxZ},
-                    {bb.maxX, bb.minY, bb.minZ},
-                    {bb.maxX, bb.maxY, bb.minZ},
-                    {bb.maxX, bb.maxY, bb.maxZ},
-                    {bb.maxX, bb.minY, bb.maxZ}};
-
-            float[] projection;
-            float[] position = new float[]{Float.MAX_VALUE, Float.MAX_VALUE, -1.0f, -1.0F};
-
-            for (double[] vec : vectors) {
-                projection = GLUtils.project2D((float) vec[0], (float) vec[1], (float) vec[2], event.scaledResolution().getScaleFactor());
-                if (projection != null && projection[2] >= 0.0F && projection[2] < 1.0F) {
-                    float pX = projection[0];
-                    float pY = projection[1];
-                    position[0] = Math.min(position[0], pX);
-                    position[1] = Math.min(position[1], pY);
-                    position[2] = Math.max(position[2], pX);
-                    position[3] = Math.max(position[3], pY);
-                }
-            }
-
-            entityPosMap.put(player, position);
         }
     }
 
     public boolean isValid(Entity entity) {
         if (entity instanceof EntityPlayer player) {
-
             if (!player.isEntityAlive()) {
                 return false;
             }

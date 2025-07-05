@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.visual;
 
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
@@ -9,7 +8,7 @@ import wtf.demise.features.values.impl.ModeValue;
 
 import java.awt.*;
 
-@ModuleInfo(name = "Cape", description = "Renders a cape on your player.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Cape", description = "Renders a cape on your player.")
 public class Cape extends Module {
     public final ModeValue capeMode = new ModeValue("Cape mode", new String[]{"Default", "Normal", "Minecraft", "Rise", "What the fuck."}, "Normal", this);
     public final ModeValue riseMode = new ModeValue("Rise cape mode", new String[]{"Normal", "Red", "Green", "Blue", "Dogshit"}, "Normal", this, () -> capeMode.is("Rise"));

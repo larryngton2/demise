@@ -35,7 +35,6 @@ import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.exploit.Disabler;
 import wtf.demise.features.modules.impl.movement.Sprint;
 import wtf.demise.features.modules.impl.player.Scaffold;
-import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.rotation.RotationHandler;
 
 import java.util.Objects;
@@ -115,8 +114,6 @@ public class EntityPlayerSP extends AbstractClientPlayer {
     public void onUpdateWalkingPlayer() {
         MotionEvent motionEvent = new MotionEvent(this.posX, this.getEntityBoundingBox().minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround, MotionEvent.State.PRE);
         Demise.INSTANCE.getEventManager().call(motionEvent);
-
-        ticksSinceStep++;
 
         if (motionEvent.isCancelled())
             return;
@@ -571,11 +568,13 @@ public class EntityPlayerSP extends AbstractClientPlayer {
         if ((this.isUsingItem() || (killAura.isEnabled() && KillAura.isBlocking && !killAura.autoBlockMode.is("Fake"))) && !this.isRiding()) {
             SlowDownEvent slowDownEvent = new SlowDownEvent(0.2F, 0.2F, true);
             Demise.INSTANCE.getEventManager().call(slowDownEvent);
+
             this.movementInput.moveStrafe *= slowDownEvent.getStrafe();
             this.movementInput.moveForward *= slowDownEvent.getForward();
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), slowDownEvent.isSprinting());
-            if (!slowDownEvent.isSprinting()) this.setSprinting(false);
-            if (slowDownEvent.isSprinting()) this.setSprinting(MoveUtil.canSprint(true));
+            if (!slowDownEvent.isSprinting()) {
+                this.setSprinting(false);
+            }
 
             this.sprintToggleTimer = 0;
         }

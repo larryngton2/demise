@@ -3,14 +3,13 @@ package wtf.demise.features.modules.impl.legit;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.ChatUtils;
 
-@ModuleInfo(name = "JumpReset", description = "Automatically jump resets in order to reduce velocity.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "JumpReset", description = "Automatically jump resets in order to reduce velocity.")
 public class JumpReset extends Module {
     private final SliderValue chance = new SliderValue("Chance", 50, 1, 100, 1, this);
     private final SliderValue minDelay = new SliderValue("Min delay", 0, 0, 500, 1, this);

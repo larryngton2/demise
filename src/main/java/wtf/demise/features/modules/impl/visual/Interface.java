@@ -7,9 +7,8 @@ import net.minecraft.util.ResourceLocation;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.font.FontRenderer;
@@ -22,7 +21,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@ModuleInfo(name = "Interface", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Interface")
 public class Interface extends Module {
     public final MultiBoolValue elements = new MultiBoolValue("Elements", Arrays.asList(
             new BoolValue("Watermark", true),
@@ -95,7 +94,7 @@ public class Interface extends Module {
     }
 
     @EventTarget
-    public void onShader2D(Shader2DEvent e) {
+    public void onShader2D(ShaderEvent e) {
         if (elements.isEnabled("Watermark")) {
             switch (watermarkMode.get()) {
                 case "Text":
@@ -109,7 +108,7 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Armor") && e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+        if (elements.isEnabled("Armor") && e.getShaderType() != ShaderEvent.ShaderType.GLOW) {
             ArrayList<ItemStack> stuff = new ArrayList<>();
             boolean onWater = mc.thePlayer.isEntityAlive() && mc.thePlayer.isInsideOfMaterial(Material.water);
             int split = -3;
@@ -131,7 +130,7 @@ public class Interface extends Module {
         }
 
         if (elements.isEnabled("Notification")) {
-            Demise.INSTANCE.getNotificationManager().publish(true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+            Demise.INSTANCE.getNotificationManager().publish(true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
         }
     }
 

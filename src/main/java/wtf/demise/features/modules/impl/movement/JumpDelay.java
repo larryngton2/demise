@@ -3,12 +3,11 @@ package wtf.demise.features.modules.impl.movement;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 
-@ModuleInfo(name = "JumpDelay", description = "Modifies your jump delay.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "JumpDelay", description = "Modifies your jump delay.")
 public class JumpDelay extends Module {
     private final SliderValue jumpDelay = new SliderValue("Jump delay", 0, 0, 20, 1, this);
     private final TimerUtils delay = new TimerUtils();

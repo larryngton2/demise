@@ -9,14 +9,13 @@ import net.minecraft.util.MathHelper;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.RenderItemEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 
-@ModuleInfo(name = "Animations", description = "Modifies blocking animations.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Animations", description = "Modifies blocking animations.")
 public class Animations extends Module {
     public final BoolValue blockOnSwing = new BoolValue("Block on swing", true, this);
     private final ModeValue blockAnimation = new ModeValue("Block animation", new String[]{"Default", "Exhibition", "Spin"}, "Default", this);

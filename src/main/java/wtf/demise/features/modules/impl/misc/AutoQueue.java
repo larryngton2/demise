@@ -7,13 +7,12 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.gui.notification.NotificationType;
 import wtf.demise.utils.misc.ChatUtils;
 
-@ModuleInfo(name = "AutoQueue", description = "Automatically re-queues when a match is over.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "AutoQueue", description = "Automatically re-queues when a match is over.")
 public class AutoQueue extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Hypixel", "Mineblaze duels", "Mineberry duels"}, "Hypixel", this);
 

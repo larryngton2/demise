@@ -5,10 +5,9 @@ import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
-@ModuleInfo(name = "InventorySync", description = "Prevents inventory de-syncs.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "InventorySync", description = "Prevents inventory de-syncs.")
 public class InventorySync extends Module {
     public short action;
 

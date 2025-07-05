@@ -4,13 +4,12 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PacketUtils;
 
-@ModuleInfo(name = "FastUse", description = "Allows you to consume items faster.", category = ModuleCategory.Player)
+@ModuleInfo(name = "FastUse", description = "Allows you to consume items faster.")
 public class FastUse extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "NCP", "AAC"}, "Instant", this);
     private final SliderValue packets = new SliderValue("Packets", 32, 1, 100, 1, this, () -> mode.is("Vanilla"));

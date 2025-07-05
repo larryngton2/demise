@@ -9,11 +9,10 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
-import wtf.demise.events.impl.player.MoveInputEvent;
+import wtf.demise.events.impl.player.MoveEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -30,7 +29,7 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 
-@ModuleInfo(name = "LagRange", description = "Abuses latency in order to simulate tickbasing.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "LagRange", description = "Abuses latency in order to simulate tickbasing.")
 public class LagRange extends Module {
     private final SliderValue delay = new SliderValue("Delay", 50, 0, 1000, 50, this);
     private final SliderValue tickRange = new SliderValue("Attack range", 3f, 0.1f, 8f, 0.1f, this);
@@ -177,7 +176,7 @@ public class LagRange extends Module {
     }
 
     @EventTarget
-    public void onMoveInput(MoveInputEvent e) {
+    public void onMove(MoveEvent e) {
         selfPrediction = PlayerUtils.predictPlayerPosition((int) lagTicks.get());
     }
 }

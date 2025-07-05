@@ -7,7 +7,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
@@ -19,7 +18,7 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "VisualAimPoint", description = "Rotations but different.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "VisualAimPoint", description = "Rotations but different.")
 public class VisualAimPoint extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Dot", "Box"}, "Dot", this);
     private final BoolValue onlySilent = new BoolValue("Only silent", false, this);

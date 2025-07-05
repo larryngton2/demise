@@ -4,12 +4,11 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.LagUtils;
 
-@ModuleInfo(name = "RealLag", description = "FakeLag, but real.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "RealLag", description = "FakeLag, but real.")
 public class RealLag extends Module {
     private final SliderValue ping = new SliderValue("Ping", 100, 0, 1000, 1, this);
 

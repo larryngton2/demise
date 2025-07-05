@@ -386,12 +386,18 @@ public abstract class Entity implements ICommandSender {
 
             if (this.isInWeb) {
                 this.isInWeb = false;
-                x *= 0.25D;
-                y *= 0.05000000074505806D;
-                z *= 0.25D;
-                this.motionX = 0.0D;
-                this.motionY = 0.0D;
-                this.motionZ = 0.0D;
+
+                WebSlowDownEvent webSlowDownEvent = new WebSlowDownEvent();
+                Demise.INSTANCE.getEventManager().call(webSlowDownEvent);
+
+                if (!webSlowDownEvent.isCancelled()) {
+                    x *= 0.25D;
+                    y *= 0.05000000074505806D;
+                    z *= 0.25D;
+                    this.motionX = 0.0D;
+                    this.motionY = 0.0D;
+                    this.motionZ = 0.0D;
+                }
             }
 
             double d3 = x;
@@ -475,18 +481,7 @@ public abstract class Entity implements ICommandSender {
                 AxisAlignedBB axisalignedbb3 = this.getEntityBoundingBox();
                 this.setEntityBoundingBox(axisalignedbb);
 
-                boolean isPlayer = this == Minecraft.getMinecraft().thePlayer;
-
-                if (isPlayer) {
-                    ticksSinceStep = 0;
-                    PreStepEvent event = new PreStepEvent(this.stepHeight);
-
-                    Demise.INSTANCE.getEventManager().call(event);
-
-                    y = event.getHeight();
-                } else {
-                    y = this.stepHeight;
-                }
+                y = this.stepHeight;
 
                 List<AxisAlignedBB> list = this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox().addCoord(d3, y, d5));
                 AxisAlignedBB axisalignedbb4 = this.getEntityBoundingBox();
@@ -562,7 +557,7 @@ public abstract class Entity implements ICommandSender {
                     this.setEntityBoundingBox(axisalignedbb3);
                 }
 
-                if (isPlayer) {
+                if (this == Minecraft.getMinecraft().thePlayer) {
                     Demise.INSTANCE.getEventManager().call(new PostStepEvent((float) (this.getEntityBoundingBox().minY - this.posY)));
                 }
             }
@@ -892,12 +887,6 @@ public abstract class Entity implements ICommandSender {
             float f2 = MathHelper.cos(rotationYaw * (float) Math.PI / 180.0F);
             this.motionX += strafe * f2 - forward * f1;
             this.motionZ += forward * f2 + strafe * f1;
-        }
-
-        if (this == Minecraft.getMinecraft().thePlayer) {
-            final PostStrafeEvent event = new PostStrafeEvent();
-
-            Demise.INSTANCE.getEventManager().call(event);
         }
     }
 

@@ -13,13 +13,12 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.misc.MurderMystery;
 
 import java.awt.*;
 
-@ModuleInfo(name = "ItemESP", description = "ESP but for items.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ItemESP", description = "ESP but for items.")
 public class ItemESP extends Module {
 
     @EventTarget

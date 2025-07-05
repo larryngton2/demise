@@ -4,13 +4,12 @@ import net.minecraft.item.ItemBlock;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.SafeWalkEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 
-@ModuleInfo(name = "SafeWalk", description = "Prevents you from falling from blocks.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "SafeWalk", description = "Prevents you from falling from blocks.")
 public class SafeWalk extends Module {
 
     private final BoolValue heldBlocks = new BoolValue("Held Blocks Check", true, this);

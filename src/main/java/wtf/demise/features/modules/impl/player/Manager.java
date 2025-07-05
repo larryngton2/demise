@@ -5,7 +5,6 @@ import net.minecraft.item.*;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -18,7 +17,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-@ModuleInfo(name = "Manager", description = "Manages your inventory.", category = ModuleCategory.Player)
+@ModuleInfo(name = "Manager", description = "Manages your inventory.")
 public class Manager extends Module {
     private final SliderValue startDelay = new SliderValue("Start delay", 1, 0, 10, 1, this);
 

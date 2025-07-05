@@ -5,13 +5,12 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.JumpEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "MotionModifier", description = "Testing module for speeds. Good luck trying to configure this.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "MotionModifier", description = "Testing module for speeds. Good luck trying to configure this.")
 public class MotionModifier extends Module {
     private final BoolValue motionMulti = new BoolValue("Motion multi", false, this);
 

@@ -3,7 +3,6 @@ package wtf.demise.features.modules.impl.movement;
 import net.minecraft.block.BlockAir;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.server.S45PacketTitle;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -11,10 +10,8 @@ import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.BlockAABBEvent;
-import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.gui.notification.NotificationType;
@@ -23,7 +20,7 @@ import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "Phase", description = "Allows you to phase through blocks.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Phase", description = "Allows you to phase through blocks.")
 public class Phase extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Intave"}, "Vanilla", this);
 

@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MotionEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.render.RenderUtils;
@@ -84,8 +84,8 @@ public class RadarWidget extends Widget {
     }
 
     @Override
-    public void onShader(Shader2DEvent event) {
-        if (event.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+    public void onShader(ShaderEvent event) {
+        if (event.getShaderType() != ShaderEvent.ShaderType.GLOW) {
             RoundedUtils.drawShaderRound(renderX, renderY, width, height, 5, Color.BLACK);
         } else {
             RoundedUtils.drawGradientPreset(renderX, renderY, width, height, 5);

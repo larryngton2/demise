@@ -8,12 +8,11 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AttackEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.player.InventoryUtils;
 
-@ModuleInfo(name = "AutoWeapon", description = "Automatically switches to the best weapon in your hotbar when attacking.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoWeapon", description = "Automatically switches to the best weapon in your hotbar when attacking.")
 public class AutoWeapon extends Module {
     private final BoolValue switchBack = new BoolValue("Switch Back", true, this);
 

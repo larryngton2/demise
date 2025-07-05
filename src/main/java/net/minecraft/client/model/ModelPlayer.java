@@ -2,8 +2,6 @@ package net.minecraft.client.model;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.NameTags;
 
 public class ModelPlayer extends ModelBiped {
     public final ModelRenderer bipedLeftArmwear;
@@ -104,8 +102,6 @@ public class ModelPlayer extends ModelBiped {
         copyModelAngles(this.bipedLeftArm, this.bipedLeftArmwear);
         copyModelAngles(this.bipedRightArm, this.bipedRightArmwear);
         copyModelAngles(this.bipedBody, this.bipedBodyWear);
-        if (Demise.INSTANCE.getModuleManager().getModule(NameTags.class).playerRotationMap.containsKey(entityIn))
-            Demise.INSTANCE.getModuleManager().getModule(NameTags.class).playerRotationMap.remove(entityIn, this);
     }
 
     public void renderRightArm() {

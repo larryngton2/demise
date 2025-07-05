@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
@@ -14,7 +13,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.DecelerateAnimation;
 
-@ModuleInfo(name = "TargetHud", description = "Renders a widget with the current target's info.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "TargetHud", description = "Renders a widget with the current target's info.")
 public class TargetHud extends Module {
     public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this);
     public final BoolValue esp = new BoolValue("ESP", false, this, targetHUDTracking::get);

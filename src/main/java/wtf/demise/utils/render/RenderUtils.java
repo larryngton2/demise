@@ -14,6 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjglx.util.glu.GLU;
 import org.lwjglx.util.vector.Vector2f;
@@ -669,18 +670,30 @@ public class RenderUtils implements InstanceAccess {
     }
 
     public static Vector2f worldToScreen(float x, float y, float z, ScaledResolution sr, boolean ignoreInvisible) {
-        boolean isVisible;
-        FloatBuffer winCoords = FloatBuffer.allocate(3);
-        GLU.gluProject(x, y, z, ActiveRenderInfo.MODELVIEW, ActiveRenderInfo.PROJECTION, ActiveRenderInfo.VIEWPORT, winCoords);
-        float screenX = winCoords.get(0) / (float) sr.getScaleFactor();
-        float screenY = winCoords.get(1) / (float) sr.getScaleFactor();
-        isVisible = winCoords.get(2) >= 0.0f && winCoords.get(2) <= 1.0f && screenX >= 0.0f && screenX <= (float) sr.getScaledWidth() && screenY >= 0.0f && screenY <= (float) sr.getScaledHeight();
-        if (ignoreInvisible) {
-            return new Vector2f(screenX, (float) sr.getScaledHeight() - screenY);
+        x -= (float) mc.getRenderManager().viewerPosX;
+        y -= (float) mc.getRenderManager().viewerPosY;
+        z -= (float) mc.getRenderManager().viewerPosZ;
+
+        FloatBuffer winCoords = BufferUtils.createFloatBuffer(3);
+
+        GLU.gluProject(
+                x, y, z,
+                ActiveRenderInfo.MODELVIEW,
+                ActiveRenderInfo.PROJECTION,
+                ActiveRenderInfo.VIEWPORT,
+                winCoords
+        );
+
+        float screenX = winCoords.get(0) / sr.getScaleFactor();
+        float screenY = winCoords.get(1) / sr.getScaleFactor();
+        float depth = winCoords.get(2);
+
+        boolean isVisible = depth >= -0.01f && depth <= 1.01f && screenX >= 0.0f && screenX <= sr.getScaledWidth() && screenY >= 0.0f && screenY <= sr.getScaledHeight();
+
+        if (isVisible || ignoreInvisible) {
+            return new Vector2f(screenX, sr.getScaledHeight() - screenY);
         }
-        if (isVisible) {
-            return new Vector2f(screenX, (float) sr.getScaledHeight() - screenY);
-        }
+
         return null;
     }
 
@@ -699,5 +712,58 @@ public class RenderUtils implements InstanceAccess {
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
+    }
+
+    public static void draw2DCube(BlockPos pos, int color) {
+        draw2DCube(pos.getX(), pos.getY(), pos.getZ(), color);
+    }
+
+    public static void draw2DCube(double x, double y, double z, int color) {
+        y += 0.03;
+
+        Vector2f[] projected = new Vector2f[]{
+                wts(x, y, z),
+                wts(x + 1, y, z),
+                wts(x + 1, y + 1, z),
+                wts(x, y + 1, z),
+                wts(x, y, z + 1),
+                wts(x + 1, y, z + 1),
+                wts(x + 1, y + 1, z + 1),
+                wts(x, y + 1, z + 1)
+        };
+
+        int[][] faces = new int[][]{
+                {0, 1, 2, 3},
+                {5, 4, 7, 6},
+                {0, 4, 5, 1},
+                {3, 2, 6, 7},
+                {1, 5, 6, 2},
+                {4, 0, 3, 7}
+        };
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        for (int[] face : faces) {
+            GL11.glBegin(GL11.GL_QUADS);
+            color(color);
+
+            for (int index : face) {
+                Vector2f pos = projected[index];
+                if (pos == null) continue;
+
+                GL11.glVertex2f(pos.x, pos.y);
+            }
+
+            GL11.glEnd();
+        }
+
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+    }
+
+    // just to make things look cleaner
+    private static Vector2f wts(double x, double y, double z) {
+        return RenderUtils.worldToScreen((float) x, (float) y, (float) z, new ScaledResolution(mc), false);
     }
 }

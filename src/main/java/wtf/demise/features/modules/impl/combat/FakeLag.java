@@ -12,7 +12,6 @@ import wtf.demise.events.impl.packet.PacketReleaseEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.features.modules.impl.visual.Interface;
@@ -34,7 +33,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 
-@ModuleInfo(name = "FakeLag", description = "Abuses latency in order to be unpredictable to your target.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "FakeLag", description = "Abuses latency in order to be unpredictable to your target.")
 public class FakeLag extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Pulse", "Spoof"}, "Pulse", this);
     private final BoolValue smart = new BoolValue("Smart", true, this);

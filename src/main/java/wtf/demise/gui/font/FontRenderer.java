@@ -2,7 +2,6 @@ package wtf.demise.gui.font;
 
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjglx.opengl.GLContext;
-import wtf.demise.utils.misc.ChatUtils;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;

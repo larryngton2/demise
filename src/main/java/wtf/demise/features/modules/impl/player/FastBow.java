@@ -7,13 +7,12 @@ import org.lwjglx.input.Mouse;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.packet.PacketUtils;
 
-@ModuleInfo(name = "FastBow", description = "Makes you shoot bows faster.", category = ModuleCategory.Player)
+@ModuleInfo(name = "FastBow", description = "Makes you shoot bows faster.")
 public class FastBow extends Module {
     private final SliderValue speed = new SliderValue("Speed", 32, 1, 100, 1, this);
     private final BoolValue trigger = new BoolValue("Trigger (hood bypass)", true, this);

@@ -6,7 +6,7 @@ import wtf.demise.features.command.CommandExecutionException;
 import wtf.demise.features.modules.Module;
 import wtf.demise.utils.misc.ChatUtils;
 
-public final class ToggleCommand extends Command {
+public class ToggleCommand extends Command {
     @Override
     public String[] getAliases() {
         return new String[]{"toggle", "t"};

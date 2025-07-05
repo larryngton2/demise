@@ -9,14 +9,13 @@ import net.minecraft.item.ItemSword;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 
 //todo fix this bullshit
-@ModuleInfo(name = "ExplosionBlock", description = "WIP, Automatically blocks when near an explosion.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "ExplosionBlock", description = "WIP, Automatically blocks when near an explosion.")
 public class ExplosionBlock extends Module {
     private final BoolValue tnt = new BoolValue("TNT", true, this);
     private final SliderValue tntRange = new SliderValue("TNT Range", 4, 0.1f, 8, 0.01f, this, tnt::get);

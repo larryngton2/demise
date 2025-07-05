@@ -3,8 +3,7 @@ package wtf.demise.gui.widget.impl;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import wtf.demise.Demise;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.animations.ContinualAnimation;
@@ -51,12 +50,12 @@ public class PotionHUDWidget extends Widget {
     }
 
     @Override
-    public void onShader(Shader2DEvent event) {
+    public void onShader(ShaderEvent event) {
         ArrayList<PotionEffect> potions = new ArrayList<>(mc.thePlayer.getActivePotionEffects());
         width = 92;
         height = heightAnimation.getOutput();
 
-        if (event.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+        if (event.getShaderType() != ShaderEvent.ShaderType.GLOW) {
             RoundedUtils.drawShaderRound(renderX, renderY, width, height, 6, Color.black);
         } else {
             RoundedUtils.drawGradientPreset(renderX, renderY, width, height, 6);

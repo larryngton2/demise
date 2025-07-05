@@ -2,7 +2,6 @@ package wtf.demise.features.values.impl;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.util.MathHelper;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.values.Value;
 

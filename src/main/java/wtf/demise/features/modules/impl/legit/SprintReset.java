@@ -9,7 +9,6 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -17,7 +16,7 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "SprintReset", description = "Makes you deal increased knockback to targets.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "SprintReset", description = "Makes you deal increased knockback to targets.")
 public class SprintReset extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"ReSprint", "WTap", "Sneak", "Block", "Packet", "LessPacket"}, "ReSprint", this);
     private final BoolValue fast = new BoolValue("Fast", false, this, () -> mode.is("ReSprint"));

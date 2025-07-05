@@ -14,7 +14,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
@@ -30,7 +29,7 @@ import wtf.demise.utils.player.rotation.RotationUtils;
 
 import java.util.Arrays;
 
-@ModuleInfo(name = "AutoRod", description = "Automatically rods. Just read man.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoRod", description = "Automatically rods. Just read man.")
 public class AutoRod extends Module {
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this);
     private final SliderValue maxRange = new SliderValue("Max range", 4.5f, 1, 8, 0.1f, this);

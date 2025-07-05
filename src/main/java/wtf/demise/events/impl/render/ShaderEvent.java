@@ -6,11 +6,10 @@ import wtf.demise.events.impl.Event;
 
 @Getter
 @Setter
-public class Shader3DEvent implements Event {
+public class ShaderEvent implements Event {
+    private ShaderType shaderType;
 
-    private Shader3DEvent.ShaderType shaderType;
-
-    public Shader3DEvent(Shader3DEvent.ShaderType shaderType) {
+    public ShaderEvent(ShaderType shaderType) {
         this.shaderType = shaderType;
     }
 

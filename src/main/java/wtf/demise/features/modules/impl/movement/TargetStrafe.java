@@ -15,7 +15,6 @@ import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.player.Scaffold;
@@ -27,7 +26,7 @@ import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
 
-@ModuleInfo(name = "TargetStrafe", description = "Strafes around your target.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "TargetStrafe", description = "Strafes around your target.")
 public class TargetStrafe extends Module {
     public final SliderValue range = new SliderValue("Range", 1, 0.1f, 6, 0.1f, this);
     public final BoolValue holdJump = new BoolValue("Hold Jump", false, this);

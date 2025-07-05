@@ -9,7 +9,7 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.misc.StringUtils;
 
-public final class BindCommand extends Command {
+public class BindCommand extends Command {
     @Override
     public String[] getAliases() {
         return new String[]{"bind", "b"};

@@ -9,7 +9,6 @@ import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -19,7 +18,7 @@ import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.render.RenderUtils;
 
-@ModuleInfo(name = "AimAssist", description = "Assists in aiming.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AimAssist", description = "Assists in aiming.")
 public class AimAssist extends Module {
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
     private final RotationManager rotationManager = new RotationManager(this);

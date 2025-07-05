@@ -4,7 +4,6 @@ import net.minecraft.inventory.ContainerChest;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -12,7 +11,7 @@ import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.InventoryUtils;
 
-@ModuleInfo(name = "Stealer", description = "Steals items from chests.", category = ModuleCategory.Player)
+@ModuleInfo(name = "Stealer", description = "Steals items from chests.")
 public class Stealer extends Module {
     private final SliderValue startDelay = new SliderValue("Start Delay", 1, 0, 10, 1, this);
     private final SliderValue closeDelay = new SliderValue("Close Delay", 1, 0, 10, 1, this);

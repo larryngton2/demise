@@ -6,7 +6,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -14,7 +13,7 @@ import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
 //sucks ass
-@ModuleInfo(name = "HitSelect", description = "Automatically hit selects in order to start combos.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "HitSelect", description = "Automatically hit selects in order to start combos.")
 public class HitSelect extends Module {
     private final SliderValue maxWaitTime = new SliderValue("Max wait time", 500, 100, 1000, this);
     private final BoolValue teamCheck = new BoolValue("Team check", false, this);

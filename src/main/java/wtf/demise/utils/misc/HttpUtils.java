@@ -2,14 +2,11 @@ package wtf.demise.utils.misc;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import wtf.demise.Demise;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
 

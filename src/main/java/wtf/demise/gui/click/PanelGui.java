@@ -7,7 +7,7 @@ import org.lwjglx.input.Mouse;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.click.components.Category;
@@ -189,12 +189,12 @@ public class PanelGui extends GuiScreen {
 
     @EventPriority(100)
     @EventTarget
-    public void onShader2D(Shader2DEvent e) {
+    public void onShader2D(ShaderEvent e) {
         if (mc.currentScreen != this) return;
 
         ScaledResolution sr = new ScaledResolution(mc);
         RenderUtils.scaleStart(sr.getScaledWidth() / 2f, sr.getScaledHeight() / 2f, interpolatedScale);
-        if (e.getShaderType() != Shader2DEvent.ShaderType.GLOW) {
+        if (e.getShaderType() != ShaderEvent.ShaderType.GLOW) {
             RoundedUtils.drawShaderRound(posX, posY, 450, 300, 7, Color.black);
         } else {
             RoundedUtils.drawGradientPreset(posX, posY, 450, 300, 7);

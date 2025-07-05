@@ -4,13 +4,12 @@ import net.minecraft.util.MovingObjectPosition;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "AutoTool", description = "Automatically switches to the best tool when digging.", category = ModuleCategory.Player)
+@ModuleInfo(name = "AutoTool", description = "Automatically switches to the best tool when digging.")
 public class AutoTool extends Module {
     private final BoolValue spoof = new BoolValue("Spoof", false, this);
     private final BoolValue switchBack = new BoolValue("Switch Back", true, this, () -> !spoof.get());

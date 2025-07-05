@@ -6,7 +6,7 @@ import wtf.demise.utils.misc.ChatUtils;
 
 import java.util.Arrays;
 
-public final class HelpCommand extends Command {
+public class HelpCommand extends Command {
     @Override
     public String[] getAliases() {
         return new String[]{"help", "h"};

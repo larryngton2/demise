@@ -6,8 +6,7 @@ import net.minecraft.network.play.client.C0APacketAnimation;
 import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
-import wtf.demise.features.modules.impl.visual.Interface;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.render.RenderUtils;
@@ -34,8 +33,8 @@ public class InfoWidget extends Widget {
     }
 
     @Override
-    public void onShader(Shader2DEvent event) {
-        draw(true, event.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+    public void onShader(ShaderEvent event) {
+        draw(true, event.getShaderType() == ShaderEvent.ShaderType.GLOW);
     }
 
     private void draw(boolean shader, boolean isGlow) {

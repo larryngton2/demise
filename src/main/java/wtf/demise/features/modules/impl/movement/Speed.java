@@ -6,7 +6,6 @@ import net.minecraft.util.MovementInput;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
@@ -20,7 +19,7 @@ import wtf.demise.utils.player.rotation.RotationHandler;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@ModuleInfo(name = "Speed", description = "Makes you go faster.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Speed", description = "Makes you go faster.")
 public class Speed extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "Custom", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC", "Miniblox"}, "Strafe Hop", this);
 

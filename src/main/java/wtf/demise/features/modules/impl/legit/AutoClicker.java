@@ -5,7 +5,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.PlayerTickEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -14,7 +13,7 @@ import wtf.demise.utils.player.ClickHandler;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-@ModuleInfo(name = "AutoClicker", description = "Automatically clicks.", category = ModuleCategory.Legit)
+@ModuleInfo(name = "AutoClicker", description = "Automatically clicks.")
 public class AutoClicker extends Module {
     private final BoolValue left = new BoolValue("Left click", true, this);
     private final SliderValue lminCPS = new SliderValue("CPS (left min)", 10, 1, 20, this, left::get);

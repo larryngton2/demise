@@ -22,7 +22,8 @@ public final class CommandManager {
                 new FriendCommand(),
                 new ConfigCommand(),
                 new HWIDCommand(),
-                new OnlineConfigCommand()
+                new OnlineConfigCommand(),
+                new JumpCommand()
         );
 
         Demise.INSTANCE.getModuleManager().getModules().forEach(module -> {

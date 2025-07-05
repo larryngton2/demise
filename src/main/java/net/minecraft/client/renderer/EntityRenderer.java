@@ -1531,7 +1531,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
         mc.mcProfiler.endStartSection("hand");
 
-        //Demise.INSTANCE.getModuleManager().getModule(wtf.demise.features.modules.impl.visual.Shaders.class).renderShaders3D();
         Demise.INSTANCE.getEventManager().call(new Render3DEvent(partialTicks, new ScaledResolution(mc)));
 
         if (renderHand && !Shaders.isShadowPass) {

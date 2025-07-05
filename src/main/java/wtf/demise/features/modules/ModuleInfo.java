@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
 public @interface ModuleInfo {
     String name();
     String description() default "Empty description.";
-    ModuleCategory category();
 
     int key() default 0;
 }

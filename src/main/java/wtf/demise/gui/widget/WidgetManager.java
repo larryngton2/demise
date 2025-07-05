@@ -3,7 +3,7 @@ package wtf.demise.gui.widget;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.gui.widget.impl.*;
 import wtf.demise.utils.InstanceAccess;
 
@@ -42,7 +42,7 @@ public class WidgetManager implements InstanceAccess {
     }
 
     @EventTarget
-    public void onShader2D(Shader2DEvent event) {
+    public void onShader2D(ShaderEvent event) {
         for (Widget widget : widgetList) {
             if (widget.shouldRender()) {
                 widget.onShader(event);

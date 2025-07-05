@@ -1,7 +1,5 @@
 package wtf.demise.gui.click.components.impl;
 
-import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.gui.click.Component;

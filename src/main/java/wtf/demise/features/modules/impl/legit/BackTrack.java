@@ -13,7 +13,6 @@ import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
@@ -29,7 +28,7 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 
-@ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach. (BACKTRACK???)", category = ModuleCategory.Legit)
+@ModuleInfo(name = "BackTrack", description = "Abuses latency for increased reach.")
 public class BackTrack extends Module {
     private final BoolValue onlyWhenNeeded = new BoolValue("Only when needed", false, this);
     private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this, onlyWhenNeeded::get);

@@ -1,8 +1,6 @@
 package wtf.demise.gui.click.components.impl;
 
 import net.minecraft.util.MathHelper;
-import wtf.demise.Demise;
-import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;

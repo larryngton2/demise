@@ -2,7 +2,6 @@ package wtf.demise.features.modules.impl.misc;
 
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-@ModuleInfo(name = "AutoMeow", description = "meow", category = ModuleCategory.Misc)
+@ModuleInfo(name = "AutoMeow", description = "meow")
 public class AutoMeow extends wtf.demise.features.modules.Module {
     private final SliderValue delay = new SliderValue("Delay", 1, 0, 200, 1, this);
     private final SliderValue minLength = new SliderValue("Min length", 5, 1, 50, 1, this);

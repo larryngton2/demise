@@ -7,7 +7,6 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
@@ -15,7 +14,7 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@ModuleInfo(name = "AntiBot", description = "Makes Combat-related modules ignore bots.", category = ModuleCategory.Combat)
+@ModuleInfo(name = "AntiBot", description = "Makes Combat-related modules ignore bots.")
 public class AntiBot extends Module {
     public final MultiBoolValue options = new MultiBoolValue("Options", Arrays.asList(
             new BoolValue("Tab", false),

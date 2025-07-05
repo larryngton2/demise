@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL11;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
@@ -18,7 +17,7 @@ import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 
-@ModuleInfo(name = "ChestESP", description = "ESP but for chests.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ChestESP", description = "ESP but for chests.")
 public class ChestESP extends Module {
 
     private final ModeValue mode = new ModeValue("Mode", new String[]{"3D", "2D"}, "3D", this);

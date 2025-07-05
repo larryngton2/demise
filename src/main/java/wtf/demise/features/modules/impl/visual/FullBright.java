@@ -5,11 +5,10 @@ import net.minecraft.potion.PotionEffect;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "FullBright", description = "Brightens up the world.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "FullBright", description = "Brightens up the world.")
 public class FullBright extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Gamma", "Potion"}, "Gamma", this);
 

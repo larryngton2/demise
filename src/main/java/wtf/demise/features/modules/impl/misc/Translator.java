@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 
 import java.io.BufferedReader;
@@ -22,7 +21,7 @@ import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-@ModuleInfo(name = "Translator", description = "Translates your chat.", category = ModuleCategory.Misc)
+@ModuleInfo(name = "Translator", description = "Translates your chat.")
 public class Translator extends Module {
     Executor translatorThread = Executors.newFixedThreadPool(1);
 

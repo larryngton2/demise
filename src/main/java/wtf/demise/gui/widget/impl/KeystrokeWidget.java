@@ -3,7 +3,7 @@ package wtf.demise.gui.widget.impl;
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjglx.input.Keyboard;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.math.MathUtils;
@@ -39,8 +39,8 @@ public class KeystrokeWidget extends Widget {
     }
 
     @Override
-    public void onShader(Shader2DEvent event) {
-        drawKeystrokes(true, event.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+    public void onShader(ShaderEvent event) {
+        drawKeystrokes(true, event.getShaderType() == ShaderEvent.ShaderType.GLOW);
     }
 
     private void drawKeystrokes(boolean shader, boolean isGlow) {

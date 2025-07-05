@@ -9,13 +9,12 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.utils.player.ClickHandler;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "BloxdPhysics", category = ModuleCategory.Misc)
+@ModuleInfo(name = "BloxdPhysics")
 public class BloxdPhysics extends Module {
     private final BoolValue keepSprint = new BoolValue("KeepSprint", true, this);
 

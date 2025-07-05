@@ -3,13 +3,12 @@ package wtf.demise.features.modules.impl.movement;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "Strafe", description = "Modifies strafe friction.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Strafe", description = "Modifies strafe friction.")
 public class Strafe extends Module {
     public final BoolValue ground = new BoolValue("Ground", true, this);
     public final SliderValue groundStrength = new SliderValue("Ground strength", 1, 0.01f, 1, 0.01f, this, ground::get);

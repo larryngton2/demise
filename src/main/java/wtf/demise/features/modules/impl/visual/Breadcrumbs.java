@@ -9,7 +9,6 @@ import wtf.demise.events.impl.misc.WorldChangeEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-@ModuleInfo(name = "Breadcrumbs", description = "Renders a trail behind you.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Breadcrumbs", description = "Renders a trail behind you.")
 public class Breadcrumbs extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Line", "Dot"}, "Line", this);
     private final SliderValue timeout = new SliderValue("Time", 15, 1, 150, 1, this);
@@ -54,7 +53,6 @@ public class Breadcrumbs extends Module {
     public void onRender3DEvent(Render3DEvent e) {
         switch (mode.get()) {
             case "Dot": {
-                // pasted from rise 5 🤑🤑
                 GlStateManager.disableDepth();
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glDisable(GL11.GL_TEXTURE_2D);

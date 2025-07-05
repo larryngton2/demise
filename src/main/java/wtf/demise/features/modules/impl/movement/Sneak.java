@@ -5,11 +5,10 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 
-@ModuleInfo(name = "Sneak", description = "Sneak.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Sneak", description = "Sneak.")
 public class Sneak extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Legit", "Packet"}, "Legit", this);
 

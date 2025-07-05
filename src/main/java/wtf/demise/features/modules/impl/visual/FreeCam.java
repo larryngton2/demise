@@ -10,13 +10,12 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 
-@ModuleInfo(name = "FreeCam", description = "Allows you to move freely.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "FreeCam", description = "Allows you to move freely.")
 public class FreeCam extends Module {
     private final BoolValue fly = new BoolValue("Fly", true, this);
     private final SliderValue flySpeed = new SliderValue("Fly Speed", 1, 0.1f, 9.5f, 0.1f, this, fly::get);

@@ -19,10 +19,6 @@ import wtf.demise.utils.animations.Direction;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Manages all modules within the client.
- * Responsible for initializing, registering, and handling modules.
- */
 @Getter
 public class ModuleManager {
     private static final Set<Class<? extends Module>> COMBAT_MODULES = Set.of(
@@ -38,13 +34,13 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> MOVEMENT_MODULES = Set.of(
             AutoWalk.class, Fly.class, Freeze.class, InvMove.class, Jesus.class, JumpDelay.class, LongJump.class,
-            MotionModifier.class, NoSlow.class, Phase.class, SafeWalk.class, Sneak.class, Speed.class,
-            Sprint.class, Step.class, Strafe.class, TargetStrafe.class, WallClimb.class
+            MotionModifier.class, NoSlow.class, Phase.class, SafeWalk.class, Sneak.class, Speed.class, Sprint.class,
+            Step.class, Strafe.class, TargetStrafe.class, WallClimb.class, NoWeb.class
     );
 
     private static final Set<Class<? extends Module>> PLAYER_MODULES = Set.of(
-            AntiVoid.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class,
-            FastPlace.class, FastUse.class, Manager.class, NoFall.class, Scaffold.class, Stealer.class
+            AntiVoid.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class, FastPlace.class,
+            FastUse.class, Manager.class, NoFall.class, Scaffold.class, Stealer.class
     );
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
@@ -56,7 +52,7 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
             AutoBan.class, Blink.class, ClientSpoofer.class, ComboOneHit.class, Disabler.class, NoGuiClose.class,
-            Regen.class, ResetVL.class, Timer.class, PingSpoof.class, InfAura.class, AntiFlag.class
+            Regen.class, ResetVL.class, Timer.class, PingSpoof.class, InfAura.class, AntiFlag.class, Crasher.class
     );
 
     private static final Set<Class<? extends Module>> VISUAL_MODULES = Set.of(
@@ -65,7 +61,7 @@ public class ModuleManager {
             ForceDinnerbone.class, FreeCam.class, FullBright.class, Interface.class, ItemESP.class, ItemPhysics.class,
             MainMenuOptions.class, MotionBlur.class, NoHurtCam.class, NoRenderOffsetReset.class,
             Rotation.class, Shaders.class, ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class,
-            VisualAimPoint.class, TargetHud.class
+            VisualAimPoint.class, TargetHud.class, RealPos.class
     );
 
     private final Map<ModuleCategory, List<Module>> modulesByCategory;

@@ -6,7 +6,6 @@ import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
@@ -15,7 +14,7 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
-@ModuleInfo(name = "ChinaHat", description = "A rong rong time ago...", category = ModuleCategory.Visual)
+@ModuleInfo(name = "ChinaHat", description = "A rong rong time ago...")
 public class ChinaHat extends Module {
     private final ModeValue quality = new ModeValue("Quality", new String[]{
             "Not china hat anymore",

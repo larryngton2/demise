@@ -10,14 +10,13 @@ import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.PostStepEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
 
-@ModuleInfo(name = "Step", description = "Allows you to step up blocks.", category = ModuleCategory.Movement)
+@ModuleInfo(name = "Step", description = "Allows you to step up blocks.")
 public class Step extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "NCP"}, "Vanilla", this);
     private final SliderValue height = new SliderValue("Height", 1, 0.5f, 2, 0.01f, this, () -> mode.is("Vanilla"));

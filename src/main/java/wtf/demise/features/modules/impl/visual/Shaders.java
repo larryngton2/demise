@@ -1,13 +1,11 @@
 package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.client.shader.Framebuffer;
-import wtf.demise.events.impl.render.Shader2DEvent;
+import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.ModuleCategory;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ColorValue;
-import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.shader.impl.Bloom;
 import wtf.demise.utils.render.shader.impl.Blur;
@@ -15,7 +13,7 @@ import wtf.demise.utils.render.shader.impl.Shadow;
 
 import java.awt.*;
 
-@ModuleInfo(name = "Shaders", description = "Renders shaders in HUD elements.", category = ModuleCategory.Visual)
+@ModuleInfo(name = "Shaders", description = "Renders shaders in HUD elements.")
 public class Shaders extends Module {
     public final BoolValue blur = new BoolValue("Blur", true, this);
     public final BoolValue shadow = new BoolValue("Shadow", true, this);
@@ -30,7 +28,7 @@ public class Shaders extends Module {
 
         if (blur.get()) {
             Blur.startBlur();
-            INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.BLUR));
+            INSTANCE.getEventManager().call(new ShaderEvent(ShaderEvent.ShaderType.BLUR));
             Blur.endBlur(25, 1);
             RenderUtils.resetColor();
         }
@@ -39,7 +37,7 @@ public class Shaders extends Module {
             stencilFramebuffer = RenderUtils.createFrameBuffer(stencilFramebuffer);
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(false);
-            INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.GLOW));
+            INSTANCE.getEventManager().call(new ShaderEvent(ShaderEvent.ShaderType.GLOW));
             stencilFramebuffer.unbindFramebuffer();
 
             Bloom.renderBlur(stencilFramebuffer.framebufferTexture, 3, 1);
@@ -51,7 +49,7 @@ public class Shaders extends Module {
             stencilFramebuffer.framebufferClear();
             stencilFramebuffer.bindFramebuffer(true);
             RenderUtils.resetColor();
-            INSTANCE.getEventManager().call(new Shader2DEvent(Shader2DEvent.ShaderType.SHADOW));
+            INSTANCE.getEventManager().call(new ShaderEvent(ShaderEvent.ShaderType.SHADOW));
             stencilFramebuffer.unbindFramebuffer();
             RenderUtils.resetColor();
 
