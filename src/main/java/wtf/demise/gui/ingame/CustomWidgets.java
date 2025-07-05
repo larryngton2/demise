@@ -3,6 +3,7 @@ package wtf.demise.gui.ingame;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,6 +38,7 @@ import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,6 +81,10 @@ public class CustomWidgets implements InstanceAccess {
         }
 
         drawHotbarWidget(i, false, false);
+
+        if (customWidgetsModule.tabList.get()) {
+            drawTabList();
+        }
 
         if (customWidgetsModule.chat.get()) {
             drawChat(GuiIngame.getUpdateCounter(), false, false);
@@ -476,6 +482,9 @@ public class CustomWidgets implements InstanceAccess {
         }
     }
 
+    int colWidth = 130; // should be enough
+    int maxRows = 16;
+
     @EventTarget
     public void onShader2D(Shader2DEvent e) {
         int i = sr.getScaledWidth() / 2;
@@ -510,6 +519,63 @@ public class CustomWidgets implements InstanceAccess {
 
         if (customWidgetsModule.scoreboard.get()) {
             drawScoreboard(scoreObjective, sr, true, e.getShaderType() == Shader2DEvent.ShaderType.GLOW);
+        }
+
+        if (customWidgetsModule.tabList.get() && mc.gameSettings.keyBindPlayerList.isKeyDown()) {
+            String header = mc.ingameGUI.getTabList().getHeader().getFormattedText();
+            String footer = mc.ingameGUI.getTabList().getFooter().getFormattedText();
+            int headerHeight = (int) (Fonts.interRegular.get(15).getHeight() * header.split("\n").length);
+            int footerHeight = (int) (Fonts.interRegular.get(15).getHeight() * footer.split("\n").length);
+            int count = (int) Math.ceil((double) mc.getNetHandler().getPlayerInfoMap().size() / maxRows);
+            int startX = sr.getScaledWidth() / 2 - (count * colWidth) / 2;
+            RoundedUtils.drawShaderRound(startX - 4, 36, count * colWidth + 10, Math.min(mc.getNetHandler().getPlayerInfoMap().size(), 12) * maxRows + 12 + headerHeight + footerHeight, 7, Color.black);
+        }
+    }
+
+    void drawTabList() {
+        if (!mc.gameSettings.keyBindPlayerList.isKeyDown()) return;
+        Collection<NetworkPlayerInfo> xd = mc.getNetHandler().getPlayerInfoMap();
+        List<NetworkPlayerInfo> players = xd.stream()
+                .sorted(Comparator.comparing(info -> info.getGameProfile().getName()))
+                .toList();
+
+        int rowHeight = 12;
+        int columnCount = (int) Math.ceil((double) players.size() / maxRows);
+        int startX = sr.getScaledWidth() / 2 - (columnCount * colWidth) / 2;
+        int startY = 40;
+
+        String[] headerLines = mc.ingameGUI.getTabList().getHeader().getFormattedText().split("\n");
+        for (String line : headerLines) {
+            int textWidth = Fonts.interRegular.get(15).getStringWidth(line);
+            int x = sr.getScaledWidth() / 2 - textWidth / 2;
+            Fonts.interRegular.get(15).drawStringWithShadow(line, x, startY, Color.white.getRGB());
+            startY += Fonts.interRegular.get(15).getHeight();
+        }
+
+        int playerListStartY = startY;
+
+        for (int i = 0; i < players.size(); i++) {
+            int col = i / maxRows;
+            int row = i % maxRows;
+
+            int x = startX + col * colWidth;
+            int y = playerListStartY + row * rowHeight;
+
+            NetworkPlayerInfo info = players.get(i);
+            String name = mc.ingameGUI.getTabList().getPlayerName(info);
+
+            Fonts.interRegular.get(15).drawStringWithShadow(name, x, y, Color.white.getRGB());
+        }
+
+        int rowsUsed = Math.min(players.size(), maxRows);
+        startY = playerListStartY + rowsUsed * rowHeight;
+
+        String[] footerLines = mc.ingameGUI.getTabList().getFooter().getFormattedText().split("\n");
+        for (String line : footerLines) {
+            int textWidth = Fonts.interRegular.get(15).getStringWidth(line);
+            int x = sr.getScaledWidth() / 2 - textWidth / 2;
+            Fonts.interRegular.get(15).drawStringWithShadow(line, x, startY, Color.white.getRGB());
+            startY += Fonts.interRegular.get(15).getHeight();
         }
     }
 
