@@ -9,10 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjglx.input.Keyboard;
 import wtf.demise.events.annotations.EventPriority;
 import wtf.demise.events.annotations.EventTarget;
-import wtf.demise.events.impl.player.JumpEvent;
-import wtf.demise.events.impl.player.MoveInputEvent;
-import wtf.demise.events.impl.player.StrafeEvent;
-import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
@@ -32,6 +29,7 @@ public class TargetStrafe extends Module {
     public final BoolValue holdJump = new BoolValue("Hold Jump", false, this);
     public final BoolValue render = new BoolValue("Render", true, this);
     public final BoolValue behind = new BoolValue("Behind", true, this);
+    private final BoolValue onlySpeed = new BoolValue("Only speed", false, this);
 
     public float yaw;
     private boolean left, colliding;
@@ -68,15 +66,7 @@ public class TargetStrafe extends Module {
 
         active = true;
 
-        Module speed = getModule(Speed.class);
-        Module fly = getModule(Fly.class);
-
-        if ((holdJump.get() && !mc.gameSettings.keyBindJump.isKeyDown()) || (holdJump.get() && (speed == null || !speed.isEnabled()) && (fly == null || !fly.isEnabled()))) {
-            target = null;
-            return;
-        }
-
-        if (!holdJump.get() && ((speed == null || !speed.isEnabled()) && (fly == null || !fly.isEnabled()))) {
+        if ((holdJump.get() && !mc.gameSettings.keyBindJump.isKeyDown()) || (onlySpeed.get() && !getModule(Speed.class).isEnabled())) {
             target = null;
             return;
         }
@@ -109,9 +99,9 @@ public class TargetStrafe extends Module {
             yaw = getYaw(mc.thePlayer, new Vec3(target.posX, target.posY, target.posZ)) + (90 + 45) * (left ? -1 : 1);
         }
 
-        final double range = this.range.get() + Math.random() / 100f;
-        final double posX = -MathHelper.sin((float) Math.toRadians(yaw)) * range + target.posX;
-        final double posZ = MathHelper.cos((float) Math.toRadians(yaw)) * range + target.posZ;
+        double range = this.range.get() + Math.random() / 100f;
+        double posX = -MathHelper.sin((float) Math.toRadians(yaw)) * range + target.posX;
+        double posZ = MathHelper.cos((float) Math.toRadians(yaw)) * range + target.posZ;
 
         yaw = getYaw(mc.thePlayer, new Vec3(posX, target.posY, posZ));
 

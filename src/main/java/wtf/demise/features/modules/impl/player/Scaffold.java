@@ -59,7 +59,7 @@ public class Scaffold extends Module {
     private final SliderValue groundTicksToSneak = new SliderValue("Ground ticks to sneak", 5, 0, 10, this, () -> clutch.get() && autoSneakOnClutch.get());
     private final RotationManager rotationManager = new RotationManager(this);
     public final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Silent", "Ground", "Air", "None"}, "Normal", this);
-    private final ModeValue speedMode = new ModeValue("Speed mode", new String[]{"Tick", "Exempt", "None"}, "None", this);
+    private final ModeValue speedMode = new ModeValue("Speed mode", new String[]{"Tick", "Exempt", "Diagonal", "None"}, "None", this);
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
             new BoolValue("Swing", true),
             new BoolValue("RayTrace", true),
@@ -192,46 +192,50 @@ public class Scaffold extends Module {
         boolean rotateCheck = mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing));
 
         if (rotateCheck) {
-            if (!mode.is("Breezily")) {
-                switch (rotations.get()) {
-                    case "Normal":
-                        initialYaw = getBestRotation(data.blockPos, data.facing)[0];
-                        initialPitch = getBestRotation(data.blockPos, data.facing)[1];
-                        break;
-                    case "Center":
-                        Vec3 hitVec = getVec3(data);
+            switch (mode.get()) {
+                case "Normal", "Telly":
+                    switch (rotations.get()) {
+                        case "Normal":
+                            initialYaw = getBestRotation(data.blockPos, data.facing)[0];
+                            initialPitch = getBestRotation(data.blockPos, data.facing)[1];
+                            break;
+                        case "Center":
+                            Vec3 hitVec = RotationUtils.getVec3(data.blockPos, data.facing);
 
-                        initialYaw = RotationUtils.getRotations(hitVec)[0];
-                        initialPitch = RotationUtils.getRotations(hitVec)[1];
-                        break;
-                    case "GodBridge":
-                        float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
+                            initialYaw = RotationUtils.getRotations(hitVec)[0];
+                            initialPitch = RotationUtils.getRotations(hitVec)[1];
+                            break;
+                        case "GodBridge":
+                            float movingYaw = MoveUtil.isMoving() ? MoveUtil.getYawFromKeybind() - 180 : mc.thePlayer.rotationYaw - 180;
 
-                        if (mc.thePlayer.onGround) {
-                            isOnRightSide = Math.floor(mc.thePlayer.posX + Math.cos(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posX) ||
-                                    Math.floor(mc.thePlayer.posZ + Math.sin(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posZ);
-                        }
+                            if (mc.thePlayer.onGround) {
+                                isOnRightSide = Math.floor(mc.thePlayer.posX + Math.cos(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posX) ||
+                                        Math.floor(mc.thePlayer.posZ + Math.sin(Math.toRadians(movingYaw)) * 0.5) != Math.floor(mc.thePlayer.posZ);
+                            }
 
-                        float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
+                            float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
 
-                        initialYaw = Math.round(yaw / 45) * 45;
-                        initialPitch = staticify.get() ? MoveUtil.isMoving() ? 75.7f : 90f : getBestRotation(data.blockPos, data.facing)[1];
-                        break;
-                    case "Reverse":
-                        initialYaw = MoveUtil.getYawFromKeybind() - 180;
-                        initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
-                        break;
+                            initialYaw = Math.round(yaw / 45) * 45;
+                            initialPitch = staticify.get() ? MoveUtil.isMoving() ? 75.7f : 90f : getBestRotation(data.blockPos, data.facing)[1];
+                            break;
+                        case "Reverse":
+                            initialYaw = MoveUtil.getYawFromKeybind() - 180;
+                            initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
+                            break;
+                    }
+                    break;
+                case "Breezily": {
+                    float yaw = MoveUtil.getYawFromKeybind() - 180;
+                    initialYaw = Math.round(yaw / 45) * 45;
+                    initialPitch = MoveUtil.isMoving() ? MoveUtil.isMovingStraight() ? 80 : 75.7f : 90;
                 }
-            } else {
-                float yaw = MoveUtil.getYawFromKeybind() - 180;
-                initialYaw = Math.round(yaw / 45) * 45;
-                initialPitch = 80;
+                break;
             }
         }
 
         float[] rotation = new float[]{initialYaw, initialPitch};
 
-        if (clutch.get()) {
+        if (clutch.get() && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.getPositionVector().subtract(0, 2, 0))).getBlock() instanceof BlockAir) {
             switch (clutchCriteria.get()) {
                 case "MouseOver":
                     MovingObjectPosition ray = RotationUtils.rayTraceSafe(rotation, 4.5, 1);
@@ -290,12 +294,15 @@ public class Scaffold extends Module {
                         MoveUtil.strafe(mc.thePlayer.movementInput.moveStrafe == 0 ? 0.1591f : 0.1565f);
                     }
                     break;
+                case "Diagonal":
+                    MoveUtil.useDiagonalSpeed();
+                    break;
             }
         }
     }
 
     private void setClutchRot(boolean rotateCheck) {
-        Vec3 hitVec = getVec3(data);
+        Vec3 hitVec = RotationUtils.getVec3(data.blockPos, data.facing);
 
         if (rotateCheck) {
             switch (clutchRotMode.get()) {
@@ -335,7 +342,7 @@ public class Scaffold extends Module {
 
     private void place() {
         if (!mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            place(data.blockPos, data.facing, getVec3(data));
+            place(data.blockPos, data.facing, RotationUtils.getVec3(data.blockPos, data.facing));
         }
     }
 
@@ -355,41 +362,48 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onMovementInput(MoveInputEvent e) {
-        if (mode.is("Breezily")) {
-            boolean isLeaningOffBlock = PlayerUtils.getBlock(data.blockPos.offset(data.facing)) instanceof BlockAir;
-            BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ);
-            if (isLeaningOffBlock && !mc.thePlayer.isJumping && MoveUtil.isMoving() && MoveUtil.isMovingStraight()) {
-                switch (mc.thePlayer.getHorizontalFacing()) {
-                    case EAST -> {
-                        if (b.getZ() + 0.5 > mc.thePlayer.posZ) {
-                            e.setStrafe(1);
-                        } else {
-                            e.setStrafe(-1);
+        switch (mode.get()) {
+            case "Breezily":
+                boolean isLeaningOffBlock = PlayerUtils.getBlock(data.blockPos.offset(data.facing)) instanceof BlockAir;
+                BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ);
+                if (isLeaningOffBlock && MoveUtil.isMoving() && MoveUtil.isMovingStraight()) {
+                    switch (mc.thePlayer.getHorizontalFacing()) {
+                        case EAST -> {
+                            if (b.getZ() + 0.5 > mc.thePlayer.posZ) {
+                                e.setStrafe(1);
+                            } else {
+                                e.setStrafe(-1);
+                            }
                         }
-                    }
-                    case WEST -> {
-                        if (b.getZ() + 0.5 < mc.thePlayer.posZ) {
-                            e.setStrafe(1);
-                        } else {
-                            e.setStrafe(-1);
+                        case WEST -> {
+                            if (b.getZ() + 0.5 < mc.thePlayer.posZ) {
+                                e.setStrafe(1);
+                            } else {
+                                e.setStrafe(-1);
+                            }
                         }
-                    }
-                    case SOUTH -> {
-                        if (b.getX() + 0.5 < mc.thePlayer.posX) {
-                            e.setStrafe(1);
-                        } else {
-                            e.setStrafe(-1);
+                        case SOUTH -> {
+                            if (b.getX() + 0.5 < mc.thePlayer.posX) {
+                                e.setStrafe(1);
+                            } else {
+                                e.setStrafe(-1);
+                            }
                         }
-                    }
-                    case NORTH -> {
-                        if (b.getX() + 0.5 > mc.thePlayer.posX) {
-                            e.setStrafe(1);
-                        } else {
-                            e.setStrafe(-1);
+                        case NORTH -> {
+                            if (b.getX() + 0.5 > mc.thePlayer.posX) {
+                                e.setStrafe(1);
+                            } else {
+                                e.setStrafe(-1);
+                            }
                         }
                     }
                 }
-            }
+                break;
+            case "Telly":
+                if (mc.thePlayer.onGround && !towering() && !towerMoving() && (!isEnabled(Speed.class)) && mc.thePlayer.isSprinting() && MoveUtil.isMoving()) {
+                    e.setJumping(true);
+                }
+                break;
         }
 
         if (addons.isEnabled("Jump")) {
@@ -425,21 +439,6 @@ public class Scaffold extends Module {
 
             if (blocksPlacedSneak == blocksToSneak.get()) {
                 e.setSneaking(true);
-            }
-        }
-    }
-
-    @EventTarget
-    public void onStrafe(StrafeEvent e) {
-        if (mc.thePlayer.onGround) {
-            if (mode.is("Telly") && !towering() && !towerMoving() && (!isEnabled(Speed.class))) {
-                if (mode.is("Telly") && !mc.thePlayer.isSprinting()) {
-                    return;
-                }
-
-                if (MoveUtil.isMoving()) {
-                    mc.thePlayer.jump();
-                }
             }
         }
     }
@@ -613,7 +612,7 @@ public class Scaffold extends Module {
             }
             previousBlock = data.blockPos.offset(data.facing);
         } else {
-            MovingObjectPosition ray = RotationUtils.rayTrace(4.5, 1);
+            MovingObjectPosition ray = RotationUtils.rayTraceSafe(4.5, 1);
 
             if (ray.getBlockPos().equalsBlockPos(pos) && (!strictRayTrace.get() || ray.sideHit.equals(facing))) {
                 if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
@@ -630,19 +629,6 @@ public class Scaffold extends Module {
 
             previousBlock = ray.getBlockPos().offset(ray.sideHit);
         }
-    }
-
-    private Vec3 getVec3(PlaceData data) {
-        BlockPos pos = data.blockPos;
-        EnumFacing face = data.facing;
-        double x = pos.getX() + 0.5D;
-        double y = pos.getY() + 0.5D;
-        double z = pos.getZ() + 0.5D;
-        x += face.getFrontOffsetX() / 2.0D;
-        z += face.getFrontOffsetZ() / 2.0D;
-        y += face.getFrontOffsetY() / 2.0D;
-
-        return new Vec3(x, y, z);
     }
 
     private PlaceData findBlock(BlockPos pos) {
@@ -722,7 +708,7 @@ public class Scaffold extends Module {
         float[] yRange = getAxisMinMax(faceVec.getY());
         float[] zRange = getAxisMinMax(faceVec.getZ());
 
-        float[] bestRot = RotationUtils.getRotations(getVec3(data));
+        float[] bestRot = RotationUtils.getRotations(RotationUtils.getVec3(data.blockPos, data.facing));
         double bestDist = RotationUtils.getRotationDifference(bestRot);
         boolean picked = false;
 
@@ -744,7 +730,7 @@ public class Scaffold extends Module {
             }
         }
 
-        return picked ? bestRot : RotationUtils.getRotations(getVec3(data));
+        return picked ? bestRot : RotationUtils.getRotations(RotationUtils.getVec3(data.blockPos, data.facing));
     }
 
     private float[] getAxisMinMax(int axisValue) {

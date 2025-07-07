@@ -87,6 +87,11 @@ public class NoSlow extends Module {
                     speed = bowSpeed.get();
                     sprint = bowSprint.get();
                 }
+                case NONE -> {
+                    mode = "null";
+                    speed = 0.2f;
+                    sprint = false;
+                }
             }
         }
 

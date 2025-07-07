@@ -18,7 +18,8 @@ import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;
-import wtf.demise.utils.player.SmoothMode;
+import wtf.demise.utils.player.rotation.enums.MovementCorrectionMode;
+import wtf.demise.utils.player.rotation.enums.SmoothMode;
 
 @Getter
 public class RotationManager implements InstanceAccess {
@@ -32,7 +33,7 @@ public class RotationManager implements InstanceAccess {
     final SliderValue minRange;
     final SliderValue maxRange;
     final SliderValue decrementPerCycle;
-    final BoolValue movementFix;
+    final ModeValue moveCorrection;
     final BoolValue shortStop;
     final SliderValue shortStopDuration;
     final SliderValue rotationDiffBuildUpToStop;
@@ -64,7 +65,7 @@ public class RotationManager implements InstanceAccess {
         minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         decrementPerCycle = new SliderValue("Decrement per cycle", 0.5f, 0.1f, 2, 0.1f, module, () -> !smoothMode.is("None") && distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
-        movementFix = new BoolValue("Movement fix", false, module);
+        moveCorrection = new ModeValue("Movement correction", new String[]{"Silent", "Strict", "None"}, "None", module);
         shortStop = new BoolValue("Short stop", false, module);
         shortStopDuration = new SliderValue("Duration", 50, 25, 1000, 25, module, shortStop::get);
         rotationDiffBuildUpToStop = new SliderValue("Rotation diff buildup to stop", 180, 50, 720, 1, module, shortStop::get);
@@ -110,7 +111,7 @@ public class RotationManager implements InstanceAccess {
         hSpeed = MathHelper.clamp_float(hSpeed, 0, 180);
         vSpeed = MathHelper.clamp_float(vSpeed, 0, 180);
 
-        RotationHandler.setRotation(targetRotation, movementFix.get(), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get(), extraSmoothFactor.get());
+        RotationHandler.setRotation(targetRotation, MovementCorrectionMode.valueOf(moveCorrection.get()), new float[]{hSpeed, vSpeed}, accel.get(), new float[]{yawAccelFactor.get(), pitchAccelFactor.get()}, mode, silent.get(), extraSmoothFactor.get());
     }
 
     public float[] getSimpleRotationsToEntity(Entity entity) {

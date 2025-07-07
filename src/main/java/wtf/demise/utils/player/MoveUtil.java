@@ -318,7 +318,7 @@ public class MoveUtil implements InstanceAccess {
         if (targetStrafe.isEnabled() && targetStrafe.active && targetStrafe.target != null) {
             dir = targetStrafe.yaw;
         } else {
-            dir = mc.thePlayer.rotationYaw - getDir();
+            dir = getYawFromKeybind();
         }
 
         return (float) Math.toRadians(dir);

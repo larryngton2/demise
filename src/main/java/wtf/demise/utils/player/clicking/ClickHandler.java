@@ -1,9 +1,14 @@
-package wtf.demise.utils.player;
+package wtf.demise.utils.player.clicking;
 
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import de.florianmichael.vialoadingbase.ViaLoadingBase;
 import de.florianmichael.viamcp.fixes.AttackOrder;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemSpade;
+import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -12,12 +17,13 @@ import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.StaticTickEvent;
 import wtf.demise.events.impl.misc.TickEvent;
 import wtf.demise.events.impl.player.AttackEvent;
+import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.misc.ChatUtils;
 import wtf.demise.utils.packet.PacketUtils;
+import wtf.demise.utils.player.PlayerUtils;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -39,9 +45,10 @@ public class ClickHandler implements InstanceAccess {
     private static float swingRange;
     private static boolean forceblahblahblah;
     private final TimerUtils patternUpdateTimer = new TimerUtils();
-    private final TimerUtils blockTimer = new TimerUtils();
     public static boolean clickingNow;
     private int cachedClicks;
+    private static boolean cooldown;
+    private int lastHitTicks;
 
     public enum ClickMode {
         Legit,
@@ -49,7 +56,7 @@ public class ClickHandler implements InstanceAccess {
         PlayerController
     }
 
-    public static void initHandler(float minCPS, float maxCPS, boolean rayTrace, boolean smartClicking, boolean forceClickOnBackTrack, boolean ignoreBlocking, boolean failSwing, float attackRange, float swingRange, ClickMode clickMode, EntityLivingBase target) {
+    public static void initHandler(float minCPS, float maxCPS, boolean rayTrace, boolean smartClicking, boolean forceClickOnBackTrack, boolean ignoreBlocking, boolean failSwing, boolean cooldown, float attackRange, float swingRange, ClickMode clickMode, EntityLivingBase target) {
         ClickHandler.minCPS = minCPS;
         ClickHandler.maxCPS = maxCPS;
         ClickHandler.rayTrace = rayTrace;
@@ -61,6 +68,7 @@ public class ClickHandler implements InstanceAccess {
         ClickHandler.clickMode = clickMode;
         ClickHandler.swingRange = swingRange;
         ClickHandler.forceblahblahblah = forceClickOnBackTrack;
+        ClickHandler.cooldown = cooldown;
 
         initialized = true;
     }
@@ -115,6 +123,13 @@ public class ClickHandler implements InstanceAccess {
     }
 
     @EventTarget
+    public void onMotion(MotionEvent e) {
+        if (e.isPre() && cooldown) {
+            lastHitTicks++;
+        }
+    }
+
+    @EventTarget
     public void onStaticTick(StaticTickEvent e) {
         if (mc.thePlayer == null || mc.theWorld == null) {
             return;
@@ -147,12 +162,48 @@ public class ClickHandler implements InstanceAccess {
                 killAura.preAttack();
             }
 
+            float cooldown;
+
+            if (ClickHandler.cooldown) {
+                cooldown = 4;
+
+                if (mc.thePlayer.getHeldItem() != null) {
+                    Item item = mc.thePlayer.getHeldItem().getItem();
+
+                    if (item instanceof ItemSpade || item == Items.golden_axe || item == Items.diamond_axe || item == Items.wooden_hoe || item == Items.golden_hoe)
+                        cooldown = 20;
+
+                    if (item == Items.wooden_axe || item == Items.stone_axe)
+                        cooldown = 25;
+
+                    if (item instanceof ItemSword)
+                        cooldown = 12;
+
+                    if (item instanceof ItemPickaxe)
+                        cooldown = 17;
+
+                    if (item == Items.iron_axe)
+                        cooldown = 22;
+
+                    if (item == Items.stone_hoe)
+                        cooldown = 10;
+
+                    if (item == Items.iron_hoe)
+                        cooldown = 7;
+                }
+
+                cooldown *= Math.max(1, mc.timer.timerSpeed);
+
+                if (lastHitTicks <= cooldown || mc.thePlayer.fallDistance < 0) {
+                    cachedClicks = 0;
+                    initialized = false;
+                    clickingNow = false;
+                    return;
+                }
+            }
+
             for (int i = 0; i < cachedClicks; i++) {
                 lastTargetTime.reset();
-
-                if (!ignoreBlocking && mc.thePlayer.isUsingItem()) {
-                    blockTimer.reset();
-                }
 
                 float distance = (float) PlayerUtils.getDistanceToEntityBox(target);
                 if (distance > attackRange && distance <= swingRange && failSwing) {
@@ -164,6 +215,8 @@ public class ClickHandler implements InstanceAccess {
                         handleFailSwing();
                     }
                 }
+
+                lastHitTicks = 0;
             }
 
             cachedClicks = 0;
@@ -184,7 +237,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private void handleFailSwing() {
-        if (blockTimer.hasTimeElapsed(50)) {
+        if (!mc.thePlayer.isBlocking() || ignoreBlocking) {
             switch (clickMode) {
                 case Packet, PlayerController:
                     AttackOrder.sendConditionalSwing(mc.objectMouseOver);
@@ -216,7 +269,7 @@ public class ClickHandler implements InstanceAccess {
     }
 
     private void attack() {
-        if (blockTimer.hasTimeElapsed(50)) {
+        if (!mc.thePlayer.isBlocking() || ignoreBlocking) {
             switch (clickMode) {
                 case Legit:
                     if (mc.currentScreen == null) mc.clickMouse();

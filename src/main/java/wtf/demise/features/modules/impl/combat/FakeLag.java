@@ -50,6 +50,7 @@ public class FakeLag extends Module {
     private final SliderValue timer = new SliderValue("Timer", 0.75f, 0.01f, 1, 0.01f, this, () -> keepRangeMode.get().equals("Timer down"));
     private final SliderValue timerTicks = new SliderValue("Timer ticks", 1, 1, 10, 1, this, () -> keepRangeMode.get().equals("Timer down"));
     private final BoolValue experimentalDynamicHurtTime = new BoolValue("Experimental dynamic hurt time", false, this, smart::get);
+    private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final BoolValue pauseOnBacktrack = new BoolValue("Pause on backtrack", false, this);
     private final BoolValue forceFirstHit = new BoolValue("Force first hit", false, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
@@ -275,7 +276,7 @@ public class FakeLag extends Module {
         boolean attacked = this.attacked && target.hurtTime <= hurtTimeToAttack.get();
         boolean rangeCheck = PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get());
 
-        if (mc.thePlayer.hurtTime != 0) {
+        if (mc.thePlayer.hurtTime > hurtTimeToStop.get()) {
             hurtTimer.reset();
         }
 
@@ -365,7 +366,7 @@ public class FakeLag extends Module {
     }
 
     private boolean simpleCriteria() {
-        return mc.thePlayer.hurtTime == 0 && Range.between(attackRange.get(), alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target));
+        return mc.thePlayer.hurtTime <= hurtTimeToStop.get() && Range.between(attackRange.get(), alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get()).contains((float) PlayerUtils.getDistanceToEntityBox(target));
     }
 
     @EventTarget

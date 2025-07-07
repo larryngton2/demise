@@ -44,8 +44,10 @@ public class SliderComponent extends Component {
         Fonts.interRegular.get(15).drawString(setting.getMax() + "", getX() - 2 + getWidth() - Fonts.interRegular.get(15).getStringWidth(setting.getMax() + ""), getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, new Color(160, 160, 160).getRGB());
 
         if (dragging) {
-            final double difference = setting.getMax() - setting.getMin(), value = setting.getMin() + MathHelper.clamp_float((mouseX - getX()) / getWidth(), 0, 1) * difference;
-            setting.setValue(BigDecimal.valueOf(MathUtils.incValue(value, setting.getIncrement())).setScale(getDecimalPoints(String.valueOf(setting.getIncrement())), RoundingMode.FLOOR).floatValue());
+            double clampedRatio = Math.max(0, Math.min(1, (mouseX - getX()) / (double) getWidth()));
+            double difference = setting.getMax() - setting.getMin(), value = setting.getMin() + clampedRatio * difference;
+
+            setting.setValue(BigDecimal.valueOf(incValue(value, setting.getIncrement())).setScale(getDecimalPoints(String.valueOf(setting.getIncrement())), RoundingMode.CEILING).floatValue());
 
             if (previousSetting != setting.get()) {
                 if (soundTimer.hasTimeElapsed(25)) {
@@ -55,6 +57,10 @@ public class SliderComponent extends Component {
                 previousSetting = setting.get();
             }
         }
+    }
+
+    public static double incValue(double value, double increment) {
+        return Math.round(value / increment) * increment;
     }
 
     public static Integer getDecimalPoints(String n) {

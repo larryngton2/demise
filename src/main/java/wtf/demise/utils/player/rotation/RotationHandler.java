@@ -14,7 +14,8 @@ import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.SmoothMode;
+import wtf.demise.utils.player.rotation.enums.MovementCorrectionMode;
+import wtf.demise.utils.player.rotation.enums.SmoothMode;
 
 import static java.lang.Math.*;
 import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
@@ -29,7 +30,7 @@ public class RotationHandler implements InstanceAccess {
     private static float hSpeed;
     private static float vSpeed;
     private static SmoothMode smoothMode;
-    public static boolean correction;
+    public static MovementCorrectionMode correction;
     public static float rotDiffBuildUp;
     public static boolean reset;
     private static final TimerUtils tickTimer = new TimerUtils();
@@ -48,7 +49,7 @@ public class RotationHandler implements InstanceAccess {
     public RotationHandler() {
         enabled = true;
         smoothMode = SmoothMode.Linear;
-        correction = true;
+        correction = MovementCorrectionMode.Silent;
         hSpeed = 180;
         vSpeed = 180;
         targetRotation = currentRotation = new float[]{0, 0};
@@ -66,7 +67,7 @@ public class RotationHandler implements InstanceAccess {
         RotationHandler.hSpeed = hSpeed;
         RotationHandler.vSpeed = vSpeed;
         RotationHandler.smoothMode = SmoothMode.Linear;
-        RotationHandler.correction = correction;
+        RotationHandler.correction = correction ? MovementCorrectionMode.Silent : MovementCorrectionMode.None;
         RotationHandler.accel = false;
         RotationHandler.accelFactorYaw = 0;
         RotationHandler.accelFactorPitch = 0;
@@ -74,7 +75,7 @@ public class RotationHandler implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, boolean correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent, float smoothingFactor) {
+    public static void setRotation(float[] rotation, MovementCorrectionMode correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent, float smoothingFactor) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
 
@@ -94,30 +95,30 @@ public class RotationHandler implements InstanceAccess {
         enabled = true;
     }
 
-    private boolean shouldCorrect() {
-        return shouldRotate() && correction;
-    }
-
     @EventTarget
     private void onMove(MoveInputEvent e) {
-        if (shouldCorrect()) {
-            MoveUtil.fixMovement(e, currentRotation[0]);
-        } else if (shouldRotate() && abs(getAngleDifference((float) toDegrees(MoveUtil.getDirection()), currentRotation[0])) > 90 && !mc.thePlayer.omniSprint && !Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled()) {
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
-            mc.thePlayer.setSprinting(false);
+        if (shouldRotate()) {
+            if (correction == MovementCorrectionMode.Silent) {
+                MoveUtil.fixMovement(e, currentRotation[0]);
+            } else if (abs(getAngleDifference((float) toDegrees(MoveUtil.getDirection()), currentRotation[0])) > 90 && !mc.thePlayer.omniSprint && !Demise.INSTANCE.getModuleManager().getModule(Scaffold.class).isEnabled()) {
+                if (correction == MovementCorrectionMode.None) {
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
+                    mc.thePlayer.setSprinting(false);
+                }
+            }
         }
     }
 
     @EventTarget
     private void onStrafe(StrafeEvent e) {
-        if (shouldCorrect()) {
+        if (correction != MovementCorrectionMode.None && shouldRotate()) {
             e.setYaw(currentRotation[0]);
         }
     }
 
     @EventTarget
     private void onJump(JumpEvent event) {
-        if (shouldCorrect()) {
+        if (correction != MovementCorrectionMode.None && shouldRotate()) {
             event.setYaw(currentRotation[0]);
         }
     }
@@ -131,8 +132,8 @@ public class RotationHandler implements InstanceAccess {
 
     @EventTarget
     public void onWorldChange(WorldChangeEvent e) {
-        currentRotation = mc.thePlayer.getRotation();
-        targetRotation = mc.thePlayer.getRotation();
+        currentRotation = targetRotation = mc.thePlayer.getRotation();
+        reset = true;
     }
 
     @EventTarget

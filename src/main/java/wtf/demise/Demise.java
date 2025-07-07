@@ -25,9 +25,8 @@ import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.packet.LagUtils;
-import wtf.demise.utils.player.ClickHandler;
+import wtf.demise.utils.player.clicking.ClickHandler;
 import wtf.demise.utils.player.rotation.RotationHandler;
-import wtf.demise.utils.player.rotation.RotationUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -132,7 +131,6 @@ public class Demise {
     }
 
     private void registerEventHandlers() {
-        eventManager.register(new RotationUtils());
         eventManager.register(new LagUtils());
         eventManager.register(new BlinkComponent());
         eventManager.register(new SpoofSlotUtils());

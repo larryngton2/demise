@@ -37,9 +37,10 @@ public class AutoRod extends Module {
     private final SliderValue maxRecastDelay = new SliderValue("Max recast delay", 100, 0, 1000, 5, this);
     private final SliderValue fov = new SliderValue("Fov", 90, 0, 360, 1, this);
     private final BoolValue rotate = new BoolValue("Rotate", true, this);
-    private final SliderValue predictSize = new SliderValue("Predict Size", 2, 0.1f, 10, 0.1f, this, rotate::get);
+    private final SliderValue predictSize = new SliderValue("Predict size", 2, 0.1f, 10, 0.1f, this, rotate::get);
     private final RotationManager rotationManager = new RotationManager(this);
-    private final BoolValue onlyOnKillAura = new BoolValue("Only on KillAura", false, this);
+    private final BoolValue onlyOnKillAura = new BoolValue("Only on kill aura", false, this);
+    public final BoolValue overrideAuraRots = new BoolValue("Override kill aura rots", false, this);
 
     private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
             new BoolValue("Players", true),
@@ -55,6 +56,7 @@ public class AutoRod extends Module {
     private boolean usingRod;
     private int oldSlot;
     private static EntityLivingBase currentTarget;
+    public boolean rotating;
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
@@ -156,13 +158,16 @@ public class AutoRod extends Module {
 
     @EventTarget
     public void onAngle(AngleEvent e) {
-        if ((!getModule(KillAura.class).isEnabled() && onlyOnKillAura.get())) {
+        if (!getModule(KillAura.class).isEnabled() && onlyOnKillAura.get()) {
+            rotating = false;
             return;
         }
 
         double range = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
-        if (rotate.get() && KillAura.currentTarget == null && range > minRange.get() && range <= maxRange.get()) {
+        rotating = rotate.get() && KillAura.currentTarget == null && range > minRange.get() && range <= maxRange.get();
+
+        if (rotating) {
             float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.get(), 0.03f, 2f);
 
             rotationManager.setRotation(finalRotation);

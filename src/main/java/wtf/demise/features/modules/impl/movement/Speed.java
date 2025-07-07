@@ -2,6 +2,7 @@ package wtf.demise.features.modules.impl.movement;
 
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovementInput;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.*;
@@ -21,7 +22,7 @@ import java.math.RoundingMode;
 
 @ModuleInfo(name = "Speed", description = "Makes you go faster.")
 public class Speed extends Module {
-    private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "Custom", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC", "Miniblox"}, "Strafe Hop", this);
+    private final ModeValue mode = new ModeValue("Mode", new String[]{"Strafe Hop", "Custom", "NCP", "Verus", "Legit", "Intave", "Vulcan", "BMC", "Miniblox", "Collide"}, "Strafe Hop", this);
 
     private final BoolValue abideFriction = new BoolValue("Abide friction", true, this, () -> mode.is("Custom"));
     private final SliderValue customSpeed = new SliderValue("Speed", 0.35f, 0, 1, 0.01f, this, () -> mode.is("Custom") && abideFriction.get());
@@ -52,6 +53,8 @@ public class Speed extends Module {
     private final ModeValue bmcMode = new ModeValue("BMC mode", new String[]{"Low", "Ground"}, "Low", this, () -> mode.is("BMC"));
 
     private final SliderValue hopTicks = new SliderValue("Hop ticks", 5, 1, 6, 1, this, () -> mode.is("Miniblox"));
+
+    private final SliderValue collideSpeed = new SliderValue("Collide speed", 0.08f, 0.01f, 0.08f, 0.01f, this, () -> mode.is("Collide"));
 
     private final BoolValue damageBoost = new BoolValue("Damage boost", false, this);
     private final SliderValue boostSpeed = new SliderValue("Boost speed", 0.5f, 0.01f, 1f, 0.01f, this, damageBoost::get);
@@ -340,6 +343,21 @@ public class Speed extends Module {
     public void onGravity(GravityEvent e) {
         if (mode.is("Intave") && customGravity.get()) {
             e.setGravityDecrement(0.081);
+        }
+    }
+
+    @EventTarget
+    public void onStrafe(StrafeEvent e) {
+        if (mode.is("Collide")) {
+            for (EntityPlayer player : mc.theWorld.playerEntities) {
+                if (player == mc.thePlayer) {
+                    continue;
+                }
+
+                if (mc.thePlayer.getEntityBoundingBox().expand(1, 1, 1).intersectsWith(player.getEntityBoundingBox())) {
+                    MoveUtil.moveFlying(collideSpeed.get());
+                }
+            }
         }
     }
 

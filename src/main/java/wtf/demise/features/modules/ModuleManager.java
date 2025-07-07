@@ -39,7 +39,7 @@ public class ModuleManager {
     );
 
     private static final Set<Class<? extends Module>> PLAYER_MODULES = Set.of(
-            AntiVoid.class, AutoTool.class, BedNuker.class, FastBow.class, FastBreak.class, FastPlace.class,
+            AntiVoid.class, AutoTool.class, BedBreaker.class, FastBow.class, FastBreak.class, FastPlace.class,
             FastUse.class, Manager.class, NoFall.class, Scaffold.class, Stealer.class
     );
 

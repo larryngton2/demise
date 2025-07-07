@@ -47,7 +47,7 @@ public class FastPlace extends Module {
 
     @EventTarget
     public void onMotion(MotionEvent e) {
-        setTag(MathUtils.incValue(ignoreTickCycle.get() ? frameDelay.get() : speed.get(), 1) + "");
+        setTag(String.valueOf(ignoreTickCycle.get() ? frameDelay.get() : speed.get()));
         if (mc.thePlayer.getHeldItem() == null) return;
         if (mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock) mc.rightClickDelayTimer = (int) speed.get();
     }

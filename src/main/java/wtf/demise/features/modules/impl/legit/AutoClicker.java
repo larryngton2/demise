@@ -9,7 +9,7 @@ import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
-import wtf.demise.utils.player.ClickHandler;
+import wtf.demise.utils.player.clicking.ClickHandler;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -45,7 +45,7 @@ public class AutoClicker extends Module {
 
             if (mc.gameSettings.keyBindAttack.isKeyDown()) {
                 // clicking using keybind, don't need raytrace etc. target is mc.thePlayer so you can always attack.
-                ClickHandler.initHandler(lminCPS.get(), lmaxCPS.get(), false, false, false, false, false, 3, 3, ClickHandler.ClickMode.Legit, mc.thePlayer);
+                ClickHandler.initHandler(lminCPS.get(), lmaxCPS.get(), false, false, false, false, false, false, 3, 3, ClickHandler.ClickMode.Legit, mc.thePlayer);
             }
         }
     }

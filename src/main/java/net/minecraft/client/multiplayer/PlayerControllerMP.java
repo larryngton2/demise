@@ -25,7 +25,7 @@ import wtf.demise.events.impl.player.AttackEvent;
 public class PlayerControllerMP {
     private final Minecraft mc;
     private final NetHandlerPlayClient netClientHandler;
-    private BlockPos currentBlock = new BlockPos(-1, -1, -1);
+    public BlockPos currentBlock = new BlockPos(-1, -1, -1);
     private ItemStack currentItemHittingBlock;
     public float curBlockDamageMP;
     private float stepSoundTickCounter;

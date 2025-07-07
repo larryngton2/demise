@@ -19,6 +19,7 @@ import wtf.demise.events.impl.player.*;
 import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
+import wtf.demise.features.modules.impl.legit.AutoRod;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
@@ -26,8 +27,9 @@ import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.BlinkComponent;
-import wtf.demise.utils.player.ClickHandler;
+import wtf.demise.utils.player.clicking.ClickHandler;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.clicking.ClickManager;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -42,16 +44,7 @@ public class KillAura extends Module {
     public final SliderValue attackRange = new SliderValue("Attack range", 3, 1, 8, 0.1f, this);
     private final SliderValue searchRange = new SliderValue("Search range", 4.0f, 1, 8, 0.1f, this);
 
-    // attack
-    private final ModeValue clickMode = new ModeValue("Click mode", new String[]{"Legit", "Packet", "PlayerController"}, "Packet", this);
-    private final BoolValue smartClicking = new BoolValue("Smart clicking", false, this);
-    private final BoolValue forceAttackOnBacktrack = new BoolValue("Force attack on BackTrack", false, this, smartClicking::get);
-    private final BoolValue ignoreBlocking = new BoolValue("Ignore blocking", true, this);
-    private final SliderValue minCPS = new SliderValue("CPS (min)", 12, 0, 20, 1, this);
-    private final SliderValue maxCPS = new SliderValue("CPS (max)", 16, 0, 20, 1, this);
-    public final BoolValue rayTrace = new BoolValue("RayTrace", false, this);
-    private final BoolValue failSwing = new BoolValue("Fail swing", false, this);
-    private final SliderValue swingRange = new SliderValue("Swing range", 3.5f, 1, 8, 0.1f, this, failSwing::get);
+    private final ClickManager clickManager = new ClickManager(this);
 
     // autoBlock
     public final BoolValue autoBlock = new BoolValue("AutoBlock", true, this);
@@ -59,13 +52,12 @@ public class KillAura extends Module {
     public final ModeValue autoBlockMode = new ModeValue("AutoBlock mode", new String[]{"Fake", "Vanilla", "Release", "Force", "Blink", "NCP"}, "Vanilla", this, autoBlock::get);
     private final SliderValue reblockTicks = new SliderValue("Reblock ticks", 0, 0, 5, 1, this, autoBlock::get);
     private final BoolValue alwaysRenderBlocking = new BoolValue("Always render blocking", false, this, autoBlock::get);
-    public final BoolValue unBlockOnRayCastFail = new BoolValue("Unblock on rayCast fail", false, this, () -> autoBlock.get() && rayTrace.get());
 
     // rotation
     private final RotationManager rotationManager = new RotationManager(this);
 
     // aim point
-    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight", "Assist"}, "Straight", this);
+    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight"}, "Straight", this);
     private final BoolValue setMinAimPoint = new BoolValue("Set min aim point", true, this, () -> aimPos.is("Straight"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
     private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
@@ -93,6 +85,7 @@ public class KillAura extends Module {
     private final SliderValue yOffset = new SliderValue("Static Y offset", 0, -2, 0.4f, 0.01f, this);
     private final BoolValue onlyUpdateOnMiss = new BoolValue("Only update on miss", false, this);
     private final BoolValue onlyRotateOnMiss = new BoolValue("Only rotate on miss", false, this);
+    private final BoolValue pauseInHitbox = new BoolValue("Pause rotations in hitbox", false, this);
 
     // target
     private final ModeValue targetMode = new ModeValue("Target selection mode", new String[]{"Single", "Switch"}, "Single", this);
@@ -115,7 +108,6 @@ public class KillAura extends Module {
     private PlayerUtils.PredictProcess selfPrediction;
     private final Queue<Vec3> positionHistory = new LinkedList<>();
     private final TimerUtils lastSwitchTime = new TimerUtils();
-    public List<EntityLivingBase> targets = new ArrayList<>();
     public static EntityLivingBase currentTarget;
     public static boolean isBlocking = false;
     private Vec3 targetVec;
@@ -150,7 +142,6 @@ public class KillAura extends Module {
         }
 
         currentTarget = null;
-        targets.clear();
         positionHistory.clear();
     }
 
@@ -284,8 +275,7 @@ public class KillAura extends Module {
                     firstHit = true;
                 }
 
-                ClickHandler.ClickMode mode = ClickHandler.ClickMode.valueOf(clickMode.get());
-                ClickHandler.initHandler(minCPS.get(), maxCPS.get(), rayTrace.get() && rayTrace.canDisplay(), smartClicking.get(), forceAttackOnBacktrack.get(), ignoreBlocking.get(), failSwing.get(), attackRange.get(), swingRange.get(), mode, currentTarget);
+                clickManager.click(attackRange.get(), currentTarget);
 
                 double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
@@ -306,23 +296,16 @@ public class KillAura extends Module {
                 BlinkComponent.dispatch(true);
             }
         }
-
-        if (Objects.equals(clickMode.get(), "Packet")) {
-            targets.clear();
-            for (Entity entity : mc.theWorld.loadedEntityList) {
-                if (entity instanceof EntityLivingBase && PlayerUtils.getDistanceToEntityBox(entity) <= searchRange.get()) {
-                    targets.add((EntityLivingBase) entity);
-                }
-            }
-        }
-
-        targets.removeIf(target -> isTargetInvalid());
     }
 
     @EventTarget
     public void onAngle(AngleEvent e) {
         if (currentTarget != null && !isTargetInvalid()) {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
+
+            if (getModule(AutoRod.class).rotating && getModule(AutoRod.class).overrideAuraRots.get()) {
+                return;
+            }
 
             if (distance <= searchRange.get()) {
                 rotationManager.setRotation(getRotations(currentTarget));
@@ -376,7 +359,7 @@ public class KillAura extends Module {
     }
 
     public void preAttack() {
-        if (extraCheck() && canAutoBlock()) {
+        if (canAutoBlock()) {
             totalBlockingTicks++;
 
             switch (autoBlockMode.get()) {
@@ -406,7 +389,7 @@ public class KillAura extends Module {
     }
 
     private void onAttack() {
-        if (extraCheck() && canAutoBlock()) {
+        if (canAutoBlock()) {
             switch (autoBlockMode.get()) {
                 case "Force":
                     setBlocking(true);
@@ -418,7 +401,7 @@ public class KillAura extends Module {
     }
 
     public void postAttack() {
-        if (extraCheck() && canAutoBlock()) {
+        if (canAutoBlock()) {
             switch (autoBlockMode.get()) {
                 case "Release":
                     if (!isBlocking) {
@@ -446,10 +429,6 @@ public class KillAura extends Module {
         if (ray.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             sendPacket(new C02PacketUseEntity(ray.entityHit, ray.hitVec));
         }
-    }
-
-    private boolean extraCheck() {
-        return !ClickHandler.rayTraceFailed() || !unBlockOnRayCastFail.get() || !rayTrace.get();
     }
 
     private void setBlocking(boolean state) {
@@ -491,7 +470,7 @@ public class KillAura extends Module {
 
     @EventTarget
     public void onMotion(MotionEvent e) {
-        if (autoBlockMode.is("NCP") && canAutoBlock() && extraCheck()) {
+        if (autoBlockMode.is("NCP") && canAutoBlock()) {
             if (e.isPre()) {
                 sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
             }
@@ -559,16 +538,6 @@ public class KillAura extends Module {
                 final double ex = (finalBoundingBox.maxX + finalBoundingBox.minX) / 2;
                 final double ey = MathHelper.clamp_double(playerPos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
                 final double ez = (finalBoundingBox.maxZ + finalBoundingBox.minZ) / 2;
-
-                vec = new Vec3(ex, ey, ez);
-            }
-            break;
-            case "Assist": {
-                final Vec3 pos = playerPos.add(mc.thePlayer.getLookVec());
-
-                final double ex = MathHelper.clamp_double(pos.xCoord, finalBoundingBox.minX, finalBoundingBox.maxX);
-                final double ey = MathHelper.clamp_double(pos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
-                final double ez = MathHelper.clamp_double(pos.zCoord, finalBoundingBox.minZ, finalBoundingBox.maxZ);
 
                 vec = new Vec3(ex, ey, ez);
             }
@@ -687,12 +656,9 @@ public class KillAura extends Module {
 
         pitch = MathHelper.clamp_float(pitch, -90, 90);
 
-        if (!(mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !onlyRotateOnMiss.get())) {
-            yaw = prevRot[0];
-            pitch = prevRot[1];
-        }
+        if ((mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && onlyRotateOnMiss.get()) ||
+                (mc.thePlayer.getEntityBoundingBox().intersectsWith(entity.getEntityBoundingBox()) && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && pauseInHitbox.get())) {
 
-        if (mc.thePlayer.getEntityBoundingBox().intersectsWith(entity.getEntityBoundingBox()) && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             yaw = prevRot[0];
             pitch = prevRot[1];
         }

@@ -4,6 +4,7 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
+import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.utils.InstanceAccess;
 
 import static java.lang.Math.*;
@@ -65,22 +66,12 @@ public class RotationUtils implements InstanceAccess {
         return result;
     }
 
-    public static MovingObjectPosition rayTrace(float[] rot, double reach, float partialTicks) {
-        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
-        Vec3 direction = mc.thePlayer.getLookCustom(rot[0], rot[1]);
-        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
-        return mc.theWorld.rayTraceBlocks(from, to, false, true, true);
-    }
-
-    public static MovingObjectPosition rayTrace(double reach, float partialTicks) {
-        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
-        Vec3 direction = mc.thePlayer.getLookCustom(currentRotation[0], currentRotation[1]);
-        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
-        return mc.theWorld.rayTraceBlocks(from, to, false, true, true);
-    }
-
     public static float[] getRotations(BlockPos blockPos, EnumFacing enumFacing) {
         return getRotations(blockPos, enumFacing, 0.25, 0.25);
+    }
+
+    public static float[] getRotations(BlockPos blockPos) {
+        return getRotations(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, mc.thePlayer.posX, mc.thePlayer.posY + (double)mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
     }
 
     public static float[] getRotations(BlockPos blockPos, EnumFacing enumFacing, double xz, double y) {
@@ -174,5 +165,16 @@ public class RotationUtils implements InstanceAccess {
                         velocity * velocity * velocity * velocity - gravityModifier * (gravityModifier * posSqrt * posSqrt + 2 * posY * velocity * velocity)
                 )) / (gravityModifier * posSqrt)))
         };
+    }
+
+    public static Vec3 getVec3(BlockPos pos, EnumFacing face) {
+        double x = pos.getX() + 0.5D;
+        double y = pos.getY() + 0.5D;
+        double z = pos.getZ() + 0.5D;
+        x += face.getFrontOffsetX() / 2.0D;
+        z += face.getFrontOffsetZ() / 2.0D;
+        y += face.getFrontOffsetY() / 2.0D;
+
+        return new Vec3(x, y, z);
     }
 }

@@ -27,11 +27,6 @@ public class MathUtils implements InstanceAccess {
         return Math.round(d * 2) / 2.0;
     }
 
-    public static double incValue(double val, double inc) {
-        double one = 1.0 / inc;
-        return Math.round(val * one) / one;
-    }
-
     public static float interpolate(float current, float target) {
         return interpolate(current, target, mc.timer.partialTicks);
     }
