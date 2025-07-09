@@ -571,8 +571,9 @@ public class EntityPlayerSP extends AbstractClientPlayer {
 
             this.movementInput.moveStrafe *= slowDownEvent.getStrafe();
             this.movementInput.moveForward *= slowDownEvent.getForward();
-            KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), slowDownEvent.isSprinting());
+
             if (!slowDownEvent.isSprinting()) {
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
                 this.setSprinting(false);
             }
 

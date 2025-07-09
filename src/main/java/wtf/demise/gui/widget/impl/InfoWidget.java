@@ -46,9 +46,9 @@ public class InfoWidget extends Widget {
 
         String str1 = Minecraft.getDebugFPS() + " FPS";
         String cpsText = leftClicks.size() + " | " + rightClicks.size() + " CPS";
-        float width1 = Fonts.interRegular.get(15).getStringWidth(str1) + 6;
-        float width2 = Fonts.interRegular.get(15).getStringWidth(mc.thePlayer.getName()) + 16;
-        float width3 = Fonts.interRegular.get(15).getStringWidth(cpsText) + 6;
+        float width1 = Fonts.interRegular.get(15).getStringWidth(str1) + 7;
+        float width2 = Fonts.interRegular.get(15).getStringWidth(mc.thePlayer.getName()) + 18;
+        float width3 = Fonts.interRegular.get(15).getStringWidth(cpsText) + 7;
 
         if (renderX < sr.getScaledWidth() / 2f) {
             x = renderX;

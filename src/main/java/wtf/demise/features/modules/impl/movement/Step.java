@@ -36,6 +36,8 @@ public class Step extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {
+        setTag(mode.get());
+
         if (mode.is("Vanilla")) {
             mc.thePlayer.stepHeight = height.get();
         }

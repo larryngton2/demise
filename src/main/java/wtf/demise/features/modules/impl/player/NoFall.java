@@ -79,18 +79,20 @@ public class NoFall extends Module {
                     }
                 }
 
-                RotationHandler.setBasicRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
-
                 mc.thePlayer.inventory.currentItem = getBucketSlot();
                 SpoofSlotUtils.startSpoofing(oldSlot);
                 setSlot = false;
 
-                if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    if (!clicked) {
-                        KeyBinding.onTick(mc.gameSettings.keyBindUseItem.getKeyCode());
-                        clicked = true;
+                if (mc.thePlayer.inventory.getCurrentItem().getItem() == Items.water_bucket) {
+                    RotationHandler.setBasicRotation(RotationUtils.getRotations(new BlockPos(targetPos), EnumFacing.UP), true, 180, 180);
+
+                    if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && !mc.thePlayer.isInWater()) {
+                        if (!clicked) {
+                            KeyBinding.onTick(mc.gameSettings.keyBindUseItem.getKeyCode());
+                            clicked = true;
+                        }
+                        keepSlotTimer.reset();
                     }
-                    keepSlotTimer.reset();
                 }
             } else {
                 if (keepSlotTimer.hasTimeElapsed(keepTicks.get() * 50L)) {

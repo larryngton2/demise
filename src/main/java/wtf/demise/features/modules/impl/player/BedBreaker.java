@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.player;
 
 import net.minecraft.block.BlockBed;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
@@ -19,7 +20,8 @@ import static wtf.demise.utils.player.rotation.RotationHandler.currentRotation;
 
 @ModuleInfo(name = "BedBreaker", description = "Automatically breaks beds around you.")
 public class BedBreaker extends Module {
-    private final BoolValue legit = new BoolValue("Legit", false, this);
+    private final BoolValue throughWalls = new BoolValue("Break through walls", true, this);
+    private final BoolValue instant = new BoolValue("Instant break", false, this);
     private final RotationManager rotationManager = new RotationManager(this);
 
     private BlockPos bedPos;
@@ -35,20 +37,14 @@ public class BedBreaker extends Module {
         }
 
         if (bedPos != null) {
-            if (!legit.get()) {
+            if (throughWalls.get()) {
                 if (rayTraceBed().typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    mc.playerController.onPlayerDamageBlock(bedPos, mc.objectMouseOver.sideHit);
-                    sendPacket(new C0APacketAnimation());
-                } else {
-                    mc.playerController.resetBlockRemoving();
+                    sendBlockBreak();
                 }
             } else {
                 // the bed will break eventually since the player is aiming at it
                 if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    mc.playerController.onPlayerDamageBlock(mc.objectMouseOver.getBlockPos(), mc.objectMouseOver.sideHit);
-                    sendPacket(new C0APacketAnimation());
-                } else {
-                    mc.playerController.resetBlockRemoving();
+                    sendBlockBreak();
                 }
             }
         } else {
@@ -56,6 +52,19 @@ public class BedBreaker extends Module {
                 mc.playerController.resetBlockRemoving();
             }
         }
+    }
+
+    private void sendBlockBreak() {
+        BlockPos pos = throughWalls.get() ? bedPos : mc.objectMouseOver.getBlockPos();
+
+        if (instant.get()) {
+            sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, pos, mc.objectMouseOver.sideHit));
+            sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, pos, mc.objectMouseOver.sideHit));
+            mc.playerController.onPlayerDestroyBlock(pos);
+        } else {
+            mc.playerController.onPlayerDamageBlock(pos, mc.objectMouseOver.sideHit);
+        }
+        sendPacket(new C0APacketAnimation());
     }
 
     private MovingObjectPosition rayTraceBed() {

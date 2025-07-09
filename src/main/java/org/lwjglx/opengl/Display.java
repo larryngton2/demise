@@ -19,7 +19,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Display {
-    private static String windowTitle = "Initializing...";
+    private static String windowTitle = "demise";
 
     private static boolean displayCreated = false;
     private static boolean displayFocused = false;

@@ -2,6 +2,7 @@ package wtf.demise.gui.font;
 
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjglx.opengl.GLContext;
+import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -162,7 +163,13 @@ public class FontRenderer {
             offset += drawChar(chr, x + offset, y);
         }
         glPopMatrix();
-        return offset / 2;
+
+        /*
+        Minecraft mc = Minecraft.getMinecraft();
+        return (int) (offset * (mc != null ? new ScaledResolution(mc).getScaleFactor() : 0.5));
+         */
+
+        return offset;
     }
 
     public float getMiddleOfBox(float height) {
@@ -170,7 +177,6 @@ public class FontRenderer {
     }
 
     public final int getStringWidth(String text) {
-
         if (text == null) {
             return 0;
         }
@@ -274,9 +280,9 @@ public class FontRenderer {
         }
     }
 
-    public final void drawStringWithShadow(String newstr, float i, float i1, int rgb) {
-        drawString(newstr, i + 0.5f, i1 + 0.5f, rgb, true);
-        drawString(newstr, i, i1, rgb);
+    public final float drawStringWithShadow(String newstr, float i, float i1, int rgb) {
+        float shadowWidth = drawString(newstr, i + 0.5f, i1 + 0.5f, rgb, true);
+        return Math.max(shadowWidth, drawString(newstr, i, i1, rgb, false));
     }
 
     public final void drawOutlinedString(String str, float x, float y, int internalCol, int externalCol) {
@@ -291,40 +297,37 @@ public class FontRenderer {
         drawStringWithShadow(z, (float) x, (float) positionY, mainTextColor);
     }
 
-    public float drawStringWithShadow(String text, double x, double y, double sWidth, int color) {
-        float shadowWidth = this.drawString(text, (float) (x + sWidth), (float) (y + sWidth), color, true);
-        return Math.max(shadowWidth, this.drawString(text, (float) x, (float) y, color, false));
-    }
-
     public void drawGradientWithShadow(String text, float x, float y, GradientApplier colorSupplier) {
-        final char[] string = text.toCharArray();
         int index = 0;
 
-        for (char ch : string) {
-            if (ch == '§') continue;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
 
-            ++index;
-            final String character = valueOf(ch);
+            if (ch == '§' && i + 1 < text.length()) {
+                i++;
+                continue;
+            }
 
-            float width = getStringWidth(character);
-            drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB());
-            x += width;
+            String character = String.valueOf(ch);
+            x += drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB());
+            index++;
         }
     }
 
     public void drawGradient(String text, float x, float y, GradientApplier colorSupplier) {
-        final char[] string = text.toCharArray();
         int index = 0;
 
-        for (char ch : string) {
-            if (ch == '§') continue;
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
 
-            ++index;
-            final String character = valueOf(ch);
+            if (ch == '§' && i + 1 < text.length()) {
+                i++;
+                continue;
+            }
 
-            float width = getStringWidth(character);
-            drawString(character, x, y, colorSupplier.colour(index).getRGB(), false);
-            x += width;
+            String character = String.valueOf(ch);
+            x += drawString(character, x, y, colorSupplier.colour(index).getRGB()) / 2f;
+            index++;
         }
     }
 

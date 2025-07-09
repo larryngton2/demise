@@ -69,12 +69,11 @@ public class InventoryUtils implements InstanceAccess {
             return true;
         } else if (stack.getItem() instanceof ItemSword && isBestSword(stack)) {
             return true;
-        } else if (stack.getItem() == Items.arrow) {
-            return true;
-        } else if (stack.getItem() instanceof ItemFishingRod) {
-            return true;
         } else {
-            return stack.getItem() instanceof ItemEnderPearl;
+            return stack.getItem() == Items.arrow ||
+                    stack.getItem() instanceof ItemFishingRod ||
+                    stack.getItem() instanceof ItemEnderPearl ||
+                    stack.getItem() == Items.water_bucket;
         }
     }
 

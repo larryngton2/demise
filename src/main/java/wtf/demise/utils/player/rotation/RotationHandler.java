@@ -174,7 +174,7 @@ public class RotationHandler implements InstanceAccess {
             float deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
             lastFrameTime = currentTime;
 
-            deltaTime = Math.min(deltaTime, 1.0f / 90);
+            deltaTime = Math.min(deltaTime, 1.0f / 120);
             timeScale = deltaTime * 120;
             return;
         }
