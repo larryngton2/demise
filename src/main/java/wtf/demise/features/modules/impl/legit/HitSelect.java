@@ -16,7 +16,6 @@ import wtf.demise.utils.player.PlayerUtils;
 @ModuleInfo(name = "HitSelect", description = "Automatically hit selects in order to start combos.")
 public class HitSelect extends Module {
     private final SliderValue maxWaitTime = new SliderValue("Max wait time", 500, 100, 1000, this);
-    private final BoolValue teamCheck = new BoolValue("Team check", false, this);
 
     public boolean blockClicking;
     private boolean wTap;
@@ -30,7 +29,7 @@ public class HitSelect extends Module {
 
     @EventTarget
     public void onGameEvent(GameEvent e) {
-        EntityLivingBase target = PlayerUtils.getTarget(8, teamCheck.get());
+        EntityLivingBase target = PlayerUtils.getTarget(8);
 
         if (target == null) {
             blockClicking = false;

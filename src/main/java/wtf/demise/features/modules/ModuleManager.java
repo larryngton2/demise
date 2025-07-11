@@ -7,6 +7,7 @@ import wtf.demise.events.impl.misc.KeyPressEvent;
 import wtf.demise.features.modules.impl.combat.*;
 import wtf.demise.features.modules.impl.exploit.*;
 import wtf.demise.features.modules.impl.exploit.Timer;
+import wtf.demise.features.modules.impl.fun.*;
 import wtf.demise.features.modules.impl.legit.*;
 import wtf.demise.features.modules.impl.misc.*;
 import wtf.demise.features.modules.impl.misc.bloxdphysics.BloxdPhysics;
@@ -23,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModuleManager {
     private static final Set<Class<? extends Module>> COMBAT_MODULES = Set.of(
             AntiBot.class, Criticals.class, FakeLag.class, KeepSprint.class, KillAura.class, TickBase.class,
-            TimerRange.class, Velocity.class, LagRange.class
+            TimerRange.class, Velocity.class, LagRange.class, TPAura.class
     );
 
     private static final Set<Class<? extends Module>> LEGIT_MODULES = Set.of(
@@ -45,9 +46,8 @@ public class ModuleManager {
 
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
             AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
-            InventorySync.class, MurderMystery.class, Test.class, Twerk.class, BloxdPhysics.class, Gambling.class,
-            AutoMeow.class, CheatDetector.class, Translator.class, Spammer.class, InputFix.class, RealLag.class,
-            KillInsults.class
+            InventorySync.class, MurderMystery.class, Test.class, BloxdPhysics.class, CheatDetector.class,
+            Translator.class, Spammer.class, InputFix.class, RealLag.class, KillInsults.class, Targets.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(
@@ -61,7 +61,11 @@ public class ModuleManager {
             ForceDinnerbone.class, FreeCam.class, FullBright.class, Interface.class, ItemESP.class, ItemPhysics.class,
             MainMenuOptions.class, MotionBlur.class, NoHurtCam.class, NoRenderOffsetReset.class,
             Rotation.class, Shaders.class, ThirdPersonDistance.class, Trajectories.class, ViewBobbing.class,
-            VisualAimPoint.class, TargetHud.class, RealPos.class
+            VisualAimPoint.class, TargetHud.class, RealPos.class, AFKGui.class
+    );
+
+    private static final Set<Class<? extends Module>> FUN_MODULES = Set.of(
+            Twerk.class, AutoMeow.class, Gambling.class, FPSBooster.class, FPSDecreaser.class
     );
 
     private final Map<ModuleCategory, List<Module>> modulesByCategory;
@@ -86,6 +90,7 @@ public class ModuleManager {
         initializeCategoryModules(MISC_MODULES, ModuleCategory.Misc);
         initializeCategoryModules(EXPLOIT_MODULES, ModuleCategory.Exploit);
         initializeCategoryModules(VISUAL_MODULES, ModuleCategory.Visual);
+        initializeCategoryModules(FUN_MODULES, ModuleCategory.Fun);
     }
 
     private void initializeCategoryModules(Set<Class<? extends Module>> moduleClasses, ModuleCategory category) {

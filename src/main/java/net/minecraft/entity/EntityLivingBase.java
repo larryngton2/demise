@@ -1560,6 +1560,10 @@ public abstract class EntityLivingBase extends Entity {
         return this.worldObj.rayTraceBlocks(new Vec3(this.posX, this.posY + (double) this.getEyeHeight(), this.posZ), new Vec3(entityIn.posX, entityIn.posY + (double) entityIn.getEyeHeight(), entityIn.posZ)) == null;
     }
 
+    public boolean canPosBeSeen(final Vec3 vec3) {
+        return this.worldObj.rayTraceBlocks(new Vec3(this.posX, this.posY + this.getEyeHeight(), this.posZ), vec3) == null;
+    }
+
     public Vec3 getLookVec() {
         return this.getLook(1.0F);
     }

@@ -51,31 +51,33 @@ public class Category implements IComponent {
     public void render(boolean shader) {
         float x = this.x;
 
-        if (isSelected) {
-            x += 3;
-            float width = Fonts.interRegular.get(18).getStringWidth(category.getName());
-            interpolatedLineWidth = MathUtils.interpolate(interpolatedLineWidth, width, 0.05f);
-        } else {
-            interpolatedLineWidth = MathUtils.interpolate(interpolatedLineWidth, 0, 0.05f);
-        }
-
-        if (isHovered) {
-            x += 2.5f;
-        }
-
-        if (!PanelGui.dragging) {
-            interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.15f);
-        } else {
-            interpolatedX = x;
-        }
-
         if (!shader) {
+            if (isSelected) {
+                x += 3;
+                float width = Fonts.interRegular.get(18).getStringWidth(category.getName());
+                interpolatedLineWidth = MathUtils.interpolate(interpolatedLineWidth, width, 0.15f);
+            } else {
+                interpolatedLineWidth = MathUtils.interpolate(interpolatedLineWidth, 0, 0.15f);
+            }
+
+            if (isHovered) {
+                x += 2.5f;
+            }
+
+            if (!PanelGui.dragging) {
+                interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
+            } else {
+                interpolatedX = x;
+            }
+
             Fonts.interRegular.get(18).drawString(category.getName(), interpolatedX, y, Color.white.getRGB());
             RenderUtils.drawRect(interpolatedX, y + Fonts.interRegular.get(18).getHeight() - 2.6f, interpolatedLineWidth, 0.5f, Color.white.getRGB());
         }
 
         if (isSelected) {
-            handleScroll();
+            if (!shader)
+                handleScroll();
+
 
             float componentStartY = PanelGui.posY + 12 + Fonts.urbanist.get(35).getHeight();
             float viewHeight = 255;
@@ -87,7 +89,9 @@ public class Category implements IComponent {
             }
 
             maxScroll = Math.max(0, totalHeight - viewHeight);
-            scrollOffset = MathUtils.interpolate(scrollOffset, targetScrollOffset, 0.1f);
+
+            if (!shader)
+                scrollOffset = MathUtils.interpolate(scrollOffset, targetScrollOffset, 0.25f);
 
             RenderUtils.scissor(0, componentStartY, PanelGui.posX + 450, viewHeight, PanelGui.interpolatedScale);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);

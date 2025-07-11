@@ -4,7 +4,6 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
 import org.jetbrains.annotations.NotNull;
-import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.utils.InstanceAccess;
 
 import static java.lang.Math.*;
@@ -71,7 +70,7 @@ public class RotationUtils implements InstanceAccess {
     }
 
     public static float[] getRotations(BlockPos blockPos) {
-        return getRotations(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, mc.thePlayer.posX, mc.thePlayer.posY + (double)mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
+        return getRotations(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, mc.thePlayer.posX, mc.thePlayer.posY + (double) mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
     }
 
     public static float[] getRotations(BlockPos blockPos, EnumFacing enumFacing, double xz, double y) {
@@ -100,26 +99,6 @@ public class RotationUtils implements InstanceAccess {
 
     public static float[] getRotations(Vec3 vec) {
         return getRotations(vec.xCoord, vec.yCoord, vec.zCoord);
-    }
-
-    public static float[] getRotationToBlock(BlockPos blockPos, EnumFacing direction) {
-        double centerX = blockPos.getX() + 0.5 + direction.getFrontOffsetX() * 0.5;
-        double centerY = blockPos.getY() + 0.5 + direction.getFrontOffsetY() * 0.5;
-        double centerZ = blockPos.getZ() + 0.5 + direction.getFrontOffsetZ() * 0.5;
-
-        double playerX = mc.thePlayer.posX;
-        double playerY = mc.thePlayer.posY + mc.thePlayer.getEyeHeight();
-        double playerZ = mc.thePlayer.posZ;
-
-        double deltaX = centerX - playerX;
-        double deltaY = centerY - playerY;
-        double deltaZ = centerZ - playerZ;
-
-        double distanceXZ = sqrt(deltaX * deltaX + deltaZ * deltaZ);
-        float yaw = (float) (toDegrees(atan2(deltaZ, deltaX)) - 90.0F);
-        float pitch = (float) -toDegrees(atan2(deltaY, distanceXZ));
-
-        return new float[]{yaw, pitch};
     }
 
     public static Vec3 getBestHitVec(final Entity entity) {
@@ -176,5 +155,29 @@ public class RotationUtils implements InstanceAccess {
         y += face.getFrontOffsetY() / 2.0D;
 
         return new Vec3(x, y, z);
+    }
+
+    public static Vec3 findNearestVisiblePoint(Vec3 initialVec, AxisAlignedBB box) {
+        Vec3 eyes = mc.thePlayer.getPositionEyes(1);
+        Vec3 nearestVec = initialVec;
+        double nearestDist = Double.MAX_VALUE;
+
+        for (double x = box.minX; x <= box.maxX; x += 0.1) {
+            for (double y = box.minY; y <= box.maxY; y += 0.1) {
+                for (double z = box.minZ; z <= box.maxZ; z += 0.1) {
+                    Vec3 pos = new Vec3(x, y, z);
+                    if (mc.thePlayer.canPosBeSeen(pos)) {
+                        double dist = pos.distanceTo(eyes);
+
+                        if (dist < nearestDist) {
+                            nearestDist = dist;
+                            nearestVec = pos;
+                        }
+                    }
+                }
+            }
+        }
+
+        return nearestVec;
     }
 }

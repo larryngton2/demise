@@ -10,9 +10,9 @@ import net.minecraft.util.Vec3;
 import java.util.List;
 
 public class S27PacketExplosion implements Packet<INetHandlerPlayClient> {
-    private double posX;
-    private double posY;
-    private double posZ;
+    public double posX;
+    public double posY;
+    public double posZ;
     private float strength;
     private List<BlockPos> affectedBlockPositions;
     private float field_149152_f;

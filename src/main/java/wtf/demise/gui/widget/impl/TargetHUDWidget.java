@@ -14,7 +14,6 @@ import wtf.demise.features.modules.impl.visual.TargetHud;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.gui.widget.Widget;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.animations.Animation;
 import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -43,84 +42,57 @@ public class TargetHUDWidget extends Widget {
         this.height = 37;
         this.width = 120;
 
-        //todo improve
-        if (targetHud.esp.get() && targetHud.targetHUDTracking.get()) {
-            for (Entity entity : mc.theWorld.loadedEntityList) {
-                if (entity instanceof EntityPlayer entityPlayer && PlayerUtils.getDistanceToEntityBox(entityPlayer) < 6) {
-                    if (entityPlayer == mc.thePlayer) continue;
-                    if (targetHud.target != null && entityPlayer == targetHud.target) {
-                        renderTargetHUD(false, entityPlayer, false, false);
-                        continue;
-                    }
-
-                    renderTargetHUD(false, entityPlayer, true, false);
-                }
-            }
-        } else if (targetHud.target != null) {
-            renderTargetHUD(false, (EntityPlayer) targetHud.target, false, false);
+        if (targetHud.target != null) {
+            renderTargetHUD(false, (EntityPlayer) targetHud.target, false);
         }
     }
 
     @Override
     public void onShader(ShaderEvent e) {
-        if (targetHud.esp.get() && targetHud.targetHUDTracking.get()) {
-            for (Entity entity : mc.theWorld.loadedEntityList) {
-                if (entity instanceof EntityPlayer entityPlayer && PlayerUtils.getDistanceToEntityBox(entityPlayer) < 6) {
-                    if (entityPlayer == mc.thePlayer) continue;
-                    if (targetHud.target != null && entityPlayer == targetHud.target) {
-                        renderTargetHUD(true, entityPlayer, false, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
-                        continue;
-                    }
-
-                    renderTargetHUD(true, entityPlayer, true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
-                }
-            }
-        } else if (targetHud.target != null) {
-            renderTargetHUD(true, (EntityPlayer) targetHud.target, false, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
+        if (targetHud.target != null) {
+            renderTargetHUD(true, (EntityPlayer) targetHud.target, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
         }
     }
 
-    private void renderTargetHUD(boolean shader, EntityPlayer target, boolean visibleCheck, boolean isGlow) {
+    private void renderTargetHUD(boolean shader, EntityPlayer target, boolean isGlow) {
         if (target != null) {
             TargetHUD targetHUD;
             if (!targetHud.targetHUDTracking.get()) {
-                targetHUD = new TargetHUD(renderX, renderY, target, targetHud.decelerateAnimation, shader, isGlow);
+                targetHUD = new TargetHUD(renderX, renderY, target, shader, isGlow);
             } else {
-                float[] pos = new float[]{getPos(target, visibleCheck).x, getPos(target, visibleCheck).y};
-                targetHUD = new TargetHUD(pos[0], pos[1], target, targetHud.decelerateAnimation, shader, isGlow);
+                float[] pos = new float[]{getPos(target, shader).x, getPos(target, shader).y};
+                targetHUD = new TargetHUD(pos[0], pos[1], target, shader, isGlow);
             }
             targetHUD.render();
         }
     }
 
-    private Vector2f getPos(Entity target, boolean visibleCheck) {
+    private Vector2f getPos(Entity target, boolean shader) {
         float x = (float) MathUtils.interpolate(target.prevPosX, target.posX);
         float y = (float) MathUtils.interpolate(target.prevPosY, target.posY) + target.height - targetHud.offsetY.get() / 100;
         float z = (float) MathUtils.interpolate(target.prevPosZ, target.posZ);
 
-        Vector2f pos = RenderUtils.worldToScreen(x, y, z, sr, visibleCheck);
+        Vector2f pos = RenderUtils.worldToScreen(x, y, z, sr, false);
 
         if (pos == null) {
-            if (!targetHud.esp.get()) {
-                interpolatedX = MathUtils.interpolate(interpolatedX, renderX, 0.05f);
-                interpolatedY = MathUtils.interpolate(interpolatedY, renderY, 0.05f);
+            interpolatedX = MathUtils.interpolate(interpolatedX, renderX, 0.05f);
+            interpolatedY = MathUtils.interpolate(interpolatedY, renderY, 0.05f);
 
-                return new Vector2f(interpolatedX, interpolatedY);
-            } else {
-                return new Vector2f(renderX, renderY);
-            }
+            return new Vector2f(interpolatedX, interpolatedY);
         }
 
         Vector2f rPos = new Vector2f(pos.x, pos.y);
         float rPosX = rPos.x + (targetHud.centerX.get() ? target.width - width / 2 : targetHud.offsetX.get());
         float rPosY = rPos.y;
 
-        if ((interpolatedX == 0 && interpolatedY == 0) || targetHud.esp.get()) {
-            interpolatedX = rPosX;
-            interpolatedY = rPosY;
-        } else {
-            interpolatedX = MathUtils.interpolate(interpolatedX, rPosX, targetHud.interpolation.get());
-            interpolatedY = MathUtils.interpolate(interpolatedY, rPosY, targetHud.interpolation.get());
+        if (!shader) {
+            if (interpolatedX == 0 && interpolatedY == 0) {
+                interpolatedX = rPosX;
+                interpolatedY = rPosY;
+            } else {
+                interpolatedX = MathUtils.interpolate(interpolatedX, rPosX, targetHud.interpolation.get());
+                interpolatedY = MathUtils.interpolate(interpolatedY, rPosY, targetHud.interpolation.get());
+            }
         }
 
         return new Vector2f(interpolatedX, interpolatedY);
@@ -137,17 +109,15 @@ public class TargetHUDWidget extends Widget {
 class TargetHUD implements InstanceAccess {
     private float x, y, width, height;
     private EntityPlayer target;
-    private Animation animation;
     private boolean shader;
     private Interface setting = INSTANCE.getModuleManager().getModule(Interface.class);
     private final DecimalFormat decimalFormat = new DecimalFormat("0.0");
     private boolean isGlow;
 
-    public TargetHUD(float x, float y, EntityPlayer target, Animation animation, boolean shader, boolean isGlow) {
+    public TargetHUD(float x, float y, EntityPlayer target, boolean shader, boolean isGlow) {
         this.x = x;
         this.y = y;
         this.target = target;
-        this.animation = animation;
         this.shader = shader;
         this.isGlow = isGlow;
     }
@@ -157,8 +127,12 @@ class TargetHUD implements InstanceAccess {
         setHeight(INSTANCE.getWidgetManager().get(TargetHUDWidget.class).height);
         GlStateManager.pushMatrix();
 
+        if (!shader) {
+            TargetHud.interpolatedScale = MathUtils.interpolate(TargetHud.interpolatedScale, TargetHud.targetScale, 0.25f);
+        }
+
         GlStateManager.translate(x + width / 2F, y + height / 2F, 0);
-        GlStateManager.scale(animation.getOutput(), animation.getOutput(), animation.getOutput());
+        GlStateManager.scale(TargetHud.interpolatedScale, TargetHud.interpolatedScale, TargetHud.interpolatedScale);
         GlStateManager.translate(-(x + width / 2F), -(y + height / 2F), 0);
 
         float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();

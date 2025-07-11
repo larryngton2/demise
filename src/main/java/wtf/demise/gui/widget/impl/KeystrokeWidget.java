@@ -78,12 +78,14 @@ public class KeystrokeWidget extends Widget {
                 color = new Color(setting.bgColor(), true);
             }
 
-            key.setInterpolatedX(MathUtils.interpolate(key.getInterpolatedX(), x, 0.25f));
-            key.setInterpolatedY(MathUtils.interpolate(key.getInterpolatedY(), y, 0.25f));
-            key.setInterpolatedWidth(MathUtils.interpolate(key.getInterpolatedWidth(), width, 0.25f));
-            key.setInterpolatedHeight(MathUtils.interpolate(key.getInterpolatedHeight(), height, 0.25f));
+            if (!shader) {
+                key.setInterpolatedX(MathUtils.interpolate(key.getInterpolatedX(), x, 0.25f));
+                key.setInterpolatedY(MathUtils.interpolate(key.getInterpolatedY(), y, 0.25f));
+                key.setInterpolatedWidth(MathUtils.interpolate(key.getInterpolatedWidth(), width, 0.25f));
+                key.setInterpolatedHeight(MathUtils.interpolate(key.getInterpolatedHeight(), height, 0.25f));
 
-            key.setColor(ColorUtils.interpolateColorC(key.getColor(), color, 0.25f));
+                key.setColor(ColorUtils.interpolateColorC(key.getColor(), color, 0.25f));
+            }
 
             if (!shader) {
                 RoundedUtils.drawRound(key.getInterpolatedX(), key.getInterpolatedY(), key.getInterpolatedWidth(), key.getInterpolatedHeight(), 3, key.getColor());

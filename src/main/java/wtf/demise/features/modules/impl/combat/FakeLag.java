@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.*;
@@ -49,7 +50,6 @@ public class FakeLag extends Module {
     private final ModeValue keepRangeMode = new ModeValue("Keep range mode", new String[]{"None", "WTap", "Timer down"}, "None", this, smart::get);
     private final SliderValue timer = new SliderValue("Timer", 0.75f, 0.01f, 1, 0.01f, this, () -> keepRangeMode.get().equals("Timer down"));
     private final SliderValue timerTicks = new SliderValue("Timer ticks", 1, 1, 10, 1, this, () -> keepRangeMode.get().equals("Timer down"));
-    private final BoolValue experimentalDynamicHurtTime = new BoolValue("Experimental dynamic hurt time", false, this, smart::get);
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final BoolValue pauseOnBacktrack = new BoolValue("Pause on backtrack", false, this);
     private final BoolValue forceFirstHit = new BoolValue("Force first hit", false, this);
@@ -57,14 +57,13 @@ public class FakeLag extends Module {
     private final ModeValue renderMode = new ModeValue("Render mode", new String[]{"Box", "FakePlayer", "Line"}, "FakePlayer", this, realPos::get);
     private final BoolValue onlyOnGround = new BoolValue("Only onGround", false, this);
     private final BoolValue onlyKillAura = new BoolValue("Only on killAura", false, this);
-    private final BoolValue teamCheck = new BoolValue("Team check", false, this);
 
     public static boolean blinking = false, picked = false;
     private final TimerUtils delay = new TimerUtils();
     private final TimerUtils recoilTimer = new TimerUtils();
     private static double x, y, z;
     private double lerpX, lerpY, lerpZ;
-    public EntityPlayer target;
+    public EntityLivingBase target;
     private int ms;
     private boolean attacked;
     private boolean dispatched;
@@ -72,7 +71,6 @@ public class FakeLag extends Module {
     private boolean forceWTap;
     private boolean isFirstHit = true;
     private boolean shouldTimer;
-    private int targetHits;
     private boolean isPreTick;
     //lol
     private final TimerUtils timerTimer = new TimerUtils();
@@ -107,7 +105,7 @@ public class FakeLag extends Module {
     public void onUpdate(UpdateEvent e) {
         this.setTag(ms + " ms");
 
-        target = PlayerUtils.getTarget(alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get() + 1, teamCheck.get());
+        target = PlayerUtils.getTarget(alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get() + 1);
 
         if (ms == 0) ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
 
@@ -303,27 +301,6 @@ public class FakeLag extends Module {
                     timerTimer.reset();
                     shouldTimer = true;
                     break;
-            }
-        }
-
-        if (experimentalDynamicHurtTime.get()) {
-            // hurtTime == 10 doesn't add at all,
-            // hurtTime == 9 adds twice
-            // fuck
-            if (mc.thePlayer.hurtTime == 9) {
-                targetHits++;
-            }
-
-            if (target.hurtTime == 10) {
-                targetHits = 0;
-            }
-
-            if (PlayerUtils.getDistanceToEntityBox(target) > 4.5) {
-                targetHits = 0;
-            }
-
-            if (targetHits > 2 && PlayerUtils.getDistToTargetFromMouseOver(target) > 3) {
-                return true;
             }
         }
 

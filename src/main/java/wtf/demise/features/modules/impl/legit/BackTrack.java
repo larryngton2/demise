@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.network.play.server.S18PacketEntityTeleport;
@@ -37,11 +38,10 @@ public class BackTrack extends Module {
     private final BoolValue onlyDouble = new BoolValue("Only double", true, this, onlyWhenNeeded::get);
     private final BoolValue extraCheck = new BoolValue("Extra check", true, this);
     private final SliderValue ms = new SliderValue("Delay ms", 50, 0, 5000, 5, this);
-    private final BoolValue teamCheck = new BoolValue("Team check", false, this);
     private final ModeValue esp = new ModeValue("Mode", new String[]{"Off", "Box", "FakePlayer"}, "Box", this);
     private final ColorValue color = new ColorValue("Color", new Color(0, 0, 0, 100), this, () -> esp.is("Box"));
 
-    private EntityPlayer target;
+    private EntityLivingBase target;
     public static Vec3 realPosition = new Vec3(0, 0, 0);
     public static Vec3 realLastPos = new Vec3(0, 0, 0);
     private final ContinualAnimation animatedX = new ContinualAnimation();
@@ -68,7 +68,7 @@ public class BackTrack extends Module {
         if (e.isPost()) {
             if (mc.thePlayer.isDead) return;
 
-            target = PlayerUtils.getTarget(8, teamCheck.get());
+            target = PlayerUtils.getTarget(8);
 
             if (target == null) return;
 

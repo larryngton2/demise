@@ -1,7 +1,7 @@
 package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
@@ -44,12 +44,11 @@ public class LagRange extends Module {
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
     private final ModeValue renderMode = new ModeValue("Render mode", new String[]{"Box", "FakePlayer"}, "FakePlayer", this, realPos::get);
     private final BoolValue onlyKillAura = new BoolValue("Only on killAura", false, this);
-    private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
 
     private PlayerUtils.PredictProcess selfPrediction;
     private final TimerUtils msTimer = new TimerUtils();
     private final TimerUtils timer = new TimerUtils();
-    private EntityPlayer target;
+    private EntityLivingBase target;
     private boolean isFirstHit;
     private boolean blinking;
     private double x, y, z;
@@ -59,7 +58,7 @@ public class LagRange extends Module {
     public void onUpdate(UpdateEvent e) {
         setTag(String.valueOf(lagTicks.get()));
 
-        target = PlayerUtils.getTarget(searchRange.get(), teamCheck.get());
+        target = PlayerUtils.getTarget(searchRange.get());
 
         if (target == null || (onlyKillAura.get() && !getModule(KillAura.class).isEnabled()) || (pauseOnBacktrack.get() && getModule(BackTrack.class).isEnabled() && BackTrack.shouldLag) || mc.thePlayer.isDead) {
             if (blinking) {
@@ -87,6 +86,7 @@ public class LagRange extends Module {
                 }
 
                 picked = false;
+                timer.reset();
                 msTimer.reset();
             }
 

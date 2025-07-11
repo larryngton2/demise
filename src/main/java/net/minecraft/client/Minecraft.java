@@ -192,6 +192,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage {
     @Getter
     private ISaveFormat saveLoader;
     @Getter
+    @Setter
     private static int debugFPS;
     public int rightClickDelayTimer;
     private String serverName;

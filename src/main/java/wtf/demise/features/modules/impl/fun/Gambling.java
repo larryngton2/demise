@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.misc;
+package wtf.demise.features.modules.impl.fun;
 
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.misc.GameEvent;

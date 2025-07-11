@@ -42,15 +42,6 @@ public class AutoRod extends Module {
     private final BoolValue onlyOnKillAura = new BoolValue("Only on kill aura", false, this);
     public final BoolValue overrideAuraRots = new BoolValue("Override kill aura rots", false, this);
 
-    private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
-            new BoolValue("Players", true),
-            new BoolValue("Non players", true),
-            new BoolValue("Teams", true),
-            new BoolValue("Bots", false),
-            new BoolValue("Invisibles", false),
-            new BoolValue("Dead", false)
-    ), this);
-
     private final TimerUtils recastTimer = new TimerUtils();
     private final TimerUtils delayTimer = new TimerUtils();
     private boolean usingRod;
@@ -62,7 +53,7 @@ public class AutoRod extends Module {
     public void onUpdate(UpdateEvent e) {
         rotationManager.updateRotSpeed(e);
 
-        currentTarget = findTarget();
+        currentTarget = PlayerUtils.getTarget(maxRange.get());
 
         if (currentTarget == null || !mc.thePlayer.canEntityBeSeen(currentTarget) || mc.thePlayer.isUsingItem() || (!getModule(KillAura.class).isEnabled() && onlyOnKillAura.get())) {
             if (!getModule(Scaffold.class).isEnabled()) {
@@ -95,44 +86,6 @@ public class AutoRod extends Module {
         } else {
             reset();
         }
-    }
-
-    public EntityLivingBase findTarget() {
-        EntityLivingBase target = null;
-        double closestDistance = maxRange.get() + 0.4;
-
-        for (Entity entity : mc.theWorld.loadedEntityList) {
-            double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
-
-            if (entity != mc.thePlayer && distanceToEntity <= maxRange.get()) {
-                if (!(entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager || entity instanceof EntityPlayer)) {
-                    continue;
-                }
-
-                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
-                    if (!allowedTargets.isEnabled("Non players")) continue;
-                }
-
-                if (entity.isInvisible() && !allowedTargets.isEnabled("Invisibles")) continue;
-                if (entity.isDead && !allowedTargets.isEnabled("Dead")) continue;
-
-                if (entity instanceof EntityPlayer) {
-                    if (!allowedTargets.isEnabled("Players")) continue;
-                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
-                    if (!allowedTargets.isEnabled("Bots") && getModule(AntiBot.class).isBot((EntityPlayer) entity))
-                        continue;
-                    if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
-                }
-
-                if (distanceToEntity < closestDistance) {
-                    target = (EntityLivingBase) entity;
-                    closestDistance = distanceToEntity;
-                }
-
-            }
-        }
-
-        return target;
     }
 
     private void resetInUsingRod() {

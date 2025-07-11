@@ -907,7 +907,6 @@ public class GuiIngame extends Gui {
         }
     }
 
-
     public void updateTick() {
         if (this.recordPlayingUpFor > 0) {
             --this.recordPlayingUpFor;

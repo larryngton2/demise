@@ -9,6 +9,9 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
@@ -20,6 +23,8 @@ import net.optifine.reflect.Reflector;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
+import wtf.demise.features.modules.impl.misc.Targets;
+import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.utils.InstanceAccess;
 import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationUtils;
@@ -120,31 +125,86 @@ public class PlayerUtils implements InstanceAccess {
         return getBlock(mc.thePlayer.posX + offsetX, mc.thePlayer.posY + offsetY, mc.thePlayer.posZ + offsetZ);
     }
 
-    public EntityPlayer getTarget(double distance, boolean teamCheck) {
-        EntityPlayer target = null;
-        if (mc.theWorld == null) {
-            return null;
-        }
+    public EntityLivingBase getTarget(double distance) {
+        EntityLivingBase target = null;
+        double closestDistance = distance + 0.5;
 
-        for (EntityPlayer entity : mc.theWorld.playerEntities) {
-            if (teamCheck && isInTeam(entity))
-                continue;
+        MultiBoolValue allowedTargets = Demise.INSTANCE.getModuleManager().getModule(Targets.class).allowedTargets;
 
-            if (Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).isEnabled() && Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).bots.contains(entity))
-                continue;
+        for (Entity e : mc.theWorld.loadedEntityList) {
+            if (!(e instanceof EntityLivingBase entity)) continue;
 
-            float tempDistance = mc.thePlayer.getDistanceToEntity(entity) - 0.5657f;
-            if (entity != mc.thePlayer && tempDistance <= distance) {
-                target = entity;
-                distance = tempDistance;
+            double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
+
+            if (entity != mc.thePlayer && distanceToEntity <= distance) {
+                if (!(entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager || entity instanceof EntityPlayer)) {
+                    continue;
+                }
+
+                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
+                    if (!allowedTargets.isEnabled("Non players")) continue;
+                }
+
+                if (entity.isInvisible() && !allowedTargets.isEnabled("Invisibles")) continue;
+                if (entity.isDead && !allowedTargets.isEnabled("Dead")) continue;
+
+                if (entity instanceof EntityPlayer) {
+                    if (!allowedTargets.isEnabled("Players")) continue;
+                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
+                    if (!allowedTargets.isEnabled("Bots") && Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).isBot((EntityPlayer) entity))
+                        continue;
+                    if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
+                }
+
+                if (distanceToEntity < closestDistance) {
+                    target = entity;
+                    closestDistance = distanceToEntity;
+                }
             }
         }
 
-        if (Demise.INSTANCE.getModuleManager().getModule(KillAura.class).isEnabled() && KillAura.currentTarget != null) {
-            return (EntityPlayer) KillAura.currentTarget;
+        return target;
+    }
+
+    private List<EntityLivingBase> getTargetList(double distance, EntityLivingBase currentTarget) {
+        List<EntityLivingBase> targets = new ArrayList<>();
+
+        MultiBoolValue allowedTargets = Demise.INSTANCE.getModuleManager().getModule(Targets.class).allowedTargets;
+
+        for (Entity entity : mc.theWorld.loadedEntityList) {
+            if (entity != mc.thePlayer) {
+                if (!(entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager || entity instanceof EntityPlayer)) {
+                    continue;
+                }
+
+                if (entity instanceof EntityAnimal || entity instanceof EntityMob || entity instanceof EntityVillager) {
+                    if (!allowedTargets.isEnabled("Non players")) continue;
+                }
+
+                if (entity.isInvisible() && !allowedTargets.isEnabled("Invisibles")) continue;
+                if (entity.isDead && !allowedTargets.isEnabled("Dead")) continue;
+
+                if (entity instanceof EntityPlayer) {
+                    if (!allowedTargets.isEnabled("Players")) continue;
+                    if (Demise.INSTANCE.getFriendManager().isFriend((EntityPlayer) entity)) continue;
+                    if (!allowedTargets.isEnabled("Bots") && Demise.INSTANCE.getModuleManager().getModule(AntiBot.class).isBot((EntityPlayer) entity))
+                        continue;
+                    if (PlayerUtils.isInTeam(entity) && !allowedTargets.isEnabled("Teams")) continue;
+                }
+
+                double distanceToEntity = PlayerUtils.getDistanceToEntityBox(entity);
+
+                if (distanceToEntity <= distance) {
+                    targets.add((EntityLivingBase) entity);
+                }
+            }
         }
 
-        return target;
+        if (targets.isEmpty()) {
+            return null;
+        }
+
+        return targets;
     }
 
     public Block getBlock(BlockPos blockPos) {

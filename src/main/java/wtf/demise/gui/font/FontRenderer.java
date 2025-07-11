@@ -2,7 +2,6 @@ package wtf.demise.gui.font;
 
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjglx.opengl.GLContext;
-import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -12,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import static java.lang.String.valueOf;
 import static org.lwjgl.opengl.GL11.*;
 
 public class FontRenderer {
@@ -163,12 +161,6 @@ public class FontRenderer {
             offset += drawChar(chr, x + offset, y);
         }
         glPopMatrix();
-
-        /*
-        Minecraft mc = Minecraft.getMinecraft();
-        return (int) (offset * (mc != null ? new ScaledResolution(mc).getScaleFactor() : 0.5));
-         */
-
         return offset;
     }
 
@@ -309,7 +301,7 @@ public class FontRenderer {
             }
 
             String character = String.valueOf(ch);
-            x += drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB());
+            x += drawStringWithShadow(character, x, y, colorSupplier.colour(index).getRGB()) / 2f;
             index++;
         }
     }

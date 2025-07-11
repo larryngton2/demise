@@ -140,6 +140,7 @@ public class RotationHandler implements InstanceAccess {
     @EventPriority(-100)
     public void onPacket(final PacketEvent e) {
         if (!(e.getPacket() instanceof C03PacketPlayer packetPlayer)) return;
+        serverRotation = new float[]{packetPlayer.yaw, packetPlayer.pitch};
 
         if (!packetPlayer.rotating) {
             rotDiffBuildUp = 0;
@@ -149,14 +150,10 @@ public class RotationHandler implements InstanceAccess {
         if (shouldRotate()) {
             packetPlayer.yaw = currentRotation[0];
             packetPlayer.pitch = currentRotation[1];
-        }
 
-        if (serverRotation != null && shouldRotate()) {
             float diff = getAngleDifference(packetPlayer.getYaw(), serverRotation[0]);
             rotDiffBuildUp += diff;
         }
-
-        serverRotation = new float[]{packetPlayer.yaw, packetPlayer.pitch};
     }
 
     @EventTarget

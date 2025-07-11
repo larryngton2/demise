@@ -20,6 +20,7 @@ import wtf.demise.events.impl.render.Render3DEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.legit.AutoRod;
+import wtf.demise.features.modules.impl.misc.Targets;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.MultiBoolValue;
@@ -30,6 +31,7 @@ import wtf.demise.utils.packet.BlinkComponent;
 import wtf.demise.utils.player.clicking.ClickHandler;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.clicking.ClickManager;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -57,23 +59,24 @@ public class KillAura extends Module {
     private final RotationManager rotationManager = new RotationManager(this);
 
     // aim point
-    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Legs", "Nearest", "Straight"}, "Straight", this);
+    private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Straight"}, "Straight", this);
     private final BoolValue setMinAimPoint = new BoolValue("Set min aim point", true, this, () -> aimPos.is("Straight"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-    private final BoolValue predict = new BoolValue("Rotation prediction", false, this);
-    private final SliderValue predictTicks = new SliderValue("Predict ticks", 2, 1, 3, 1, this, () -> predict.get() && predict.canDisplay());
-    private final SliderValue targetOffset = new SliderValue("Normal target pos offset", 0, -5, 5, 0.01f, this);
-    private final BoolValue staticMissOffset = new BoolValue("Static miss offset", true, this);
-    private final SliderValue missTargetOffset = new SliderValue("Miss target pos offset", 0, -5, 5, 0.01f, this, staticMissOffset::get);
-    private final SliderValue minMissOffset = new SliderValue("Min miss offset", 0, -5, 5, 0.01f, this, () -> !staticMissOffset.get());
-    private final SliderValue maxMissOffset = new SliderValue("max miss offset", 0, -5, 5, 0.01f, this, () -> !staticMissOffset.get());
-    private final SliderValue missOffsetLerp = new SliderValue("Miss offset lerp", 0.1f, 0.01f, 1, 0.01f, this, () -> !staticMissOffset.get());
+
+    private final BoolValue aimAtNearestVisiblePoint = new BoolValue("Aim at nearest visible point", false, this);
+
+    private final SliderValue targetOffset = new SliderValue("Target pos offset", 0, -5, 5, 0.01f, this);
+
+    private final BoolValue predictionHeuristics = new BoolValue("Prediction heuristics", false, this);
+
     private final BoolValue delayed = new BoolValue("Delayed target pos", false, this);
     private final SliderValue delayUpdates = new SliderValue("Delay updates", 1, 1, 50, 1, this, () -> delayed.get() && delayed.canDisplay());
     private final BoolValue delayOnHurtTime = new BoolValue("Delay on hurtTime", true, this, () -> delayed.get() && delayed.canDisplay());
     private final SliderValue hurtTime = new SliderValue("Delay hurtTime", 5, 1, 10, 1, this, () -> delayOnHurtTime.get() && delayOnHurtTime.canDisplay());
+
     private final ModeValue offsetMode = new ModeValue("Offset mode", new String[]{"None", "Gaussian", "Noise", "Jitter"}, "None", this);
     private final BoolValue notOnFirstHit = new BoolValue("Not on first hit", false, this, () -> !offsetMode.is("None"));
+    private final BoolValue onlyOnRotation = new BoolValue("Only on rotation", true, this, () -> !offsetMode.is("None"));
     private final SliderValue oChance = new SliderValue("Offset chance", 75, 1, 100, 1, this, () -> !offsetMode.is("None") && !offsetMode.is("Jitter"));
     private final SliderValue minYawFactor = new SliderValue("Min Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
     private final SliderValue maxYawFactor = new SliderValue("Max Yaw Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
@@ -81,10 +84,10 @@ public class KillAura extends Module {
     private final SliderValue maxPitchFactor = new SliderValue("Max Pitch Factor", 0.25f, 0, 1, 0.01f, this, () -> !offsetMode.is("None"));
     private final BoolValue interpolateVec = new BoolValue("Interpolate vec", false, this, () -> !offsetMode.is("None"));
     private final SliderValue amount = new SliderValue("Amount", 0.5f, 0.01f, 1, 0.01f, this, () -> interpolateVec.get() && interpolateVec.canDisplay());
+
     private final SliderValue xOffset = new SliderValue("Static X offset", 0, -0.4f, 0.4f, 0.01f, this);
     private final SliderValue yOffset = new SliderValue("Static Y offset", 0, -2, 0.4f, 0.01f, this);
-    private final BoolValue onlyUpdateOnMiss = new BoolValue("Only update on miss", false, this);
-    private final BoolValue onlyRotateOnMiss = new BoolValue("Only rotate on miss", false, this);
+
     private final BoolValue pauseInHitbox = new BoolValue("Pause rotations in hitbox", false, this);
 
     // target
@@ -95,17 +98,6 @@ public class KillAura extends Module {
     // visual
     private final BoolValue targetESP = new BoolValue("Target ESP", false, this);
 
-    // targetS
-    private final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
-            new BoolValue("Players", true),
-            new BoolValue("Non players", true),
-            new BoolValue("Teams", true),
-            new BoolValue("Bots", false),
-            new BoolValue("Invisibles", false),
-            new BoolValue("Dead", false)
-    ), this);
-
-    private PlayerUtils.PredictProcess selfPrediction;
     private final Queue<Vec3> positionHistory = new LinkedList<>();
     private final TimerUtils lastSwitchTime = new TimerUtils();
     public static EntityLivingBase currentTarget;
@@ -115,13 +107,14 @@ public class KillAura extends Module {
     private double lastXOffset;
     private double lastYOffset;
     private double lastZOffset;
-    private float currentMissOffset;
     private boolean shouldRandomize;
     private Vec3 offsetVec = new Vec3(0, 0, 0);
     private float[] prevRot;
     private int totalBlockingTicks;
     private boolean firstHit = true;
     private Vec3 delayedVec = new Vec3(0, 0, 0);
+    private boolean tickRotating;
+    private int runTicks;
 
     @Override
     public void onEnable() {
@@ -147,6 +140,8 @@ public class KillAura extends Module {
 
     private EntityLivingBase findNextTarget() {
         List<Entity> targets = new ArrayList<>();
+
+        MultiBoolValue allowedTargets = getModule(Targets.class).allowedTargets;
 
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity != mc.thePlayer) {
@@ -191,6 +186,8 @@ public class KillAura extends Module {
         double leastHealth = Float.MAX_VALUE;
         double leastHurtTime = 10;
         double closestAngle = Double.MAX_VALUE;
+
+        MultiBoolValue allowedTargets = getModule(Targets.class).allowedTargets;
 
         for (Entity e : mc.theWorld.loadedEntityList) {
             if (!(e instanceof EntityLivingBase entity)) continue;
@@ -303,12 +300,12 @@ public class KillAura extends Module {
         if (currentTarget != null && !isTargetInvalid()) {
             double distance = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
-            if (getModule(AutoRod.class).rotating && getModule(AutoRod.class).overrideAuraRots.get()) {
+            if (getModule(AutoRod.class).rotating && getModule(AutoRod.class).overrideAuraRots.get() && getModule(AutoRod.class).isEnabled()) {
                 return;
             }
 
             if (distance <= searchRange.get()) {
-                rotationManager.setRotation(getRotations(currentTarget));
+                rotationManager.setRotation(getRotations());
             }
         }
     }
@@ -325,6 +322,21 @@ public class KillAura extends Module {
             positionHistory.clear();
             delayedVec = targetVec;
         }
+
+        if (currentTarget != null) {
+            double diffYaw = 0;
+            double diffPitch = 0;
+
+            if (RotationHandler.currentRotation != null && prevRot != null) {
+                diffYaw = MathHelper.wrapAngleTo180_float(RotationHandler.currentRotation[0] - prevRot[0]);
+                diffPitch = MathHelper.wrapAngleTo180_float(RotationHandler.currentRotation[1] - prevRot[1]);
+            }
+
+            float yawSpeed = (rotationManager.getRandYawSpeed() * rotationManager.getExtraSmoothFactor().get()) / 2;
+            float pitchSpeed = (rotationManager.getRandPitchSpeed() * rotationManager.getExtraSmoothFactor().get()) / 2;
+
+            tickRotating = Math.abs(diffYaw) > yawSpeed || Math.abs(diffPitch) > pitchSpeed;
+        }
     }
 
     @EventTarget
@@ -338,6 +350,7 @@ public class KillAura extends Module {
         }
     }
 
+    // shut up intellij
     private boolean isTargetInvalid() {
         return currentTarget.isDead || PlayerUtils.getDistanceToEntityBox(currentTarget) > searchRange.get() || currentTarget.getEntityWorld() != mc.thePlayer.getEntityWorld();
     }
@@ -465,7 +478,7 @@ public class KillAura extends Module {
     }
 
     private boolean shouldBlock() {
-        return totalBlockingTicks % (reblockTicks.get() + 1) == 0;
+        return totalBlockingTicks % (reblockTicks.get() + 1) != 0;
     }
 
     @EventTarget
@@ -485,33 +498,40 @@ public class KillAura extends Module {
         return PlayerUtils.isHoldingSword() && autoBlock.get() && currentTarget != null && PlayerUtils.getDistanceToEntityBox(currentTarget) <= autoBlockRange.get();
     }
 
-    private float[] getRotations(EntityLivingBase entity) {
-        Vec3 playerPos;
+    private boolean targetRunningAway() {
+        double lookX = currentTarget.posX - mc.thePlayer.posX;
+        double lookY = currentTarget.posZ - mc.thePlayer.posZ;
 
-        if (predict.get() && selfPrediction != null) {
-            playerPos = new Vec3(selfPrediction.position.xCoord, selfPrediction.position.yCoord + mc.thePlayer.getEyeHeight(), selfPrediction.position.zCoord);
+        float yaw = (float) (Math.atan2(lookY, lookX) * 180.0D / Math.PI) - 90.0F;
+        yaw = mc.thePlayer.rotationYaw + MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw);
+
+        if (Math.abs(yaw - MathHelper.wrapAngleTo180_float(currentTarget.rotationYaw)) < 90 && currentTarget.getDistance(currentTarget.lastTickPosX, currentTarget.posY, currentTarget.lastTickPosZ) > 0.1) {
+            runTicks++;
         } else {
-            playerPos = mc.thePlayer.getPositionEyes(1);
+            runTicks = 0;
         }
 
-        double predictionAmount;
+        return runTicks >= 5;
+    }
 
-        if (!mc.objectMouseOver.typeOfHit.equals(MovingObjectPosition.MovingObjectType.ENTITY) || PlayerUtils.getDistanceToEntityBox(entity) > attackRange.get()) {
-            if (staticMissOffset.get()) {
-                predictionAmount = missTargetOffset.get();
-            } else {
-                currentMissOffset = MathUtils.interpolate(currentMissOffset, maxMissOffset.get(), missOffsetLerp.get());
-                predictionAmount = currentMissOffset;
-            }
+    private float[] getRotations() {
+        Vec3 playerPos = mc.thePlayer.getPositionEyes(1);
+
+        float targetOffset = this.targetOffset.get();
+
+        double dist = PlayerUtils.getDistanceToEntityBox(currentTarget);
+
+        if (predictionHeuristics.get() && ((targetRunningAway() && dist > attackRange.get()) || dist > attackRange.get() + 1.5)) {
+            targetOffset = (float) (Math.min(Math.max((dist - attackRange.get()) * 3, 0), 10));
+            rotationManager.setSpeedMulti(0.166f);
         } else {
-            predictionAmount = targetOffset.get();
-            currentMissOffset = minMissOffset.get();
+            rotationManager.setSpeedMulti(1);
         }
 
-        Vec3 prediction = entity.getPositionVector().subtract(new Vec3(entity.prevPosX, entity.prevPosY, entity.prevPosZ)).multiply(predictionAmount);
+        Vec3 prediction = currentTarget.getPositionVector().subtract(new Vec3(currentTarget.prevPosX, currentTarget.prevPosY, currentTarget.prevPosZ)).multiply(targetOffset);
 
-        AxisAlignedBB bb = entity.getHitbox().offset(prediction).contract(0, yTrim.get(), 0);
-        AxisAlignedBB finalBoundingBox = new AxisAlignedBB(bb.minX, bb.minY + (setMinAimPoint.get() ? entity.height * 0.45 : 0), bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+        AxisAlignedBB bb = currentTarget.getHitbox().offset(prediction).contract(0, yTrim.get(), 0);
+        AxisAlignedBB finalBoundingBox = new AxisAlignedBB(bb.minX, bb.minY + (setMinAimPoint.get() ? currentTarget.height * 0.45 : 0), bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
 
         Vec3 boxCenter = bb.getCenter();
         Vec3 entityPos = new Vec3(boxCenter.xCoord, bb.minY, boxCenter.zCoord);
@@ -519,25 +539,17 @@ public class KillAura extends Module {
 
         switch (aimPos.get()) {
             case "Head": {
-                vec = entityPos.add(0.0, entity.getEyeHeight(), 0.0);
+                vec = entityPos.add(0.0, currentTarget.getEyeHeight(), 0.0);
             }
             break;
             case "Torso": {
-                vec = entityPos.add(0.0, entity.height * 0.75, 0.0);
-            }
-            break;
-            case "Legs": {
-                vec = entityPos.add(0.0, entity.height * 0.45, 0.0);
-            }
-            break;
-            case "Nearest": {
-                vec = RotationUtils.getBestHitVec(entity);
+                vec = entityPos.add(0.0, currentTarget.height * 0.75, 0.0);
             }
             break;
             case "Straight": {
-                final double ex = (finalBoundingBox.maxX + finalBoundingBox.minX) / 2;
-                final double ey = MathHelper.clamp_double(playerPos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
-                final double ez = (finalBoundingBox.maxZ + finalBoundingBox.minZ) / 2;
+                double ex = (finalBoundingBox.maxX + finalBoundingBox.minX) / 2;
+                double ey = MathHelper.clamp_double(playerPos.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
+                double ez = (finalBoundingBox.maxZ + finalBoundingBox.minZ) / 2;
 
                 vec = new Vec3(ex, ey, ez);
             }
@@ -547,11 +559,15 @@ public class KillAura extends Module {
                 break;
         }
 
-        if (!firstHit || !notOnFirstHit.get()) {
-            double minXZ = -0.4;
-            double maxXZ = 0.4;
+        if (!mc.thePlayer.canPosBeSeen(entityPos.add(0, currentTarget.getEyeHeight(), 0)) && aimAtNearestVisiblePoint.get()) {
+            vec = RotationUtils.findNearestVisiblePoint(vec, finalBoundingBox);
+        }
+
+        if ((!firstHit || !notOnFirstHit.get()) && (!onlyOnRotation.get() || tickRotating)) {
+            double minXZ = -0.5;
+            double maxXZ = 0.5;
             double minY = -2;
-            double maxY = 0.4;
+            double maxY = 0.5;
 
             double yawFactor = MathUtils.randomizeDouble(minYawFactor.get(), maxYawFactor.get());
             double pitchFactor = MathUtils.randomizeDouble(minPitchFactor.get(), maxPitchFactor.get());
@@ -613,14 +629,18 @@ public class KillAura extends Module {
                     offsetVec = new Vec3(0, 0, 0);
             }
         } else {
-            offsetVec = new Vec3(0, 0, 0);
+            offsetVec = MathUtils.interpolate(offsetVec, new Vec3(0, 0, 0), (interpolateVec.get() ? amount.get() : mc.timer.partialTicks) / 4);
         }
 
-        if (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY || !onlyUpdateOnMiss.get()) {
-            targetVec = new Vec3(vec.xCoord, vec.yCoord, vec.zCoord).add(offsetVec).add(xOffset.get(), yOffset.get(), xOffset.get());
-            if (delayed.get() && targetVec != null) {
-                positionHistory.offer(targetVec);
-            }
+        targetVec = new Vec3(vec.xCoord, vec.yCoord, vec.zCoord).add(offsetVec).add(xOffset.get(), yOffset.get(), xOffset.get());
+        if (delayed.get() && targetVec != null) {
+            positionHistory.offer(targetVec);
+        }
+
+        if (targetVec != null) {
+            targetVec.xCoord = MathHelper.clamp_double(targetVec.xCoord, finalBoundingBox.minX, finalBoundingBox.maxX);
+            targetVec.yCoord = MathHelper.clamp_double(targetVec.yCoord, finalBoundingBox.minY, finalBoundingBox.maxY);
+            targetVec.zCoord = MathHelper.clamp_double(targetVec.zCoord, finalBoundingBox.minZ, finalBoundingBox.maxZ);
         }
 
         if (delayed.get()) {
@@ -654,21 +674,12 @@ public class KillAura extends Module {
         float yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
         float pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
 
-        pitch = MathHelper.clamp_float(pitch, -90, 90);
-
-        if ((mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && onlyRotateOnMiss.get()) ||
-                (mc.thePlayer.getEntityBoundingBox().intersectsWith(entity.getEntityBoundingBox()) && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && pauseInHitbox.get())) {
-
+        if (mc.thePlayer.getEntityBoundingBox().intersectsWith(currentTarget.getEntityBoundingBox()) && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && pauseInHitbox.get()) {
             yaw = prevRot[0];
             pitch = prevRot[1];
         }
 
         prevRot = new float[]{yaw, pitch};
         return new float[]{yaw, pitch};
-    }
-
-    @EventTarget
-    public void onMove(MoveEvent e) {
-        selfPrediction = PlayerUtils.predictPlayerPosition((int) predictTicks.get());
     }
 }

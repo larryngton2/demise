@@ -24,7 +24,6 @@ public class AimAssist extends Module {
     private final RotationManager rotationManager = new RotationManager(this);
     private final BoolValue onlyOnClick = new BoolValue("Only on click", true, this);
     private final SliderValue resetTime = new SliderValue("Reset time", 500, 0, 1000, 1, this, onlyOnClick::get);
-    private final BoolValue teamCheck = new BoolValue("Team check", false, this);
     private final BoolValue targetESP = new BoolValue("Target ESP", false, this);
 
     private EntityLivingBase target;
@@ -40,7 +39,7 @@ public class AimAssist extends Module {
         }
 
         if (!onlyOnClick.get() || !resetTimer.hasTimeElapsed(resetTime.get())) {
-            target = PlayerUtils.getTarget(searchRange.get(), teamCheck.get());
+            target = PlayerUtils.getTarget(searchRange.get());
         } else {
             target = null;
         }

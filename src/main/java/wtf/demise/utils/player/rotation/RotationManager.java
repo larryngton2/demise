@@ -78,12 +78,14 @@ public class RotationManager implements InstanceAccess {
     @Setter
     private float randPitchSpeed;
     private int maxThresholdReachAttempts;
+    @Setter
+    private float speedMulti = 1;
 
     public void setRotation(float[] targetRotation) {
         SmoothMode mode = SmoothMode.valueOf(smoothMode.get());
 
-        float hSpeed = randYawSpeed;
-        float vSpeed = randPitchSpeed;
+        float hSpeed = randYawSpeed * speedMulti;
+        float vSpeed = randPitchSpeed * speedMulti;
 
         if (shortStop.get() && shouldShortStop()) {
             hSpeed = MathUtils.randomizeFloat(0, 0.1f);
@@ -91,8 +93,8 @@ public class RotationManager implements InstanceAccess {
         }
 
         if (imperfectCorrelation.get()) {
-            hSpeed *= MathUtils.randomizeFloat(0.9F, 1.1F);
-            vSpeed *= MathUtils.randomizeFloat(0.9F, 1.1F);
+            hSpeed *= MathUtils.randomizeFloat(0.9f, 1.1f);
+            vSpeed *= MathUtils.randomizeFloat(0.9f, 1.1f);
         }
 
         if (module.getClass() == KillAura.class) {

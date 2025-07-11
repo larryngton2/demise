@@ -33,7 +33,7 @@ public class SprintReset extends Module {
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());
 
-        target = PlayerUtils.getTarget(8, false);
+        target = PlayerUtils.getTarget(8);
 
         if (target == null) {
             return;

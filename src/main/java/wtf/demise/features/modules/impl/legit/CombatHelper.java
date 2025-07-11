@@ -50,7 +50,7 @@ public class CombatHelper extends Module {
     @EventTarget
     public void onGame(GameEvent e) {
         if (!getModule(KillAura.class).isEnabled()) {
-            target = PlayerUtils.getTarget(publicSearchRange.get() * 2, false);
+            target = PlayerUtils.getTarget(publicSearchRange.get() * 2);
         } else {
             target = KillAura.currentTarget;
         }

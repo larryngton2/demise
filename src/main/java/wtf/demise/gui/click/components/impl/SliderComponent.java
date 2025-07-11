@@ -44,10 +44,16 @@ public class SliderComponent extends Component {
         Fonts.interRegular.get(15).drawString(setting.getMax() + "", getX() - 2 + getWidth() - Fonts.interRegular.get(15).getStringWidth(setting.getMax() + ""), getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, new Color(160, 160, 160).getRGB());
 
         if (dragging) {
-            double clampedRatio = Math.max(0, Math.min(1, (mouseX - getX()) / (double) getWidth()));
-            double difference = setting.getMax() - setting.getMin(), value = setting.getMin() + clampedRatio * difference;
+            float clampedRatio = Math.max(0, Math.min(1, (mouseX - getX()) / getWidth()));
+            float rawValue = setting.getMin() + (setting.getMax() - setting.getMin()) * clampedRatio;
 
-            setting.setValue(BigDecimal.valueOf(incValue(value, setting.getIncrement())).setScale(getDecimalPoints(String.valueOf(setting.getIncrement())), RoundingMode.CEILING).floatValue());
+            BigDecimal valueBD = BigDecimal.valueOf(rawValue);
+            BigDecimal incrementBD = BigDecimal.valueOf(setting.getIncrement());
+
+            BigDecimal snapped = valueBD.divide(incrementBD, 0, RoundingMode.HALF_UP).multiply(incrementBD);
+            BigDecimal finalValue = snapped.setScale(getDecimalPoints(String.valueOf(setting.getIncrement())), RoundingMode.HALF_UP);
+
+            setting.setValue(finalValue.floatValue());
 
             if (previousSetting != setting.get()) {
                 if (soundTimer.hasTimeElapsed(25)) {

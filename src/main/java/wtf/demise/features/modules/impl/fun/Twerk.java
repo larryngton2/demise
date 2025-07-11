@@ -1,4 +1,4 @@
-package wtf.demise.features.modules.impl.misc;
+package wtf.demise.features.modules.impl.fun;
 
 import net.minecraft.client.settings.KeyBinding;
 import wtf.demise.events.annotations.EventTarget;

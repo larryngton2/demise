@@ -1,5 +1,6 @@
 package wtf.demise.features.modules.impl.combat;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovementInput;
@@ -47,13 +48,12 @@ public class TickBase extends Module {
     private final BoolValue renderPredictedTargetPos = new BoolValue("Render predicted target pos", false, this);
     private final BoolValue renderPredictedSelfPos = new BoolValue("Render predicted self pos", false, this);
     private final BoolValue useBacktrackPos = new BoolValue("Use backtrack pos", false, this);
-    private final BoolValue teamCheck = new BoolValue("Team Check", false, this);
 
     private final TimerUtils timer = new TimerUtils();
     private int skippedTick = 0;
     private long shifted, previousTime;
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
-    private EntityPlayer target;
+    private EntityLivingBase target;
     public boolean working;
     private int ticksToSkip;
     private boolean firstAnimation;
@@ -68,7 +68,7 @@ public class TickBase extends Module {
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());
 
-        target = PlayerUtils.getTarget(searchRange.get(), teamCheck.get());
+        target = PlayerUtils.getTarget(searchRange.get());
     }
 
     @EventTarget

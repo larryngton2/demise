@@ -67,7 +67,8 @@ public class SearchCategory implements IComponent {
                 drawText("Search...");
             }
 
-            handleScroll();
+            if (!shader)
+                handleScroll();
 
             float componentStartY = posY + 12 + Fonts.urbanist.get(35).getHeight();
             float viewHeight = 255;
@@ -79,7 +80,9 @@ public class SearchCategory implements IComponent {
             }
 
             maxScroll = Math.max(0, totalHeight - viewHeight);
-            scrollOffset = MathUtils.interpolate(scrollOffset, targetScrollOffset, 0.1f);
+
+            if (!shader)
+                scrollOffset = MathUtils.interpolate(scrollOffset, targetScrollOffset, 0.25f);
 
             RenderUtils.scissor(0, componentStartY, posX + 450, viewHeight, PanelGui.interpolatedScale);
             GL11.glEnable(GL11.GL_SCISSOR_TEST);
