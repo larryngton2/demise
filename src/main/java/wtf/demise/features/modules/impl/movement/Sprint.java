@@ -14,6 +14,10 @@ public class Sprint extends Module {
     private final BoolValue omni = new BoolValue("Omni", false, this);
     public final BoolValue silent = new BoolValue("Silent", false, this);
 
+    public Sprint() {
+        silent.setDescription("Sprint clientside without sending sprint packets to the server.");
+    }
+
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         if (!isEnabled(Scaffold.class)) {

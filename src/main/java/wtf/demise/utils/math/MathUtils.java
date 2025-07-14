@@ -120,29 +120,8 @@ public class MathUtils implements InstanceAccess {
         return (float) (output * Math.exp(-(x * x) / (2.0 * (sigma * sigma))));
     }
 
-    public static int nextInt(int min, int max) {
-        if (min == max || max - min <= 0D)
-            return min;
-
-        return (int) (min + ((max - min) * Math.random()));
-    }
-
-    public static double nextDouble(double min, double max) {
-        if (min == max || max - min <= 0D)
-            return min;
-
-        return min + ((max - min) * Math.random());
-    }
-
     public static float normalize(float value, float min, float max) {
         return (value - min) / (max - min);
-    }
-
-    public static float nextFloat(final float startInclusive, final float endInclusive) {
-        if (startInclusive == endInclusive || endInclusive - startInclusive <= 0F)
-            return startInclusive;
-
-        return (float) (startInclusive + ((endInclusive - startInclusive) * Math.random()));
     }
 
     public static int randomizeInt(double min, double max) {

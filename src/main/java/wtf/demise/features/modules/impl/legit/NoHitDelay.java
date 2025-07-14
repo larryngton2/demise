@@ -2,10 +2,11 @@ package wtf.demise.features.modules.impl.legit;
 
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.UpdateEvent;
+import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
 
 @ModuleInfo(name = "NoHitDelay", description = "Removes Minecraft's hit delay.")
-public class NoHitDelay extends wtf.demise.features.modules.Module {
+public class NoHitDelay extends Module {
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {

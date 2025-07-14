@@ -2,7 +2,6 @@ package wtf.demise.features.modules.impl.legit;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.network.play.server.S18PacketEntityTeleport;
 import net.minecraft.util.AxisAlignedBB;
@@ -142,7 +141,7 @@ public class BackTrack extends Module {
                     animatedY.animate((float) y, 20);
                     animatedZ.animate((float) z, 20);
 
-                    AxisAlignedBB box = mc.thePlayer.getEntityBoundingBox().expand(0.1, 0.1, 0.1);
+                    AxisAlignedBB box = target.getEntityBoundingBox().expand(0.1, 0.1, 0.1);
                     AxisAlignedBB axis = new AxisAlignedBB(box.minX - mc.thePlayer.posX + animatedX.getOutput(), box.minY - mc.thePlayer.posY + animatedY.getOutput(), box.minZ - mc.thePlayer.posZ + animatedZ.getOutput(), box.maxX - mc.thePlayer.posX + animatedX.getOutput(), box.maxY - mc.thePlayer.posY + animatedY.getOutput(), box.maxZ - mc.thePlayer.posZ + animatedZ.getOutput());
 
                     if (shouldLag) {

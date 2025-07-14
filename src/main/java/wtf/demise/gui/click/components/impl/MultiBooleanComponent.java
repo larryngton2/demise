@@ -24,10 +24,11 @@ public class MultiBooleanComponent extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
+
         float heightoff = 4;
         float lineHeight = Fonts.interRegular.get(13).getHeight() + 2;
 
-        Fonts.interSemiBold.get(15).drawString(setting.getName(), getX() + 4, getY() + 2, -1);
+        Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY() + 2.5f, -1);
 
         for (BoolValue boolValue : setting.getValues()) {
             select.putIfAbsent(boolValue, new EaseOutSine(100, 1));
@@ -38,7 +39,7 @@ public class MultiBooleanComponent extends Component {
             heightoff += lineHeight;
         }
 
-        setHeight(Fonts.interRegular.get(15).getHeight() + 4 + heightoff);
+        setHeight(Fonts.interRegular.get(15).getHeight() + heightoff);
         super.drawScreen(mouseX, mouseY);
     }
 

@@ -1,10 +1,8 @@
 package wtf.demise.gui.click.components.impl;
 
-import net.minecraft.util.MathHelper;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.gui.click.Component;
 import wtf.demise.gui.font.Fonts;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SoundUtil;
 import wtf.demise.utils.render.MouseUtils;
@@ -30,7 +28,9 @@ public class SliderComponent extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
-        Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY(), -1);
+        setDescription(setting.getDescription());
+
+        Fonts.interRegular.get(15).drawString(setting.getName(), getX() + 4, getY() + 2.5f, -1);
 
         anim = RenderUtils.animate(anim, (getWidth() - 8) * (setting.get() - setting.getMin()) / (setting.getMax() - setting.getMin()), 15);
         float sliderWidth = anim;
@@ -39,9 +39,9 @@ public class SliderComponent extends Component {
         RoundedUtils.drawRound(getX() + 4, getY() + Fonts.interRegular.get(15).getHeight() + 2, sliderWidth, 2, 1, Color.white.darker().darker());
         RenderUtils.drawCircle(getX() + 4 + sliderWidth, getY() + Fonts.interRegular.get(15).getHeight() + 3, 0, 360, 2, 0.1f, true, Color.white.brighter().brighter().getRGB());
 
-        Fonts.interRegular.get(15).drawString(setting.getMin() + "", getX() + 2, getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, new Color(160, 160, 160).getRGB());
-        Fonts.interRegular.get(15).drawCenteredString(setting.get() + "", getX() + getWidth() / 2, getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, -1);
-        Fonts.interRegular.get(15).drawString(setting.getMax() + "", getX() - 2 + getWidth() - Fonts.interRegular.get(15).getStringWidth(setting.getMax() + ""), getY() + Fonts.interRegular.get(15).getHeight() * 2 + 2, new Color(160, 160, 160).getRGB());
+        Fonts.interRegular.get(15).drawString(setting.getMin() + "", getX() + 4, getY() + Fonts.interRegular.get(15).getHeight() * 2 + 1, new Color(160, 160, 160).getRGB());
+        Fonts.interRegular.get(15).drawCenteredString(setting.get() + "", getX() + getWidth() / 2, getY() + Fonts.interRegular.get(15).getHeight() * 2 + 1, -1);
+        Fonts.interRegular.get(15).drawString(setting.getMax() + "", getX() - 4 + getWidth() - Fonts.interRegular.get(15).getStringWidth(setting.getMax() + ""), getY() + Fonts.interRegular.get(15).getHeight() * 2 + 1, new Color(160, 160, 160).getRGB());
 
         if (dragging) {
             float clampedRatio = Math.max(0, Math.min(1, (mouseX - getX()) / getWidth()));
@@ -63,10 +63,6 @@ public class SliderComponent extends Component {
                 previousSetting = setting.get();
             }
         }
-    }
-
-    public static double incValue(double value, double increment) {
-        return Math.round(value / increment) * increment;
     }
 
     public static Integer getDecimalPoints(String n) {

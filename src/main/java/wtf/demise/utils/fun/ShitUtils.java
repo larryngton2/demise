@@ -1,6 +1,7 @@
 package wtf.demise.utils.fun;
 
 import lombok.experimental.UtilityClass;
+
 import java.io.IOException;
 
 @UtilityClass

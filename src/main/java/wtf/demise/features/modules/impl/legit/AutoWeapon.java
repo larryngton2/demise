@@ -16,6 +16,10 @@ import wtf.demise.utils.player.InventoryUtils;
 public class AutoWeapon extends Module {
     private final BoolValue switchBack = new BoolValue("Switch Back", true, this);
 
+    public AutoWeapon() {
+        switchBack.setDescription("Switches back after sending an attack packet. Funny on some servers' murder mystery.");
+    }
+
     @EventTarget
     public void onAttack(AttackEvent e) {
         int slot = -1;

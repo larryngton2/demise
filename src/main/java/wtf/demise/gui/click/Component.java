@@ -13,6 +13,7 @@ public class Component implements IComponent {
     private float x, y, width, height;
     private Color color = new Color(INSTANCE.getModuleManager().getModule(Interface.class).color());
     private int colorRGB = color.getRGB();
+    private String description = "";
 
     public void drawBackground(Color color) {
         RenderUtils.drawRect(x, y, width, height, color.getRGB());

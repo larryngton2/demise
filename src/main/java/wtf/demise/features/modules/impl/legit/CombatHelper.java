@@ -42,6 +42,12 @@ public class CombatHelper extends Module {
     private final SliderValue predictionTicks = new SliderValue("Target Prediction Ticks", 5, 1, 20, 1, this, adaptiveStrafe::get);
     private final BoolValue lagCheck = new BoolValue("Lag check", false, this, adaptiveStrafe::get);
 
+    public CombatHelper() {
+        adaptiveStrafe.setDescription("Simulates sweaty retard movement.");
+        forceStrafe.setDescription("Makes you always strafe.");
+        lagCheck.setDescription("Only strafe when FakeLag is lagging.");
+    }
+
     private boolean isBlocking;
     private EntityLivingBase target;
     private Vec3 lastTargetPos;

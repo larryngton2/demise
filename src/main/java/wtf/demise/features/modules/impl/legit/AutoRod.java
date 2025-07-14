@@ -1,33 +1,23 @@
 package wtf.demise.features.modules.impl.legit;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.Range;
-import wtf.demise.Demise;
 import wtf.demise.events.annotations.EventTarget;
 import wtf.demise.events.impl.player.AngleEvent;
 import wtf.demise.events.impl.player.UpdateEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.modules.impl.combat.AntiBot;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
-
-import java.util.Arrays;
 
 @ModuleInfo(name = "AutoRod", description = "Automatically rods. Just read man.")
 public class AutoRod extends Module {

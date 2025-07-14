@@ -3,7 +3,6 @@ package wtf.demise.utils.player.clicking;
 import lombok.Getter;
 import net.minecraft.entity.EntityLivingBase;
 import wtf.demise.features.modules.Module;
-import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;

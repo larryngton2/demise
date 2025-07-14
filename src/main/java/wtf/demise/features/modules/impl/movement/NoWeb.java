@@ -16,6 +16,10 @@ public class NoWeb extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Vanilla", "Legit flat"}, "Vanilla", this);
     private final BoolValue safeJump = new BoolValue("Safe jump", true, this, () -> mode.is("Vanilla"));
 
+    public NoWeb() {
+        safeJump.setDescription("Modifies jump values to not get flagged.");
+    }
+
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());

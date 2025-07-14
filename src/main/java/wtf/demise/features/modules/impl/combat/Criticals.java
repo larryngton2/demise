@@ -23,7 +23,13 @@ public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Jump", "NoGround", "Visual", "NCP", "Timer"}, "Jump", this);
     private final BoolValue staticOffset = new BoolValue("Static offset", false, this, () -> mode.is("NCP"));
     private final BoolValue stopXZOnHit = new BoolValue("Stop XZ on hit", true, this, () -> mode.is("NCP"));
-    private final SliderValue tickDelay = new SliderValue("Tick delay", 9, 1, 20, 1, this);
+    private final SliderValue tickDelay = new SliderValue("Tick delay", 9, 0, 20, 1, this);
+
+    public Criticals() {
+        staticOffset.setDescription("Use a fixed motion value instead of an array of values to tp.");
+        stopXZOnHit.setDescription("Stop x and z motion on attack.");
+        tickDelay.setDescription("Ticks before dealing a critical hit again.");
+    }
 
     private boolean attacked;
     private final TimerUtils timer = new TimerUtils();

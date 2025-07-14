@@ -11,7 +11,6 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 
 @ModuleInfo(name = "FastPlace", description = "Allows you to place blocks faster.")
@@ -20,6 +19,10 @@ public class FastPlace extends Module {
     private final BoolValue ignoreTickCycle = new BoolValue("Ignore tick cycle", false, this);
     private final SliderValue frameDelay = new SliderValue("Frame delay", 0, 0, 50, 1, this, ignoreTickCycle::get);
     private final BoolValue swing = new BoolValue("Swing", true, this, ignoreTickCycle::get);
+
+    public FastPlace() {
+        ignoreTickCycle.setDescription("Instead of placing blocks on ticks, places on frames instead.");
+    }
 
     private final TimerUtils timer = new TimerUtils();
 

@@ -37,34 +37,6 @@ public class RotationUtils implements InstanceAccess {
         return (float) hypot(abs(getAngleDifference(a[0], b[0])), abs(a[1] - b[1]));
     }
 
-    public static MovingObjectPosition rayTraceSafe(float[] rot, double reach, float partialTicks) {
-        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
-        Vec3 direction = mc.thePlayer.getLookCustom(rot[0], rot[1]);
-        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
-
-        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
-
-        if (result == null) {
-            return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
-        }
-
-        return result;
-    }
-
-    public static MovingObjectPosition rayTraceSafe(double reach, float partialTicks) {
-        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
-        Vec3 direction = mc.thePlayer.getLookCustom(currentRotation[0], currentRotation[1]);
-        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
-
-        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
-
-        if (result == null) {
-            return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
-        }
-
-        return result;
-    }
-
     public static float[] getRotations(BlockPos blockPos, EnumFacing enumFacing) {
         return getRotations(blockPos, enumFacing, 0.25, 0.25);
     }

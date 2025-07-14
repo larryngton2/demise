@@ -11,7 +11,6 @@ import wtf.demise.utils.math.MathUtils;
 
 @ModuleInfo(name = "SafeWalk", description = "Prevents you from falling from blocks.")
 public class SafeWalk extends Module {
-
     private final BoolValue heldBlocks = new BoolValue("Held Blocks Check", true, this);
     private final BoolValue pitchCheck = new BoolValue("Pitch Check", true, this);
     private final SliderValue minPitch = new SliderValue("Min Pitch", 55, 50, 90, 1, this, pitchCheck::get);

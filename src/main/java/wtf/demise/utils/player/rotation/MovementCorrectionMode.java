@@ -1,4 +1,4 @@
-package wtf.demise.utils.player.rotation.enums;
+package wtf.demise.utils.player.rotation;
 
 public enum MovementCorrectionMode {
     Silent,

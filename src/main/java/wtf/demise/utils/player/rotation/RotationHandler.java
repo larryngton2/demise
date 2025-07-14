@@ -11,11 +11,8 @@ import wtf.demise.events.impl.packet.PacketEvent;
 import wtf.demise.events.impl.player.*;
 import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.utils.InstanceAccess;
-import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.MoveUtil;
-import wtf.demise.utils.player.rotation.enums.MovementCorrectionMode;
-import wtf.demise.utils.player.rotation.enums.SmoothMode;
 
 import static java.lang.Math.*;
 import static wtf.demise.utils.player.rotation.RotationUtils.getAngleDifference;
@@ -29,7 +26,6 @@ public class RotationHandler implements InstanceAccess {
     private static boolean silent;
     private static float hSpeed;
     private static float vSpeed;
-    private static SmoothMode smoothMode;
     public static MovementCorrectionMode correction;
     public static float rotDiffBuildUp;
     public static boolean reset;
@@ -48,7 +44,6 @@ public class RotationHandler implements InstanceAccess {
 
     public RotationHandler() {
         enabled = true;
-        smoothMode = SmoothMode.Linear;
         correction = MovementCorrectionMode.Silent;
         hSpeed = 180;
         vSpeed = 180;
@@ -66,7 +61,6 @@ public class RotationHandler implements InstanceAccess {
         RotationHandler.silent = true;
         RotationHandler.hSpeed = hSpeed;
         RotationHandler.vSpeed = vSpeed;
-        RotationHandler.smoothMode = SmoothMode.Linear;
         RotationHandler.correction = correction ? MovementCorrectionMode.Silent : MovementCorrectionMode.None;
         RotationHandler.accel = false;
         RotationHandler.accelFactorYaw = 0;
@@ -75,7 +69,7 @@ public class RotationHandler implements InstanceAccess {
         enabled = true;
     }
 
-    public static void setRotation(float[] rotation, MovementCorrectionMode correction, float[] speed, boolean accel, float[] accelFactor, SmoothMode smoothMode, boolean silent, float smoothingFactor) {
+    public static void setRotation(float[] rotation, MovementCorrectionMode correction, float[] speed, boolean accel, float[] accelFactor, boolean silent, float smoothingFactor) {
         if (tickTimer.hasTimeElapsed(50)) {
             lastDelta = getRotationDifference(currentRotation, previousRotation);
 
@@ -86,7 +80,6 @@ public class RotationHandler implements InstanceAccess {
         RotationHandler.silent = silent;
         RotationHandler.hSpeed = speed[0];
         RotationHandler.vSpeed = speed[1];
-        RotationHandler.smoothMode = smoothMode;
         RotationHandler.correction = correction;
         RotationHandler.accel = accel;
         RotationHandler.accelFactorYaw = accelFactor[0];
@@ -162,6 +155,8 @@ public class RotationHandler implements InstanceAccess {
             currentRotation = mc.thePlayer.getRotation();
         }
 
+        // normalise rotation deltas to 60 fps
+        // in other words, makes the rotation speed be equivalent to having 60 fps
         if (e.getState() == MouseMoveEvent.State.PRE) {
             if (lastFrameTime == 0L) {
                 lastFrameTime = System.nanoTime();
@@ -171,8 +166,9 @@ public class RotationHandler implements InstanceAccess {
             float deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
             lastFrameTime = currentTime;
 
-            deltaTime = Math.min(deltaTime, 1.0f / 120);
-            timeScale = deltaTime * 120;
+            // 45 is the min fps you can get without the rotation breaking
+            deltaTime = Math.min(deltaTime, 1.0f / 45);
+            timeScale = deltaTime * 60;
             return;
         }
 
@@ -238,36 +234,16 @@ public class RotationHandler implements InstanceAccess {
         float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
 
-        int[] finalTargetRotation = new int[]{
+        int[] delta = new int[]{
                 (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
                 (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
         };
-
-        int[] delta;
-
-        if (smoothMode.equals(SmoothMode.Relative)) {
-            float factorH = (float) max(min(rotationDifference / 180 * hSpeed, 180), MathUtils.randomizeFloat(4, 6));
-            float factorV = (float) max(min(rotationDifference / 180 * vSpeed, 180), MathUtils.randomizeFloat(4, 6));
-
-            float[] factor = new float[]{factorH, factorV};
-
-            straightLineYaw = straightLineYaw / hSpeed * factor[0];
-            straightLinePitch = straightLinePitch / vSpeed * factor[1];
-
-            delta = new int[]{
-                    (int) (max(-straightLineYaw, min(straightLineYaw, yawDifference)) / f1),
-                    (int) -(max(-straightLinePitch, min(straightLinePitch, pitchDifference)) / f1)
-            };
-        } else {
-            delta = finalTargetRotation;
-        }
 
         if (accel) {
             float[] factors = new float[]{accelFactorYaw, accelFactorPitch};
 
             // nothing else worked ok
             // 16.67 is roughly the frame delay of 60 fps
-            // if you don't get > 60 fps, please don't consider using this client
             if (tickTimer1.hasTimeElapsed((long) 16.67)) {
                 interpolatedAccelDeltaYaw = (int) (delta[0] * (1 - factors[0]) + previousDeltaYaw * factors[0]);
                 interpolatedAccelDeltaPitch = (int) (delta[1] * (1 - factors[1]) + previousDeltaPitch * factors[1]);

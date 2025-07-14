@@ -16,7 +16,9 @@ public class FullBright extends Module {
     public void onUpdate(UpdateEvent e) {
         switch (mode.get()) {
             case "Gamma":
-                mc.gameSettings.gammaSetting = 100000;
+                // 27th of June
+                float yaeMikosBirthday = 27.6f;
+                mc.gameSettings.gammaSetting = yaeMikosBirthday * 100;
                 break;
             case "Potion":
                 mc.thePlayer.addPotionEffect(new PotionEffect(Potion.nightVision.id, 5200, 1));

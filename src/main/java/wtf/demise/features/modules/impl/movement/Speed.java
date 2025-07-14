@@ -57,6 +57,11 @@ public class Speed extends Module {
     private final SliderValue minMoveTicks = new SliderValue("Move ticks for limit", 15, 0, 40, 1, this, minSpeedLimiter::get);
     private final BoolValue printAirTicks = new BoolValue("Print airTicks", false, this);
 
+    public Speed() {
+        abideFriction.setDescription("True: move at a constant speed defined by the speed option, False: follow vanilla speed.");
+        yawOffsetMode.setDescription("Ground: when on ground, aims at the dir you are moving at to strafe more, Air: automatically does 45deg strafes to gain more speed, Constant: always aims at the dir you are moving at.");
+    }
+
     private int movingTicks, ticks;
 
     @Override

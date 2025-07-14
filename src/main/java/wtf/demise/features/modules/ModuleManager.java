@@ -24,13 +24,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModuleManager {
     private static final Set<Class<? extends Module>> COMBAT_MODULES = Set.of(
             AntiBot.class, Criticals.class, FakeLag.class, KeepSprint.class, KillAura.class, TickBase.class,
-            TimerRange.class, Velocity.class, LagRange.class, TPAura.class
+            TimerRange.class, Velocity.class, LagRange.class
     );
 
     private static final Set<Class<? extends Module>> LEGIT_MODULES = Set.of(
-            AimAssist.class, AutoClicker.class, AutoHeal.class, AutoRod.class, AutoWeapon.class, BackTrack.class,
-            CombatHelper.class, HitBox.class, HitSelect.class, JumpReset.class, LegitScaffold.class, NoHitDelay.class,
-            Reach.class, SprintReset.class
+            AutoClicker.class, AutoHeal.class, AutoRod.class, AutoWeapon.class, BackTrack.class, CombatHelper.class,
+            HitBox.class, HitSelect.class, JumpReset.class, LegitScaffold.class, NoHitDelay.class, Reach.class,
+            SprintReset.class
     );
 
     private static final Set<Class<? extends Module>> MOVEMENT_MODULES = Set.of(
@@ -47,7 +47,8 @@ public class ModuleManager {
     private static final Set<Class<? extends Module>> MISC_MODULES = Set.of(
             AnnoyUtils.class, AutoQueue.class, AutoRegister.class, ExplosionBlock.class, FlagDetector.class,
             InventorySync.class, MurderMystery.class, Test.class, BloxdPhysics.class, CheatDetector.class,
-            Translator.class, Spammer.class, InputFix.class, RealLag.class, KillInsults.class, Targets.class
+            Translator.class, Spammer.class, InputFix.class, RealLag.class, KillInsults.class, Targets.class,
+            Parkour.class
     );
 
     private static final Set<Class<? extends Module>> EXPLOIT_MODULES = Set.of(

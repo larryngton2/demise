@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.opengl.GL11;
 import org.lwjglx.input.Keyboard;
+import wtf.demise.Demise;
 import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.values.Value;
 import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.click.Component;
@@ -15,6 +17,7 @@ import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.animations.Direction;
 import wtf.demise.utils.animations.impl.EaseInOutQuad;
 import wtf.demise.utils.math.MathUtils;
+import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.misc.StringUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.MouseUtils;
@@ -22,6 +25,7 @@ import wtf.demise.utils.render.RenderUtils;
 import wtf.demise.utils.render.RoundedUtils;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
@@ -38,6 +42,10 @@ public class ModuleComponent implements IComponent {
     private final CopyOnWriteArrayList<Component> settings = new CopyOnWriteArrayList<>();
     private final EaseInOutQuad openAnimation = new EaseInOutQuad(250, 1);
     private float slideProgress = 0f;
+    private Component cachedComponent;
+    private int alpha;
+    private float interpolatedY;
+    private final TimerUtils alphaTimer = new TimerUtils();
 
     public ModuleComponent(Module module) {
         openAnimation.setDirection(Direction.BACKWARDS);
@@ -71,7 +79,9 @@ public class ModuleComponent implements IComponent {
 
     public void render(boolean shader) {
         float width = 375;
-        slideProgress = MathUtils.interpolate(slideProgress, visibleSetting ? 1 : 0, 0.1f);
+        if (!shader) {
+            slideProgress = MathUtils.interpolate(slideProgress, visibleSetting ? 1 : 0, 0.2f);
+        }
         float slideOffset = (width / 4) * (1.0f - slideProgress);
 
         if (!shader) {
@@ -95,6 +105,7 @@ public class ModuleComponent implements IComponent {
 
             String keyName = module.getKeyBind() == 0 ? "None" : StringUtils.upperSnakeCaseToPascal(Keyboard.getKeyName(module.getKeyBind()));
             Fonts.interRegular.get(14).drawString(keyName, x + width - 8 - Fonts.interRegular.get(14).getStringWidth(keyName) + slideOffset, y + 10, new Color(150, 150, 150, 150).getRGB());
+
         } else {
             RoundedUtils.drawShaderRound(x + slideOffset, y, width, height, 8, Color.black);
         }
@@ -113,6 +124,8 @@ public class ModuleComponent implements IComponent {
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         float slideOffset = (width / 4) * (1.0f - slideProgress);
 
+        Component hoveredComponent = null;
+
         for (Component component : settings) {
             if (!component.isVisible()) continue;
 
@@ -126,6 +139,10 @@ public class ModuleComponent implements IComponent {
                 if (component.isChild()) {
                     RenderUtils.drawRect(x + 3.5f + slideOffset, component.getY() - 2.8f, 1, component.getHeight(), Color.gray.getRGB());
                 }
+
+                if (component.isHovered(mouseX, mouseY)) {
+                    hoveredComponent = component;
+                }
             }
 
             yOffset += (float) (component.getHeight() * openAnimation.getOutput());
@@ -133,6 +150,62 @@ public class ModuleComponent implements IComponent {
         }
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+        if (hoveredComponent != null && hoveredComponent.isVisible() && mouseY <= PanelGui.posY + 12 + Fonts.urbanist.get(35).getHeight() + 255 && mouseY >= PanelGui.posY + 12 + Fonts.urbanist.get(35).getHeight() && !hoveredComponent.getDescription().isEmpty()) {
+            cachedComponent = hoveredComponent;
+
+            if (alphaTimer.hasTimeElapsed(10)) {
+                alpha = Math.min(alpha + 10, 255);
+                alphaTimer.reset();
+            }
+
+            interpolatedY = MathUtils.interpolate(interpolatedY, mouseY + 3 - (Fonts.interRegular.get(15).getHeight() + 5) / 2f, 0.15f);
+        } else {
+            if (alphaTimer.hasTimeElapsed(10)) {
+                alpha = Math.max(alpha - 10, 0);
+                alphaTimer.reset();
+            }
+
+            if (alpha == 0) {
+                cachedComponent = null;
+            }
+        }
+
+        if (alpha > 0 && cachedComponent != null) {
+            String str = cachedComponent.getDescription();
+            float x = this.x + width + 15;
+            float floatA = (float) alpha;
+            int maxWidth = Math.min(Fonts.interRegular.get(15).getStringWidth(str), 200);
+
+            Color i = new Color(Demise.INSTANCE.getModuleManager().getModule(Interface.class).bgColor(), true);
+            Color finalColor = new Color(i.getRed(), i.getGreen(), i.getBlue(), (int) ((floatA / 255) * i.getAlpha()));
+
+            ArrayList<String> lines = new ArrayList<>();
+
+            StringBuilder currentLine = new StringBuilder();
+            for (String word : str.split(" ")) {
+                String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+                if (Fonts.interRegular.get(15).getStringWidth(testLine) <= maxWidth) {
+                    currentLine.setLength(0);
+                    currentLine.append(testLine);
+                } else {
+                    lines.add(currentLine.toString());
+                    currentLine.setLength(0);
+                    currentLine.append(word);
+                }
+            }
+            if (!currentLine.isEmpty()) {
+                lines.add(currentLine.toString());
+            }
+
+            float lineHeight = Fonts.interRegular.get(15).getHeight() + 2;
+            float totalHeight = lines.size() * lineHeight + 5;
+            RoundedUtils.drawRound(x, interpolatedY - 2.5f, maxWidth + 6, totalHeight - 2.5f, 5, finalColor);
+
+            for (int j = 0; j < lines.size(); j++) {
+                Fonts.interRegular.get(15).drawString(lines.get(j), x + 3, interpolatedY + 2.5f + j * lineHeight, new Color(255, 255, 255, alpha).getRGB());
+            }
+        }
     }
 
     @Override

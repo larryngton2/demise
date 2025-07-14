@@ -12,6 +12,10 @@ public class FastBreak extends Module {
     private final BoolValue legit = new BoolValue("Legit", true, this);
     private final SliderValue speed = new SliderValue("Speed", 0.5f, 0, 0.9f, 0.1f, this, () -> !legit.get());
 
+    public FastBreak() {
+        legit.setDescription("Removes the delay between block breaks.");
+    }
+
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         this.setTag(legit.get() ? "Legit" : "+" + speed.get());

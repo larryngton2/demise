@@ -7,7 +7,7 @@ import wtf.demise.features.values.impl.MultiBoolValue;
 
 import java.util.Arrays;
 
-@ModuleInfo(name = "Targets", description = "what")
+@ModuleInfo(name = "Targets")
 public class Targets extends Module {
     public final MultiBoolValue allowedTargets = new MultiBoolValue("Allowed targets", Arrays.asList(
             new BoolValue("Players", true),

@@ -18,6 +18,11 @@ public class AutoMeow extends wtf.demise.features.modules.Module {
     private final SliderValue minLength = new SliderValue("Min length", 5, 1, 50, 1, this);
     private final SliderValue maxLength = new SliderValue("Max length", 10, 1, 50, 1, this);
 
+    public AutoMeow() {
+        minLength.setDescription("Min meow length.");
+        maxLength.setDescription("Max meow length.");
+    }
+
     private final List<String> baseMessages = Arrays.asList(
             "nya",
             "nya~",

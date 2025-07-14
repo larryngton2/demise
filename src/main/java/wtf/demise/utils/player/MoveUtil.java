@@ -233,7 +233,7 @@ public class MoveUtil implements InstanceAccess {
 
         if (forward == 0 && strafe == 0) return;
 
-        double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(direction(playerYaw, forward, strafe)));
+        double angle = MathHelper.wrapAngleTo180_double(Math.toDegrees(getDirection()));
 
         float closestForward = 0, closestStrafe = 0;
         float closestDifference = Float.MAX_VALUE;

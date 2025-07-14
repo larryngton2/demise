@@ -25,6 +25,10 @@ public class SprintReset extends Module {
     private final BoolValue diffCheck = new BoolValue("Angle diff check", false, this);
     private final BoolValue notWhileHurt = new BoolValue("Not while hurt", false, this);
 
+    public SprintReset() {
+        fallbackMode.setDescription("Mode to use when you arent holding a sword.");
+    }
+
     private final TimerUtils timer = new TimerUtils();
     private boolean isBlocking;
     private EntityLivingBase target;

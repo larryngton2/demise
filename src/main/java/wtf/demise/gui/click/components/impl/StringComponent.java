@@ -28,6 +28,8 @@ public class StringComponent extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
+        setDescription(setting.getDescription());
+
         input.setDirection(inputting ? Direction.FORWARDS : Direction.BACKWARDS);
         text = setting.get();
         if (setting.isOnlyNumber() && !NumberUtils.isNumber(text)) {

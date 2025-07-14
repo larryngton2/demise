@@ -37,7 +37,9 @@ import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @ModuleInfo(name = "Scaffold", description = "Automatically places blocks bellow you.")
@@ -60,9 +62,10 @@ public class Scaffold extends Module {
     private final RotationManager rotationManager = new RotationManager(this);
     public final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Silent", "Ground", "Air", "None"}, "Normal", this);
     private final ModeValue speedMode = new ModeValue("Speed mode", new String[]{"Tick", "Exempt", "Diagonal", "None"}, "None", this);
+    private final ModeValue rayTraceMode = new ModeValue("Raytrace mode", new String[]{"None", "Normal", "Strict"}, "None", this);
+    private final SliderValue maxPlaceRange = new SliderValue("Max place range", 5, 1, 12, 1, this, () -> rayTraceMode.is("None"));
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
             new BoolValue("Swing", true),
-            new BoolValue("RayTrace", true),
             new BoolValue("KeepY", false),
             new BoolValue("Speed keepY", false),
             new BoolValue("Jump", false),
@@ -72,7 +75,6 @@ public class Scaffold extends Module {
             new BoolValue("Sneak", false),
             new BoolValue("Target block ESP", false)
     ), this);
-    private final BoolValue strictRayTrace = new BoolValue("Strict rayTrace", false, this, () -> addons.isEnabled("RayTrace"));
     private final SliderValue blockToJump = new SliderValue("Blocks to jump", 6, 0, 15, this, () -> addons.isEnabled("Jump"));
     private final BoolValue onlyStraight = new BoolValue("Only straight", true, this, () -> addons.isEnabled("Jump"));
     private final SliderValue blocksToSneak = new SliderValue("Blocks to sneak", 7, 0, 15, this, () -> addons.isEnabled("Sneak"));
@@ -80,6 +82,11 @@ public class Scaffold extends Module {
     private final ModeValue tower = new ModeValue("Tower", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> mode.is("Normal"));
     private final ModeValue towerMove = new ModeValue("Tower move", new String[]{"Jump", "Vanilla", "PullDown", "NCP"}, "Jump", this, () -> mode.is("Normal"));
     private final SliderValue pullDownMotion = new SliderValue("PullDown motion", 0.95f, 0.5f, 1, 0.01f, this, () -> towerMove.is("PullDown") && towerMove.canDisplay());
+
+    public Scaffold() {
+        staticify.setDescription("Makes your pitch static when enabled.");
+        rayTraceMode.setDescription("None: places blocks bellow you without any checks, Normal: checks if you are aiming at the target block before placing, Strict: checks if you are aiming at the target block and at the correct face before placing");
+    }
 
     private BlockPos previousBlock;
     public BlockPos targetBlock;
@@ -238,7 +245,7 @@ public class Scaffold extends Module {
         if (clutch.get() && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.getPositionVector().subtract(0, 2, 0))).getBlock() instanceof BlockAir) {
             switch (clutchCriteria.get()) {
                 case "MouseOver":
-                    MovingObjectPosition ray = RotationUtils.rayTraceSafe(rotation, 4.5, 1);
+                    MovingObjectPosition ray = PlayerUtils.rayTraceBlock(rotation, 4.5, 1);
 
                     if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving() || (ray.getBlockPos() != null && ray.getBlockPos().distanceSq(data.blockPos) > 1)) {
                         setClutchRot(rotateCheck);
@@ -362,48 +369,41 @@ public class Scaffold extends Module {
 
     @EventTarget
     public void onMovementInput(MoveInputEvent e) {
-        switch (mode.get()) {
-            case "Breezily":
-                boolean isLeaningOffBlock = PlayerUtils.getBlock(data.blockPos.offset(data.facing)) instanceof BlockAir;
-                BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ);
-                if (isLeaningOffBlock && MoveUtil.isMoving() && MoveUtil.isMovingStraight()) {
-                    switch (mc.thePlayer.getHorizontalFacing()) {
-                        case EAST -> {
-                            if (b.getZ() + 0.5 > mc.thePlayer.posZ) {
-                                e.setStrafe(1);
-                            } else {
-                                e.setStrafe(-1);
-                            }
+        if (mode.is("Breezily")) {
+            boolean isLeaningOffBlock = PlayerUtils.getBlock(data.blockPos.offset(data.facing)) instanceof BlockAir;
+            BlockPos b = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1, mc.thePlayer.posZ);
+            if (isLeaningOffBlock && MoveUtil.isMoving() && MoveUtil.isMovingStraight()) {
+                switch (mc.thePlayer.getHorizontalFacing(initialYaw).getOpposite()) {
+                    case EAST -> {
+                        if (b.getZ() + 0.5 > mc.thePlayer.posZ) {
+                            e.setStrafe(1);
+                        } else {
+                            e.setStrafe(-1);
                         }
-                        case WEST -> {
-                            if (b.getZ() + 0.5 < mc.thePlayer.posZ) {
-                                e.setStrafe(1);
-                            } else {
-                                e.setStrafe(-1);
-                            }
+                    }
+                    case WEST -> {
+                        if (b.getZ() + 0.5 < mc.thePlayer.posZ) {
+                            e.setStrafe(1);
+                        } else {
+                            e.setStrafe(-1);
                         }
-                        case SOUTH -> {
-                            if (b.getX() + 0.5 < mc.thePlayer.posX) {
-                                e.setStrafe(1);
-                            } else {
-                                e.setStrafe(-1);
-                            }
+                    }
+                    case SOUTH -> {
+                        if (b.getX() + 0.5 < mc.thePlayer.posX) {
+                            e.setStrafe(1);
+                        } else {
+                            e.setStrafe(-1);
                         }
-                        case NORTH -> {
-                            if (b.getX() + 0.5 > mc.thePlayer.posX) {
-                                e.setStrafe(1);
-                            } else {
-                                e.setStrafe(-1);
-                            }
+                    }
+                    case NORTH -> {
+                        if (b.getX() + 0.5 > mc.thePlayer.posX) {
+                            e.setStrafe(1);
+                        } else {
+                            e.setStrafe(-1);
                         }
                     }
                 }
-                break;
-            case "Telly":
-                if (mc.thePlayer.onGround && !towering() && !towerMoving() && (!isEnabled(Speed.class)) && mc.thePlayer.isSprinting() && MoveUtil.isMoving()) {
-                    e.setJumping(true);
-                }
-                break;
+            }
         }
 
         if (addons.isEnabled("Jump")) {
@@ -440,6 +440,13 @@ public class Scaffold extends Module {
             if (blocksPlacedSneak == blocksToSneak.get()) {
                 e.setSneaking(true);
             }
+        }
+    }
+
+    @EventTarget
+    public void onStrafe(StrafeEvent e) {
+        if (mode.is("Telly") && mc.thePlayer.onGround && !towering() && !towerMoving() && (!isEnabled(Speed.class)) && mc.thePlayer.isSprinting() && MoveUtil.isMoving()) {
+            mc.thePlayer.jump();
         }
     }
 
@@ -599,8 +606,32 @@ public class Scaffold extends Module {
     }
 
     private void place(BlockPos pos, EnumFacing facing, Vec3 hitVec) {
-        if (!addons.isEnabled("RayTrace")) {
-            if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), pos, facing, hitVec)) {
+        MovingObjectPosition ray = PlayerUtils.rayTraceBlock(4.5, 1);
+        BlockPos targetPos = pos;
+        Vec3 targetHitVec = hitVec;
+        boolean shouldPlace = false;
+
+        switch (rayTraceMode.get()) {
+            case "None":
+                shouldPlace = true;
+                break;
+            case "Normal":
+                if (ray.getBlockPos().equalsBlockPos(pos)) {
+                    targetPos = ray.getBlockPos();
+                    shouldPlace = true;
+                }
+                break;
+            case "Strict":
+                if (ray.getBlockPos().equalsBlockPos(pos) && ray.sideHit.equals(facing)) {
+                    targetPos = ray.getBlockPos();
+                    targetHitVec = ray.hitVec;
+                    shouldPlace = true;
+                }
+                break;
+        }
+
+        if (shouldPlace) {
+            if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), targetPos, facing, targetHitVec)) {
                 if (addons.isEnabled("Swing")) {
                     mc.thePlayer.swingItem();
                     mc.getItemRenderer().resetEquippedProgress();
@@ -610,23 +641,11 @@ public class Scaffold extends Module {
                 blocksPlacedSneak++;
                 blocksPlacedJump++;
             }
+        }
+
+        if (rayTraceMode.get().equals("None")) {
             previousBlock = data.blockPos.offset(data.facing);
         } else {
-            MovingObjectPosition ray = RotationUtils.rayTraceSafe(4.5, 1);
-
-            if (ray.getBlockPos().equalsBlockPos(pos) && (!strictRayTrace.get() || ray.sideHit.equals(facing))) {
-                if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem(), ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
-                    if (addons.isEnabled("Swing")) {
-                        mc.thePlayer.swingItem();
-                        mc.getItemRenderer().resetEquippedProgress();
-                    } else {
-                        mc.getNetHandler().addToSendQueue(new C0APacketAnimation());
-                    }
-                    blocksPlacedSneak++;
-                    blocksPlacedJump++;
-                }
-            }
-
             previousBlock = ray.getBlockPos().offset(ray.sideHit);
         }
     }
@@ -637,7 +656,7 @@ public class Scaffold extends Module {
             return immediateCheck;
         }
 
-        for (int depth = 1; depth <= 6; depth++) {
+        for (int depth = 1; depth <= (rayTraceMode.is("None") ? maxPlaceRange.get() : 6); depth++) {
             List<BlockPos> positions = generateOffsets(pos, depth);
             if (positions.isEmpty()) continue;
 
@@ -719,7 +738,7 @@ public class Scaffold extends Module {
                     Vec3 worldPos = localPos.add(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
 
                     double diff = RotationUtils.getRotationDifference(worldPos);
-                    MovingObjectPosition ray = RotationUtils.rayTraceSafe(bestRot, 4.5, 1);
+                    MovingObjectPosition ray = PlayerUtils.rayTraceBlock(bestRot, 4.5, 1);
 
                     if (diff < bestDist && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && ray.getBlockPos().equalsBlockPos(blockPos) && ray.sideHit.equals(face)) {
                         bestDist = diff;

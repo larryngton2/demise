@@ -15,6 +15,10 @@ import wtf.demise.features.values.impl.BoolValue;
 public class InvMove extends Module {
     private final BoolValue safe = new BoolValue("Safe", false, this);
 
+    public InvMove() {
+        safe.setDescription("Only move in guis where the server doesn't see whether you are inside or not.");
+    }
+
     private final KeyBinding[] keyBindings = new KeyBinding[]{
             mc.gameSettings.keyBindForward,
             mc.gameSettings.keyBindRight,

@@ -45,6 +45,11 @@ public class LagRange extends Module {
     private final ModeValue renderMode = new ModeValue("Render mode", new String[]{"Box", "FakePlayer"}, "FakePlayer", this, realPos::get);
     private final BoolValue onlyKillAura = new BoolValue("Only on killAura", false, this);
 
+    public LagRange() {
+        delay.setDescription("Delay between lagging again.");
+        stopRange.setDescription("Range to not lag at all.");
+    }
+
     private PlayerUtils.PredictProcess selfPrediction;
     private final TimerUtils msTimer = new TimerUtils();
     private final TimerUtils timer = new TimerUtils();
@@ -122,10 +127,8 @@ public class LagRange extends Module {
     }
 
     private boolean shouldStart() {
-        AxisAlignedBB entityBoundingBox = target.getHitbox();
-
-        double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(PlayerUtils.getPosFromAABB(entityBoundingBox).add(0, target.getEyeHeight(), 0), mc.thePlayer);
-        double predictedSelfDistance = PlayerUtils.getDistToTargetFromMouseOver(selfPrediction.position.add(0, mc.thePlayer.getEyeHeight(), 0), mc.thePlayer.getLook(1), target, entityBoundingBox);
+        double predictedTargetDistance = PlayerUtils.getCustomDistanceToEntityBox(PlayerUtils.getPosFromAABB(target.getHitbox()).add(0, target.getEyeHeight(), 0), mc.thePlayer);
+        double predictedSelfDistance = PlayerUtils.getCustomDistanceToEntityBox(selfPrediction.position.add(0, mc.thePlayer.getEyeHeight(), 0), target);
 
         return predictedSelfDistance < predictedTargetDistance &&
                 predictedSelfDistance <= tickRange.get() &&

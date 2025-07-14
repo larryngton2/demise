@@ -1,7 +1,6 @@
 package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.Vec3;
@@ -49,6 +48,16 @@ public class TickBase extends Module {
     private final BoolValue renderPredictedSelfPos = new BoolValue("Render predicted self pos", false, this);
     private final BoolValue useBacktrackPos = new BoolValue("Use backtrack pos", false, this);
 
+    public TickBase() {
+        mode.setDescription("Future: tp and then gain balance, Past: gain balance and then tp.");
+        pauseRenderer.setDescription("Skips updating the game renderer when gaining balance, purely visual.");
+        delay.setDescription("Delay between teleports.");
+        tickRange.setDescription("Max range to tp into.");
+        minRange.setDescription("Min range to tp into.");
+        allowEarlyBreak.setDescription("Skip further checking when finding a possible tick to tp into.");
+        prioritiseCrits.setDescription("Skip further checking when finding a possible tick to tp into where you will deal a critical hit.");
+    }
+
     private final TimerUtils timer = new TimerUtils();
     private int skippedTick = 0;
     private long shifted, previousTime;
@@ -75,6 +84,8 @@ public class TickBase extends Module {
     public void onTimerManipulation(TimerManipulationEvent e) {
         if (mode.is("Past")) {
             if (target == null || selfPrediction.isEmpty() || shouldStop()) {
+                previousTime = e.getTime();
+                e.setTime(e.getTime() - shifted);
                 return;
             }
 

@@ -19,6 +19,10 @@ public class Stealer extends Module {
     private final SliderValue maxDelay = new SliderValue("Max Delay", 1, 0, 10, 1, this);
     public final BoolValue menuCheck = new BoolValue("Menu Check", true, this);
 
+    public Stealer() {
+        menuCheck.setDescription("Checks for if you are in a valid container before stealing items.");
+    }
+
     private final TimerUtils stealTimer = new TimerUtils();
     private final TimerUtils startDelayTimer = new TimerUtils();
     private final TimerUtils closeDelayTimer = new TimerUtils();

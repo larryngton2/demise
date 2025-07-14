@@ -32,10 +32,10 @@ public class KillInsults extends Module {
                 if (mc.thePlayer.ticksExisted > 20) {
                     switch (mode.get()) {
                         case "Rise 5":
-                            mc.thePlayer.sendChatMessage(insults[MathUtils.nextInt(0, insults.length)].replaceAll(":user:", target.getName()));
+                            mc.thePlayer.sendChatMessage(insults[MathUtils.randomizeInt(0, insults.length)].replaceAll(":user:", target.getName()));
                             break;
                         case "Sigma":
-                            mc.thePlayer.sendChatMessage(sigma[MathUtils.nextInt(0, sigma.length)].replaceAll(":user:", target.getName()));
+                            mc.thePlayer.sendChatMessage(sigma[MathUtils.randomizeInt(0, sigma.length)].replaceAll(":user:", target.getName()));
                             break;
                     }
                 }

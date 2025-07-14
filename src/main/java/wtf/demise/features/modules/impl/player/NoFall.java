@@ -27,7 +27,7 @@ import wtf.demise.utils.player.rotation.RotationUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleInfo(name = "NoFall", description = "Mitigates fall damage.")
+@ModuleInfo(name = "NoFall", description = "Mitigates or removes fall damage.")
 public class NoFall extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Packet", "On ground", "Off ground", "Clutch"}, "Packet", this);
     private final SliderValue fallDistance = new SliderValue("Fall distance", 3, 0, 10, 1, this, () -> !mode.is("Off ground"));

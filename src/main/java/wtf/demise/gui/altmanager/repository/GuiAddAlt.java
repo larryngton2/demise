@@ -150,7 +150,9 @@ public final class GuiAddAlt extends GuiScreen {
 
                 CompletableFuture<MicrosoftAltCredential> future = callback.start((s, o) -> groupAltInfo.updateStatus(String.format(s, o[0])));
 
-                Sys.openURL(MicrosoftAuthCallback.url);
+                if (!Sys.openURL(MicrosoftAuthCallback.url)) {
+                    System.out.println("Failed to open the login page. URL: " + MicrosoftAuthCallback.url);
+                }
 
                 future.whenCompleteAsync((o, t) -> {
                     if (t != null) {

@@ -1,8 +1,6 @@
 package wtf.demise.utils.render;
 
 import lombok.experimental.UtilityClass;
-import net.minecraft.entity.EntityLivingBase;
-import wtf.demise.utils.math.MathUtils;
 
 import java.awt.*;
 

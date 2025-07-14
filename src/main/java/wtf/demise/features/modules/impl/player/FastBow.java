@@ -15,7 +15,11 @@ import wtf.demise.utils.packet.PacketUtils;
 @ModuleInfo(name = "FastBow", description = "Makes you shoot bows faster.")
 public class FastBow extends Module {
     private final SliderValue speed = new SliderValue("Speed", 32, 1, 100, 1, this);
-    private final BoolValue trigger = new BoolValue("Trigger (hood bypass)", true, this);
+    private final BoolValue trigger = new BoolValue("Trigger", true, this);
+
+    public FastBow() {
+        trigger.setDescription("Hood bypass.");
+    }
 
     @EventTarget
     public void onUpdate(UpdateEvent e) {

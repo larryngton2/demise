@@ -19,8 +19,9 @@ public class AntiBot extends Module {
     public final MultiBoolValue options = new MultiBoolValue("Options", Arrays.asList(
             new BoolValue("Tab", false),
             new BoolValue("Hypixel", false),
-            new BoolValue("Simple", false))
-            , this);
+            new BoolValue("Simple", false)
+    ), this);
+
     public final ArrayList<EntityPlayer> bots = new ArrayList<>();
     private static final String VALID_USERNAME_REGEX = "^[a-zA-Z0-9_]{1,16}+$";
 
@@ -34,7 +35,7 @@ public class AntiBot extends Module {
     }
 
     @EventTarget
-    public void onWorld(WorldChangeEvent event) {
+    public void onWorld(WorldChangeEvent e) {
         bots.clear();
     }
 
@@ -59,20 +60,22 @@ public class AntiBot extends Module {
 
         if (options.isEnabled("Hypixel")) {
             for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
-                return info.getGameProfile().getId().compareTo(player.getUniqueID()) != 0 || this.nameStartsWith(player, "[NPC] ") || !player.getName().matches(VALID_USERNAME_REGEX);
+                return info.getGameProfile().getId().compareTo(player.getUniqueID()) != 0 || this.nameStartsWithNPC(player) || !player.getName().matches(VALID_USERNAME_REGEX);
             }
         }
 
         if (options.isEnabled("Simple")) {
-            for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
-                return info.getDisplayName().getFormattedText().contains("BOT") || info.getDisplayName().getFormattedText().contains("NPC");
-            }
+            return nameContains(player, "BOT") || nameContains(player, "NPC");
         }
 
         return false;
     }
 
-    private boolean nameStartsWith(EntityPlayer player, String prefix) {
-        return EnumChatFormatting.getTextWithoutFormattingCodes(player.getDisplayName().getUnformattedText()).startsWith(prefix);
+    private boolean nameContains(EntityPlayer player, String str) {
+        return player.getDisplayName().getFormattedText().toLowerCase().contains(str);
+    }
+
+    private boolean nameStartsWithNPC(EntityPlayer player) {
+        return EnumChatFormatting.getTextWithoutFormattingCodes(player.getDisplayName().getUnformattedText()).startsWith("[NPC] ");
     }
 }

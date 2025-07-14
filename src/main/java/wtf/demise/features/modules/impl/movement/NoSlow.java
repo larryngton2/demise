@@ -23,23 +23,23 @@ import wtf.demise.features.values.impl.SliderValue;
 @ModuleInfo(name = "NoSlow", description = "Modifies item-use slowdown.")
 public class NoSlow extends Module {
     private final BoolValue sword = new BoolValue("Sword", false, this);
-    private final ModeValue swordMode = new ModeValue("Sword mode", new String[]{"Vanilla", "Intave", "NCP", "Tick"}, "Vanilla", this, sword::get);
-    private final SliderValue swordSpeed = new SliderValue("Sword speed", 1, 0.2f, 1, 0.01f, this, () -> sword.get() && swordMode.is("Vanilla"));
+    private final ModeValue swordMode = new ModeValue("Sword mode", new String[]{"Vanilla", "Intave", "Intave old", "NCP", "Tick"}, "Vanilla", this, sword::get);
+    private final SliderValue swordSpeed = new SliderValue("Sword speed", 1, 0.2f, 1, 0.01f, this, sword::get);
     private final BoolValue swordSprint = new BoolValue("Sword sprint", true, this, sword::get);
 
     private final BoolValue consumable = new BoolValue("Consumable", false, this);
-    private final ModeValue consumableMode = new ModeValue("Consumable mode", new String[]{"Vanilla", "Intave", "Intave old", "NCP", "Tick"}, "Vanilla", this, consumable::get);
-    private final SliderValue consumableSpeed = new SliderValue("Consumable speed", 1, 0.2f, 1, 0.01f, this, () -> consumable.get() && consumableMode.is("Vanilla"));
+    private final ModeValue consumableMode = new ModeValue("Consumable mode", new String[]{"Vanilla", "Intave", "Intave old", "NCP", "Tick", "Packet"}, "Vanilla", this, consumable::get);
+    private final SliderValue consumableSpeed = new SliderValue("Consumable speed", 1, 0.2f, 1, 0.01f, this, consumable::get);
     private final BoolValue consumableSprint = new BoolValue("Consumable sprint", true, this, consumable::get);
 
     private final BoolValue bow = new BoolValue("Bow", false, this);
     private final ModeValue bowMode = new ModeValue("Bow mode", new String[]{"Vanilla", "Tick"}, "Vanilla", this, bow::get);
-    private final SliderValue bowSpeed = new SliderValue("Bow speed", 1, 0.2f, 1, 0.01f, this, () -> bow.get() && bowMode.is("Vanilla"));
+    private final SliderValue bowSpeed = new SliderValue("Bow speed", 1, 0.2f, 1, 0.01f, this, bow::get);
     private final BoolValue bowSprint = new BoolValue("Bow sprint", true, this, bow::get);
 
     private final BoolValue sneak = new BoolValue("Sneak", false, this);
     private final ModeValue sneakMode = new ModeValue("Sneak mode", new String[]{"Vanilla"}, "Vanilla", this, sneak::get);
-    private final SliderValue sneakSpeed = new SliderValue("Sneak speed", 1, 0.3f, 1, 0.01f, this, () -> sneak.get() && sneakMode.is("Vanilla"));
+    private final SliderValue sneakSpeed = new SliderValue("Sneak speed", 1, 0.3f, 1, 0.01f, this, sneak::get);
 
     private CurrentSlowDown currentSlowDown = CurrentSlowDown.NONE;
     private String mode;
@@ -115,10 +115,8 @@ public class NoSlow extends Module {
             case "NCP":
                 switch (currentSlowDown) {
                     case CONSUMABLE -> {
-                        if (mc.thePlayer.isUsingItem() && ncpShouldWork) {
-                            if (mc.thePlayer.ticksExisted % 3 == 0) {
-                                sendPacketNoEvent(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
-                            }
+                        if (ncpShouldWork && mc.thePlayer.ticksExisted % 3 == 0) {
+                            sendPacketNoEvent(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
                         }
                     }
                     case SWORD -> {
@@ -130,6 +128,11 @@ public class NoSlow extends Module {
                             sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getCurrentEquippedItem()));
                         }
                     }
+                }
+                break;
+            case "Packet":
+                if (mc.thePlayer.itemInUseCount > 2) {
+                    mc.thePlayer.clearItemInUse();
                 }
                 break;
         }
@@ -144,21 +147,18 @@ public class NoSlow extends Module {
 
     @EventTarget
     public void onSlowDown(SlowDownEvent e) {
-        switch (mode) {
-            case "Vanilla", "Intave", "Intave old", "NCP":
-                e.setForward(speed);
-                e.setStrafe(speed);
-                e.setSprinting(sprint);
-                break;
-            case "Tick":
-                if (mc.thePlayer.onGroundTicks % 2 != 0 && mc.thePlayer.isUsingItem()) {
-                    if (mc.thePlayer.onGround) {
-                        e.setForward(speed);
-                        e.setStrafe(speed);
-                        e.setSprinting(sprint);
-                    }
+        if (!mode.equals("Tick")) {
+            e.setForward(speed);
+            e.setStrafe(speed);
+            e.setSprinting(sprint);
+        } else {
+            if (mc.thePlayer.onGroundTicks % 2 != 0 && mc.thePlayer.isUsingItem()) {
+                if (mc.thePlayer.onGround) {
+                    e.setForward(speed);
+                    e.setStrafe(speed);
+                    e.setSprinting(sprint);
                 }
-                break;
+            }
         }
     }
 

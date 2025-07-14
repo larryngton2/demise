@@ -13,7 +13,6 @@ import wtf.demise.utils.render.RoundedUtils;
 import java.awt.*;
 
 public class ColorPickerComponent extends Component {
-
     private final ColorValue setting;
     private final Animation open = new EaseOutSine(250, 1);
     private boolean opened, pickingHue, pickingOthers, pickingAlpha;
@@ -25,6 +24,8 @@ public class ColorPickerComponent extends Component {
 
     @Override
     public void drawScreen(int mouseX, int mouseY) {
+        setDescription(setting.getDescription());
+
         open.setDirection(opened ? Direction.FORWARDS : Direction.BACKWARDS);
         this.setHeight((float) (Fonts.interRegular.get(15).getHeight() + ((Fonts.interRegular.get(15).getHeight() + 2 + 45 + 2 + 12) * open.getOutput())));
 

@@ -7,7 +7,6 @@ import wtf.demise.events.impl.misc.GameEvent;
 import wtf.demise.events.impl.player.MoveInputEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
-import wtf.demise.features.values.impl.BoolValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.player.PlayerUtils;

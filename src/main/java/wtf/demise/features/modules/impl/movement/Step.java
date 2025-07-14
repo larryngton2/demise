@@ -25,8 +25,6 @@ public class Step extends Module {
 
     private final DoubleList MOTION = DoubleList.of(.42, .75, 1);
     private boolean stepped = false;
-    private boolean bmcIsStepping = false;
-    private int bmcStepTicks;
 
     @Override
     public void onDisable() {

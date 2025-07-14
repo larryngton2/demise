@@ -47,16 +47,21 @@ public class FakeLag extends Module {
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 100, 0, 1000, this);
     private final SliderValue delayOnOpponentAttack = new SliderValue("Delay on opponent attack", 200, 0, 500, this, () -> mode.is("Spoof"));
-    private final ModeValue keepRangeMode = new ModeValue("Keep range mode", new String[]{"None", "WTap", "Timer down"}, "None", this, smart::get);
-    private final SliderValue timer = new SliderValue("Timer", 0.75f, 0.01f, 1, 0.01f, this, () -> keepRangeMode.get().equals("Timer down"));
-    private final SliderValue timerTicks = new SliderValue("Timer ticks", 1, 1, 10, 1, this, () -> keepRangeMode.get().equals("Timer down"));
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final BoolValue pauseOnBacktrack = new BoolValue("Pause on backtrack", false, this);
     private final BoolValue forceFirstHit = new BoolValue("Force first hit", false, this);
     private final BoolValue realPos = new BoolValue("Display real pos", true, this);
     private final ModeValue renderMode = new ModeValue("Render mode", new String[]{"Box", "FakePlayer", "Line"}, "FakePlayer", this, realPos::get);
-    private final BoolValue onlyOnGround = new BoolValue("Only onGround", false, this);
+    private final BoolValue onlyOnGround = new BoolValue("Only on ground", false, this);
     private final BoolValue onlyKillAura = new BoolValue("Only on killAura", false, this);
+
+    public FakeLag() {
+        mode.setDescription("Pulse: simulates packet loss, Spoof: simulates high ping.");
+        hurtTimeToAttack.setDescription("An attack will be registered only if the target's hurt time is bellow this value.");
+        earlyRelease.setDescription("Only use on bad anticheats. Teleports you to the best past position.");
+        alwaysSpoof.setDescription("Makes FakeLag ignore search range.");
+        recoilTime.setDescription("Delay to lag again after stopping.");
+    }
 
     public static boolean blinking = false, picked = false;
     private final TimerUtils delay = new TimerUtils();
@@ -292,18 +297,6 @@ public class FakeLag extends Module {
         }
         */
 
-        if (attacked && mc.thePlayer.hurtTime == 0 && PlayerUtils.getDistanceToEntityBox(target) > 2.5 && PlayerUtils.getDistanceToEntityBox(target) <= 3) {
-            switch (keepRangeMode.get()) {
-                case "WTap":
-                    forceWTap = true;
-                    break;
-                case "Timer down":
-                    timerTimer.reset();
-                    shouldTimer = true;
-                    break;
-            }
-        }
-
         return !attacked && rangeCheck && selfHurtTimeCheck && distanceDiffCheck; //&& minDistanceCheck;
     }
 
@@ -317,18 +310,6 @@ public class FakeLag extends Module {
         }
     }
     */
-
-    @EventTarget
-    public void onUpdate1(UpdateEvent e) {
-        if (smart.get() && shouldTimer) {
-            if (!timerTimer.hasTimeElapsed(timerTicks.get() * 50L)) {
-                mc.timer.timerSpeed = timer.get();
-            } else {
-                mc.timer.timerSpeed = 1;
-                shouldTimer = false;
-            }
-        }
-    }
 
     @EventTarget
     public void onMoveInput(MoveInputEvent e) {

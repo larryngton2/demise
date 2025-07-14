@@ -50,6 +50,11 @@ public class Velocity extends Module {
 
     private final BoolValue onSwing = new BoolValue("On swing", false, this);
 
+    public Velocity() {
+        explosion.setDescription("Check explosion packets to modify knockback.");
+        motionGround.setDescription("Also sets the server's ground state to true when taking knockback.");
+    }
+
     private boolean attacked;
     private boolean velocity;
     private int sentPackets;
@@ -211,7 +216,7 @@ public class Velocity extends Module {
             case "Intave":
                 if (intaveMode.is("Tick Reduce")) {
                     if (Range.between((int) mHurtTime.get(), (int) mmHurtTime.get()).contains(mc.thePlayer.hurtTime)) {
-                        double factor = MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get());
+                        double factor = MathUtils.randomizeDouble(rFactorMin.get(), rFactorMax.get());
                         mc.thePlayer.motionX *= factor;
                         mc.thePlayer.motionZ *= factor;
                     }
@@ -228,7 +233,7 @@ public class Velocity extends Module {
     @EventTarget
     public void onHitSlowDown(HitSlowDownEvent e) {
         if (mode.is("Reduce")) {
-            e.setSlowDown(MathUtils.nextDouble(rFactorMin.get(), rFactorMax.get()));
+            e.setSlowDown(MathUtils.randomizeDouble(rFactorMin.get(), rFactorMax.get()));
         }
     }
 }

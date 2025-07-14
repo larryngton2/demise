@@ -22,7 +22,6 @@ import net.minecraft.util.*;
 import net.optifine.reflect.Reflector;
 import wtf.demise.Demise;
 import wtf.demise.features.modules.impl.combat.AntiBot;
-import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.misc.Targets;
 import wtf.demise.features.values.impl.MultiBoolValue;
 import wtf.demise.utils.InstanceAccess;
@@ -353,6 +352,34 @@ public class PlayerUtils implements InstanceAccess {
         }
 
         return vec33 == null ? Double.MAX_VALUE : playerPos.distanceTo(vec33);
+    }
+
+    public MovingObjectPosition rayTraceBlock(float[] rot, double reach, float partialTicks) {
+        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
+        Vec3 direction = mc.thePlayer.getLookCustom(rot[0], rot[1]);
+        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
+
+        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+
+        if (result == null) {
+            return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
+        }
+
+        return result;
+    }
+
+    public MovingObjectPosition rayTraceBlock(double reach, float partialTicks) {
+        Vec3 from = mc.thePlayer.getPositionEyes(partialTicks);
+        Vec3 direction = mc.thePlayer.getLookVec();
+        Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
+
+        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+
+        if (result == null) {
+            return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
+        }
+
+        return result;
     }
 
     public Vec3 getPosFromAABB(AxisAlignedBB a) {

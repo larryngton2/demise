@@ -11,8 +11,8 @@ import wtf.demise.events.impl.player.StrafeEvent;
 import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.values.impl.BoolValue;
-import wtf.demise.utils.player.clicking.ClickHandler;
 import wtf.demise.utils.player.MoveUtil;
+import wtf.demise.utils.player.clicking.ClickHandler;
 
 @ModuleInfo(name = "BloxdPhysics")
 public class BloxdPhysics extends Module {

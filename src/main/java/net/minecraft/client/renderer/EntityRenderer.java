@@ -331,6 +331,14 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     }
 
     public void getMouseOver(float partialTicks) {
+        Entity e = mc.getRenderViewEntity();
+
+        if (e != null && mc.theWorld != null) {
+            getMouseOver(partialTicks, e.rotationYaw, e.rotationPitch, 0);
+        }
+    }
+
+    public void getMouseOver(float partialTicks, float yaw, float pitch, float expand) {
         Entity entity = mc.getRenderViewEntity();
 
         if (entity != null && mc.theWorld != null) {
@@ -339,7 +347,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             double blockReachDistance = mc.playerController.getBlockReachDistance();
 
             double reach = 3.0D;
-            float expand = 0;
 
             MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand);
             Demise.INSTANCE.getEventManager().call(mouseOverEvent);
@@ -347,7 +354,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             reach = Math.max(reach, mouseOverEvent.getRange());
             blockReachDistance = Math.max(blockReachDistance, mouseOverEvent.getRange() + 1.5);
 
-            mc.objectMouseOver = entity.rayTrace(blockReachDistance, partialTicks);
+            mc.objectMouseOver = entity.rayTraceCustom(blockReachDistance, partialTicks, yaw, pitch);
             double distance = blockReachDistance;
             final Vec3 vec3 = entity.getPositionEyes(partialTicks);
             boolean flag = false;
@@ -480,7 +487,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
                     mc.gameSettings.smoothCamera = true;
                     mc.renderGlobal.displayListEntitiesDirty = true;
                 } else {
-                    interpolatedZoom = MathUtils.interpolateNoUpdateCheck(interpolatedZoom, mc.gameSettings.fovSetting / 4f, 0.1f);
+                    interpolatedZoom = MathUtils.interpolate(interpolatedZoom, mc.gameSettings.fovSetting / 4f, 0.1f);
                     f = interpolatedZoom;
                 }
             } else if (Config.zoomMode) {
@@ -493,10 +500,8 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
             if (!flag) {
                 if (useFOVSetting) {
-                    interpolatedZoom = MathUtils.interpolateNoUpdateCheck(interpolatedZoom, f2, 0.1f);
+                    interpolatedZoom = MathUtils.interpolate(interpolatedZoom, f2, 0.1f);
                     f = interpolatedZoom;
-                } else {
-                    interpolatedZoom = MathUtils.interpolateNoUpdateCheck(interpolatedZoom, 70, 0.1f);
                 }
             }
 
@@ -1203,19 +1208,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             renderWorldPass(1, partialTicks, finishTimeNano);
             GlStateManager.colorMask(true, true, true, false);
         } else {
-            /*
-            handFramebuffer = RenderUtils.createFrameBuffer(handFramebuffer, true);
-            handFramebuffer.framebufferClear();
-            handFramebuffer.bindFramebuffer(true);
-            RenderUtils.resetColor();
-
-            renderWorldPass(2, partialTicks, finishTimeNano);
-
-            handFramebuffer.unbindFramebuffer();
-            RenderUtils.resetColor();
-            Shadow.renderBloom(handFramebuffer.framebufferTexture, 50, 1);
-             */
-
             renderWorldPass(2, partialTicks, finishTimeNano);
         }
         mc.mcProfiler.endSection();

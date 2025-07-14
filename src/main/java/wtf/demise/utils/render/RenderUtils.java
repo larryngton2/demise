@@ -670,14 +670,25 @@ public class RenderUtils implements InstanceAccess {
     }
 
     public static Vector2f worldToScreen(float x, float y, float z, ScaledResolution sr, boolean ignoreInvisible) {
-        x -= (float) mc.getRenderManager().viewerPosX;
-        y -= (float) mc.getRenderManager().viewerPosY;
-        z -= (float) mc.getRenderManager().viewerPosZ;
+        double camX = mc.getRenderManager().viewerPosX;
+        double camY = mc.getRenderManager().viewerPosY;
+        double camZ = mc.getRenderManager().viewerPosZ;
+
+        float relX = (float) (x - camX);
+        float relY = (float) (y - camY);
+        float relZ = (float) (z - camZ);
+
+        Vec3 viewDir = mc.thePlayer.getLookVec();
+        Vec3 toPoint = new Vec3(relX, relY, relZ);
+
+        if (viewDir.dotProduct(toPoint) < 0.0 && !ignoreInvisible) {
+            return null;
+        }
 
         FloatBuffer winCoords = BufferUtils.createFloatBuffer(3);
 
         GLU.gluProject(
-                x, y, z,
+                relX, relY, relZ,
                 ActiveRenderInfo.MODELVIEW,
                 ActiveRenderInfo.PROJECTION,
                 ActiveRenderInfo.VIEWPORT,
@@ -688,7 +699,9 @@ public class RenderUtils implements InstanceAccess {
         float screenY = winCoords.get(1) / sr.getScaleFactor();
         float depth = winCoords.get(2);
 
-        boolean isVisible = depth >= -0.01f && depth <= 1.01f && screenX >= 0.0f && screenX <= sr.getScaledWidth() && screenY >= 0.0f && screenY <= sr.getScaledHeight();
+        boolean isVisible = depth >= -0.01f && depth <= 1.01f &&
+                screenX >= 0.0f && screenX <= sr.getScaledWidth() &&
+                screenY >= 0.0f && screenY <= sr.getScaledHeight();
 
         if (isVisible || ignoreInvisible) {
             return new Vector2f(screenX, sr.getScaledHeight() - screenY);

@@ -78,7 +78,6 @@ public class Category implements IComponent {
             if (!shader)
                 handleScroll();
 
-
             float componentStartY = PanelGui.posY + 12 + Fonts.urbanist.get(35).getHeight();
             float viewHeight = 255;
 

@@ -17,6 +17,10 @@ import wtf.demise.utils.render.ColorUtils;
 public class FPSBooster extends Module {
     private final BoolValue moreBoost = new BoolValue("More boost", false, this);
 
+    public FPSBooster() {
+        moreBoost.setDescription("Gives you a bazillion fps.");
+    }
+
     // from gothaj
     @EventTarget
     public void onUpdate(UpdateEvent e) {

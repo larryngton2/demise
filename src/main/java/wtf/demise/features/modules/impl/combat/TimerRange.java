@@ -2,7 +2,6 @@ package wtf.demise.features.modules.impl.combat;
 
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import org.apache.commons.lang3.Range;
 import wtf.demise.Demise;
@@ -51,6 +50,14 @@ public class TimerRange extends Module {
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final BoolValue renderPredictedSelfPos = new BoolValue("Render predicted self pos", false, this);
     private final BoolValue renderBalance = new BoolValue("Render balance", false, this);
+
+    public TimerRange() {
+        preload.setDescription("Automatically gain balance.");
+        alwaysGainBalance.setDescription("Makes TimerRange ignore balance range.");
+        balanceTimer.setDescription("The speed to run the game on when gaining balance.");
+        maxBalanceTimer.setDescription("The speed to run the game on when balance = maxBalance.");
+        delay.setDescription("Delay between teleports.");
+    }
 
     private final TimerUtils timer = new TimerUtils();
     private final List<PlayerUtils.PredictProcess> selfPrediction = new ArrayList<>();
