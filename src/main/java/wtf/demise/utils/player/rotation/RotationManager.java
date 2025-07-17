@@ -53,10 +53,10 @@ public class RotationManager implements InstanceAccess {
         yawAccelFactor = new SliderValue("Yaw accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
         pitchAccelFactor = new SliderValue("Pitch accel factor", 0.25f, 0.01f, 0.9f, 0.01f, module, () -> accel.get() && accel.canDisplay());
         imperfectCorrelation = new BoolValue("Imperfect correlation", false, module);
-        yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.01f, module);
-        yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.01f, module);
-        pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.01f, module);
-        pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.01f, module);
+        yawRotationSpeedMin = new SliderValue("Yaw rotation speed (min)", 180, 0.01f, 180, 0.1f, module);
+        yawRotationSpeedMax = new SliderValue("Yaw rotation speed (max)", 180, 0.01f, 180, 0.1f, module);
+        pitchRotationSpeedMin = new SliderValue("Pitch rotation speed (min)", 180, 0.01f, 180, 0.1f, module);
+        pitchRotationSpeedMax = new SliderValue("Pitch rotation speed (max)", 180, 0.01f, 180, 0.1f, module);
         distanceBasedRotationSpeed = new BoolValue("Distance based rotation speed", false, module, () -> module.getClass() == KillAura.class);
         minRange = new SliderValue("Min range", 0, 0, 8, 0.1f, module, () -> distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());
         maxRange = new SliderValue("Max range", 8, 0, 8, 0.1f, module, () -> distanceBasedRotationSpeed.get() && distanceBasedRotationSpeed.canDisplay());

@@ -1,6 +1,7 @@
 package wtf.demise.features.modules.impl.visual;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -14,6 +15,7 @@ import wtf.demise.features.values.impl.*;
 import wtf.demise.gui.font.FontRenderer;
 import wtf.demise.gui.font.Fonts;
 import wtf.demise.utils.misc.SpoofSlotUtils;
+import wtf.demise.utils.player.PlayerUtils;
 import wtf.demise.utils.render.ColorUtils;
 import wtf.demise.utils.render.RenderUtils;
 
@@ -27,17 +29,17 @@ public class Interface extends Module {
             new BoolValue("Watermark", true),
             new BoolValue("Module list", true),
             new BoolValue("Armor", true),
-            new BoolValue("Potion HUD", true),
-            new BoolValue("Notification", true),
+            new BoolValue("Notifications", true),
             new BoolValue("Keystrokes", true),
             new BoolValue("Info", true),
             new BoolValue("Motion graph", false),
             new BoolValue("Radar", false)
     ), this);
 
-    public final ModeValue watermarkMode = new ModeValue("Watermark mode", new String[]{"Text", "Blue archive", "Bivir"}, "Text", this, () -> elements.isEnabled("Watermark"));
+    public final ModeValue watermarkMode = new ModeValue("Watermark mode", new String[]{"Text", "Blue archive", "Bivir", "Old"}, "Text", this, () -> elements.isEnabled("Watermark"));
+    public final ModeValue moduleListMode = new ModeValue("Module list mode", new String[]{"New", "Old"}, "New", this, () -> elements.isEnabled("Module list"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module list"));
-    public final BoolValue notificationSounds = new BoolValue("Notification sounds", true, this, () -> elements.isEnabled("Notification"));
+    public final BoolValue notificationSounds = new BoolValue("Notification sounds", true, this, () -> elements.isEnabled("Notifications"));
     private final ModeValue colorMode = new ModeValue("Color mode", new String[]{"Winter", "Blend", "Mango", "Snowy sky", "Miko", "Satin", "Gothic", "Cotton candy"}, "Winter", this);
     private final SliderValue fadeSpeed = new SliderValue("Fade speed", 1, 1, 10, 1, this);
     public final ModeValue bgStyle = new ModeValue("Background style", new String[]{"Transparent", "Opaque", "Custom"}, "Transparent", this, () -> elements.isEnabled("Module List"));
@@ -64,6 +66,15 @@ public class Interface extends Module {
                 case "Bivir":
                     RenderUtils.drawImage(new ResourceLocation("demise/img/bivir.png"), 10, 0, (int) (240 * 0.35f), (int) (240 * 0.35f));
                     break;
+                case "Old":
+                    mc.fontRendererObj.drawStringWithShadow("d", 5, 5, color());
+                    mc.fontRendererObj.drawStringWithShadow(
+                            "emise | " +
+                                    Minecraft.getDebugFPS() + "fps | " +
+                                    (mc.isSingleplayer() ? "singleplayer" : PlayerUtils.getCurrServer()),
+                            5 + (mc.fontRendererObj.getStringWidth("d")), 5, Color.WHITE.getRGB()
+                    );
+                    break;
             }
         }
 
@@ -88,7 +99,7 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Notification")) {
+        if (elements.isEnabled("Notifications")) {
             Demise.INSTANCE.getNotificationManager().publish(false, false);
         }
     }
@@ -129,7 +140,7 @@ public class Interface extends Module {
             }
         }
 
-        if (elements.isEnabled("Notification")) {
+        if (elements.isEnabled("Notifications")) {
             Demise.INSTANCE.getNotificationManager().publish(true, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
         }
     }

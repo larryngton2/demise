@@ -108,7 +108,7 @@ public class AutoRod extends Module {
 
         double range = PlayerUtils.getDistanceToEntityBox(currentTarget);
 
-        rotating = rotate.get() && KillAura.currentTarget == null && range > minRange.get() && range <= maxRange.get();
+        rotating = rotate.get() && KillAura.currentTarget == null && range > minRange.get() && range <= maxRange.get() && mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemFishingRod;
 
         if (rotating) {
             float[] finalRotation = RotationUtils.faceTrajectory(currentTarget, true, predictSize.get(), 0.03f, 2f);

@@ -2,6 +2,7 @@ package wtf.demise.gui.widget.impl;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,8 +40,40 @@ public class TargetHUDWidget extends Widget {
 
     @Override
     public void render() {
-        this.height = 37;
-        this.width = 120;
+        switch (targetHud.mode.get()) {
+            case "New":
+                this.height = 37;
+                this.width = 120;
+                break;
+            case "Old":
+                String TargetName = targetHud.target.getDisplayName().getFormattedText();
+
+                double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(targetHud.target) + targetHud.target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
+
+                if (mc.thePlayer != null) {
+                    String status = initialDiff >= 0 ? " §aW" : " §cL";
+                    TargetName = TargetName + status;
+                }
+
+                float current$minX;
+                float current$maxX;
+                float current$minY;
+                float current$maxY;
+
+                final ScaledResolution scaledResolution = new ScaledResolution(mc);
+                final int padding = 8;
+                final int n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
+                final float n4 = scaledResolution.getScaledWidth() / 2f - n3 / 2f + x;
+                final float n5 = scaledResolution.getScaledHeight() / 2f + 15 + y;
+                current$minX = n4 - padding;
+                current$minY = n5 - padding;
+                current$maxX = n4 + n3;
+                current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding;
+
+                this.width = current$maxX - current$minX;
+                this.height = current$maxY - current$minY;
+                break;
+        }
 
         if (targetHud.target != null) {
             renderTargetHUD(false, (EntityPlayer) targetHud.target, false);
@@ -57,11 +90,11 @@ public class TargetHUDWidget extends Widget {
     private void renderTargetHUD(boolean shader, EntityPlayer target, boolean isGlow) {
         if (target != null) {
             TargetHUD targetHUD;
-            if (!targetHud.targetHUDTracking.get()) {
-                targetHUD = new TargetHUD(renderX, renderY, target, shader, isGlow);
+            if (!targetHud.trackTarget.get()) {
+                targetHUD = new TargetHUD(renderX, renderY, target, shader, isGlow, targetHud.mode.get());
             } else {
                 float[] pos = new float[]{getPos(target, shader).x, getPos(target, shader).y};
-                targetHUD = new TargetHUD(pos[0], pos[1], target, shader, isGlow);
+                targetHUD = new TargetHUD(pos[0], pos[1], target, shader, isGlow, targetHud.mode.get());
             }
             targetHUD.render();
         }
@@ -113,13 +146,15 @@ class TargetHUD implements InstanceAccess {
     private Interface setting = INSTANCE.getModuleManager().getModule(Interface.class);
     private final DecimalFormat decimalFormat = new DecimalFormat("0.0");
     private boolean isGlow;
+    private String mode;
 
-    public TargetHUD(float x, float y, EntityPlayer target, boolean shader, boolean isGlow) {
+    public TargetHUD(float x, float y, EntityPlayer target, boolean shader, boolean isGlow, String mode) {
         this.x = x;
         this.y = y;
         this.target = target;
         this.shader = shader;
         this.isGlow = isGlow;
+        this.mode = mode;
     }
 
     public void render() {
@@ -135,39 +170,97 @@ class TargetHUD implements InstanceAccess {
         GlStateManager.scale(TargetHud.interpolatedScale, TargetHud.interpolatedScale, TargetHud.interpolatedScale);
         GlStateManager.translate(-(x + width / 2F), -(y + height / 2F), 0);
 
-        float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
-        float space = (width - 42.5f) / 100;
+        switch (mode) {
+            case "New": {
+                float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
+                float space = (width - 42.5f) / 100;
 
-        target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 50);
+                target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 50);
 
-        if (!shader) {
-            RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
+                if (!shader) {
+                    RoundedUtils.drawRound(x, y, width, height, 7, new Color(setting.bgColor(), true));
 
-            RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
-            RoundedUtils.drawGradientHorizontal(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color()), new Color(setting.color((int) target.healthAnimation.getOutput())));
-            String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
-            double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
-            String diff;
+                    RoundedUtils.drawRound(x + 38f, y + 28, (100 * space), 4, 2, new Color(0, 0, 0, 150));
+                    RoundedUtils.drawGradientHorizontal(x + 38f, y + 28, target.healthAnimation.getOutput(), 4, 2, new Color(setting.color()), new Color(setting.color((int) target.healthAnimation.getOutput())));
+                    String text = String.valueOf(BigDecimal.valueOf(PlayerUtils.getActualHealth(target)).setScale(2, RoundingMode.FLOOR).doubleValue());
+                    double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
+                    String diff;
 
-            if (initialDiff > 0) {
-                diff = "+" + initialDiff;
-            } else if (initialDiff < 0) {
-                diff = String.valueOf(initialDiff);
-            } else {
-                diff = "±" + initialDiff;
+                    if (initialDiff > 0) {
+                        diff = "+" + initialDiff;
+                    } else if (initialDiff < 0) {
+                        diff = String.valueOf(initialDiff);
+                    } else {
+                        diff = "±" + initialDiff;
+                    }
+
+                    Fonts.interSemiBold.get(13).drawString(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
+                    Fonts.interSemiBold.get(13).drawString(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
+                    Fonts.interSemiBold.get(18).drawString(target.getName(), x + 37, y + 6, -1);
+
+                    RenderUtils.renderPlayerHead(target, x + 2.5f, y + 2.5f, 32, 10);
+                } else {
+                    if (!isGlow) {
+                        RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
+                    } else {
+                        RoundedUtils.drawGradientPreset(x, y, width, height, 7);
+                    }
+                }
             }
+            break;
+            case "Old": {
+                // God, what the fuck was I doing on old demise
+                //todo
+                if (!shader) {
+                    float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
+                    float space = (width - 42.5f) / 100;
 
-            Fonts.interSemiBold.get(13).drawString(text + "HP", x + 37, y + 17, Color.lightGray.getRGB());
-            Fonts.interSemiBold.get(13).drawString(diff, x + 115 - Fonts.interSemiBold.get(13).getStringWidth(diff), y + 17, Color.lightGray.getRGB());
-            Fonts.interSemiBold.get(18).drawString(target.getName(), x + 37, y + 6, -1);
+                    target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 50);
 
-            RenderUtils.renderPlayerHead(target, x + 2.5f, y + 2.5f, 32, 10);
-        } else {
-            if (!isGlow) {
-                RoundedUtils.drawShaderRound(x, y, width, height, 7, new Color(setting.bgColor()));
-            } else {
-                RoundedUtils.drawGradientPreset(x, y, width, height, 7);
+                    String TargetName = target.getDisplayName().getFormattedText();
+                    String TargetHealth = String.format("%.1f", target.getHealth()) + " §c❤ ";
+
+                    double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
+
+                    String status = initialDiff >= 0 ? " §aW" : " §cL";
+                    TargetName = TargetName + status;
+
+                    float current$minX;
+                    float current$maxX;
+                    float current$minY;
+                    float current$maxY;
+
+                    final int padding = 8;
+                    final int n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
+                    current$minX = x;
+                    current$minY = y;
+                    current$maxX = x + n3 + padding;
+                    current$maxY = y + (mc.fontRendererObj.FONT_HEIGHT + 5) + padding;
+
+                    RenderUtils.drawRect(current$minX, current$minY, current$maxX - current$minX, current$maxY - current$minY + 10, setting.bgColor());
+
+                    final float n13 = current$minX + 6 + 27;
+                    final float n14 = current$maxX - 2;
+                    final float n15 = (int) (current$maxY + 0.45);
+
+                    RoundedUtils.drawShaderRound(n13 - 3, n15, (n14 - 2) - (n13 - 3), 4, 0, new Color(0, 0, 0, 110));
+                    RoundedUtils.drawGradientHorizontal((n13 - 3) + 0.2f, n15 + 0.2f, target.healthAnimation.getOutput() - 0.4f, 4 - 0.4f, 0, new Color(setting.color()), new Color(setting.color((int) target.healthAnimation.getOutput())));
+
+                    GlStateManager.pushMatrix();
+                    GlStateManager.enableBlend();
+                    GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+                    mc.fontRendererObj.drawString(TargetName, x + 34, y + 4, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
+                    mc.fontRendererObj.drawString(TargetHealth, x + 34, y + 14, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
+                    GlStateManager.disableBlend();
+                    GlStateManager.popMatrix();
+
+                    float targetX = current$minX + 3;
+                    float targetY = current$minY + 3;
+                    GlStateManager.color(1, 1, 1, 1);
+                    RenderUtils.renderPlayerHead(target, targetX, targetY, 25, 0);
+                }
             }
+            break;
         }
 
         GlStateManager.popMatrix();

@@ -29,38 +29,52 @@ public class ModuleListWidget extends Widget {
 
     @Override
     public void render() {
-        if (!shouldRender()) return;
-
-        currX = renderX;
-        currY = renderY;
-
-        this.height = getEnabledModules().size() * getModuleHeight();
-
-        int middle = sr.getScaledWidth() / 2;
         List<Module> enabledModules = getEnabledModules();
-
+        int middle = sr.getScaledWidth() / 2;
         float offset = 0;
 
-        for (int i = 0; i < enabledModules.size(); i++) {
-            Module module = enabledModules.get(i);
-            int width = getModuleWidth(module);
-            int height = getModuleHeight();
+        switch (setting.moduleListMode.get()) {
+            case "New":
+                currX = renderX;
+                currY = renderY;
 
-            RenderPosition position = calculateRenderPosition(module, width, middle);
+                this.height = getEnabledModules().size() * getModuleHeight();
 
-            renderModule(module, position.x, position.y, offset, width, height, middle, i, false, false);
+                for (int i = 0; i < enabledModules.size(); i++) {
+                    Module module = enabledModules.get(i);
+                    int width = getModuleWidth(module);
+                    int height = getModuleHeight();
 
-            if (!module.isHidden()) {
-                if (!(setting.hideRender.get() && Demise.INSTANCE.getModuleManager().getModulesByCategory().get(ModuleCategory.Visual).contains(module))) {
+                    RenderPosition position = calculateRenderPosition(module, width, middle);
+
+                    renderModule(module, position.x, position.y, offset, width, height, middle, i, false, false);
                     offset = calculateNextOffset(module, height, offset);
                 }
-            }
+                break;
+            case "Old":
+                int margin = 2;
+
+                for (int i = 0; i < enabledModules.size(); i++) {
+                    Module module = enabledModules.get(i);
+                    RenderPosition pos = calculateRenderPosition(module, getModuleWidth(module), middle);
+                    float moduleX = (renderX > middle) ? pos.x + (width - mc.fontRendererObj.getStringWidth(module.getName() + module.getTag())) : pos.x;
+                    float y = pos.y + offset;
+
+                    mc.fontRendererObj.drawStringWithShadow(module.getName(), moduleX, y, setting.color(i));
+                    mc.fontRendererObj.drawStringWithShadow(module.getTag(), moduleX + mc.fontRendererObj.getStringWidth(module.getName()), y, Color.lightGray.getRGB());
+                    offset += mc.fontRendererObj.FONT_HEIGHT + margin;
+                }
+
+                this.height = getEnabledModules().size() * (mc.fontRendererObj.FONT_HEIGHT + margin);
+                break;
         }
     }
 
     @Override
     public void onShader(ShaderEvent event) {
-        if (!shouldRender()) return;
+        if (!setting.moduleListMode.is("New")) {
+            return;
+        }
 
         int middle = sr.getScaledWidth() / 2;
         List<Module> enabledModules = getEnabledModules();
@@ -100,11 +114,19 @@ public class ModuleListWidget extends Widget {
     }
 
     private static int getModuleWidth(Module module) {
-        return setting.getFr().getStringWidth(module.getName() + module.getTag()) + xPadding;
+        return switch (setting.moduleListMode.get()) {
+            case "New" -> setting.getFr().getStringWidth(module.getName() + module.getTag()) + xPadding;
+            case "Old" -> mc.fontRendererObj.getStringWidth(module.getName() + module.getTag());
+            default -> 0;
+        };
     }
 
     public static int getModuleHeight() {
-        return setting.getFr().getHeight() + yPadding;
+        return switch (setting.moduleListMode.get()) {
+            case "New" -> setting.getFr().getHeight() + yPadding;
+            case "Old" -> mc.fontRendererObj.FONT_HEIGHT + 2;
+            default -> 0;
+        };
     }
 
     private void renderModule(Module module, float localX, float localY, float offset, int width, int height, int middle, int index, boolean shader, boolean isGlow) {

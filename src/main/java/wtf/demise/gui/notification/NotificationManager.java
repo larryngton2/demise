@@ -69,6 +69,7 @@ public class NotificationManager implements InstanceAccess {
                     case "Text" -> Fonts.urbanist.get(38).getHeight() + 5;
                     case "Blue archive" -> 60;
                     case "Bivir" -> 80;
+                    case "Old" -> mc.fontRendererObj.FONT_HEIGHT + 3;
                     default -> 0;
                 };
 

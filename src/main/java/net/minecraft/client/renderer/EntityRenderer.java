@@ -331,14 +331,6 @@ public class EntityRenderer implements IResourceManagerReloadListener {
     }
 
     public void getMouseOver(float partialTicks) {
-        Entity e = mc.getRenderViewEntity();
-
-        if (e != null && mc.theWorld != null) {
-            getMouseOver(partialTicks, e.rotationYaw, e.rotationPitch, 0);
-        }
-    }
-
-    public void getMouseOver(float partialTicks, float yaw, float pitch, float expand) {
         Entity entity = mc.getRenderViewEntity();
 
         if (entity != null && mc.theWorld != null) {
@@ -347,6 +339,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             double blockReachDistance = mc.playerController.getBlockReachDistance();
 
             double reach = 3.0D;
+            float expand = 0;
 
             MouseOverEvent mouseOverEvent = new MouseOverEvent(reach, expand);
             Demise.INSTANCE.getEventManager().call(mouseOverEvent);
@@ -354,7 +347,7 @@ public class EntityRenderer implements IResourceManagerReloadListener {
             reach = Math.max(reach, mouseOverEvent.getRange());
             blockReachDistance = Math.max(blockReachDistance, mouseOverEvent.getRange() + 1.5);
 
-            mc.objectMouseOver = entity.rayTraceCustom(blockReachDistance, partialTicks, yaw, pitch);
+            mc.objectMouseOver = entity.rayTrace(blockReachDistance, partialTicks);
             double distance = blockReachDistance;
             final Vec3 vec3 = entity.getPositionEyes(partialTicks);
             boolean flag = false;

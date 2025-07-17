@@ -107,13 +107,6 @@ public class MathUtils implements InstanceAccess {
         return current + (target - current) * multiple;
     }
 
-    public static Vec3 interpolateNoUpdateCheck(Vec3 current, Vec3 target, float multiple) {
-        return new Vec3(
-                interpolate(current.xCoord, target.xCoord, multiple),
-                interpolate(current.yCoord, target.yCoord, multiple),
-                interpolate(current.zCoord, target.zCoord, multiple));
-    }
-
     public static float calculateGaussianValue(float x, float sigma) {
         double PI = Math.PI;
         double output = 1.0 / Math.sqrt(2.0 * PI * (sigma * sigma));

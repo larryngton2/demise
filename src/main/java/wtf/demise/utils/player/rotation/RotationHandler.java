@@ -32,7 +32,7 @@ public class RotationHandler implements InstanceAccess {
     private static final TimerUtils tickTimer = new TimerUtils();
     private static final TimerUtils tickTimer1 = new TimerUtils();
     private long lastFrameTime = System.nanoTime();
-    private float timeScale;
+    private double timeScale;
     private static int previousDeltaYaw = 0;
     private static int previousDeltaPitch = 0;
     private static boolean accel;
@@ -41,6 +41,8 @@ public class RotationHandler implements InstanceAccess {
     private static int interpolatedAccelDeltaYaw;
     private static int interpolatedAccelDeltaPitch;
     private static float smoothingFactor;
+    private double yawAccum = 0;
+    private double pitchAccum = 0;
 
     public RotationHandler() {
         enabled = true;
@@ -163,12 +165,12 @@ public class RotationHandler implements InstanceAccess {
             }
 
             long currentTime = System.nanoTime();
-            float deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
+            double deltaTime = (currentTime - lastFrameTime) / 1_000_000_000.0f;
             lastFrameTime = currentTime;
 
             // 45 is the min fps you can get without the rotation breaking
-            deltaTime = Math.min(deltaTime, 1.0f / 45);
-            timeScale = deltaTime * 60;
+            deltaTime = Math.min(deltaTime, 1.0f / 45.0f);
+            timeScale = deltaTime * 60.0f;
             return;
         }
 
@@ -193,18 +195,24 @@ public class RotationHandler implements InstanceAccess {
     }
 
     private void handleRotation(MouseMoveEvent e, float[] target) {
-        float[] delta = toFloats(limitRotations(target));
+        double[] delta = toDoubles(limitRotations(target));
 
         float f = mc.gameSettings.mouseSensitivity * 0.6F + 0.2F;
         float f1 = f * f * f * 8.0F;
 
-        delta[0] = Math.max(Math.abs(delta[0]), f1) * Math.signum(delta[0]);
-        delta[1] = Math.max(Math.abs(delta[1]), f1) * Math.signum(delta[1]);
+        // store accumulators to maintain precision
+        // without this, rotations will be interpolated on high frame rate
+        yawAccum += delta[0] * timeScale;
+        pitchAccum += delta[1] * timeScale;
 
-        int[] scaledDelta = new int[]{(int) (delta[0] * timeScale), (int) (delta[1] * timeScale)};
+        int intYaw = (int) yawAccum;
+        int intPitch = (int) pitchAccum;
 
-        float yawStep = scaledDelta[0] * f1;
-        float pitchStep = scaledDelta[1] * f1;
+        yawAccum -= intYaw;
+        pitchAccum -= intPitch;
+
+        float yawStep = intYaw * f1;
+        float pitchStep = intPitch * f1;
 
         if (!silent) {
             e.setDeltaX(0);
@@ -260,7 +268,7 @@ public class RotationHandler implements InstanceAccess {
         return delta;
     }
 
-    private float[] toFloats(int[] ints) {
-        return new float[]{ints[0], ints[1]};
+    private double[] toDoubles(int[] ints) {
+        return new double[]{ints[0], ints[1]};
     }
 }

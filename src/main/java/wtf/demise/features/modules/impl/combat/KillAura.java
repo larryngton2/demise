@@ -68,10 +68,7 @@ public class KillAura extends Module {
     private final ModeValue aimPos = new ModeValue("Aim position", new String[]{"Head", "Torso", "Nearest", "Straight"}, "Straight", this);
     private final BoolValue setMinAimPoint = new BoolValue("Set min aim point", true, this, () -> aimPos.is("Straight"));
     private final SliderValue yTrim = new SliderValue("Y trim", 0, 0, 0.5f, 0.01f, this);
-
-    // still needs improvements, just too bored to do them
-    private final BoolValue deadzone = new BoolValue("Deadzone", false, this);
-    private final SliderValue xzTrim = new SliderValue("XZ trim", 0, 0, 0.5f, 0.01f, this, () -> aimPos.is("Nearest") || deadzone.get());
+    private final SliderValue xzTrim = new SliderValue("XZ trim", 0, 0, 0.5f, 0.01f, this, () -> aimPos.is("Nearest"));
 
     private final BoolValue aimAtNearestVisiblePoint = new BoolValue("Aim at nearest visible point", false, this);
 
@@ -118,7 +115,6 @@ public class KillAura extends Module {
         interpolateVec.setDescription("Smooth out the offset by x amount.");
         xOffset.setDescription("Offsets your yaw by x amount.");
         yOffset.setDescription("Offsets your pitch by x amount.");
-        deadzone.setDescription("Pauses rotations when looking at your target.");
         pauseInHitbox.setDescription("Pauses rotations when you are inside your target's hitbox.");
         targetESP.setDescription("Renders a cool circle around the current target.");
     }
@@ -140,7 +136,6 @@ public class KillAura extends Module {
     private Vec3 delayedVec = new Vec3(0, 0, 0);
     private boolean tickRotating;
     private int runTicks;
-    private Vec3 prevLookVec = new Vec3(0, 0, 0);
 
     @Override
     public void onEnable() {
@@ -541,9 +536,6 @@ public class KillAura extends Module {
     }
 
     private float[] getRotations() {
-        boolean deadZoneYaw = false;
-        boolean deadZonePitch = false;
-
         prevRot = new float[]{RotationHandler.currentRotation[0], RotationHandler.currentRotation[1]};
 
         Vec3 playerPos = mc.thePlayer.getPositionEyes(1);
@@ -597,38 +589,9 @@ public class KillAura extends Module {
             break;
         }
 
-        if (!mc.thePlayer.canPosBeSeen(entityPos.add(0, currentTarget.getEyeHeight(), 0)) && aimAtNearestVisiblePoint.get()) {
+        if (!mc.thePlayer.canPosBeSeen(vec) && aimAtNearestVisiblePoint.get()) {
             vec = RotationUtils.findNearestVisiblePoint(vec, finalBoundingBox);
         }
-
-        if (deadzone.get()) {
-            double deltaX = vec.xCoord - playerPos.xCoord;
-            double deltaY = vec.yCoord - playerPos.yCoord;
-            double deltaZ = vec.zCoord - playerPos.zCoord;
-
-            float yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
-            float pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
-
-            // easiest way to do it. the most accurate too
-            mc.entityRenderer.getMouseOver(1, yaw, rotationManager.getSimpleRotationsToEntity(currentTarget)[1], -xzTrim.get());
-
-            if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-                vec.xCoord = mc.thePlayer.getVectorForRotation(prevRot[1], prevRot[0]).xCoord;
-                vec.zCoord = mc.thePlayer.getVectorForRotation(prevRot[1], prevRot[0]).zCoord;
-                deadZoneYaw = true;
-            }
-
-            mc.entityRenderer.getMouseOver(1, rotationManager.getSimpleRotationsToEntity(currentTarget)[0], pitch, -yTrim.get());
-
-            if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-                vec.yCoord = mc.thePlayer.getVectorForRotation(prevRot[1], prevRot[0]).yCoord;
-                deadZonePitch = true;
-            }
-
-            mc.entityRenderer.getMouseOver(mc.timer.partialTicks);
-        }
-
-        prevLookVec = vec;
 
         if ((!firstHit || !notOnFirstHit.get()) && (!onlyOnRotation.get() || tickRotating)) {
             double minXZ = -0.5;
@@ -732,37 +695,12 @@ public class KillAura extends Module {
             currentVec = targetVec;
         }
 
-        if (deadzone.get() && (deadZoneYaw || deadZonePitch)) {
-            Vec3 lookVec = mc.thePlayer.getVectorForRotation(prevRot[1], prevRot[0])
-                    .normalize()
-                    .scale(mc.objectMouseOver.hitVec.distanceTo(currentVec));
-
-            Vec3 offset = offsetVec.normalize().scale(offsetVec.lengthVector() * 0.1);
-
-            if (deadZoneYaw) {
-                currentVec.xCoord = playerPos.add(lookVec).add(offset).xCoord;
-                currentVec.zCoord = playerPos.add(lookVec).add(offset).zCoord;
-            }
-
-            if (deadZonePitch) {
-                currentVec.yCoord = playerPos.add(lookVec).add(offset).yCoord;
-            }
-        }
-
-        assert currentVec != null;
-
-        double deltaX = currentVec.xCoord - playerPos.xCoord;
-        double deltaY = currentVec.yCoord - playerPos.yCoord;
-        double deltaZ = currentVec.zCoord - playerPos.zCoord;
-
-        float yaw = (float) -(Math.atan2(deltaX, deltaZ) * (180.0 / Math.PI));
-        float pitch = (float) (-Math.toDegrees(Math.atan2(deltaY, Math.hypot(deltaX, deltaZ))));
+        float[] rot = RotationUtils.getRotations(currentVec);
 
         if (mc.thePlayer.getEntityBoundingBox().intersectsWith(currentTarget.getEntityBoundingBox().contract(0.1, 0.1, 0.1)) && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && pauseInHitbox.get()) {
-            yaw = prevRot[0];
-            pitch = prevRot[1];
+            rot = prevRot;
         }
 
-        return new float[]{yaw, pitch};
+        return rot;
     }
 }

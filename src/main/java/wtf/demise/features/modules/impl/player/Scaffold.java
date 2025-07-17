@@ -32,6 +32,7 @@ import wtf.demise.utils.misc.SpoofSlotUtils;
 import wtf.demise.utils.player.InventoryUtils;
 import wtf.demise.utils.player.MoveUtil;
 import wtf.demise.utils.player.PlayerUtils;
+import wtf.demise.utils.player.rotation.RotationHandler;
 import wtf.demise.utils.player.rotation.RotationManager;
 import wtf.demise.utils.player.rotation.RotationUtils;
 import wtf.demise.utils.render.RenderUtils;
@@ -63,7 +64,7 @@ public class Scaffold extends Module {
     public final ModeValue sprintMode = new ModeValue("Sprint mode", new String[]{"Normal", "Silent", "Ground", "Air", "None"}, "Normal", this);
     private final ModeValue speedMode = new ModeValue("Speed mode", new String[]{"Tick", "Exempt", "Diagonal", "None"}, "None", this);
     private final ModeValue rayTraceMode = new ModeValue("Raytrace mode", new String[]{"None", "Normal", "Strict"}, "None", this);
-    private final SliderValue maxPlaceRange = new SliderValue("Max place range", 5, 1, 12, 1, this, () -> rayTraceMode.is("None"));
+    private final SliderValue maxPlaceRange = new SliderValue("Max place range", 4.5f, 1, 12, this, () -> rayTraceMode.is("None"));
     private final MultiBoolValue addons = new MultiBoolValue("Addons", Arrays.asList(
             new BoolValue("Swing", true),
             new BoolValue("KeepY", false),
@@ -88,7 +89,6 @@ public class Scaffold extends Module {
         rayTraceMode.setDescription("None: places blocks bellow you without any checks, Normal: checks if you are aiming at the target block before placing, Strict: checks if you are aiming at the target block and at the correct face before placing");
     }
 
-    private BlockPos previousBlock;
     public BlockPos targetBlock;
     private double onGroundY;
     private int oldSlot = 0;
@@ -103,6 +103,7 @@ public class Scaffold extends Module {
     private final TimerUtils clutchTimer = new TimerUtils();
     private final TimerUtils sneakTimer = new TimerUtils();
     private boolean shaderCalled;
+    private final TimerUtils shitCodeTimer = new TimerUtils();
 
     private static final EnumFacing[] FACINGS = {
             EnumFacing.EAST, EnumFacing.WEST,
@@ -195,7 +196,6 @@ public class Scaffold extends Module {
 
         mc.entityRenderer.getMouseOver(1);
 
-        //boolean rotateCheck = mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving() || (mc.objectMouseOver.getBlockPos() != null && mc.objectMouseOver.getBlockPos().distanceSq(data.blockPos) > 1);
         boolean rotateCheck = mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !mc.objectMouseOver.getBlockPos().equalsBlockPos(data.blockPos.offset(data.facing));
 
         if (rotateCheck) {
@@ -203,8 +203,8 @@ public class Scaffold extends Module {
                 case "Normal", "Telly":
                     switch (rotations.get()) {
                         case "Normal":
-                            initialYaw = getBestRotation(data.blockPos, data.facing)[0];
-                            initialPitch = getBestRotation(data.blockPos, data.facing)[1];
+                            initialYaw = getNearestRotation(RotationHandler.currentRotation)[0];
+                            initialPitch = getNearestRotation(RotationHandler.currentRotation)[1];
                             break;
                         case "Center":
                             Vec3 hitVec = RotationUtils.getVec3(data.blockPos, data.facing);
@@ -223,11 +223,11 @@ public class Scaffold extends Module {
                             float yaw = MoveUtil.isMovingStraight() ? (movingYaw + (isOnRightSide ? 45 : -45)) : movingYaw;
 
                             initialYaw = Math.round(yaw / 45) * 45;
-                            initialPitch = staticify.get() ? MoveUtil.isMoving() ? 75.7f : 90f : getBestRotation(data.blockPos, data.facing)[1];
+                            initialPitch = staticify.get() ? MoveUtil.isMoving() ? 75.7f : 90f : getNearestRotation(RotationHandler.currentRotation)[1];
                             break;
                         case "Reverse":
                             initialYaw = MoveUtil.getYawFromKeybind() - 180;
-                            initialPitch = staticify.get() ? 80 : getBestRotation(data.blockPos, data.facing)[1];
+                            initialPitch = staticify.get() ? 80 : getNearestRotation(RotationHandler.currentRotation)[1];
                             break;
                     }
                     break;
@@ -238,42 +238,43 @@ public class Scaffold extends Module {
                 }
                 break;
             }
-        }
 
-        float[] rotation = new float[]{initialYaw, initialPitch};
+            float[] rotation = new float[]{initialYaw, initialPitch};
 
-        if (clutch.get() && mc.theWorld.getBlockState(new BlockPos(mc.thePlayer.getPositionVector().subtract(0, 2, 0))).getBlock() instanceof BlockAir) {
-            switch (clutchCriteria.get()) {
-                case "MouseOver":
-                    MovingObjectPosition ray = PlayerUtils.rayTraceBlock(rotation, 4.5, 1);
+            if (clutch.get()) {
+                switch (clutchCriteria.get()) {
+                    case "MouseOver":
+                        MovingObjectPosition ray = PlayerUtils.rayTraceBlock(rotation, 4.5, 1);
 
-                    if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving() || (ray.getBlockPos() != null && ray.getBlockPos().distanceSq(data.blockPos) > 1)) {
-                        setClutchRot(rotateCheck);
-                        clutching = true;
-                    } else {
-                        clutching = false;
-                    }
-                    break;
-                case "Prediction":
-                    boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(initialYaw), 1).down()).getBlock() instanceof BlockAir;
-                    boolean isLeaningOffBlock = PlayerUtils.getBlock(data.blockPos.offset(data.facing)) instanceof BlockAir;
+                        if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || !MoveUtil.isMoving() || (ray.getBlockPos() != null && ray.getBlockPos().distanceSq(data.blockPos) > 1)) {
+                            setClutchRot();
+                            clutching = true;
+                        } else {
+                            clutching = false;
+                        }
 
-                    if ((isLeaningOffBlock && nextBlockIsAir) || !MoveUtil.isMoving()) {
-                        startClutch = true;
-                    } else if (startClutch) {
-                        clutchTimer.reset();
-                        startClutch = false;
-                    }
+                        break;
+                    case "Prediction":
+                        boolean isLeaningOffBlock = PlayerUtils.getBlock(new BlockPos(mc.thePlayer.getPositionVector().subtract(0, 1, 0)).offset(mc.thePlayer.getHorizontalFacing(initialYaw).getOpposite())) instanceof BlockAir;
+                        boolean nextBlockIsAir = mc.theWorld.getBlockState(mc.thePlayer.getPosition().offset(EnumFacing.fromAngle(initialYaw), 1).down()).getBlock() instanceof BlockAir;
 
-                    clutching = startClutch || !clutchTimer.hasTimeElapsed(200);
+                        if ((isLeaningOffBlock && nextBlockIsAir) || !MoveUtil.isMoving()) {
+                            startClutch = true;
+                        } else if (startClutch) {
+                            clutchTimer.reset();
+                            startClutch = false;
+                        }
 
-                    if (clutching) {
-                        setClutchRot(rotateCheck);
-                    }
-                    break;
+                        clutching = startClutch || !clutchTimer.hasTimeElapsed(200);
+
+                        if (clutching) {
+                            setClutchRot();
+                        }
+                        break;
+                }
+            } else {
+                clutching = false;
             }
-        } else {
-            clutching = false;
         }
 
         if (!mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
@@ -308,22 +309,21 @@ public class Scaffold extends Module {
         }
     }
 
-    private void setClutchRot(boolean rotateCheck) {
+    private void setClutchRot() {
         Vec3 hitVec = RotationUtils.getVec3(data.blockPos, data.facing);
 
-        if (rotateCheck) {
-            switch (clutchRotMode.get()) {
-                case "Normal": {
-                    this.yaw = getBestRotation(data.blockPos, data.facing)[0];
-                    this.pitch = getBestRotation(data.blockPos, data.facing)[1];
-                }
-                break;
-                case "Center": {
-                    this.yaw = RotationUtils.getRotations(hitVec)[0];
-                    this.pitch = RotationUtils.getRotations(hitVec)[1];
-                }
-                break;
+        switch (clutchRotMode.get()) {
+            case "Normal": {
+                float[] currentRotation = new float[]{initialYaw, initialPitch};
+                this.yaw = getNearestRotation(currentRotation)[0];
+                this.pitch = getNearestRotation(currentRotation)[1];
             }
+            break;
+            case "Center": {
+                this.yaw = RotationUtils.getRotations(hitVec)[0];
+                this.pitch = RotationUtils.getRotations(hitVec)[1];
+            }
+            break;
         }
 
         boolean isLeaningOffBlock = PlayerUtils.getBlock(data.blockPos.offset(data.facing)) instanceof BlockAir;
@@ -347,17 +347,14 @@ public class Scaffold extends Module {
         }
     }
 
-    private void place() {
-        if (!mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
-            place(data.blockPos, data.facing, RotationUtils.getVec3(data.blockPos, data.facing));
-        }
-    }
-
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         setTag(mode.get());
         rotationManager.updateRotSpeed(e);
-        place();
+
+        if (!mode.is("Telly") || mode.is("Telly") && mc.thePlayer.offGroundTicks >= tellyTicks) {
+            place(data.blockPos, data.facing, RotationUtils.getVec3(data.blockPos, data.facing));
+        }
     }
 
     @EventTarget
@@ -642,12 +639,6 @@ public class Scaffold extends Module {
                 blocksPlacedJump++;
             }
         }
-
-        if (rayTraceMode.get().equals("None")) {
-            previousBlock = data.blockPos.offset(data.facing);
-        } else {
-            previousBlock = ray.getBlockPos().offset(ray.sideHit);
-        }
     }
 
     private PlaceData findBlock(BlockPos pos) {
@@ -660,7 +651,7 @@ public class Scaffold extends Module {
             List<BlockPos> positions = generateOffsets(pos, depth);
             if (positions.isEmpty()) continue;
 
-            BlockPos playerPos = mc.thePlayer.getPosition();
+            BlockPos playerPos = new BlockPos(mc.thePlayer.getPositionEyes(1));
             positions.sort(Comparator.comparingDouble(p -> p.distanceSq(playerPos)));
 
             for (BlockPos targetPos : positions) {
@@ -708,10 +699,6 @@ public class Scaffold extends Module {
             Block block = mc.theWorld.getBlockState(newPos).getBlock();
 
             if (block != Blocks.air) {
-                if (newPos.equals(previousBlock)) {
-                    return new PlaceData(FACINGS[i], newPos);
-                }
-
                 if (!block.getMaterial().isReplaceable() && !isInteractable(block)) {
                     return new PlaceData(FACINGS[i], newPos);
                 }
@@ -720,42 +707,62 @@ public class Scaffold extends Module {
         return null;
     }
 
-    private float[] getBestRotation(BlockPos blockPos, EnumFacing face) {
+    private float[] getNearestRotation(float[] currentRot) {
+        BlockPos blockPos = data.blockPos;
+        EnumFacing face = data.facing;
+
+        {
+            MovingObjectPosition ray = PlayerUtils.rayTraceBlock(currentRot, 4.5, 1);
+
+            if (ray.getBlockPos().equalsBlockPos(blockPos) && ray.sideHit.equals(face)) {
+                return currentRot;
+            }
+        }
+
+        float[] bestRot = null;
+        float bestDiff = Float.MAX_VALUE;
+
         Vec3i faceVec = face.getDirectionVec();
+        double[] xRange = getAxisMinMax(faceVec.getX());
+        double[] yRange = getAxisMinMax(faceVec.getY());
+        double[] zRange = getAxisMinMax(faceVec.getZ());
 
-        float[] xRange = getAxisMinMax(faceVec.getX());
-        float[] yRange = getAxisMinMax(faceVec.getY());
-        float[] zRange = getAxisMinMax(faceVec.getZ());
+        for (double x = xRange[0]; x <= xRange[1]; x += 0.01) {
+            for (double y = yRange[0]; y <= yRange[1]; y += 0.01) {
+                for (double z = zRange[0]; z <= zRange[1]; z += 0.01) {
+                    Vec3 pos = new Vec3(
+                            blockPos.getX() + clampInBlock(x),
+                            blockPos.getY() + clampInBlock(y),
+                            blockPos.getZ() + clampInBlock(z)
+                    );
 
-        float[] bestRot = RotationUtils.getRotations(RotationUtils.getVec3(data.blockPos, data.facing));
-        double bestDist = RotationUtils.getRotationDifference(bestRot);
-        boolean picked = false;
+                    float[] rot = RotationUtils.getRotations(pos);
+                    if (Float.isNaN(rot[0]) || Float.isNaN(rot[1])) continue;
 
-        for (float x = xRange[0]; x <= xRange[1]; x += 0.01f) {
-            for (float y = yRange[0]; y <= yRange[1]; y += 0.01f) {
-                for (float z = zRange[0]; z <= zRange[1]; z += 0.01f) {
-                    Vec3 localPos = new Vec3(x, y, z);
-                    Vec3 worldPos = localPos.add(new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+                    float diff = RotationUtils.getRotationDifference(currentRot, rot);
+                    MovingObjectPosition ray = PlayerUtils.rayTraceBlock(rot, 4.5, 1);
 
-                    double diff = RotationUtils.getRotationDifference(worldPos);
-                    MovingObjectPosition ray = PlayerUtils.rayTraceBlock(bestRot, 4.5, 1);
-
-                    if (diff < bestDist && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && ray.getBlockPos().equalsBlockPos(blockPos) && ray.sideHit.equals(face)) {
-                        bestDist = diff;
-                        bestRot = RotationUtils.getRotations(worldPos);
-                        picked = true;
+                    if (ray.getBlockPos().equalsBlockPos(blockPos) && ray.sideHit.equals(face)) {
+                        if (diff < bestDiff) {
+                            bestRot = rot;
+                            bestDiff = diff;
+                        }
                     }
                 }
             }
         }
 
-        return picked ? bestRot : RotationUtils.getRotations(RotationUtils.getVec3(data.blockPos, data.facing));
+        return bestRot != null ? bestRot : RotationUtils.getRotations(RotationUtils.getVec3(blockPos, face));
     }
 
-    private float[] getAxisMinMax(int axisValue) {
-        if (axisValue == 1) return new float[]{1.0f, 1.0f};
-        if (axisValue == -1) return new float[]{0.0f, 0.0f};
-        return new float[]{0.1f, 0.9f};
+    private double[] getAxisMinMax(int axisValue) {
+        if (axisValue == 1) return new double[]{0.95, 0.99};
+        if (axisValue == -1) return new double[]{0.01, 0.05};
+        return new double[]{0.2, 0.8};
+    }
+
+    private double clampInBlock(double offset) {
+        return Math.max(0.01, Math.min(0.99, offset));
     }
 
     @AllArgsConstructor

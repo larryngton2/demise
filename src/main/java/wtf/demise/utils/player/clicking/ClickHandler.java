@@ -21,6 +21,7 @@ import wtf.demise.events.impl.player.MotionEvent;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.modules.impl.legit.BackTrack;
 import wtf.demise.utils.InstanceAccess;
+import wtf.demise.utils.math.MathUtils;
 import wtf.demise.utils.math.TimerUtils;
 import wtf.demise.utils.packet.PacketUtils;
 import wtf.demise.utils.player.PlayerUtils;
@@ -75,14 +76,13 @@ public class ClickHandler implements InstanceAccess {
 
     private void generateClickPattern() {
         clickPattern.clear();
-        double cps = ThreadLocalRandom.current().nextDouble(minCPS, maxCPS + 1);
-        int clicksPerSecond = (int) Math.round(cps);
+        double cps = MathUtils.randomizeDouble(minCPS, maxCPS);
 
         int totalTicks = 20;
-        int clicksToDistribute = clicksPerSecond;
+        double clicksToDistribute = cps;
 
         for (int i = 0; i < totalTicks; i++) {
-            double probability = (double) clicksToDistribute / (totalTicks - i);
+            double probability = clicksToDistribute / (totalTicks - i);
 
             if (ThreadLocalRandom.current().nextDouble() < probability) {
                 clickPattern.add(1);
@@ -143,6 +143,20 @@ public class ClickHandler implements InstanceAccess {
             cachedClicks = 0;
         }
     }
+
+    /*
+    @EventTarget
+    public void onRender2D(Render2DEvent e) {
+        StringBuilder str = new StringBuilder();
+
+        for (Integer i : clickPattern) {
+            str.append(i);
+        }
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        Fonts.interRegular.get(20).drawCenteredStringWithShadow(str.toString(), sr.getScaledWidth() / 2f, (sr.getScaledHeight() / 2f) + 10, -1);
+    }
+    */
 
     @EventTarget
     public void onTickEvent(TickEvent e) {

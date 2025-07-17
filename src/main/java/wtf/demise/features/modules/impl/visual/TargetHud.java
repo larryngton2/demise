@@ -10,16 +10,18 @@ import wtf.demise.features.modules.Module;
 import wtf.demise.features.modules.ModuleInfo;
 import wtf.demise.features.modules.impl.combat.KillAura;
 import wtf.demise.features.values.impl.BoolValue;
+import wtf.demise.features.values.impl.ModeValue;
 import wtf.demise.features.values.impl.SliderValue;
 import wtf.demise.utils.math.TimerUtils;
 
 @ModuleInfo(name = "TargetHud", description = "Renders a widget with the current target's info.")
 public class TargetHud extends Module {
-    public final BoolValue targetHUDTracking = new BoolValue("TargetHUD tracking", false, this);
-    public final SliderValue interpolation = new SliderValue("Interpolation", 0.5f, 0.01f, 1, 0.01f, this, targetHUDTracking::get);
-    public final BoolValue centerX = new BoolValue("Center X", true, this, targetHUDTracking::get);
-    public final SliderValue offsetX = new SliderValue("Offset X", 0, -100, 100, this, () -> targetHUDTracking.get() && !centerX.get());
-    public final SliderValue offsetY = new SliderValue("Offset Y", 100, -25, 200, this, targetHUDTracking::get);
+    public final ModeValue mode = new ModeValue("Mode", new String[]{"New", "Old"}, "New", this);
+    public final BoolValue trackTarget = new BoolValue("Track target", false, this);
+    public final SliderValue interpolation = new SliderValue("Interpolation", 0.5f, 0.01f, 1, 0.01f, this, trackTarget::get);
+    public final BoolValue centerX = new BoolValue("Center X", true, this, trackTarget::get);
+    public final SliderValue offsetX = new SliderValue("Offset X", 0, -100, 100, this, () -> trackTarget.get() && !centerX.get());
+    public final SliderValue offsetY = new SliderValue("Offset Y", 100, -25, 200, this, trackTarget::get);
 
     public static float interpolatedScale;
     public static float targetScale;

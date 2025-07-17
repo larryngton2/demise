@@ -359,7 +359,7 @@ public class PlayerUtils implements InstanceAccess {
         Vec3 direction = mc.thePlayer.getLookCustom(rot[0], rot[1]);
         Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
 
-        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, false, false);
 
         if (result == null) {
             return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));
@@ -373,7 +373,7 @@ public class PlayerUtils implements InstanceAccess {
         Vec3 direction = mc.thePlayer.getLookVec();
         Vec3 to = from.addVector(direction.xCoord * reach, direction.yCoord * reach, direction.zCoord * reach);
 
-        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, true, true);
+        MovingObjectPosition result = mc.theWorld.rayTraceBlocks(from, to, false, false, false);
 
         if (result == null) {
             return new MovingObjectPosition(MovingObjectPosition.MovingObjectType.MISS, to, EnumFacing.UP, new BlockPos(to));

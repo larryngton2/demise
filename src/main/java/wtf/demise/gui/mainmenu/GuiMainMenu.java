@@ -78,7 +78,7 @@ public class GuiMainMenu extends GuiScreen {
         MenuButton.shader = false;
         renderButtons(buttonWidth, buttonHeight, mouseX, mouseY);
 
-        float x = (width / 2f - buttonWidth / 2f) + buttonWidth / 2 - ((float) Fonts.interBold.get(35).getStringWidth(funny ? "dimaise" : Demise.INSTANCE.getClientName()) / 2);
+        float x = (width / 2f - buttonWidth / 2f) + buttonWidth / 2 - ((float) Fonts.interBold.get(35).getStringWidth(funny ? "dihmise" : Demise.INSTANCE.getClientName()) / 2);
         float y = (height / 2f) + 20 - (buttons.size() * buttonHeight) / 2f;
 
         if (interpolatedX == 0 || interpolatedY == 0) {
@@ -89,7 +89,7 @@ public class GuiMainMenu extends GuiScreen {
         interpolatedX = MathUtils.interpolate(interpolatedX, x, 0.25f);
         interpolatedY = MathUtils.interpolate(interpolatedY, y, 0.25f);
 
-        Fonts.urbanist.get(38).drawString(funny ? "dimaise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, new Color(255, 255, 255, 208).getRGB());
+        Fonts.urbanist.get(38).drawString(funny ? "dihmise" : Demise.INSTANCE.getClientName(), interpolatedX, interpolatedY, new Color(255, 255, 255, 208).getRGB());
 
         if (fade) {
             RenderUtils.drawRect(0, 0, mc.displayWidth, mc.displayHeight, new Color(0, 0, 0, alpha).getRGB());

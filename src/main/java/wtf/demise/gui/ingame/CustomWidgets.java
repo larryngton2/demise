@@ -22,6 +22,7 @@ import wtf.demise.events.impl.render.ChatGUIEvent;
 import wtf.demise.events.impl.render.Render2DEvent;
 import wtf.demise.events.impl.render.ShaderEvent;
 import wtf.demise.features.modules.Module;
+import wtf.demise.features.modules.impl.player.Scaffold;
 import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.gui.font.Fonts;
@@ -302,7 +303,7 @@ public class CustomWidgets implements InstanceAccess {
 
     private void drawHotbarWidget(int i, boolean shader, boolean isGlow) {
         ItemStack heldItem = mc.thePlayer.getCurrentEquippedItem();
-        int count = heldItem == null ? 0 : heldItem.stackSize;
+        int count = heldItem == null ? 0 : getModule(Scaffold.class).getBlockCount();
         String countStr = String.valueOf(count);
         float blockWH = 15;
         int spacing = 3;
@@ -359,7 +360,7 @@ public class CustomWidgets implements InstanceAccess {
 
             if (SpoofSlotUtils.isSpoofing()) {
                 RenderHelper.enableGUIStandardItemLighting();
-                mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, (int) interpolatedWidgetX + 3, (int) (interpolatedWidgetY + 10 - (blockWH / 2)));
+                mc.getRenderItem().renderItemAndEffectIntoGUI(heldItem, interpolatedWidgetX + 2, (interpolatedWidgetY + 9.5f - (blockWH / 2)));
                 RenderHelper.disableStandardItemLighting();
             }
         } else {
