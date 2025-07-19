@@ -46,32 +46,34 @@ public class TargetHUDWidget extends Widget {
                 this.width = 120;
                 break;
             case "Old":
-                String TargetName = targetHud.target.getDisplayName().getFormattedText();
+                if (targetHud.target != null) {
+                    String TargetName = targetHud.target.getDisplayName().getFormattedText();
 
-                double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(targetHud.target) + targetHud.target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
+                    double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(targetHud.target) + targetHud.target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
 
-                if (mc.thePlayer != null) {
-                    String status = initialDiff >= 0 ? " §aW" : " §cL";
-                    TargetName = TargetName + status;
+                    if (mc.thePlayer != null) {
+                        String status = initialDiff >= 0 ? " §aW" : " §cL";
+                        TargetName = TargetName + status;
+                    }
+
+                    float current$minX;
+                    float current$maxX;
+                    float current$minY;
+                    float current$maxY;
+
+                    final ScaledResolution scaledResolution = new ScaledResolution(mc);
+                    final int padding = 8;
+                    final int n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
+                    final float n4 = scaledResolution.getScaledWidth() / 2f - n3 / 2f + x;
+                    final float n5 = scaledResolution.getScaledHeight() / 2f + 15 + y;
+                    current$minX = n4 - padding;
+                    current$minY = n5 - padding;
+                    current$maxX = n4 + n3;
+                    current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding;
+
+                    this.width = current$maxX - current$minX;
+                    this.height = current$maxY - current$minY + 8;
                 }
-
-                float current$minX;
-                float current$maxX;
-                float current$minY;
-                float current$maxY;
-
-                final ScaledResolution scaledResolution = new ScaledResolution(mc);
-                final int padding = 8;
-                final int n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
-                final float n4 = scaledResolution.getScaledWidth() / 2f - n3 / 2f + x;
-                final float n5 = scaledResolution.getScaledHeight() / 2f + 15 + y;
-                current$minX = n4 - padding;
-                current$minY = n5 - padding;
-                current$maxX = n4 + n3;
-                current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding;
-
-                this.width = current$maxX - current$minX;
-                this.height = current$maxY - current$minY;
                 break;
         }
 
@@ -82,7 +84,7 @@ public class TargetHUDWidget extends Widget {
 
     @Override
     public void onShader(ShaderEvent e) {
-        if (targetHud.target != null) {
+        if (targetHud.target != null && targetHud.mode.is("New")) {
             renderTargetHUD(true, (EntityPlayer) targetHud.target, e.getShaderType() == ShaderEvent.ShaderType.GLOW);
         }
     }
@@ -209,55 +211,44 @@ class TargetHUD implements InstanceAccess {
             }
             break;
             case "Old": {
-                // God, what the fuck was I doing on old demise
-                //todo
-                if (!shader) {
-                    float healthPercentage = PlayerUtils.getActualHealth(target) / target.getMaxHealth();
-                    float space = (width - 42.5f) / 100;
-
-                    target.healthAnimation.animate((100 * space) * MathHelper.clamp_float(healthPercentage, 0, 1), 50);
-
+                if (target != null) {
                     String TargetName = target.getDisplayName().getFormattedText();
+                    float health = MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1);
                     String TargetHealth = String.format("%.1f", target.getHealth()) + " §c❤ ";
 
-                    double initialDiff = BigDecimal.valueOf((mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) - (PlayerUtils.getActualHealth(target) + target.getAbsorptionAmount())).setScale(2, RoundingMode.FLOOR).doubleValue();
-
-                    String status = initialDiff >= 0 ? " §aW" : " §cL";
+                    String status = (health <= (mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) / mc.thePlayer.getMaxHealth()) ? " §aW" : " §cL";
                     TargetName = TargetName + status;
 
-                    float current$minX;
-                    float current$maxX;
-                    float current$minY;
-                    float current$maxY;
+                    float current$minX, current$minY, current$maxX, current$maxY;
 
-                    final int padding = 8;
-                    final int n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
-                    current$minX = x;
-                    current$minY = y;
-                    current$maxX = x + n3 + padding;
-                    current$maxY = y + (mc.fontRendererObj.FONT_HEIGHT + 5) + padding;
+                    int padding = 8;
+                    float n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
+                    float n4 = x;
+                    float n5 = y;
+                    current$minX = n4;
+                    current$minY = n5;
+                    current$maxX = n4 + n3 + padding;
+                    current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding * 2;
 
-                    RenderUtils.drawRect(current$minX, current$minY, current$maxX - current$minX, current$maxY - current$minY + 10, setting.bgColor());
+                    RenderUtils.drawCustomRect(current$minX, current$minY, current$maxX, current$maxY + 7, (Color.black.getRGB() & 0xFFFFFF) | 60 << 24);
 
-                    final float n13 = current$minX + 6 + 27;
-                    final float n14 = current$maxX - 2;
-                    final float n15 = (int) (current$maxY + 0.45);
+                    float n13 = current$minX + 6 + 27;
+                    float n14 = current$maxX - 2;
+                    float n15 = current$maxY + 0.45f;
+                    float healthBar = (float) (n14 + (n13 - n14) * (1.0 - ((health < 0.01) ? 0 : health)));
+                    if (healthBar - n13 < 1) {
+                        healthBar = n13;
+                    }
 
-                    RoundedUtils.drawShaderRound(n13 - 3, n15, (n14 - 2) - (n13 - 3), 4, 0, new Color(0, 0, 0, 110));
-                    RoundedUtils.drawGradientHorizontal((n13 - 3) + 0.2f, n15 + 0.2f, target.healthAnimation.getOutput() - 0.4f, 4 - 0.4f, 0, new Color(setting.color()), new Color(setting.color((int) target.healthAnimation.getOutput())));
+                    RenderUtils.drawCustomRect(n13 - 1, n15, healthBar - 3, n15 + 4, setting.color());
 
-                    GlStateManager.pushMatrix();
-                    GlStateManager.enableBlend();
-                    GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-                    mc.fontRendererObj.drawString(TargetName, x + 34, y + 4, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
-                    mc.fontRendererObj.drawString(TargetHealth, x + 34, y + 14, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
-                    GlStateManager.disableBlend();
-                    GlStateManager.popMatrix();
+                    mc.fontRendererObj.drawString(TargetName, (n4 + 24) + padding, n5 - 4 + padding, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
+                    mc.fontRendererObj.drawString(TargetHealth, (n4 + 24) + padding, n5 + 6 + padding, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
 
-                    float targetX = current$minX + 3;
-                    float targetY = current$minY + 3;
+                    float targetX = current$minX + 2.65f;
+                    float targetY = current$minY + 2.65f;
                     GlStateManager.color(1, 1, 1, 1);
-                    RenderUtils.renderPlayerHead(target, targetX, targetY, 25, 0);
+                    RenderUtils.renderPlayerHead(target, targetX, targetY, 26.5f, 0);
                 }
             }
             break;

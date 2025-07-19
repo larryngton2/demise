@@ -710,6 +710,34 @@ public class RenderUtils implements InstanceAccess {
         return null;
     }
 
+    public static Vector2f worldToScreenShitty(float x, float y, float z, ScaledResolution sr, boolean ignoreInvisible) {
+        x -= (float) mc.getRenderManager().viewerPosX;
+        y -= (float) mc.getRenderManager().viewerPosY;
+        z -= (float) mc.getRenderManager().viewerPosZ;
+
+        FloatBuffer winCoords = BufferUtils.createFloatBuffer(3);
+
+        GLU.gluProject(
+                x, y, z,
+                ActiveRenderInfo.MODELVIEW,
+                ActiveRenderInfo.PROJECTION,
+                ActiveRenderInfo.VIEWPORT,
+                winCoords
+        );
+
+        float screenX = winCoords.get(0) / sr.getScaleFactor();
+        float screenY = winCoords.get(1) / sr.getScaleFactor();
+        float depth = winCoords.get(2);
+
+        boolean isVisible = depth >= -0.01f && depth <= 1.01f && screenX >= 0.0f && screenX <= sr.getScaledWidth() && screenY >= 0.0f && screenY <= sr.getScaledHeight();
+
+        if (isVisible || ignoreInvisible) {
+            return new Vector2f(screenX, sr.getScaledHeight() - screenY);
+        }
+
+        return null;
+    }
+
     public static void drawLine(float startX, float startY, float endX, float endY, float width, int color) {
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -777,6 +805,29 @@ public class RenderUtils implements InstanceAccess {
 
     // just to make things look cleaner
     private static Vector2f wts(double x, double y, double z) {
-        return RenderUtils.worldToScreen((float) x, (float) y, (float) z, new ScaledResolution(mc), false);
+        return worldToScreenShitty((float) x, (float) y, (float) z, new ScaledResolution(mc), false);
+    }
+
+    public static void drawCustomRect(double left, double top, double right, double bottom, int color) {
+        float f3 = (color >> 24 & 255) / 255.0F;
+        float f = (color >> 16 & 255) / 255.0F;
+        float f1 = (color >> 8 & 255) / 255.0F;
+        float f2 = (color & 255) / 255.0F;
+        GlStateManager.pushMatrix();
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(f, f1, f2, f3);
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION);
+        worldrenderer.pos(left, bottom, 0.0D).endVertex();
+        worldrenderer.pos(right, bottom, 0.0D).endVertex();
+        worldrenderer.pos(right, top, 0.0D).endVertex();
+        worldrenderer.pos(left, top, 0.0D).endVertex();
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
     }
 }
