@@ -418,7 +418,7 @@ public class CustomWidgets implements InstanceAccess {
         Interface anInterface = getModule(Interface.class);
 
         if (anInterface.elements.isEnabled("Module list")) {
-            while (ModuleListWidget.currY + ModuleListWidget.getEnabledModules().size() * ModuleListWidget.getModuleHeight() > bgY - 15 && ModuleListWidget.currX > x - width - 25) {
+            while (ModuleListWidget.currY + ModuleListWidget.getEnabledModules().size() * ModuleListWidget.getModuleHeight() > bgY - 5 && ModuleListWidget.currX > x - width - 25) {
                 y++;
                 bgY++;
             }

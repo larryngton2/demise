@@ -33,11 +33,11 @@ public class ModuleListWidget extends Widget {
         int middle = sr.getScaledWidth() / 2;
         float offset = 0;
 
+        currX = renderX;
+        currY = renderY;
+
         switch (setting.moduleListMode.get()) {
             case "New":
-                currX = renderX;
-                currY = renderY;
-
                 this.height = getEnabledModules().size() * getModuleHeight();
 
                 for (int i = 0; i < enabledModules.size(); i++) {

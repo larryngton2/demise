@@ -1,5 +1,6 @@
 package wtf.demise.utils.render.shader.impl;
 
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.shader.Framebuffer;
 import org.lwjgl.BufferUtils;
@@ -52,8 +53,10 @@ public class Blur implements InstanceAccess {
     }
 
     private static void setupUniforms(float dirX, float dirY, float radius) {
+        ScaledResolution sr = new ScaledResolution(mc);
+
         GAUSSIAN_BLUR_SHADER.setUniformi("textureIn", 0);
-        GAUSSIAN_BLUR_SHADER.setUniformf("texelSize", 1.0f / mc.displayWidth, 1.0f / mc.displayHeight);
+        GAUSSIAN_BLUR_SHADER.setUniformf("texelSize", 1f / sr.getScaledWidth(), 1f / sr.getScaledHeight());
         GAUSSIAN_BLUR_SHADER.setUniformf("direction", dirX, dirY);
         GAUSSIAN_BLUR_SHADER.setUniformf("radius", radius);
 

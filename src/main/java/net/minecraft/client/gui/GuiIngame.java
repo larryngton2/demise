@@ -39,15 +39,13 @@ import wtf.demise.features.modules.impl.visual.CustomWidgetsModule;
 import wtf.demise.features.modules.impl.visual.Interface;
 import wtf.demise.features.modules.impl.visual.Shaders;
 import wtf.demise.gui.ingame.CustomWidgets;
+import wtf.demise.gui.widget.impl.ModuleListWidget;
 import wtf.demise.utils.misc.SpoofSlotUtils;
 
 import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class GuiIngame extends Gui {
     private static final ResourceLocation vignetteTexPath = new ResourceLocation("textures/misc/vignette.png");
@@ -523,6 +521,12 @@ public class GuiIngame extends Gui {
             int k1 = 3;
             int l1 = scaledRes.getScaledWidth() - i - k1;
             int j = 0;
+
+            if (Demise.INSTANCE.getModuleManager().getModule(Interface.class).elements.isEnabled("Module list")) {
+                while (ModuleListWidget.currY + ModuleListWidget.getEnabledModules().size() * ModuleListWidget.getModuleHeight() > (j1 - (this.getFontRenderer().FONT_HEIGHT * collection.size())) - 15 && ModuleListWidget.currX > l1 - i - 25) {
+                    j1++;
+                }
+            }
 
             for (Score score1 : collection) {
                 ++j;

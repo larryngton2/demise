@@ -22,6 +22,7 @@ public class FPSBooster extends Module {
     }
 
     // from gothaj
+    // free fire punjabi method
     @EventTarget
     public void onUpdate(UpdateEvent e) {
         if (mc.thePlayer.ticksExisted % 600 == 0) {

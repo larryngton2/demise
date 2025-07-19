@@ -38,6 +38,7 @@ import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 public class FakeLag extends Module {
     private final ModeValue mode = new ModeValue("Mode", new String[]{"Pulse", "Spoof"}, "Pulse", this);
     private final BoolValue smart = new BoolValue("Smart", true, this);
+    private final BoolValue resetInRange = new BoolValue("Reset in range", true,this, smart::get);
     private final SliderValue hurtTimeToAttack = new SliderValue("HurtTime to register attack", 3, 0, 10, 1, this, smart::get);
     private final BoolValue earlyRelease = new BoolValue("Early release", false, this, smart::get);
     private final SliderValue attackRange = new SliderValue("Attack range", 4, 0, 15, 0.1f, this, () -> !smart.get());
@@ -46,7 +47,6 @@ public class FakeLag extends Module {
     private final SliderValue recoilTime = new SliderValue("Recoil time (ms)", 50, 0, 1000, this);
     private final SliderValue delayMin = new SliderValue("Delay (min ms)", 100, 0, 1000, this);
     private final SliderValue delayMax = new SliderValue("Delay (max ms)", 100, 0, 1000, this);
-    private final SliderValue delayOnOpponentAttack = new SliderValue("Delay on opponent attack", 200, 0, 500, this, () -> mode.is("Spoof"));
     private final SliderValue hurtTimeToStop = new SliderValue("HurtTime to stop (>)", 0, 0, 10, 1, this);
     private final BoolValue pauseOnBacktrack = new BoolValue("Pause on backtrack", false, this);
     private final BoolValue forceFirstHit = new BoolValue("Force first hit", false, this);
@@ -75,10 +75,7 @@ public class FakeLag extends Module {
     private final TimerUtils hurtTimer = new TimerUtils();
     private boolean forceWTap;
     private boolean isFirstHit = true;
-    private boolean shouldTimer;
     private boolean isPreTick;
-    //lol
-    private final TimerUtils timerTimer = new TimerUtils();
     private final List<TimedVec3> path = new ArrayList<>();
 
     @Override
@@ -177,11 +174,7 @@ public class FakeLag extends Module {
             case "Spoof":
                 if (shouldLag()) {
                     if (recoilTimer.hasTimeElapsed((long) recoilTime.get())) {
-                        if (isTargetAimingAtServerPos() && target.isSwingInProgress && smart.get()) {
-                            ms = (int) delayOnOpponentAttack.get();
-                        } else {
-                            ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
-                        }
+                        ms = MathUtils.randomizeInt(delayMin.get(), delayMax.get());
 
                         LagUtils.spoof(ms, true, false, false, false, true, true, false);
                         blinking = true;
@@ -214,10 +207,15 @@ public class FakeLag extends Module {
 
     @EventTarget
     public void onTick(TickEvent e) {
-        if (target != null && forceFirstHit.get() && isFirstHit && !mc.thePlayer.isUsingItem() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-            mc.clickMouse();
-            ChatUtils.sendMessageClient("forced first hit");
-            isFirstHit = false;
+        if (target != null && isFirstHit && !mc.thePlayer.isUsingItem() && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            if (forceFirstHit.get()) {
+                mc.clickMouse();
+                ChatUtils.sendMessageClient("forced first hit");
+            }
+
+            if (attacked) {
+                isFirstHit = false;
+            }
         }
     }
 
@@ -266,15 +264,6 @@ public class FakeLag extends Module {
         return target != null && smart.get() ? smartCriteria() : simpleCriteria() && target.canEntityBeSeen(mc.thePlayer);
     }
 
-    private boolean isTargetAimingAtServerPos() {
-        float calcYawClientPos = (float) (MathHelper.atan2(mc.thePlayer.posZ - target.posZ, mc.thePlayer.posX - target.posX) * 180.0 / Math.PI - 90.0);
-        float diffXClientPos = Math.abs(MathHelper.wrapAngleTo180_float(calcYawClientPos - target.rotationYaw));
-        float calcYawRealPos = (float) (MathHelper.atan2(z - target.posZ, x - target.posX) * 180.0 / Math.PI - 90.0);
-        float diffXRealPos = Math.abs(MathHelper.wrapAngleTo180_float(calcYawRealPos - target.rotationYaw));
-
-        return diffXClientPos > 25 && diffXRealPos < 25;
-    }
-
     private boolean smartCriteria() {
         boolean attacked = this.attacked && target.hurtTime <= hurtTimeToAttack.get();
         boolean rangeCheck = PlayerUtils.getDistanceToEntityBox(target) <= (alwaysSpoof.get() ? Float.MAX_VALUE : searchRange.get());
@@ -286,30 +275,12 @@ public class FakeLag extends Module {
         boolean selfHurtTimeCheck = hurtTimer.hasTimeElapsed(100);
         boolean distanceDiffCheck = mc.thePlayer.getDistanceToEntity(target) < mc.thePlayer.getCustomDistanceToEntity(new Vec3(x, y, z), target);
 
-        //boolean minDistanceCheck = PlayerUtils.getDistanceToEntityBox(target) > 2.5;
-        //boolean isTargetAimingAtServerPos1 = !attemptingToStrafe() || diffXClientPos > 25 && diffXRealPos < 25;
-
-        /*
-        if (blinking) {
-            if (attacked && !isTargetAimingAtServerPos1) {
-                attacked = false;
-            }
+        if (!resetInRange.get()) {
+            return isFirstHit && selfHurtTimeCheck && distanceDiffCheck;
         }
-        */
 
-        return !attacked && rangeCheck && selfHurtTimeCheck && distanceDiffCheck; //&& minDistanceCheck;
+        return !attacked && rangeCheck && selfHurtTimeCheck && distanceDiffCheck;
     }
-
-    /*
-    @EventTarget
-    public void onPacket(PacketEvent e) {
-        if (e.getPacket() instanceof C02PacketUseEntity c02) {
-            if (c02.getAction() == C02PacketUseEntity.Action.ATTACK) {
-                attacked = true;
-            }
-        }
-    }
-    */
 
     @EventTarget
     public void onMoveInput(MoveInputEvent e) {

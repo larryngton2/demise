@@ -40,11 +40,6 @@ public abstract class Widget implements InstanceAccess {
         this.align = WidgetAlign.LEFT | WidgetAlign.TOP;
     }
 
-    public Widget(String name, int align) {
-        this(name);
-        this.align = align;
-    }
-
     public abstract void onShader(ShaderEvent event);
 
     public abstract void render();

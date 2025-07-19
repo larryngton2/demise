@@ -1,5 +1,7 @@
 package wtf.demise.utils.render.shader.impl;
 
+import javafx.scene.transform.Scale;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.shader.Framebuffer;
@@ -68,9 +70,11 @@ public class Shadow implements InstanceAccess {
         }
         weightBuffer.flip();
 
+        ScaledResolution sr = new ScaledResolution(mc);
+
         bloomShader.setUniformi("inTexture", 0);
         bloomShader.setUniformi("textureToCheck", 16);
-        bloomShader.setUniformf("texelSize", 1.0f / mc.displayWidth, 1.0f / mc.displayHeight);
+        bloomShader.setUniformf("texelSize", 1f / sr.getScaledWidth(), 1f / sr.getScaledHeight());
         bloomShader.setUniformf("radius", radius);
         bloomShader.setUniformf("direction", dirX, dirY);
         glUniform1fv(bloomShader.getUniform("weights"), weightBuffer);

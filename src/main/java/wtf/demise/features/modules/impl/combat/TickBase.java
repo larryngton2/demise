@@ -163,7 +163,6 @@ public class TickBase extends Module {
         }
     }
 
-
     @EventTarget
     public void onRender3D(Render3DEvent e) {
         if (renderPredictedSelfPos.get() && mc.gameSettings.thirdPersonView != 0) {

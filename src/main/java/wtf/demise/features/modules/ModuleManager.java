@@ -66,7 +66,7 @@ public class ModuleManager {
     );
 
     private static final Set<Class<? extends Module>> FUN_MODULES = Set.of(
-            Twerk.class, AutoMeow.class, Gambling.class, FPSBooster.class, FPSDecreaser.class,
+            Twerk.class, Gambling.class, FPSBooster.class, FPSDecreaser.class,
             MadeByTheBi11iona1re.class
     );
 

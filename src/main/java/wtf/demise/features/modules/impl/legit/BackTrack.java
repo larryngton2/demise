@@ -34,7 +34,7 @@ public class BackTrack extends Module {
     private final SliderValue attackRange = new SliderValue("Attack range", 3, 0.1f, 8, 0.1f, this, onlyWhenNeeded::get);
     private final SliderValue minRange = new SliderValue("Min range", 3, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
     private final SliderValue maxRange = new SliderValue("Max range", 6, 1, 8, 0.1f, this, () -> !onlyWhenNeeded.get());
-    private final BoolValue onlyDouble = new BoolValue("Only double", true, this, onlyWhenNeeded::get);
+    private final BoolValue hurtTimeBased = new BoolValue("Hurt time based", true, this, onlyWhenNeeded::get);
     private final BoolValue extraCheck = new BoolValue("Extra check", true, this);
     private final SliderValue ms = new SliderValue("Delay ms", 50, 0, 5000, 5, this);
     private final ModeValue esp = new ModeValue("Mode", new String[]{"Off", "Box", "FakePlayer"}, "Box", this);
@@ -78,13 +78,13 @@ public class BackTrack extends Module {
                 outOfRange = true;
             }
 
-            if ((target.hurtTime == 10 && onlyDouble.get()) || (realDistance < 3 && !onlyDouble.get())) {
+            if ((target.hurtTime == 10 && hurtTimeBased.get()) || (realDistance < 3 && !hurtTimeBased.get())) {
                 outOfRange = false;
             }
 
             boolean distanceCheck = PlayerUtils.getCustomDistanceToEntityBox(target.getPositionEyes(1), mc.thePlayer) >= PlayerUtils.getCustomDistanceToEntityBox(target.getPrevPositionVector(), mc.thePlayer);
             boolean extraCheck = distanceCheck || !this.extraCheck.get();
-            boolean onlyNeeded = extraCheck && (realDistance > attackRange.get() || outOfRange) && realDistance < attackRange.get() + 1.5 && clientDistance <= attackRange.get();
+            boolean onlyNeeded = extraCheck && (realDistance > attackRange.get() || outOfRange) && realDistance < 4.5 && clientDistance <= 3;
             boolean on = extraCheck && realDistance > minRange.get() && realDistance < maxRange.get();
 
             shouldLag = onlyWhenNeeded.get() ? onlyNeeded : on;

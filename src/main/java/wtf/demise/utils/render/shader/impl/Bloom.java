@@ -33,7 +33,6 @@ public class Bloom implements InstanceAccess {
 
         framebufferList.add(framebuffer = RenderUtils.createFrameBuffer(null, true));
 
-
         for (int i = 1; i <= iterations; i++) {
             Framebuffer currentBuffer = new Framebuffer((int) (mc.displayWidth / Math.pow(2, i)), (int) (mc.displayHeight / Math.pow(2, i)), true);
             currentBuffer.setFramebufferFilter(GL_LINEAR);
