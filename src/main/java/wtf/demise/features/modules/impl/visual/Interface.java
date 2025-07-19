@@ -39,7 +39,7 @@ public class Interface extends Module {
     public final ModeValue watermarkMode = new ModeValue("Watermark mode", new String[]{"Text", "Blue archive", "Bivir", "Old"}, "Text", this, () -> elements.isEnabled("Watermark"));
     public final ModeValue moduleListMode = new ModeValue("Module list mode", new String[]{"New", "Old"}, "New", this, () -> elements.isEnabled("Module list"));
     public final BoolValue hideRender = new BoolValue("Hide render", true, this, () -> elements.isEnabled("Module list"));
-    public final BoolValue notificationSounds = new BoolValue("Notification sounds", true, this, () -> elements.isEnabled("Notifications"));
+    public final BoolValue notificationSounds = new BoolValue("Notification sounds", true, this);
     private final ModeValue colorMode = new ModeValue("Color mode", new String[]{"Winter", "Blend", "Mango", "Snowy sky", "Miko", "Satin", "Gothic", "Cotton candy"}, "Winter", this);
     private final SliderValue fadeSpeed = new SliderValue("Fade speed", 1, 1, 10, 1, this);
     public final ModeValue bgStyle = new ModeValue("Background style", new String[]{"Transparent", "Opaque", "Custom"}, "Transparent", this, () -> elements.isEnabled("Module List"));

@@ -36,10 +36,10 @@ public class NotificationManager implements InstanceAccess {
     private void post(Notification notification) {
         if (INSTANCE.getModuleManager().getModule(Interface.class).elements.isEnabled("Notifications")) {
             notifications.add(notification);
+        }
 
-            if (Demise.INSTANCE.getStartTimeLong() > 1000) {
-                SoundUtil.notifSound(notification.getNotificationType());
-            }
+        if (Demise.INSTANCE.getStartTimeLong() > 1000) {
+            SoundUtil.notifSound(notification.getNotificationType());
         }
     }
 

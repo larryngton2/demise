@@ -211,45 +211,44 @@ class TargetHUD implements InstanceAccess {
             }
             break;
             case "Old": {
-                if (target != null) {
-                    String TargetName = target.getDisplayName().getFormattedText();
-                    float health = MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1);
-                    String TargetHealth = String.format("%.1f", target.getHealth()) + " §c❤ ";
+                // actual shitcode from old demise
+                String TargetName = target.getDisplayName().getFormattedText();
+                float health = MathHelper.clamp_float(target.getHealth() / target.getMaxHealth(), 0, 1);
+                String TargetHealth = String.format("%.1f", target.getHealth()) + " §c❤ ";
 
-                    String status = (health <= (mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) / mc.thePlayer.getMaxHealth()) ? " §aW" : " §cL";
-                    TargetName = TargetName + status;
+                String status = (health <= (mc.thePlayer.getHealth() + mc.thePlayer.getAbsorptionAmount()) / mc.thePlayer.getMaxHealth()) ? " §aW" : " §cL";
+                TargetName = TargetName + status;
 
-                    float current$minX, current$minY, current$maxX, current$maxY;
+                float current$minX, current$minY, current$maxX, current$maxY;
 
-                    int padding = 8;
-                    float n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
-                    float n4 = x;
-                    float n5 = y;
-                    current$minX = n4;
-                    current$minY = n5;
-                    current$maxX = n4 + n3 + padding;
-                    current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding * 2;
+                int padding = 8;
+                float n3 = mc.fontRendererObj.getStringWidth(TargetName) + padding + 20;
+                float n4 = x;
+                float n5 = y;
+                current$minX = n4;
+                current$minY = n5;
+                current$maxX = n4 + n3 + padding;
+                current$maxY = n5 + (mc.fontRendererObj.FONT_HEIGHT + 5) - 6 + padding * 2;
 
-                    RenderUtils.drawCustomRect(current$minX, current$minY, current$maxX, current$maxY + 7, (Color.black.getRGB() & 0xFFFFFF) | 60 << 24);
+                RenderUtils.drawCustomRect(current$minX, current$minY, current$maxX, current$maxY + 7, (Color.black.getRGB() & 0xFFFFFF) | 60 << 24);
 
-                    float n13 = current$minX + 6 + 27;
-                    float n14 = current$maxX - 2;
-                    float n15 = current$maxY + 0.45f;
-                    float healthBar = (float) (n14 + (n13 - n14) * (1.0 - ((health < 0.01) ? 0 : health)));
-                    if (healthBar - n13 < 1) {
-                        healthBar = n13;
-                    }
-
-                    RenderUtils.drawCustomRect(n13 - 1, n15, healthBar - 3, n15 + 4, setting.color());
-
-                    mc.fontRendererObj.drawString(TargetName, (n4 + 24) + padding, n5 - 4 + padding, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
-                    mc.fontRendererObj.drawString(TargetHealth, (n4 + 24) + padding, n5 + 6 + padding, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
-
-                    float targetX = current$minX + 2.65f;
-                    float targetY = current$minY + 2.65f;
-                    GlStateManager.color(1, 1, 1, 1);
-                    RenderUtils.renderPlayerHead(target, targetX, targetY, 26.5f, 0);
+                float n13 = current$minX + 6 + 27;
+                float n14 = current$maxX - 2;
+                float n15 = current$maxY + 0.45f;
+                float healthBar = (float) (n14 + (n13 - n14) * (1.0 - ((health < 0.01) ? 0 : health)));
+                if (healthBar - n13 < 1) {
+                    healthBar = n13;
                 }
+
+                RenderUtils.drawCustomRect(n13 - 1, n15, healthBar - 1, n15 + 4, setting.color());
+
+                mc.fontRendererObj.drawString(TargetName, (n4 + 24) + padding, n5 - 4 + padding, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
+                mc.fontRendererObj.drawString(TargetHealth, (n4 + 24) + padding, n5 + 6 + padding, (new Color(220, 220, 220, 255).getRGB() & 0xFFFFFF) | 255 << 24, true);
+
+                float targetX = current$minX + 2.65f;
+                float targetY = current$minY + 2.65f;
+                GlStateManager.color(1, 1, 1, 1);
+                RenderUtils.renderPlayerHead(target, targetX, targetY, 26.5f, 0);
             }
             break;
         }
